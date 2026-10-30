@@ -453,6 +453,9 @@ pub const ImageState = struct {
     protocol: image.RenderProtocol = .auto,
     // The source region the node shows; fit applies to it.
     crop: ?image.Region = null,
+    // tfm fork: negative = inherit the render-tree opacity; 0..1 overrides the
+    // placement opacity (scrim dim keeps icons opaque while content fades).
+    opacity_override: f32 = -1.0,
 
     pub fn deinit(self: ImageState) void {
         if (self.source) |source| source.deinit();
@@ -527,6 +530,10 @@ pub const Node = struct {
     // children replies marked.
     selected_frame: u64 = 0,
     paint: Paint = .{},
+    /// tfm fork: this node's box fill keeps (and dims) covered image placements
+    /// instead of deleting them (the modal scrim overlay). Set via
+    /// ot_scene_set_fill_dims_images; unrelated to the paint wire format.
+    fill_dims_images: bool = false,
     layout: Layout = .{},
     observed_layout: Layout = .{},
     viewport: ?handles.Handle = null,
@@ -2513,7 +2520,7 @@ pub const Scene = struct {
             if (depth == yoga.depth_max) return error.YogaDepthLimit;
             depth += 1;
         } else false;
-        try paintControl(target, node.kind, node.control, node.paint, layout, clip, within);
+        try paintControl(target, node.kind, node.control, node.paint, layout, clip, within, node.fill_dims_images);
     }
 
     fn markFocus(self: *Scene, objects: *const handles.Table) !void {
@@ -2871,6 +2878,10 @@ pub const Scene = struct {
         defer target.clearOpacity();
         try self.beginPaint(cli, options, if (recording == null) self.members.items.len else self.paint_members.items.len, banded);
         try self.paintMembers(owner, cli, options, recording, refresh_views, banded);
+        // tfm fork: bake translucent dim regions (the modal scrim overlay)
+        // into the placements after the whole paint pass, so the dim is
+        // independent of node paint order or pass count.
+        self.paintTarget(cli).applyImageDimRegions();
     }
 
     /// Paints every member, or on a band frame each member on the bands its record's rows meet.
@@ -3008,7 +3019,7 @@ pub const Scene = struct {
         } else if (entry.node.surface) |source| {
             try Context.drawContextBuffer(target, source, x, y, .{});
         } else {
-            try paintControl(target, node.kind, node.control, node.paint, cells, entry.clip, node.focus_frame == self.attempt.?.frame_id);
+            try paintControl(target, node.kind, node.control, node.paint, cells, entry.clip, node.focus_frame == self.attempt.?.frame_id, node.fill_dims_images);
             if (node.scroll != null) paintScrollFills(target, node, cells);
         }
     }
@@ -3160,7 +3171,7 @@ pub const Scene = struct {
         // Paint geometry fits i32 cells, and the image stays within its node.
         std.debug.assert(x >= std.math.minInt(i32) and x <= std.math.maxInt(i32) and y >= std.math.minInt(i32) and y <= std.math.maxInt(i32));
         const target = state.buffer orelse cli.getNextBuffer();
-        _ = try target.drawImage(source, source.render_id, @intFromFloat(x), @intFromFloat(y), @intFromFloat(width), @intFromFloat(height), @intFromFloat(pixel_width), @intFromFloat(pixel_height), source_x, source_y, source_width, source_height, state.protocol);
+        _ = try target.drawImageWithOptions(source, source.render_id, @intFromFloat(x), @intFromFloat(y), @intFromFloat(width), @intFromFloat(height), @intFromFloat(pixel_width), @intFromFloat(pixel_height), source_x, source_y, source_width, source_height, state.protocol, state.opacity_override);
     }
 
     /// Once per painted frame: place the cursor for the focused editor member, or release it.
@@ -3184,9 +3195,9 @@ pub const Scene = struct {
         self.editor_cursor_owned = true;
     }
 
-    fn paintControl(target: *buffer.OptimizedBuffer, kind: u32, control: Control, paint: Paint, layout: Layout, clip: buffer.ClipRect, focused: bool) !void {
+    fn paintControl(target: *buffer.OptimizedBuffer, kind: u32, control: Control, paint: Paint, layout: Layout, clip: buffer.ClipRect, focused: bool, fill_dims_images: bool) !void {
         if (kind == api.OT_SCENE_BOX) {
-            try paintBox(target, paint, layout, focused, control.box);
+            try paintBox(target, paint, layout, focused, control.box, fill_dims_images);
         } else if (kind == api.OT_SCENE_SLIDER) {
             try paintSlider(target, control.slider, layout, clip);
         } else if (kind == api.OT_SCENE_ARROW) {
@@ -3211,17 +3222,30 @@ pub const Scene = struct {
         return paint_options.borderSides != api.OT_BORDER_NONE or (paint_options.shouldFill != 0 and paint_options.background[3] != 0);
     }
 
-    fn paintBox(target: *buffer.OptimizedBuffer, paint_options: Paint, layout: Layout, focused: bool, details: ?*const BoxDetails) !void {
+    fn paintBox(target: *buffer.OptimizedBuffer, paint_options: Paint, layout: Layout, focused: bool, details: ?*const BoxDetails, fill_dims_images: bool) !void {
         if (hasBoxPaint(&paint_options)) {
             const border_color = if (paint_options.focusable and focused) paint_options.focusedBorderColor else paint_options.borderColor;
             const options = details orelse &BoxDetails{};
             const chars = if (options.custom_border_chars) |*custom| custom else &borders[paint_options.borderStyle];
-            try target.drawBoxChecked(@intFromFloat(layout.screenX), @intFromFloat(layout.screenY), @intFromFloat(layout.width), @intFromFloat(layout.height), chars, .{
+            const sides: buffer.BorderSides = .{
                 .left = paint_options.borderSides & api.OT_BORDER_LEFT != 0,
                 .bottom = paint_options.borderSides & api.OT_BORDER_BOTTOM != 0,
                 .right = paint_options.borderSides & api.OT_BORDER_RIGHT != 0,
                 .top = paint_options.borderSides & api.OT_BORDER_TOP != 0,
-            }, border_color, paint_options.background, options.title_color orelse border_color, paint_options.shouldFill != 0, if (options.title.len != 0) options.title else null, @intCast(options.title_alignment), if (options.bottom_title.len != 0) options.bottom_title else null, @intCast(options.bottom_title_alignment));
+            };
+            const box_x: i32 = @intFromFloat(layout.screenX);
+            const box_y: i32 = @intFromFloat(layout.screenY);
+            const box_w: u32 = @intFromFloat(layout.width);
+            const box_h: u32 = @intFromFloat(layout.height);
+            const box_title: ?[]const u8 = if (options.title.len != 0) options.title else null;
+            const box_bottom: ?[]const u8 = if (options.bottom_title.len != 0) options.bottom_title else null;
+            // tfm fork: a flagged box dims the image placements its translucent
+            // fill covers instead of deleting them (the modal scrim overlay).
+            if (fill_dims_images) {
+                try target.drawBoxCheckedDimmingImages(box_x, box_y, box_w, box_h, chars, sides, border_color, paint_options.background, options.title_color orelse border_color, paint_options.shouldFill != 0, box_title, @intCast(options.title_alignment), box_bottom, @intCast(options.bottom_title_alignment));
+            } else {
+                try target.drawBoxChecked(box_x, box_y, box_w, box_h, chars, sides, border_color, paint_options.background, options.title_color orelse border_color, paint_options.shouldFill != 0, box_title, @intCast(options.title_alignment), box_bottom, @intCast(options.bottom_title_alignment));
+            }
         }
     }
 

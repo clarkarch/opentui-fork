@@ -227,6 +227,7 @@ pub const BufferStorage = struct {
     grapheme_tracker: gp.GraphemeTracker,
     link_tracker: link.LinkTracker,
     image_placements: std.ArrayListUnmanaged(OptimizedBuffer.ImagePlacement) = .empty,
+    image_dim_regions: std.ArrayListUnmanaged(OptimizedBuffer.ImageDimRegion) = .empty,
 
     const cell_bytes = 2 * @sizeOf(u32) + 2 * @sizeOf(RGBA);
 
@@ -290,6 +291,7 @@ pub const BufferStorage = struct {
         self.link_tracker.deinit();
         for (self.image_placements.items) |placement| placement.image.deinit();
         self.image_placements.deinit(self.resourceAllocator());
+        self.image_dim_regions.deinit(self.resourceAllocator());
         self.freeArrays();
         self.allocator.destroy(self);
     }
@@ -693,6 +695,17 @@ fn applyOpacity(color: RGBA, opacity: u8) RGBA {
 
 /// Optimized buffer for terminal rendering
 pub const OptimizedBuffer = struct {
+    /// tfm fork: a translucent dimming box fill records the rect and alpha it
+    /// covered instead of mutating the placements under it (a later paint pass
+    /// re-creates them). The renderer applies the dim at transmit time.
+    pub const ImageDimRegion = struct {
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+        alpha: u8,
+    };
+
     pub const ImagePlacement = struct {
         placement_id: u32,
         image_handle: u32,
@@ -708,6 +721,15 @@ pub const OptimizedBuffer = struct {
         source_width: u32,
         source_height: u32,
         opacity: u8,
+        /// tfm fork: true when the placement opacity came from an explicit
+        /// override (ImageRenderable.placementOpacity) instead of the
+        /// inherited render-tree opacity. A translucent fill that dims images
+        /// instead of deleting them leaves overridden placements alone.
+        opacity_overridden: bool = false,
+        /// tfm fork: true once this frame's recorded dim regions were baked into
+        /// `opacity`, so a multi-pass frame applies a region exactly once per
+        /// placement (a re-place in a later pass starts false again).
+        dim_applied: bool = false,
         protocol: native_image.RenderProtocol,
     };
 
@@ -734,6 +756,7 @@ pub const OptimizedBuffer = struct {
     image_placements: *std.ArrayListUnmanaged(ImagePlacement),
     // Text lines that draws visited.
     test_text_lines: if (builtin.is_test) u64 else void = if (builtin.is_test) 0 else {},
+    image_dim_regions: *std.ArrayListUnmanaged(ImageDimRegion),
 
     const InitOptions = struct {
         respectAlpha: bool = false,
@@ -783,6 +806,7 @@ pub const OptimizedBuffer = struct {
             .scissor_stack = .empty,
             .opacity_stack = .empty,
             .image_placements = &storage.image_placements,
+            .image_dim_regions = &storage.image_dim_regions,
         };
 
         @memset(self.buffer.char, 0);
@@ -989,6 +1013,7 @@ pub const OptimizedBuffer = struct {
         self.grapheme_tracker = &storage.grapheme_tracker;
         self.link_tracker = &storage.link_tracker;
         self.image_placements = &storage.image_placements;
+        self.image_dim_regions = &storage.image_dim_regions;
     }
 
     /// Returns whether the size differs from the current one. The same size is a no-op.
@@ -1025,6 +1050,7 @@ pub const OptimizedBuffer = struct {
         storage.grapheme_tracker.used_ids.clearAndFree();
         storage.link_tracker.used_ids.clearAndFree();
         storage.image_placements.clearAndFree(storage.resourceAllocator());
+        storage.image_dim_regions.clearAndFree(storage.resourceAllocator());
         assert(storage.retained_bytes == @sizeOf(BufferStorage) + @as(u64, storage.capacity) * BufferStorage.cell_bytes);
     }
 
@@ -1071,6 +1097,68 @@ pub const OptimizedBuffer = struct {
     fn clearImagePlacements(self: *OptimizedBuffer) void {
         for (self.image_placements.items) |placement| placement.image.deinit();
         self.image_placements.clearRetainingCapacity();
+        self.image_dim_regions.clearRetainingCapacity();
+    }
+
+    /// Drops every image placement without touching the cells.
+    ///
+    /// The cells keep the reservation characters the placements wrote, so a
+    /// caller that redraws them has to repaint those cells as well.
+    pub fn clearImages(self: *OptimizedBuffer) void {
+        self.clearImagePlacements();
+    }
+
+    /// Releases every cell an image reserved, restoring it to a space.
+    ///
+    /// The counterpart to clearImages for a retained buffer: dropping a
+    /// placement leaves its reservation characters behind, and the frame diff
+    /// skips cells that carry a reservation (the placement's pixels are the
+    /// diff), so a released image would keep its picture on screen forever.
+    /// Callers that are about to repaint the cells call this first.
+    ///
+    /// Only the character changes: the cell's attributes still own whatever
+    /// grapheme/link references they held, so the redraw that follows releases
+    /// them through the normal span cleanup.
+    pub fn releaseImageCells(self: *OptimizedBuffer) void {
+        for (self.buffer.char) |*char| {
+            if (gp.isImageChar(char.*)) char.* = DEFAULT_SPACE_CHAR;
+        }
+    }
+
+    /// tfm fork: record a translucent dim region for this frame (see
+    /// ImageDimRegion). The renderer applies it when transmitting the covered
+    /// placements, independent of paint order.
+    /// tfm fork: bake this frame's recorded dim regions into the covered
+    /// placements, once, at the end of painting. Placements with an explicit
+    /// opacity override are the application's own and are left alone.
+    pub fn applyImageDimRegions(self: *OptimizedBuffer) void {
+        if (self.image_dim_regions.items.len == 0) return;
+        for (self.image_placements.items) |*placement| {
+            // A re-place in a later pass starts unapplied; one that survived is
+            // not dimmed twice. The regions outlive the pass (cleared with the
+            // frame), so a later pass that re-places the image still gets the
+            // dim from the pass that painted the fill.
+            if (placement.opacity_overridden or placement.dim_applied) continue;
+            var applied = false;
+            for (self.image_dim_regions.items) |region| {
+                const ox = @max(@as(i64, region.x), placement.x);
+                const oy = @max(@as(i64, region.y), placement.y);
+                const ex = @min(@as(i64, region.x) + region.width, @as(i64, placement.x) + placement.width);
+                const ey = @min(@as(i64, region.y) + region.height, @as(i64, placement.y) + placement.height);
+                if (ox >= ex or oy >= ey) continue;
+                placement.opacity = @intCast(mulDiv255(placement.opacity, region.alpha));
+                applied = true;
+            }
+            // Only a placement a region actually covered is marked: a region
+            // recorded later in the frame (another pass, another node) must
+            // still reach it.
+            if (applied) placement.dim_applied = true;
+        }
+    }
+
+    pub fn addImageDimRegion(self: *OptimizedBuffer, region: ImageDimRegion) void {
+        if (region.width == 0 or region.height == 0 or region.alpha == 0 or region.alpha == 255) return;
+        self.image_dim_regions.append(self.storage.resourceAllocator(), region) catch {};
     }
 
     pub fn syncImagePlacements(self: *OptimizedBuffer, source: *const OptimizedBuffer) error{ OutOfMemory, TrackerLimit }!void {
@@ -1775,6 +1863,70 @@ pub const OptimizedBuffer = struct {
                 @memset(rowSliceFg, ansi.rgbColor(255, 255, 255, 255));
                 @memset(rowSliceBg, bg);
                 fillU32(rowSliceAttrs, 0);
+            }
+        }
+    }
+
+    /// Fill a box face; when `dim_images` is set and the fill is translucent,
+    /// image placements under it are dimmed (kept) instead of deleted.
+    fn fillRectOrDimmingImages(self: *OptimizedBuffer, x: u32, y: u32, width: u32, height: u32, bg: RGBA, dim_images: bool) void {
+        if (dim_images and self.image_placements.items.len != 0 and width > 0 and height > 0) {
+            const fill_alpha = mulDiv255(@as(u32, ansi.alpha(bg)), @as(u32, opacityToU8(self.getCurrentOpacity())));
+            if (fill_alpha > 0 and fill_alpha < 255) {
+                self.fillRectDimmingImages(x, y, x + width - 1, y + height - 1, bg, fill_alpha, self.grapheme_tracker.hasAny(), self.link_tracker.hasAny());
+                return;
+            }
+        }
+        self.fillRect(x, y, width, height, bg);
+    }
+
+    /// tfm fork: fill a rect with a translucent color while KEEPING the image
+    /// placements under it. Covered reservation cells keep their image char
+    /// (only the backdrop bg blends, so the terminal dims what is behind the
+    /// raster) and each covered placement's opacity is scaled by the fill's
+    /// effective alpha — a full-screen scrim then darkens the rasters instead
+    /// of deleting them (the "black box" icons). Placements that carry an
+    /// explicit opacity override are left as they are: the app shades those
+    /// itself and expects them opaque. Opaque fills never take this path.
+    fn fillRectDimmingImages(
+        self: *OptimizedBuffer,
+        startX: u32,
+        startY: u32,
+        endX: u32,
+        endY: u32,
+        bg: RGBA,
+        fill_alpha: u32,
+        grapheme_aware: bool,
+        link_aware: bool,
+    ) void {
+        self.addImageDimRegion(.{
+            .x = @intCast(startX),
+            .y = @intCast(startY),
+            .width = endX - startX + 1,
+            .height = endY - startY + 1,
+            .alpha = @intCast(fill_alpha),
+        });
+        const fill_cell = makeCell(DEFAULT_SPACE_CHAR, ansi.rgbColor(255, 255, 255, 255), bg, 0);
+        var y: u32 = startY;
+        while (y <= endY) : (y += 1) {
+            var x: u32 = startX;
+            while (x <= endX) : (x += 1) {
+                const index = self.coordsToIndex(x, y);
+                if (!gp.isImageChar(self.buffer.char[index])) {
+                    if (grapheme_aware or link_aware) {
+                        self.setCellWithAlphaBlendingCell(x, y, fill_cell);
+                    } else {
+                        self.setCellWithAlphaBlendingRawCell(x, y, fill_cell);
+                    }
+                    continue;
+                }
+                // Reserved image cell: keep the char/attributes so the renderer
+                // still composites the placement, and blend only the backdrop
+                // (the dim itself is applied at frame end from the region).
+                // The SAME backdrop as the standard fill path: on a cell with no
+                // background (transparent-bg force) a null backdrop would leave
+                // the raw fill color, painting a square behind every alpha icon.
+                self.buffer.bg[index] = blendColors(bg, self.buffer.bg[index], self.blendBackdropColor);
             }
         }
     }
@@ -3151,7 +3303,7 @@ pub const OptimizedBuffer = struct {
         bottomTitle: ?[]const u8,
         bottomTitleAlignment: u8, // 0=left, 1=center, 2=right
     ) !void {
-        return self.drawBoxInternal(false, x, y, width, height, borderChars, borderSides, borderColor, backgroundColor, titleColor, shouldFill, title, titleAlignment, bottomTitle, bottomTitleAlignment);
+        return self.drawBoxInternal(false, x, y, width, height, borderChars, borderSides, borderColor, backgroundColor, titleColor, shouldFill, title, titleAlignment, bottomTitle, bottomTitleAlignment, false);
     }
 
     /// Scene titles use the checked text path; any failure invalidates the frame.
@@ -3175,7 +3327,32 @@ pub const OptimizedBuffer = struct {
         // Box geometry uses i32 cell arithmetic, so the far edges must fit i32.
         if (width > math.maxInt(i32) or height > math.maxInt(i32) or
             @as(i64, x) + width > math.maxInt(i32) or @as(i64, y) + height > math.maxInt(i32)) return error.InvalidDimensions;
-        return self.drawBoxInternal(true, x, y, width, height, borderChars, borderSides, borderColor, backgroundColor, titleColor, shouldFill, title, titleAlignment, bottomTitle, bottomTitleAlignment);
+        return self.drawBoxInternal(true, x, y, width, height, borderChars, borderSides, borderColor, backgroundColor, titleColor, shouldFill, title, titleAlignment, bottomTitle, bottomTitleAlignment, false);
+    }
+
+    /// tfm fork: like drawBoxChecked, but a TRANSLUCENT fill keeps the image
+    /// placements it covers and dims them instead of deleting them (the scrim
+    /// overlay path; see fillRectDimmingImages). Opaque fills behave as before.
+    pub fn drawBoxCheckedDimmingImages(
+        self: *OptimizedBuffer,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+        borderChars: [*]const u32,
+        borderSides: BorderSides,
+        borderColor: RGBA,
+        backgroundColor: RGBA,
+        titleColor: RGBA,
+        shouldFill: bool,
+        title: ?[]const u8,
+        titleAlignment: u8,
+        bottomTitle: ?[]const u8,
+        bottomTitleAlignment: u8,
+    ) !void {
+        if (width > math.maxInt(i32) or height > math.maxInt(i32) or
+            @as(i64, x) + width > math.maxInt(i32) or @as(i64, y) + height > math.maxInt(i32)) return error.InvalidDimensions;
+        return self.drawBoxInternal(true, x, y, width, height, borderChars, borderSides, borderColor, backgroundColor, titleColor, shouldFill, title, titleAlignment, bottomTitle, bottomTitleAlignment, true);
     }
 
     inline fn drawBoxInternal(
@@ -3195,6 +3372,7 @@ pub const OptimizedBuffer = struct {
         titleAlignment: u8,
         bottomTitle: ?[]const u8,
         bottomTitleAlignment: u8,
+        fill_dims_images: bool,
     ) !void {
         const opacity = self.getCurrentOpacity();
 
@@ -3224,6 +3402,7 @@ pub const OptimizedBuffer = struct {
             border_bg_transparent,
             title_visible,
             opacity,
+            fill_dims_images,
         );
     }
 
@@ -3247,6 +3426,7 @@ pub const OptimizedBuffer = struct {
         border_bg_transparent: bool,
         title_visible: bool,
         opacity: f32,
+        fill_dims_images: bool,
     ) !void {
         const startX = @max(0, x);
         const startY = @max(0, y);
@@ -3272,7 +3452,7 @@ pub const OptimizedBuffer = struct {
             if (!borderSides.top and !borderSides.right and !borderSides.bottom and !borderSides.left) {
                 const fillWidth = @as(u32, @intCast(endX - startX + 1));
                 const fillHeight = @as(u32, @intCast(endY - startY + 1));
-                self.fillRect(@intCast(startX), @intCast(startY), fillWidth, fillHeight, backgroundColor);
+                self.fillRectOrDimmingImages(@intCast(startX), @intCast(startY), fillWidth, fillHeight, backgroundColor, fill_dims_images);
             } else {
                 const innerStartX = startX + if (borderSides.left and isAtActualLeft) @as(i32, 1) else @as(i32, 0);
                 const innerStartY = startY + if (borderSides.top and isAtActualTop) @as(i32, 1) else @as(i32, 0);
@@ -3282,7 +3462,7 @@ pub const OptimizedBuffer = struct {
                 if (innerEndX >= innerStartX and innerEndY >= innerStartY) {
                     const fillWidth = @as(u32, @intCast(innerEndX - innerStartX + 1));
                     const fillHeight = @as(u32, @intCast(innerEndY - innerStartY + 1));
-                    self.fillRect(@intCast(innerStartX), @intCast(innerStartY), fillWidth, fillHeight, backgroundColor);
+                    self.fillRectOrDimmingImages(@intCast(innerStartX), @intCast(innerStartY), fillWidth, fillHeight, backgroundColor, fill_dims_images);
                 }
             }
         }
@@ -3477,6 +3657,9 @@ pub const OptimizedBuffer = struct {
         };
     }
 
+    /// tfm fork (scrims): negative opacity_override inherits the render-tree
+    /// opacity; 0..1 replaces it so a placement can stay opaque (or scale
+    /// independently) under a node-opacity dim like a modal scrim.
     pub fn drawImage(
         self: *OptimizedBuffer,
         image: *const native_image.Image,
@@ -3493,7 +3676,28 @@ pub const OptimizedBuffer = struct {
         source_height: u32,
         protocol: native_image.RenderProtocol,
     ) !bool {
-        const opacity = opacityToU8(self.getCurrentOpacity());
+        return self.drawImageWithOptions(image, image_handle, pos_x, pos_y, width, height, pixel_width, pixel_height, source_x, source_y, source_width, source_height, protocol, -1.0);
+    }
+
+    pub fn drawImageWithOptions(
+        self: *OptimizedBuffer,
+        image: *const native_image.Image,
+        image_handle: u32,
+        pos_x: i32,
+        pos_y: i32,
+        width: u32,
+        height: u32,
+        pixel_width: u32,
+        pixel_height: u32,
+        source_x: u32,
+        source_y: u32,
+        source_width: u32,
+        source_height: u32,
+        protocol: native_image.RenderProtocol,
+        opacity_override: f32,
+    ) !bool {
+        const chosen_opacity: f32 = if (opacity_override >= 0) opacity_override else self.getCurrentOpacity();
+        const opacity = opacityToU8(chosen_opacity);
         if (opacity == 0) return false;
         if (image.ref_count == math.maxInt(u32) or self.image_placements.items.len >= gp.IMAGE_ID_MASK) return error.ObjectLimit;
         if (width == 0 or height == 0 or source_width == 0 or source_height == 0 or
@@ -3540,6 +3744,7 @@ pub const OptimizedBuffer = struct {
             .source_width = source_end_x - clipped_source_x,
             .source_height = source_end_y - clipped_source_y,
             .opacity = opacity,
+            .opacity_overridden = opacity_override >= 0,
             .protocol = protocol,
         });
         @constCast(image).retain();

@@ -770,6 +770,12 @@ ot_status ot_scene_flush(ot_context *,
 /* Retains a Context-owned buffer for a surface node. NULL clears the binding.
  * Replacement retains the new buffer before releasing the previous binding. */
 ot_status ot_scene_set_surface(ot_context *, const ot_handle *node, const ot_handle *buffer);
+/* tfm fork: bind only BOX nodes. When on != 0 this node's TRANSLUCENT box fill
+ * keeps the image placements it covers and dims them (their reservation cells
+ * survive; uncovered placements and opaque fills are unchanged), instead of
+ * deleting them — the modal scrim overlay. Default 0 keeps the historical
+ * behavior. */
+ot_status ot_scene_set_fill_dims_images(ot_context *, const ot_handle *node, uint32_t on);
 ot_status ot_scene_set_box_details(ot_context *, const ot_handle *node, const ot_scene_box_details *,
     const uint8_t *title, uint32_t title_bytes, const uint8_t *bottom_title, uint32_t bottom_title_bytes);
 /* A box may filter its direct children against a root/box in the same Session.
@@ -1270,6 +1276,11 @@ typedef struct ot_embedded_terminal_options {
     uint32_t cols;
     uint32_t rows;
     uint32_t max_scrollback;
+    /* Cell pixel geometry of the host terminal. Kitty image placements are
+     * sized in pixels, so the terminal needs it to place them. Zero falls back
+     * to a nominal 8x16 cell. */
+    uint32_t cell_width_px;
+    uint32_t cell_height_px;
     uint32_t reserved;
 } ot_embedded_terminal_options;
 
@@ -1320,6 +1331,8 @@ ot_status ot_embedded_terminal_create(ot_context *, const ot_embedded_terminal_o
 ot_status ot_embedded_terminal_destroy(ot_context *, const ot_handle *terminal);
 ot_status ot_embedded_terminal_write(ot_context *, const ot_handle *terminal, const uint8_t *bytes, uint32_t byte_count);
 ot_status ot_embedded_terminal_resize(ot_context *, const ot_handle *terminal, uint32_t cols, uint32_t rows);
+/* Cell pixel geometry of the host terminal. Zero keeps the current value. */
+ot_status ot_embedded_terminal_set_cell_size(ot_context *, const ot_handle *terminal, uint32_t cell_width_px, uint32_t cell_height_px);
 #define OT_EMBEDDED_TERMINAL_INVALIDATE UINT32_C(0)
 #define OT_EMBEDDED_TERMINAL_SCROLL UINT32_C(1)
 #define OT_EMBEDDED_TERMINAL_CLEAR_SELECTION UINT32_C(2)
@@ -1762,6 +1775,9 @@ ot_status ot_scene_set_editor_options(ot_context *, const ot_handle *node, const
 #define OT_IMAGE_PROTOCOL_BLOCKS UINT32_C(3)
 #define OT_IMAGE_DRAW_SOURCE_WIDTH UINT32_C(1)
 #define OT_IMAGE_DRAW_SOURCE_HEIGHT UINT32_C(2)
+/* tfm fork: read opacity_override (0..1) instead of the inherited render-tree
+ * opacity. Without the flag the field is ignored, so a zeroed struct inherits. */
+#define OT_IMAGE_DRAW_OPACITY_OVERRIDE UINT32_C(4)
 
 ot_status ot_image_destroy(ot_context *, const ot_handle *image);
 
@@ -1844,9 +1860,12 @@ ot_status ot_image_pixels_release(ot_context *, const ot_handle *lease);
 /* Bind only IMAGE nodes. NULL image clears the binding. Nodes and drawn placements
  * retain their image independently of the imported handle. Optional buffer names
  * Context-owned backing storage for buffered Image drawing, not a legacy buffer.
- * fit and protocol use OT_IMAGE_*; mutations reject measurement-callback reentry. */
+ * fit and protocol use OT_IMAGE_*; mutations reject measurement-callback reentry.
+ * opacity_override is a tfm fork addition: a negative value (including NaN)
+ * inherits the render-tree opacity; 0..1 replaces it for this node's placements
+ * so an image can stay opaque (or scale independently) under a node-opacity dim. */
 ot_status ot_scene_set_image(ot_context *, const ot_handle *node, const ot_handle *image,
-    uint32_t fit, uint32_t protocol, const ot_handle *buffer);
+    uint32_t fit, uint32_t protocol, const ot_handle *buffer, float opacity_override);
 /* Sets the region of the source, in source pixels, that an IMAGE or VIDEO node shows; fit
  * applies to the region. All four zero show the whole source; otherwise width and height
  * are positive. A region that does not lie inside the source shows the whole source. A VIDEO
@@ -1915,7 +1934,9 @@ ot_status ot_video_get_error(ot_context *, const ot_handle *node, uint8_t *bytes
 
 /* x/y and width/height count terminal cells. pixel_* and source_* count image
  * pixels. Absent source extents and reserved fields must be zero. Exact size and
- * version are required. Only the two SOURCE_* flags are accepted. */
+ * version are required. Only the two SOURCE_* flags plus
+ * OT_IMAGE_DRAW_OPACITY_OVERRIDE (tfm fork) are accepted. opacity_override is
+ * read only with that flag and must be 0..1 (absent source extents inherit). */
 typedef struct ot_image_draw_options {
     uint32_t struct_size;
     uint32_t abi_version;
@@ -1931,7 +1952,8 @@ typedef struct ot_image_draw_options {
     uint32_t source_y;
     uint32_t source_width;
     uint32_t source_height;
-    uint32_t reserved[2];
+    float opacity_override;
+    uint32_t reserved[1];
 } ot_image_draw_options;
 
 /* Offscreen buffers require NULL frame; Session drawing requires its current

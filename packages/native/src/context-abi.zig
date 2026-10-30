@@ -377,18 +377,20 @@ pub fn ot_image_destroy(context: ?*ContextHandle, image_ptr: ?*const c.ot_handle
     return destroyKind(context, image_ptr, .image);
 }
 
-pub fn ot_scene_set_image(context: ?*ContextHandle, node_ptr: ?*const c.ot_handle, image_ptr: ?*const c.ot_handle, fit: u32, protocol: u32, buffer_ptr: ?*const c.ot_handle) callconv(.c) c.ot_status {
+pub fn ot_scene_set_image(context: ?*ContextHandle, node_ptr: ?*const c.ot_handle, image_ptr: ?*const c.ot_handle, fit: u32, protocol: u32, buffer_ptr: ?*const c.ot_handle, opacity_override: f32) callconv(.c) c.ot_status {
     const status = sessionContextStatus(context);
     if (status != c.OT_OK) return status;
     const owner = context.?;
     const node = node_ptr orelse return sessionError(owner, error.InvalidOptions);
     if (fit > c.OT_IMAGE_FILL or protocol > c.OT_IMAGE_PROTOCOL_BLOCKS) return sessionError(owner, error.InvalidOptions);
+    if (std.math.isNan(opacity_override) or opacity_override > 1.0) return sessionError(owner, error.InvalidOptions);
     owner.core.sceneSetImage(
         handleFromC(node.*),
         if (image_ptr) |id| handleFromC(id.*) else null,
         @fromBackingInt(@intCast(fit)),
         @fromBackingInt(@intCast(protocol)),
         if (buffer_ptr) |id| handleFromC(id.*) else null,
+        opacity_override,
     ) catch |err| return sessionError(owner, err);
     return c.OT_OK;
 }
@@ -1787,6 +1789,16 @@ pub fn ot_scene_set_surface(context: ?*ContextHandle, node_ptr: ?*const c.ot_han
     return c.OT_OK;
 }
 
+pub fn ot_scene_set_fill_dims_images(context: ?*ContextHandle, node_ptr: ?*const c.ot_handle, on: u32) callconv(.c) c.ot_status {
+    const status = sessionContextStatus(context);
+    if (status != c.OT_OK) return status;
+    const owner = context.?;
+    const node = node_ptr orelse return sessionError(owner, error.InvalidOptions);
+    if (on > 1) return sessionError(owner, error.InvalidOptions);
+    owner.core.sceneSetFillDimsImages(handleFromC(node.*), on == 1) catch |err| return sessionError(owner, err);
+    return c.OT_OK;
+}
+
 pub fn ot_scene_set_box_details(context: ?*ContextHandle, node_ptr: ?*const c.ot_handle, options_ptr: ?*const c.ot_scene_box_details, title_ptr: ?[*]const u8, title_bytes: u32, bottom_ptr: ?[*]const u8, bottom_bytes: u32) callconv(.c) c.ot_status {
     const status = sessionContextStatus(context);
     if (status != c.OT_OK) return status;
@@ -2778,16 +2790,18 @@ test "Context image ABI rejects invalid records identities and mutation reentry"
     _ = try core.sceneCreateNode(session, c.OT_SCENE_ROOT, 1);
     var node = std.mem.zeroes(c.ot_handle);
     try std.testing.expectEqual(c.OT_OK, ot_scene_create_node(context, &session_c, c.OT_SCENE_IMAGE, 2, &node));
-    try std.testing.expectEqual(c.OT_OK, ot_scene_set_image(context, &node, &image, c.OT_IMAGE_COVER, c.OT_IMAGE_PROTOCOL_BLOCKS, &target));
-    try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_scene_set_image(null, &node, &image, 0, 0, null));
-    try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_scene_set_image(context, null, &image, 0, 0, null));
-    try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_scene_set_image(context, &node, &image, 3, 0, null));
-    try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_scene_set_image(context, &node, &image, 0, 4, null));
-    try std.testing.expectEqual(c.OT_WRONG_KIND, ot_scene_set_image(context, &node, &target, 0, 0, null));
-    try std.testing.expectEqual(c.OT_WRONG_KIND, ot_scene_set_image(context, &node, &image, 0, 0, &image));
+    try std.testing.expectEqual(c.OT_OK, ot_scene_set_image(context, &node, &image, c.OT_IMAGE_COVER, c.OT_IMAGE_PROTOCOL_BLOCKS, &target, -1.0));
+    try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_scene_set_image(null, &node, &image, 0, 0, null, -1.0));
+    try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_scene_set_image(context, null, &image, 0, 0, null, -1.0));
+    try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_scene_set_image(context, &node, &image, 3, 0, null, -1.0));
+    try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_scene_set_image(context, &node, &image, 0, 4, null, -1.0));
+    // tfm fork: an opacity override above 1 is rejected; 0..1 is accepted.
+    try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_scene_set_image(context, &node, &image, 0, 0, null, 2.0));
+    try std.testing.expectEqual(c.OT_WRONG_KIND, ot_scene_set_image(context, &node, &target, 0, 0, null, -1.0));
+    try std.testing.expectEqual(c.OT_WRONG_KIND, ot_scene_set_image(context, &node, &image, 0, 0, &image, -1.0));
     var foreign = image;
     foreign.context_id += 1;
-    try std.testing.expectEqual(c.OT_WRONG_CONTEXT, ot_scene_set_image(context, &node, &foreign, 0, 0, null));
+    try std.testing.expectEqual(c.OT_WRONG_CONTEXT, ot_scene_set_image(context, &node, &foreign, 0, 0, null, -1.0));
 
     var draw = std.mem.zeroes(c.ot_image_draw_options);
     draw.struct_size = @sizeOf(c.ot_image_draw_options);
@@ -2801,10 +2815,13 @@ test "Context image ABI rejects invalid records identities and mutation reentry"
         switch (field) {
             0 => invalid.struct_size -= 1,
             1 => invalid.abi_version += 1,
-            2 => invalid.flags = 4,
+            2 => invalid.flags = 8,
             3 => invalid.protocol = 4,
             4 => invalid.reserved[0] = 1,
-            5 => invalid.reserved[1] = 1,
+            5 => {
+                invalid.flags = c.OT_IMAGE_DRAW_OPACITY_OVERRIDE;
+                invalid.opacity_override = 2;
+            },
             6 => invalid.source_width = 1,
             7 => invalid.source_height = 1,
             8 => invalid.source_x = 2,
@@ -2825,6 +2842,12 @@ test "Context image ABI rejects invalid records identities and mutation reentry"
     var frame = std.mem.zeroes(c.ot_scene_frame_request);
     try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_buffer_draw_image(context, &target, &frame, &image, &draw, &drawn));
     try std.testing.expectEqual(99, drawn);
+    // tfm fork: the OPACITY_OVERRIDE flag with a 0..1 value is accepted.
+    var overridden = draw;
+    overridden.flags = c.OT_IMAGE_DRAW_OPACITY_OVERRIDE;
+    overridden.opacity_override = 0.5;
+    try std.testing.expectEqual(c.OT_OK, ot_buffer_draw_image(context, &target, null, &image, &overridden, &drawn));
+    try std.testing.expectEqual(1, drawn);
     try std.testing.expectEqual(c.OT_OK, ot_buffer_draw_image(context, &target, null, &image, &draw, &drawn));
     try std.testing.expectEqual(1, drawn);
     draw.x = 2;
@@ -2866,7 +2889,7 @@ test "Context image ABI rejects invalid records identities and mutation reentry"
         defer core.scene_measuring = false;
         var measured: u32 = 99;
         try std.testing.expectEqual(c.OT_OK, ot_scene_has_measure(context, &node, &measured));
-        try std.testing.expectEqual(c.OT_CONTEXT_BUSY, ot_scene_set_image(context, &node, null, 0, 0, null));
+        try std.testing.expectEqual(c.OT_CONTEXT_BUSY, ot_scene_set_image(context, &node, null, 0, 0, null, -1.0));
         try std.testing.expectEqual(c.OT_CONTEXT_BUSY, ot_buffer_draw_image(context, &target, null, &image, &draw, &drawn));
         try std.testing.expectEqual(c.OT_CONTEXT_BUSY, ot_session_set_image_resolution(context, &session_c, 0, 0, 0, 0));
         try std.testing.expectEqual(c.OT_CONTEXT_BUSY, ot_session_set_kitty_image_transport(context, &session_c, 0));
@@ -2874,8 +2897,8 @@ test "Context image ABI rejects invalid records identities and mutation reentry"
     }
     try std.testing.expectEqual(c.OT_OK, ot_image_destroy(context, &image));
     try std.testing.expectEqual(c.OT_STALE_HANDLE, ot_buffer_draw_image(context, &target, null, &image, &draw, &drawn));
-    try std.testing.expectEqual(c.OT_STALE_HANDLE, ot_scene_set_image(context, &node, &image, 0, 0, null));
-    try std.testing.expectEqual(c.OT_OK, ot_scene_set_image(context, &node, null, 0, 0, null));
+    try std.testing.expectEqual(c.OT_STALE_HANDLE, ot_scene_set_image(context, &node, &image, 0, 0, null, -1.0));
+    try std.testing.expectEqual(c.OT_OK, ot_scene_set_image(context, &node, null, 0, 0, null, -1.0));
 }
 
 test "Context focused draw records validate exact size before payload access" {
@@ -4950,7 +4973,7 @@ test "Context typed destroy exports reject other kinds and destroy their own onc
         .{ &ot_buffer_destroy, try core.createBuffer(1, 1, .{}) },
         .{ &ot_session_destroy, try core.createSession(.{}) },
         .{ &unicode_transport.ot_unicode_destroy, try core.createUnicode("a", .unicode) },
-        .{ &terminal_transport.ot_embedded_terminal_destroy, try core.createEmbeddedTerminal(2, 1, 0) },
+        .{ &terminal_transport.ot_embedded_terminal_destroy, try core.createEmbeddedTerminal(2, 1, 0, .{}) },
     };
     const expected = [_]c.ot_status{ c.OT_CONTEXT_BUSY, c.OT_INVALID_ARGUMENT, c.OT_WRONG_KIND, c.OT_WRONG_CONTEXT, c.OT_OK, c.OT_STALE_HANDLE };
     inline for (cases) |case| {

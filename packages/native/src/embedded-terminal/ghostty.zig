@@ -9,6 +9,14 @@ pub const DeviceAttributes = @typeInfo(@typeInfo(@typeInfo(@FieldType(TerminalSt
 pub const Coordinate = vt.Coordinate;
 pub const RenderState = vt.RenderState;
 pub const Selection = vt.Selection;
+/// XTWINOPS size-report values (CSI 14/16/18 t answers).
+pub const size_report = vt.size_report;
+/// Kitty protocols (graphics): the VT stores transmitted images and their
+/// placements here, and the embedder renders them.
+pub const kitty = vt.kitty;
+/// The VT's system interface. `sys.decode_png` is unset in library builds,
+/// so the embedder installs its own decoder.
+pub const sys = vt.sys;
 
 pub const Key = struct {
     action: vt.input.KeyAction = .press,

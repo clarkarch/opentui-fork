@@ -516,7 +516,7 @@ fn appendCommand(recording: *Recording, command: Command, resources: Resources) 
         .editor_view => recording.append(c.ot_scene_record_view{ .header = recordHeader(c.OT_SCENE_RECORD_EDITOR_VIEW), .source = cHandle(resources.editor_view), .x = 2, .y = 1 }, &.{}),
         .scene_text => recording.append(c.ot_scene_record_view{ .header = recordHeader(c.OT_SCENE_RECORD_SCENE_BODY), .source = cHandle(resources.scene_text), .x = 2, .y = 1 }, &.{}),
         .scene_box => recording.append(c.ot_scene_record_view{ .header = recordHeader(c.OT_SCENE_RECORD_SCENE_BODY), .source = cHandle(resources.scene_box), .x = 2, .y = 1 }, &.{}),
-        .image => recording.append(c.ot_scene_record_image{ .header = recordHeader(c.OT_SCENE_RECORD_IMAGE), .image = cHandle(resources.image), .options = .{ .struct_size = @sizeOf(c.ot_image_draw_options), .abi_version = c.OT_CONTEXT_ABI_VERSION, .flags = 0, .protocol = c.OT_IMAGE_PROTOCOL_BLOCKS, .x = 8, .y = 2, .width = 2, .height = 1, .pixel_width = 0, .pixel_height = 0, .source_x = 0, .source_y = 0, .source_width = 0, .source_height = 0, .reserved = .{ 0, 0 } } }, &.{}),
+        .image => recording.append(c.ot_scene_record_image{ .header = recordHeader(c.OT_SCENE_RECORD_IMAGE), .image = cHandle(resources.image), .options = .{ .struct_size = @sizeOf(c.ot_image_draw_options), .abi_version = c.OT_CONTEXT_ABI_VERSION, .flags = 0, .protocol = c.OT_IMAGE_PROTOCOL_BLOCKS, .x = 8, .y = 2, .width = 2, .height = 1, .pixel_width = 0, .pixel_height = 0, .source_x = 0, .source_y = 0, .source_width = 0, .source_height = 0, .opacity_override = -1, .reserved = .{0} } }, &.{}),
         .unicode => recording.append(c.ot_scene_record_unicode{ .header = recordHeader(c.OT_SCENE_RECORD_UNICODE), .unicode = cHandle(resources.unicode), .index = 1, .x = 11, .y = 3, .attributes = 1, .foreground = white, .background = blue }, &.{}),
     }
 }
@@ -540,9 +540,9 @@ fn paintScene(f: Fixture) !context.Handle {
     // A wide picture takes the fit path and the cropping cover path.
     const pixels = utils.repeat(u8, &.{ 200, 40, 0, 255, 0, 40, 200, 255 }, 4).*;
     const picture = try f.owner.createImagePixels(&pixels, 4, 2, .{ .stride = 16 });
-    try f.owner.sceneSetImage(try placed(f, c.OT_SCENE_IMAGE, 6, 0, 3, 2), picture, .fit, .blocks, null);
+    try f.owner.sceneSetImage(try placed(f, c.OT_SCENE_IMAGE, 6, 0, 3, 2), picture, .fit, .blocks, null, -1.0);
     const backed = try placed(f, c.OT_SCENE_IMAGE, 7, 2, 3, 2);
-    try f.owner.sceneSetImage(backed, picture, .cover, .blocks, try f.owner.createBuffer(2, 1, .{}));
+    try f.owner.sceneSetImage(backed, picture, .cover, .blocks, try f.owner.createBuffer(2, 1, .{}), -1.0);
     const cells = try f.owner.createBuffer(2, 1, .{});
     try f.owner.drawBufferText(cells, "sf", 0, 0, .{ 255, 255, 255, 255 }, null, 0);
     try f.owner.sceneSetSurface(try placed(f, c.OT_SCENE_CUSTOM, 8, 6, 2, 2), cells);
@@ -812,7 +812,7 @@ test "Scene image paints a fill wider than its pixel range" {
     f.cli.image_resolution = .{ .terminal_width = 4, .terminal_height = 2, .pixel_width = 40, .pixel_height = 40 };
     const pixels = [_]u8{ 200, 40, 0, 255 };
     const image = try placed(f, c.OT_SCENE_IMAGE, 2, 0, 0, 1);
-    try f.owner.sceneSetImage(image, try f.owner.createImagePixels(&pixels, 1, 1, .{ .stride = 4 }), .fill, .blocks, null);
+    try f.owner.sceneSetImage(image, try f.owner.createImagePixels(&pixels, 1, 1, .{ .stride = 4 }), .fill, .blocks, null, -1.0);
     // 5e8 cells fit i32 but not u32 pixels at 10 per cell; 1e15 also leaves the cell range. Each paints like 4 cells.
     var cells: [3]u32 = undefined;
     for ([_]f32{ 4, 5e8, 1e15 }, &cells) |width, *cell| {

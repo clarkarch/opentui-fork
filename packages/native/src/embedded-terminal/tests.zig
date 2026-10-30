@@ -521,14 +521,21 @@ test "embedded terminal drains generated PTY responses incrementally" {
         .{ .query = "\x1b[=c", .reply = "\x1bP!|00000000\x1b\\" },
         .{ .query = "\x1b]10;?\x07", .reply = "\x1b]10;rgb:ffff/ffff/ffff\x07" },
         .{ .query = "\x1b]11;?\x1b\\", .reply = "\x1b]11;rgb:0000/0000/0000\x1b\\" },
-        // No Kitty graphics: the support probe gets no reply, so programs use text.
-        .{ .query = "\x1b_Gi=31,s=1,v=1,a=q,t=d,f=24;AAAA\x1b\\", .reply = "" },
+        // tfm fork: Kitty graphics ARE enabled in the VT (the pane renders the
+        // placements), so the support probe is answered.
+        .{ .query = "\x1b_Gi=31,s=1,v=1,a=q,t=d,f=24;AAAA\x1b\\", .reply = "\x1b_Gi=31;OK\x1b\\" },
         // No glyph protocol: the compositor never draws registered glyphs.
         .{ .query = "\x1b_25a1;s\x1b\\\x1b_25a1;q;cp=41\x1b\\", .reply = "" },
         // No Kitty drag and drop: queries get no reply and registrations keep no state.
         .{ .query = "\x1b]72;t=q\x1b\\\x1b]72;t=p\x1b\\\x1b]72;t=a;text/plain\x1b\\", .reply = "" },
         .{ .query = set_colors ++ "\x1bc" ++ ask_colors, .reply = reset_colors },
         .{ .query = set_colors ++ "\x1b[!p" ++ ask_colors, .reply = reset_colors },
+        // XTWINOPS size reports. A program inside the pane asks for the pixel
+        // geometry before it places images; a silent pane leaves it on
+        // fallback cell metrics and it never rasterizes at all.
+        .{ .query = "\x1b[14t", .reply = "\x1b[4;64;160t" },
+        .{ .query = "\x1b[16t", .reply = "\x1b[6;16;8t" },
+        .{ .query = "\x1b[18t", .reply = "\x1b[8;4;20t" },
     };
     for (cases) |case| {
         try terminal.write(case.query);
@@ -537,7 +544,9 @@ test "embedded terminal drains generated PTY responses incrementally" {
         const rest_len = try terminal.drainResponses(output[first_len..]);
         try std.testing.expectEqualStrings(case.reply, output[0 .. first_len + rest_len]);
     }
-    try std.testing.expectEqual(0, @sizeOf(@TypeOf(terminal.terminal.screens.active.kitty_images)));
+    // tfm fork: the Kitty image storage is real -- the pane renders the
+    // placements the VT stores.
+    try std.testing.expect(@sizeOf(@TypeOf(terminal.terminal.screens.active.kitty_images)) > 0);
     try std.testing.expectEqual(null, terminal.terminal.kitty_dnd);
 }
 
@@ -615,4 +624,345 @@ test "embedded terminal composes a transparent default background as the termina
 
 comptime {
     _ = ghostty;
+}
+
+test "embedded terminal draws a kitty image placement into the pane buffer" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+    const target = try buffer.OptimizedBuffer.init(std.testing.allocator, 4, 2, .{ .link_pool = &pools.links, .pool = &pools.graphemes });
+    defer target.deinit();
+
+    const terminal = try EmbeddedTerminal.init(std.testing.io, std.testing.allocator, .{
+        .cols = 4,
+        .rows = 2,
+        .cell_size = .{ .width = 8, .height = 16 },
+    });
+    defer terminal.deinit();
+
+    // Transmit and display a 2x2 RGBA image at the cursor. The kitty payload
+    // is base64 encoded, like every kitty transmission.
+    const rgba = [_]u8{ 255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 0, 255 };
+    const rgba_len = std.base64.standard.Encoder.calcSize(rgba.len);
+    var encoded: [64]u8 = undefined;
+    _ = std.base64.standard.Encoder.encode(encoded[0..rgba_len], &rgba);
+
+    const build_payload = struct {
+        fn make(alloc: std.mem.Allocator, id: u32, body: []const u8) ![]u8 {
+            const head = try std.fmt.allocPrint(alloc, "\x1b_Ga=T,f=32,s=2,v=2,i={d};", .{id});
+            defer alloc.free(head);
+            const out = try alloc.alloc(u8, head.len + body.len + 2);
+            @memcpy(out[0..head.len], head);
+            @memcpy(out[head.len..][0..body.len], body);
+            out[head.len + body.len] = 0x1b;
+            out[head.len + body.len + 1] = '\\';
+            return out;
+        }
+    };
+
+    const payload = try build_payload.make(std.testing.allocator, 7, encoded[0..rgba_len]);
+    defer std.testing.allocator.free(payload);
+    try terminal.write(payload);
+
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+    const placement = target.image_placements.items[0];
+    // A 2x2 pixel image covers a single 8x16 cell.
+    try std.testing.expectEqual(@as(u32, 1), placement.width);
+    try std.testing.expectEqual(@as(u32, 1), placement.height);
+    try std.testing.expectEqual(@as(u32, 8), placement.pixel_width);
+    try std.testing.expectEqual(@as(u32, 16), placement.pixel_height);
+    // The cell is reserved for the image.
+    try std.testing.expect(gp.isImageChar(target.get(0, 0).?.char));
+    try std.testing.expectEqual(@as(u32, 2), placement.image.width());
+    try std.testing.expectEqual(@as(u32, 2), placement.image.height());
+
+    // A second compose without a VT change keeps the placement.
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+
+    // A second image (its own id) is placed next to the first one.
+    const second = try build_payload.make(std.testing.allocator, 8, encoded[0..rgba_len]);
+    defer std.testing.allocator.free(second);
+    try terminal.write(second);
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 2), target.image_placements.items.len);
+
+    // Reusing an image id REPLACES that image and its placements (kitty's
+    // rule), so the count stays at two instead of stacking a third.
+    try terminal.write(payload);
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 2), target.image_placements.items.len);
+}
+
+test "embedded terminal decodes a kitty PNG image" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+    const target = try buffer.OptimizedBuffer.init(std.testing.allocator, 4, 2, .{ .link_pool = &pools.links, .pool = &pools.graphemes });
+    defer target.deinit();
+
+    const terminal = try EmbeddedTerminal.init(std.testing.io, std.testing.allocator, .{
+        .cols = 4,
+        .rows = 2,
+        .cell_size = .{ .width = 8, .height = 16 },
+    });
+    defer terminal.deinit();
+
+    // A 2x2 PNG, base64 encoded the way the kitty protocol transmits it. The
+    // payload carries the base64 text, not the raw PNG bytes.
+    const encoded = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEElEQVR4nGP4z8DwHwohFABFzAf5Zsv/OQAAAABJRU5ErkJggg==";
+    var payload: std.ArrayListUnmanaged(u8) = .empty;
+    defer payload.deinit(std.testing.allocator);
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=T,f=100,i=9;");
+    try payload.appendSlice(std.testing.allocator, encoded);
+    try payload.appendSlice(std.testing.allocator, "\x1b\\");
+    try terminal.write(payload.items);
+
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+    try std.testing.expectEqual(@as(u32, 2), target.image_placements.items[0].image.width());
+    try std.testing.expectEqual(@as(u32, 2), target.image_placements.items[0].image.height());
+}
+
+test "embedded terminal draws a kitty unicode placeholder placement" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+    const target = try buffer.OptimizedBuffer.init(std.testing.allocator, 6, 3, .{ .link_pool = &pools.links, .pool = &pools.graphemes });
+    defer target.deinit();
+
+    const terminal = try EmbeddedTerminal.init(std.testing.io, std.testing.allocator, .{
+        .cols = 6,
+        .rows = 3,
+        .cell_size = .{ .width = 8, .height = 16 },
+    });
+    defer terminal.deinit();
+
+    // Kitty's unicode-placeholder protocol: the image is a VIRTUAL placement
+    // (U=1) with no screen position, and each placeholder cell anchors it. The
+    // cell's foreground colour carries the image id. Programs that keep images
+    // inside a text layout (scrolling with it) place them this way.
+    const encoded = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEElEQVR4nGP4z8DwHwohFABFzAf5Zsv/OQAAAABJRU5ErkJggg==";
+    var payload: std.ArrayListUnmanaged(u8) = .empty;
+    defer payload.deinit(std.testing.allocator);
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=t,f=100,i=7,U=1,q=2;");
+    try payload.appendSlice(std.testing.allocator, encoded);
+    try payload.appendSlice(std.testing.allocator, "\x1b\\");
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=p,i=7,U=1,c=1,r=1,q=2\x1b\\");
+    // One placeholder cell (U+10EEEE) whose fg is rgb(0, 0, 7): the image id.
+    try payload.appendSlice(std.testing.allocator, "\x1b[38;2;0;0;7m\xF4\x8E\xBB\xAE\x1b[39m");
+    try terminal.write(payload.items);
+
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+    const placement = target.image_placements.items[0];
+    try std.testing.expectEqual(@as(u32, 1), placement.width);
+    try std.testing.expectEqual(@as(u32, 1), placement.height);
+    // The placeholder codepoint itself never gets painted.
+    try std.testing.expect(gp.isImageChar(target.get(0, 0).?.char) or target.get(0, 0).?.char == buffer.DEFAULT_SPACE_CHAR);
+}
+
+test "embedded terminal clears a unicode placeholder image on delete-all" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+    const target = try buffer.OptimizedBuffer.init(std.testing.allocator, 6, 3, .{ .link_pool = &pools.links, .pool = &pools.graphemes });
+    defer target.deinit();
+
+    const terminal = try EmbeddedTerminal.init(std.testing.io, std.testing.allocator, .{
+        .cols = 6,
+        .rows = 3,
+        .cell_size = .{ .width = 8, .height = 16 },
+    });
+    defer terminal.deinit();
+
+    const encoded = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEElEQVR4nGP4z8DwHwohFABFzAf5Zsv/OQAAAABJRU5ErkJggg==";
+    var payload: std.ArrayListUnmanaged(u8) = .empty;
+    defer payload.deinit(std.testing.allocator);
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=t,f=100,i=7,U=1,q=2;");
+    try payload.appendSlice(std.testing.allocator, encoded);
+    try payload.appendSlice(std.testing.allocator, "\x1b\\");
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=p,i=7,U=1,c=1,r=1,q=2\x1b\\");
+    try payload.appendSlice(std.testing.allocator, "\x1b[38;2;0;0;7m\xF4\x8E\xBB\xAE\x1b[39m");
+    try terminal.write(payload.items);
+
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+
+    // Kitty's delete-all is how a client clears a placeholder image: it does
+    // not repaint the cells, it expects the terminal to drop the picture.
+    try terminal.write("\x1b_Ga=d,d=A\x1b\\");
+    try terminal.compose(target, 0, 0);
+
+    try std.testing.expectEqual(@as(usize, 0), target.image_placements.items.len);
+}
+
+test "embedded terminal drops a unicode placeholder image when its cells are repainted" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+    const target = try buffer.OptimizedBuffer.init(std.testing.allocator, 6, 3, .{ .link_pool = &pools.links, .pool = &pools.graphemes });
+    defer target.deinit();
+
+    const terminal = try EmbeddedTerminal.init(std.testing.io, std.testing.allocator, .{
+        .cols = 6,
+        .rows = 3,
+        .cell_size = .{ .width = 8, .height = 16 },
+    });
+    defer terminal.deinit();
+
+    // A virtual placement is anchored to CELLS, so a program clears its image
+    // by writing ordinary text over the placeholders — no image mutation at
+    // all. A pane that only replots on image storage changes keeps showing the
+    // old picture until the next image arrives.
+    const encoded = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEElEQVR4nGP4z8DwHwohFABFzAf5Zsv/OQAAAABJRU5ErkJggg==";
+    var payload: std.ArrayListUnmanaged(u8) = .empty;
+    defer payload.deinit(std.testing.allocator);
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=t,f=100,i=7,U=1,q=2;");
+    try payload.appendSlice(std.testing.allocator, encoded);
+    try payload.appendSlice(std.testing.allocator, "\x1b\\");
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=p,i=7,U=1,c=1,r=1,q=2\x1b\\");
+    try payload.appendSlice(std.testing.allocator, "\x1b[38;2;0;0;7m\xF4\x8E\xBB\xAE\x1b[39m");
+    try terminal.write(payload.items);
+
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+
+    // Repaint the cell with text. Nothing about the image storage changed.
+    try terminal.write("\x1b[HX");
+    try terminal.compose(target, 0, 0);
+
+    try std.testing.expectEqual(@as(usize, 0), target.image_placements.items.len);
+    try std.testing.expectEqual(@as(u32, 'X'), target.get(0, 0).?.char);
+}
+
+test "embedded terminal draws an OpenTUI transmitted-then-placed image" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+    const target = try buffer.OptimizedBuffer.init(std.testing.allocator, 6, 3, .{ .link_pool = &pools.links, .pool = &pools.graphemes });
+    defer target.deinit();
+
+    const terminal = try EmbeddedTerminal.init(std.testing.io, std.testing.allocator, .{
+        .cols = 6,
+        .rows = 3,
+        .cell_size = .{ .width = 8, .height = 16 },
+    });
+    defer terminal.deinit();
+
+    // OpenTUI's kitty transport never transmits-and-displays: it sends a
+    // quiet transmit (`a=t`, no placement), moves the cursor, and then places
+    // the image with an explicit placement id whose low bit carries its
+    // z-order. A VT that only understood `a=T` shows nothing for it.
+    const encoded = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEElEQVR4nGP4z8DwHwohFABFzAf5Zsv/OQAAAABJRU5ErkJggg==";
+    var payload: std.ArrayListUnmanaged(u8) = .empty;
+    defer payload.deinit(std.testing.allocator);
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=t,f=100,i=4100000000,m=0,q=2;");
+    try payload.appendSlice(std.testing.allocator, encoded);
+    try payload.appendSlice(std.testing.allocator, "\x1b\\");
+    try payload.appendSlice(std.testing.allocator, "\x1b[2;3H");
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=p,i=4100000000,p=2147483648,c=2,r=1,x=0,y=0,w=2,h=2,C=1,z=-1073741823,q=2\x1b\\");
+    try terminal.write(payload.items);
+
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+    const placement = target.image_placements.items[0];
+    // Placed at row 2, column 3 (0-based 1,2) and two cells wide.
+    try std.testing.expectEqual(@as(i32, 2), placement.x);
+    try std.testing.expectEqual(@as(i32, 1), placement.y);
+    try std.testing.expectEqual(@as(u32, 2), placement.width);
+    try std.testing.expectEqual(@as(u32, 1), placement.height);
+}
+
+test "embedded terminal keeps an image placement when its row is repainted" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+    const target = try buffer.OptimizedBuffer.init(std.testing.allocator, 6, 3, .{ .link_pool = &pools.links, .pool = &pools.graphemes });
+    defer target.deinit();
+
+    const terminal = try EmbeddedTerminal.init(std.testing.io, std.testing.allocator, .{
+        .cols = 6,
+        .rows = 3,
+        .cell_size = .{ .width = 8, .height = 16 },
+    });
+    defer terminal.deinit();
+
+    const encoded = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEElEQVR4nGP4z8DwHwohFABFzAf5Zsv/OQAAAABJRU5ErkJggg==";
+    var payload: std.ArrayListUnmanaged(u8) = .empty;
+    defer payload.deinit(std.testing.allocator);
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=t,f=100,i=11,m=0,q=2;");
+    try payload.appendSlice(std.testing.allocator, encoded);
+    try payload.appendSlice(std.testing.allocator, "\x1b\\");
+    try payload.appendSlice(std.testing.allocator, "\x1b[2;3H");
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=p,i=11,p=1,c=2,r=1,q=2\x1b\\");
+    try terminal.write(payload.items);
+
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+
+    // A program that repaints the cells under its image (a selection tint, a
+    // background flip) must not knock the placement out: the cells are a
+    // reservation, and only deleting the image releases them.
+    try terminal.write("\x1b[2;1H\x1b[48;2;40;40;40mXYZW\x1b[49m");
+    try terminal.compose(target, 0, 0);
+
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+    // Still reserved where the image sits, and still two cells wide.
+    try std.testing.expect(gp.isImageChar(target.get(2, 1).?.char));
+    try std.testing.expect(gp.isImageChar(target.get(3, 1).?.char));
+    // The cells the repaint actually owns still took the new background.
+    const repainted = target.get(0, 1).?.bg;
+    try std.testing.expectEqual(@as(u8, 40), ansi.red(repainted));
+}
+
+test "embedded terminal releases image cells when the image is deleted" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+    const target = try buffer.OptimizedBuffer.init(std.testing.allocator, 6, 3, .{ .link_pool = &pools.links, .pool = &pools.graphemes });
+    defer target.deinit();
+
+    const terminal = try EmbeddedTerminal.init(std.testing.io, std.testing.allocator, .{
+        .cols = 6,
+        .rows = 3,
+        .cell_size = .{ .width = 8, .height = 16 },
+    });
+    defer terminal.deinit();
+
+    const encoded = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEElEQVR4nGP4z8DwHwohFABFzAf5Zsv/OQAAAABJRU5ErkJggg==";
+    var payload: std.ArrayListUnmanaged(u8) = .empty;
+    defer payload.deinit(std.testing.allocator);
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=t,f=100,i=11,m=0,q=2;");
+    try payload.appendSlice(std.testing.allocator, encoded);
+    try payload.appendSlice(std.testing.allocator, "\x1b\\");
+    try payload.appendSlice(std.testing.allocator, "\x1b[2;3H");
+    try payload.appendSlice(std.testing.allocator, "\x1b_Ga=p,i=11,p=1,c=2,r=1,q=2\x1b\\");
+    try terminal.write(payload.items);
+
+    try terminal.compose(target, 0, 0);
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+    try std.testing.expect(gp.isImageChar(target.get(2, 1).?.char));
+
+    // The program deletes the image. The cells it reserved have to be released
+    // with it: a reservation left behind in the retained pane buffer is a hole
+    // the host's diff skips (it treats the cell as covered by the placement),
+    // so the old picture stays on screen as a stuck artifact.
+    try terminal.write("\x1b_Ga=d,d=i,i=11\x1b\\");
+    try terminal.compose(target, 0, 0);
+
+    try std.testing.expectEqual(@as(usize, 0), target.image_placements.items.len);
+    try std.testing.expect(!gp.isImageChar(target.get(2, 1).?.char));
+    try std.testing.expect(!gp.isImageChar(target.get(3, 1).?.char));
+    // The text underneath came back, not a blank hole.
+    try std.testing.expectEqual(@as(u32, buffer.DEFAULT_SPACE_CHAR), target.get(2, 1).?.char);
+
+    // A re-place elsewhere (an animation lifts the icon a cell, the pane
+    // scrolls) must leave the vacated cells released and only reserve the new
+    // rect.
+    var moved: std.ArrayListUnmanaged(u8) = .empty;
+    defer moved.deinit(std.testing.allocator);
+    try moved.appendSlice(std.testing.allocator, "\x1b[2;5H");
+    try moved.appendSlice(std.testing.allocator, "\x1b_Ga=p,i=11,p=2,c=2,r=1,q=2\x1b\\");
+    try terminal.write(moved.items);
+    try terminal.compose(target, 0, 0);
+
+    try std.testing.expectEqual(@as(usize, 1), target.image_placements.items.len);
+    try std.testing.expect(gp.isImageChar(target.get(4, 1).?.char));
+    try std.testing.expect(gp.isImageChar(target.get(5, 1).?.char));
+    try std.testing.expect(!gp.isImageChar(target.get(2, 1).?.char));
+    try std.testing.expect(!gp.isImageChar(target.get(3, 1).?.char));
 }

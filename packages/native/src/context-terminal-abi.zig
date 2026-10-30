@@ -9,7 +9,10 @@ pub fn ot_embedded_terminal_create(context: ?*abi.ContextHandle, options: ?*cons
     if (status != c.OT_OK) return status;
     const value = transport.record(c.ot_embedded_terminal_options, options) catch |err| return fail(context, err);
     if (out == null or value.reserved != 0) return fail(context, error.InvalidOptions);
-    out.?.* = abi.handleToC(context.?.core.createEmbeddedTerminal(value.cols, value.rows, value.max_scrollback) catch |err| return fail(context, err));
+    out.?.* = abi.handleToC(context.?.core.createEmbeddedTerminal(value.cols, value.rows, value.max_scrollback, .{
+        .width = value.cell_width_px,
+        .height = value.cell_height_px,
+    }) catch |err| return fail(context, err));
     return c.OT_OK;
 }
 
@@ -30,6 +33,14 @@ pub fn ot_embedded_terminal_resize(context: ?*abi.ContextHandle, id: ?*const c.o
     if (status != c.OT_OK) return status;
     if (id == null) return fail(context, error.InvalidOptions);
     context.?.core.embeddedTerminalResize(abi.handleFromC(id.?.*), cols, rows) catch |err| return fail(context, err);
+    return c.OT_OK;
+}
+
+pub fn ot_embedded_terminal_set_cell_size(context: ?*abi.ContextHandle, id: ?*const c.ot_handle, cell_width_px: u32, cell_height_px: u32) callconv(.c) c.ot_status {
+    const status = abi.sessionContextStatus(context);
+    if (status != c.OT_OK) return status;
+    if (id == null) return fail(context, error.InvalidOptions);
+    context.?.core.embeddedTerminalSetCellSize(abi.handleFromC(id.?.*), cell_width_px, cell_height_px) catch |err| return fail(context, err);
     return c.OT_OK;
 }
 
@@ -179,7 +190,7 @@ test "Context terminal ABI copies controller output and rejects stale handles" {
     if (!@import("ghostty_vt_options").available) return error.SkipZigTest;
     const context: ?*abi.ContextHandle = try abi.createTestContext(.{ .object_capacity = 16, .render_cells_max = 16 });
     defer std.testing.expectEqual(c.OT_OK, abi.ot_context_destroy(context)) catch unreachable;
-    const config: c.ot_embedded_terminal_options = .{ .struct_size = 24, .abi_version = c.OT_CONTEXT_ABI_VERSION, .cols = 4, .rows = 2, .max_scrollback = 0, .reserved = 0 };
+    const config: c.ot_embedded_terminal_options = .{ .struct_size = @sizeOf(c.ot_embedded_terminal_options), .abi_version = c.OT_CONTEXT_ABI_VERSION, .cols = 4, .rows = 2, .max_scrollback = 0, .reserved = 0 };
     var id = std.mem.zeroes(c.ot_handle);
     try std.testing.expectEqual(c.OT_OK, ot_embedded_terminal_create(context, &config, &id));
     const target = abi.handleToC(try context.?.core.createBuffer(4, 2, .{}));
