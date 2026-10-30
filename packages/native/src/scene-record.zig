@@ -117,10 +117,14 @@ pub fn gridFromC(options: *const c.ot_buffer_grid_options) !context.BufferGrid {
 pub fn imageDrawFromC(options: *const c.ot_image_draw_options) !context.ImageDraw {
     if (options.struct_size != @sizeOf(c.ot_image_draw_options)) return error.InvalidOptions;
     if (options.abi_version != c.OT_CONTEXT_ABI_VERSION) return error.UnsupportedVersion;
-    if (options.flags & ~@as(u32, c.OT_IMAGE_DRAW_SOURCE_WIDTH | c.OT_IMAGE_DRAW_SOURCE_HEIGHT) != 0 or
-        options.protocol > c.OT_IMAGE_PROTOCOL_BLOCKS or options.reserved[0] != 0 or options.reserved[1] != 0 or
+    if (options.flags & ~@as(u32, c.OT_IMAGE_DRAW_SOURCE_WIDTH | c.OT_IMAGE_DRAW_SOURCE_HEIGHT | c.OT_IMAGE_DRAW_OPACITY_OVERRIDE) != 0 or
+        options.protocol > c.OT_IMAGE_PROTOCOL_BLOCKS or options.reserved[0] != 0 or
         (options.flags & c.OT_IMAGE_DRAW_SOURCE_WIDTH == 0 and options.source_width != 0) or
         (options.flags & c.OT_IMAGE_DRAW_SOURCE_HEIGHT == 0 and options.source_height != 0)) return error.InvalidOptions;
+    // tfm fork: opacity_override is opt-in via the flag; without it the draw
+    // inherits the render-tree opacity (a zeroed struct stays backwards compatible).
+    const has_opacity_override = options.flags & c.OT_IMAGE_DRAW_OPACITY_OVERRIDE != 0;
+    if (has_opacity_override and (std.math.isNan(options.opacity_override) or options.opacity_override > 1.0)) return error.InvalidOptions;
     return .{
         .x = options.x,
         .y = options.y,
@@ -133,6 +137,7 @@ pub fn imageDrawFromC(options: *const c.ot_image_draw_options) !context.ImageDra
         .source_width = if (options.flags & c.OT_IMAGE_DRAW_SOURCE_WIDTH != 0) options.source_width else null,
         .source_height = if (options.flags & c.OT_IMAGE_DRAW_SOURCE_HEIGHT != 0) options.source_height else null,
         .protocol = @fromBackingInt(@intCast(options.protocol)),
+        .opacity_override = if (has_opacity_override) options.opacity_override else -1.0,
     };
 }
 

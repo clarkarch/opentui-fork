@@ -2683,6 +2683,37 @@ pub const CliRenderer = struct {
                     const state = &image_dirty_items[id - 1];
                     if (state.protocol == .fallback) break :blk;
                     if (!should_force and !state.clear and gp.isImageChar(currentCell.?.char)) {
+                        // The placement's pixels are unchanged, but the CELL under
+                        // it may not be: a scrim fill dims the background of the
+                        // reserved cells too. Skipping the write would leave the
+                        // pre-scrim background on the terminal, which shows
+                        // through any alpha raster as a square behind it. Emit
+                        // the cell only when its colors/attributes changed — the
+                        // image composites ABOVE the cell, so a bg-only write is
+                        // safe.
+                        const cell_changed = !buf.rgbaEqual(currentCell.?.bg, cell.bg) or
+                            !buf.rgbaEqual(currentCell.?.fg, cell.fg) or currentCell.?.attributes != cell.attributes;
+                        if (cell_changed) {
+                            if (!frame_started) {
+                                self.beginRenderFrame(writer);
+                                frame_started = true;
+                            }
+                            writer.writeAll(ansi.ANSI.reset) catch {};
+                            ansi.ANSI.moveToOutput(writer, x + 1, y + 1 + self.renderOffset) catch {};
+                            self.emitColor(writer, cell.fg, false);
+                            self.emitColor(writer, cell.bg, true);
+                            ansi.TextAttributes.applyAttributesOutputWriter(writer, cell.attributes) catch {};
+                            writer.writeByte(' ') catch {};
+                            currentFg = cell.fg;
+                            currentBg = cell.bg;
+                            currentAttributes = cell.attributes;
+                            clearRunY = y;
+                            clearRunEnd = x + 1;
+                            runLength = 0;
+                            self.currentRenderBuffer.syncCell(x, y, cell);
+                            cellsUpdated += 1;
+                            continue;
+                        }
                         if (runLength > 0) {
                             writer.writeAll(ansi.ANSI.reset) catch {};
                             runLength = 0;

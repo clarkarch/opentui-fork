@@ -12,6 +12,10 @@ export interface ImageRenderableOptions extends RenderableOptions<ImageRenderabl
   /** The region of the source to show, in source pixels; `fit` applies to it. */
   crop?: ExtractOptions
   protocol?: ImageRenderProtocol
+  /** tfm fork (scrims): 0..1 replaces the inherited render-tree opacity for this
+   * image's placements (survives a dimmed ancestor, e.g. a modal scrim); leaving
+   * it null inherits the node opacity exactly as before. */
+  placementOpacity?: number | null
   onLoad?: (image: NativeImage) => void
   onError?: (error: unknown) => void
 }
@@ -70,6 +74,7 @@ export class ImageRenderable extends Renderable {
   private _fit: ImageFit
   private _crop: ExtractOptions | undefined
   private _protocol: ImageRenderProtocol
+  private _placementOpacity: number | null
   public loadPromise: Promise<void> | null = null
 
   constructor(ctx: RenderContext, options: ImageRenderableOptions) {
@@ -77,6 +82,7 @@ export class ImageRenderable extends Renderable {
     try {
       this._fit = options.fit ?? "fit"
       this._protocol = options.protocol ?? "auto"
+      this._placementOpacity = options.placementOpacity ?? null
       this.onLoad = options.onLoad
       this.onError = options.onError
       this.setNativeSceneImage()
@@ -174,6 +180,19 @@ export class ImageRenderable extends Renderable {
     if (this._protocol === next) return
     this.setNativeSceneImage(this._image, this._fit, next)
     this._protocol = next
+    this.requestRender()
+  }
+
+  /** tfm fork (scrims): placement-level opacity override, see placementOpacity. */
+  public get placementOpacity(): number | null {
+    return this._placementOpacity
+  }
+
+  public set placementOpacity(value: number | null | undefined) {
+    const next = value ?? null
+    if (this._placementOpacity === next) return
+    this._placementOpacity = next
+    this.setNativeSceneImage(this._image, this._fit, this._protocol)
     this.requestRender()
   }
 
@@ -281,6 +300,8 @@ export class ImageRenderable extends Renderable {
       sourceWidth,
       sourceHeight,
       this._protocol,
+      // tfm fork (scrims): placements can stay opaque under a dimmed ancestor.
+      this._placementOpacity ?? undefined,
     )
   }
 
@@ -343,7 +364,7 @@ export class ImageRenderable extends Renderable {
     fit: ImageFit = this._fit,
     protocol: ImageRenderProtocol = this._protocol,
   ): void {
-    this._ctx.nativeScene.setImage(this, image, fit, protocol, this.buffered ? this.frameBuffer : null)
+    this._ctx.nativeScene.setImage(this, image, fit, protocol, this.buffered ? this.frameBuffer : null, this._placementOpacity)
   }
 
   protected destroySelf(): void {

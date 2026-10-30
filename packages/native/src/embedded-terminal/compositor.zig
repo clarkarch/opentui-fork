@@ -2,6 +2,7 @@ const std = @import("std");
 const ansi = @import("../ansi.zig");
 const buffer = @import("../buffer.zig");
 const ghostty = @import("ghostty.zig");
+const gp = @import("../grapheme.zig");
 
 pub const Error = std.mem.Allocator.Error || buffer.BufferError || error{
     InvalidUnicode,
@@ -10,6 +11,29 @@ pub const Error = std.mem.Allocator.Error || buffer.BufferError || error{
     UnsupportedResource,
     TrackerLimit,
 };
+
+/// The kitty graphics unicode placeholder: a private use codepoint that
+/// anchors an image to a cell.
+const kitty_placeholder: u21 = 0x10EEEE;
+
+/// True when the target already holds an image reservation at this cell.
+///
+/// An image is drawn OVER its cells, so a text pass must leave them alone: the
+/// row is repainted for reasons that have nothing to do with the picture (a
+/// selection tint, a background flip), and overwriting a reserved cell drops
+/// the placement — the pane then loses the image until the picture itself
+/// changes. Only deleting the image releases the cells.
+inline fn imageReserved(target: *const buffer.OptimizedBuffer, x: i64, y: i64, width: u32) bool {
+    if (y < 0 or y >= target.getHeight()) return false;
+    var offset: u32 = 0;
+    while (offset < width) : (offset += 1) {
+        const column = x + @as(i64, offset);
+        if (column < 0 or column >= target.getWidth()) continue;
+        const cell = target.get(@intCast(column), @intCast(y)) orelse continue;
+        if (gp.isImageChar(cell.char)) return true;
+    }
+    return false;
+}
 
 pub fn compose(
     allocator: std.mem.Allocator,
@@ -66,6 +90,9 @@ fn clearRow(target: *buffer.OptimizedBuffer, origin_x: i32, y: u32, cols: u16, f
     if (start >= end) return;
     var x: u32 = @intCast(start);
     while (x < end) : (x += 1) {
+        // Image cells keep their picture: clearRow runs for any dirty row,
+        // including one whose image did not change.
+        if (imageReserved(target, @intCast(x), y, 1)) continue;
         if (checked) {
             try target.drawGraphemeChecked(" ", 1, x, y, fg, bg, 0);
         } else target.set(x, y, .{
@@ -107,6 +134,9 @@ fn composeRow(
         const dest_x = @as(i64, origin_x) + @as(i64, @intCast(x));
         if (dest_x < 0 or dest_x >= target.getWidth()) continue;
         if (raw.wide == .spacer_tail or raw.wide == .spacer_head) continue;
+        // An image reservation owns these cells (see imageReserved): a text
+        // repaint under a picture must not take the picture away.
+        if (imageReserved(target, dest_x, dest_y, raw.gridWidth())) continue :cell_loop;
 
         const grapheme: []const u21 = if (raw.hasGrapheme()) graphemes[x] else &.{};
         const style = if (raw.hasStyling()) styles[x] else @TypeOf(styles[x]){};
@@ -115,6 +145,19 @@ fn composeRow(
         if (style.flags.inverse) std.mem.swap(@TypeOf(fg), &fg, &bg);
         if (selection) |range| {
             if (x < text_end and x + raw.gridWidth() > range[0] and x <= range[1]) std.mem.swap(@TypeOf(fg), &fg, &bg);
+        }
+
+        // The kitty unicode placeholder anchors an image to a cell. It is a
+        // private use codepoint that must never be painted: the image is
+        // drawn over the cell instead.
+        if (raw.codepoint() == kitty_placeholder) {
+            target.set(@intCast(dest_x), @intCast(dest_y), .{
+                .char = buffer.DEFAULT_SPACE_CHAR,
+                .fg = fg,
+                .bg = bg,
+                .attributes = attributes(style),
+            });
+            continue :cell_loop;
         }
 
         var stack: [128]u8 = undefined;

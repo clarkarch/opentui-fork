@@ -402,6 +402,13 @@ export class NativeScene {
     if (this.staging.stageBackground(this.driver.context, handle, color, renderable)) this.yogaHost.stageScene(this)
   }
 
+  /** tfm fork: a box node's translucent fill dims covered image placements
+   * instead of deleting them. */
+  setFillDimsImages(renderable: Renderable, on: boolean): void {
+    this.flushStaged()
+    this.driver.renderLib.sceneSetFillDimsImages(this.driver.context, renderable._getSceneHandle(this), on)
+  }
+
   setBoxDetails(renderable: Renderable, details: NativeSceneBoxDetails): void {
     this.flushStaged()
     this.driver.renderLib.sceneSetBoxDetails(this.driver.context, renderable._getSceneHandle(this), details)
@@ -464,6 +471,7 @@ export class NativeScene {
     fit: ImageFit,
     protocol: ImageRenderProtocol,
     buffer: OptimizedBuffer | null,
+    placementOpacity?: number | null,
   ): void {
     this.flushStaged()
     const { renderLib: lib, context } = this.driver
@@ -474,6 +482,7 @@ export class NativeScene {
       fit,
       protocol,
       buffer?._getSceneHandle(this) ?? null,
+      placementOpacity ?? null,
     )
   }
 

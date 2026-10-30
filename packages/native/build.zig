@@ -562,9 +562,18 @@ fn applyDependencies(
             .@"emit-themes" = false,
             .i18n = false,
             .@"lib-version-string" = GHOSTTY_VT_VERSION,
-            // The embedded terminal draws cells only, so it must not answer Kitty graphics or glyph
-            // protocol commands. Kitty graphics also needs wuffs, which the vendored archive does not carry.
-            .@"vt-features" = "-kitty-graphics,-glyph-protocol",
+            // tfm fork: upstream disables the Kitty graphics and glyph protocols
+            // here ("the embedded terminal draws cells only"). The fork DOES
+            // render Kitty images inside the embedded terminal pane, so the
+            // graphics protocol stays enabled -- which is why the vendored
+            // deps carry the fork's own `wuffs` package (Ghostty requires one
+            // for the protocol). The PNG decoder is installed by the fork
+            // (src/embedded-terminal/main.zig installs OpenTUI's wuffs decoder,
+            // because `sys.decode_png` is null in library builds).
+            //
+            // The glyph protocol stays disabled: the pane renders cells only,
+            // so registered glyphs would never be drawn.
+            .@"vt-features" = "-glyph-protocol",
         })) |ghostty| {
             module.addImport("ghostty_vt", ghostty.module("ghostty-vt"));
         }

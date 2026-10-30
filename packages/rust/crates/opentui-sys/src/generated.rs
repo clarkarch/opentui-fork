@@ -5,7 +5,7 @@ use core::ffi::c_void;
 
 /// FNV-1a 64-bit hash of the `opentui.h` these declarations were generated from.
 /// The build script rejects native artifacts whose header has a different hash.
-pub const OPENTUI_HEADER_FNV1A64: u64 = 0x574a7cb01e6ffac6;
+pub const OPENTUI_HEADER_FNV1A64: u64 = 0x01498cd983a54f5a;
 
 pub type ot_status = i32;
 
@@ -533,6 +533,7 @@ pub const OT_IMAGE_PROTOCOL_SIXEL: u32 = 2;
 pub const OT_IMAGE_PROTOCOL_BLOCKS: u32 = 3;
 pub const OT_IMAGE_DRAW_SOURCE_WIDTH: u32 = 1;
 pub const OT_IMAGE_DRAW_SOURCE_HEIGHT: u32 = 2;
+pub const OT_IMAGE_DRAW_OPACITY_OVERRIDE: u32 = 4;
 pub const OT_IMAGE_ENCODED_BYTES_MAX: u32 = 67108864;
 pub const OT_IMAGE_FORMAT_UNKNOWN: u32 = 0;
 pub const OT_IMAGE_FORMAT_PNG: u32 = 1;
@@ -2223,6 +2224,8 @@ pub struct ot_embedded_terminal_options {
     pub cols: u32,
     pub rows: u32,
     pub max_scrollback: u32,
+    pub cell_width_px: u32,
+    pub cell_height_px: u32,
     pub reserved: u32,
 }
 
@@ -2240,14 +2243,16 @@ impl Default for ot_embedded_terminal_options {
 }
 
 const _: () = {
-    assert!(core::mem::size_of::<ot_embedded_terminal_options>() == 24);
+    assert!(core::mem::size_of::<ot_embedded_terminal_options>() == 32);
     assert!(core::mem::align_of::<ot_embedded_terminal_options>() == 4);
     assert!(core::mem::offset_of!(ot_embedded_terminal_options, struct_size) == 0);
     assert!(core::mem::offset_of!(ot_embedded_terminal_options, abi_version) == 4);
     assert!(core::mem::offset_of!(ot_embedded_terminal_options, cols) == 8);
     assert!(core::mem::offset_of!(ot_embedded_terminal_options, rows) == 12);
     assert!(core::mem::offset_of!(ot_embedded_terminal_options, max_scrollback) == 16);
-    assert!(core::mem::offset_of!(ot_embedded_terminal_options, reserved) == 20);
+    assert!(core::mem::offset_of!(ot_embedded_terminal_options, cell_width_px) == 20);
+    assert!(core::mem::offset_of!(ot_embedded_terminal_options, cell_height_px) == 24);
+    assert!(core::mem::offset_of!(ot_embedded_terminal_options, reserved) == 28);
 };
 
 #[repr(C)]
@@ -3082,7 +3087,7 @@ const _: () = {
 };
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ot_image_draw_options {
     pub struct_size: u32,
     pub abi_version: u32,
@@ -3098,7 +3103,8 @@ pub struct ot_image_draw_options {
     pub source_y: u32,
     pub source_width: u32,
     pub source_height: u32,
-    pub reserved: [u32; 2],
+    pub opacity_override: f32,
+    pub reserved: [u32; 1],
 }
 
 // SAFETY: the record has no padding and only integer or float fields.
@@ -3131,7 +3137,8 @@ const _: () = {
     assert!(core::mem::offset_of!(ot_image_draw_options, source_y) == 44);
     assert!(core::mem::offset_of!(ot_image_draw_options, source_width) == 48);
     assert!(core::mem::offset_of!(ot_image_draw_options, source_height) == 52);
-    assert!(core::mem::offset_of!(ot_image_draw_options, reserved) == 56);
+    assert!(core::mem::offset_of!(ot_image_draw_options, opacity_override) == 56);
+    assert!(core::mem::offset_of!(ot_image_draw_options, reserved) == 60);
 };
 
 #[repr(C)]
@@ -4370,7 +4377,7 @@ const _: () = {
 };
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ot_scene_record_image {
     pub header: ot_scene_record_header,
     pub image: ot_handle,
@@ -4450,6 +4457,7 @@ unsafe extern "C" {
     pub fn ot_scene_set_paint(context: *mut ot_context, node: *const ot_handle, scene_paint_options: *const ot_scene_paint_options) -> ot_status;
     pub fn ot_scene_flush(context: *mut ot_context, updates: *const u8, byte_count: u32, out_applied: *mut u32) -> ot_status;
     pub fn ot_scene_set_surface(context: *mut ot_context, node: *const ot_handle, buffer: *const ot_handle) -> ot_status;
+    pub fn ot_scene_set_fill_dims_images(context: *mut ot_context, node: *const ot_handle, on: u32) -> ot_status;
     pub fn ot_scene_set_box_details(context: *mut ot_context, node: *const ot_handle, scene_box_details: *const ot_scene_box_details, title: *const u8, title_bytes: u32, bottom_title: *const u8, bottom_title_bytes: u32) -> ot_status;
     pub fn ot_scene_set_viewport(context: *mut ot_context, node: *const ot_handle, viewport: *const ot_handle) -> ot_status;
     pub fn ot_scene_set_scroll(context: *mut ot_context, node: *const ot_handle, scene_scroll_options: *const ot_scene_scroll_options) -> ot_status;
@@ -4492,6 +4500,7 @@ unsafe extern "C" {
     pub fn ot_embedded_terminal_destroy(context: *mut ot_context, terminal: *const ot_handle) -> ot_status;
     pub fn ot_embedded_terminal_write(context: *mut ot_context, terminal: *const ot_handle, bytes: *const u8, byte_count: u32) -> ot_status;
     pub fn ot_embedded_terminal_resize(context: *mut ot_context, terminal: *const ot_handle, cols: u32, rows: u32) -> ot_status;
+    pub fn ot_embedded_terminal_set_cell_size(context: *mut ot_context, terminal: *const ot_handle, cell_width_px: u32, cell_height_px: u32) -> ot_status;
     pub fn ot_embedded_terminal_command(context: *mut ot_context, terminal: *const ot_handle, command: u32, argument: i32) -> ot_status;
     pub fn ot_embedded_terminal_set_selection(context: *mut ot_context, terminal: *const ot_handle, start_x: u32, start_y: u32, end_x: u32, end_y: u32) -> ot_status;
     pub fn ot_embedded_terminal_get_selected_text(context: *mut ot_context, terminal: *const ot_handle, bytes: *mut u8, capacity: u32, out_count: *mut u32) -> ot_status;
@@ -4576,7 +4585,7 @@ unsafe extern "C" {
     pub fn ot_image_copy_png(context: *mut ot_context, image: *const ot_handle, destination: *mut u8, capacity: u64, out_byte_count: *mut u64) -> ot_status;
     pub fn ot_image_take_pixels(context: *mut ot_context, image: *const ot_handle, out_pixels: *mut ot_image_pixels) -> ot_status;
     pub fn ot_image_pixels_release(context: *mut ot_context, lease: *const ot_handle) -> ot_status;
-    pub fn ot_scene_set_image(context: *mut ot_context, node: *const ot_handle, image: *const ot_handle, fit: u32, protocol: u32, buffer: *const ot_handle) -> ot_status;
+    pub fn ot_scene_set_image(context: *mut ot_context, node: *const ot_handle, image: *const ot_handle, fit: u32, protocol: u32, buffer: *const ot_handle, opacity_override: f32) -> ot_status;
     pub fn ot_scene_set_crop(context: *mut ot_context, node: *const ot_handle, left: u32, top: u32, width: u32, height: u32) -> ot_status;
     pub fn ot_scene_set_video(context: *mut ot_context, node: *const ot_handle, fit: u32, buffer: *const ot_handle) -> ot_status;
     pub fn ot_video_open(context: *mut ot_context, node: *const ot_handle, path: *const u8, path_length: u32, flags: u32, out_info: *mut ot_video_info) -> ot_status;

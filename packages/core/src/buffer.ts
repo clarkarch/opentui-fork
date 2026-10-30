@@ -41,6 +41,7 @@ function packDrawOptions(
   shouldFill: boolean,
   titleAlignment: "left" | "center" | "right",
   bottomTitleAlignment: "left" | "center" | "right",
+  fillDimsImages = false,
 ): number {
   let packed = 0
 
@@ -67,6 +68,12 @@ function packDrawOptions(
 
   packed |= alignment << 5
   packed |= bottomAlignment << 7
+
+  // tfm fork: bit 9 asks a translucent fill to dim the image placements it
+  // covers instead of deleting them (see BoxRenderable.fillDimsImages).
+  if (fillDimsImages) {
+    packed |= 1 << 9
+  }
 
   return packed
 }
@@ -712,6 +719,9 @@ export class OptimizedBuffer {
     sourceWidth: number = image.width,
     sourceHeight: number = image.height,
     protocol: ImageRenderProtocol = "auto",
+    /** tfm fork (scrims): 0..1 replaces the inherited render-tree opacity for this
+     * placement; null/undefined inherits the node opacity exactly as before. */
+    opacityOverride?: number | null,
   ): boolean {
     this.guard()
     requireInteger(x, "x", -0x80000000, 0x7fffffff)
@@ -739,6 +749,7 @@ export class OptimizedBuffer {
       sourceWidth,
       sourceHeight,
       protocol,
+      opacityOverride: opacityOverride ?? null,
     }
     const handle = image._getContextHandle(this.lib, this.source.context)
     const recorder = this.recorder
@@ -827,6 +838,9 @@ export class OptimizedBuffer {
     titleAlignment?: "left" | "center" | "right"
     bottomTitle?: string
     bottomTitleAlignment?: "left" | "center" | "right"
+    /** tfm fork: a translucent fill dims covered image placements instead of
+     * deleting them (BoxRenderable.fillDimsImages). */
+    fillDimsImages?: boolean
   }): void {
     this.guard()
     if (options.width <= 0 || options.height <= 0) return
@@ -838,6 +852,7 @@ export class OptimizedBuffer {
       options.shouldFill ?? false,
       options.titleAlignment || "left",
       options.bottomTitleAlignment || "left",
+      options.fillDimsImages ?? false,
     )
 
     this.drawChecked({

@@ -135,6 +135,8 @@ pub const ImageDraw = struct {
     source_width: ?u32 = null,
     source_height: ?u32 = null,
     protocol: image.RenderProtocol = .auto,
+    /// tfm fork: negative = inherit the render-tree opacity; 0..1 overrides it.
+    opacity_override: f32 = -1.0,
 };
 
 pub const BufferGrid = struct {
@@ -1752,7 +1754,7 @@ pub const Context = struct {
         target.drawChar(char, @intCast(x), @intCast(y), foreground, background, attributes);
     }
 
-    pub fn createEmbeddedTerminal(self: *Context, cols: u32, rows: u32, max_scrollback: u32) !Handle {
+    pub fn createEmbeddedTerminal(self: *Context, cols: u32, rows: u32, max_scrollback: u32, cell_size: embedded_terminal.CellSize) !Handle {
         try self.beginMutation();
         defer self.mutating = false;
         try self.checkBufferDimensions(cols, rows);
@@ -1764,6 +1766,7 @@ pub const Context = struct {
             .rows = @intCast(rows),
             .max_scrollback = max_scrollback,
             .logger = &self.logger,
+            .cell_size = cell_size,
         });
         errdefer value.deinit();
         return self.objects.insert(.embedded_terminal, value);
@@ -1789,6 +1792,13 @@ pub const Context = struct {
         try self.checkBufferDimensions(cols, rows);
         if (cols > std.math.maxInt(u16) or rows > std.math.maxInt(u16)) return error.InvalidDimensions;
         try value.resize(@intCast(cols), @intCast(rows));
+    }
+
+    pub fn embeddedTerminalSetCellSize(self: *Context, handle: Handle, cell_width_px: u32, cell_height_px: u32) !void {
+        try self.beginMutation();
+        defer self.mutating = false;
+        const value = try self.getEmbeddedTerminal(handle);
+        value.setCellSize(cell_width_px, cell_height_px);
     }
 
     pub fn embeddedTerminalCommand(self: *Context, handle: Handle, command: u32, argument: i32) !void {
@@ -1972,7 +1982,7 @@ pub const Context = struct {
         const height = options.source_height orelse source.height() - options.source_y;
         if (width > source.width() - options.source_x or height > source.height() - options.source_y) return error.InvalidOptions;
         if (source.ref_count == std.math.maxInt(u32)) return error.ObjectLimit;
-        return target.drawImage(source, source.render_id, options.x, options.y, options.width, options.height, options.pixel_width, options.pixel_height, options.source_x, options.source_y, width, height, options.protocol);
+        return target.drawImageWithOptions(source, source.render_id, options.x, options.y, options.width, options.height, options.pixel_width, options.pixel_height, options.source_x, options.source_y, width, height, options.protocol, options.opacity_override);
     }
 
     pub fn sessionSetImageResolution(self: *Context, handle: Handle, terminal_width: u32, terminal_height: u32, pixel_width: u32, pixel_height: u32) !void {
@@ -2095,7 +2105,7 @@ pub const Context = struct {
             },
             .compose => try drawContextBuffer(target, try self.getBuffer(options.source orelse return error.InvalidOptions), options.x, options.y, options.crop),
             .box => {
-                if (options.packed_options & ~@as(u32, 0x1ff) != 0 or
+                if (options.packed_options & ~@as(u32, 0x3ff) != 0 or
                     (options.packed_options >> 5) & 3 > 2 or (options.packed_options >> 7) & 3 > 2) return error.InvalidOptions;
                 if (options.width == 0 or options.height == 0) return;
                 // Zero keeps the default border character.
@@ -2104,12 +2114,19 @@ pub const Context = struct {
                 }
                 try buf.validateTextInput(text);
                 try buf.validateTextInput(bottom_title);
-                try target.drawBoxChecked(options.x, options.y, options.width, options.height, &options.border_chars, .{
+                const sides: buf.BorderSides = .{
                     .top = options.packed_options & api.OT_BORDER_TOP != 0,
                     .right = options.packed_options & api.OT_BORDER_RIGHT != 0,
                     .bottom = options.packed_options & api.OT_BORDER_BOTTOM != 0,
                     .left = options.packed_options & api.OT_BORDER_LEFT != 0,
-                }, options.foreground, background, options.title_color, options.packed_options & 16 != 0, if (text.len == 0) null else text, @intCast((options.packed_options >> 5) & 3), if (bottom_title.len == 0) null else bottom_title, @intCast((options.packed_options >> 7) & 3));
+                };
+                // tfm fork: bit 9 asks a translucent fill to dim the image
+                // placements it covers instead of deleting them.
+                if (options.packed_options & (1 << 9) != 0) {
+                    try target.drawBoxCheckedDimmingImages(options.x, options.y, options.width, options.height, &options.border_chars, sides, options.foreground, background, options.title_color, options.packed_options & 16 != 0, if (text.len == 0) null else text, @intCast((options.packed_options >> 5) & 3), if (bottom_title.len == 0) null else bottom_title, @intCast((options.packed_options >> 7) & 3));
+                } else {
+                    try target.drawBoxChecked(options.x, options.y, options.width, options.height, &options.border_chars, sides, options.foreground, background, options.title_color, options.packed_options & 16 != 0, if (text.len == 0) null else text, @intCast((options.packed_options >> 5) & 3), if (bottom_title.len == 0) null else bottom_title, @intCast((options.packed_options >> 7) & 3));
+                }
             },
             // Text and fills draw their part inside the target. A cell outside it draws nothing.
             .text => try target.drawTextFitted(text, options.x, options.y, options.foreground, options.background, options.attributes, options.fit),
@@ -2507,11 +2524,12 @@ pub const Context = struct {
         try value.scene_node.?.owner.setBoxDetails(value, details);
     }
 
-    pub fn sceneSetImage(self: *Context, handle: Handle, source_handle: ?Handle, fit: image.Fit, protocol: image.RenderProtocol, buffer_handle: ?Handle) !void {
+    pub fn sceneSetImage(self: *Context, handle: Handle, source_handle: ?Handle, fit: image.Fit, protocol: image.RenderProtocol, buffer_handle: ?Handle, opacity_override: f32) !void {
         try self.beginMutation();
         defer self.mutating = false;
         const node = try self.scenePaintNode(handle);
         if (node.scene_node.?.kind != api.OT_SCENE_IMAGE) return error.WrongKind;
+        if (std.math.isNan(opacity_override) or opacity_override > 1.0) return error.InvalidOptions;
         try yoga.check(yoga.nodeTeardownStatus(node.yoga_node));
         const source = if (source_handle) |id| try self.getImage(id) else null;
         const target = if (buffer_handle) |id| try self.getBuffer(id) else null;
@@ -2523,7 +2541,7 @@ pub const Context = struct {
         const state = &node.scene_node.?.control.image;
         const crop = state.crop;
         state.deinit();
-        state.* = .{ .source = source, .fit = fit, .protocol = protocol, .buffer = target, .crop = crop };
+        state.* = .{ .source = source, .fit = fit, .protocol = protocol, .buffer = target, .crop = crop, .opacity_override = opacity_override };
     }
 
     /// Sets the source region an IMAGE or VIDEO node shows; null shows the whole source.
@@ -2614,6 +2632,16 @@ pub const Context = struct {
         if (source) |value| try value.retain();
         if (node.surface) |previous| previous.deinit();
         node.surface = source;
+    }
+
+    /// tfm fork: mark a box node so its translucent fill keeps (and dims) the
+    /// image placements it covers instead of deleting them (the scrim overlay).
+    pub fn sceneSetFillDimsImages(self: *Context, handle: Handle, on: bool) !void {
+        try self.beginMutation();
+        defer self.mutating = false;
+        const node = try self.sceneMutableNode(handle);
+        if (node.scene_node.?.kind != api.OT_SCENE_BOX) return error.WrongKind;
+        node.scene_node.?.fill_dims_images = on;
     }
 
     pub fn sceneSetEditorView(self: *Context, handle: Handle, view_handle: ?Handle) !void {

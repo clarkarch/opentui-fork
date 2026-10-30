@@ -47,6 +47,7 @@ const context_drawing_resources_tests = @import("tests/context-drawing-resources
 const session_tests = @import("tests/session_test.zig");
 const scene_tests = @import("tests/scene_test.zig");
 const scene_box_details_tests = @import("tests/scene_box_details_test.zig");
+const scene_image_fill_tests = @import("tests/scene_image_fill_test.zig");
 const scene_order_tests = @import("tests/scene_order_test.zig");
 const scene_parity_tests = @import("tests/scene_parity_test.zig");
 const output_sim_tests = @import("tests/output_sim_test.zig");
@@ -146,6 +147,7 @@ comptime {
     _ = session_tests;
     _ = scene_tests;
     _ = scene_box_details_tests;
+    _ = scene_image_fill_tests;
     _ = scene_order_tests;
     _ = scene_parity_tests;
     _ = output_sim_tests;

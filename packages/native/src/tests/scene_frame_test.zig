@@ -585,7 +585,7 @@ test "Scene frame work counts each frame kind and publishes only presented scene
     try f.owner.sceneSetStyle(image_node, 4, 1, 0, 1, 1, 1);
     try f.owner.sceneMoveNode(image_node, f.root, 2);
     // Image placements, even drawn as blocks, are a full-path reason, merged with a forced encode's.
-    try f.owner.sceneSetImage(image_node, picture, .fit, .blocks, null);
+    try f.owner.sceneSetImage(image_node, picture, .fit, .blocks, null, -1.0);
     const reasons = (try presentWork(f, .{ .force = true })).full_path_reasons;
     try testing.expectEqual(FrameWork.full_path_screen | FrameWork.full_path_images, reasons);
     // A hook frame counts its host requests.
@@ -1121,7 +1121,7 @@ fn retainedTable(verify: bool, counts: []FrameWork) !void {
             .image => {
                 const pixels = utils.repeat(u8, &.{ 200, 40, 0, 255 }, 4).*;
                 image_node = try placedAt(f, f.root, c.OT_SCENE_IMAGE, 10, 4, 7, 2, 1);
-                try f.owner.sceneSetImage(image_node, try f.owner.createImagePixels(&pixels, 2, 2, .{ .stride = 8 }), .fit, .blocks, null);
+                try f.owner.sceneSetImage(image_node, try f.owner.createImagePixels(&pixels, 2, 2, .{ .stride = 8 }), .fit, .blocks, null, -1.0);
             },
         }
         const result = try presentWork(f, .{});

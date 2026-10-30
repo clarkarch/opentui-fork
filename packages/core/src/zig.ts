@@ -608,6 +608,9 @@ export interface NativeContextImageDraw {
   sourceWidth?: number
   sourceHeight?: number
   protocol?: ImageRenderProtocol
+  /** tfm fork (scrims): 0..1 replaces the inherited render-tree opacity for this
+   * draw; undefined/null inherits. Values > 1 are rejected natively. */
+  opacityOverride?: number | null
 }
 
 export interface NativeSceneTextSelectionOptions {
@@ -1769,7 +1772,17 @@ function encodeImageDrawOptions(options: NativeContextImageDraw, words: Uint32Ar
   signed[word + fields.y.offset / 4] = toFFII32(options.y ?? 0, "Image y")
   const sourceWidth = options.sourceWidth
   const sourceHeight = options.sourceHeight
-  words[word + fields.flags.offset / 4] = (sourceWidth === undefined ? 0 : 1) | (sourceHeight === undefined ? 0 : 2)
+  // tfm fork: float f32 field, opt-in via the OPACITY_OVERRIDE flag so a zeroed
+  // options record keeps inheriting the render-tree opacity.
+  const opacityOverride = options.opacityOverride
+  if (opacityOverride !== undefined && opacityOverride !== null && (typeof opacityOverride !== "number" || Number.isNaN(opacityOverride))) throw new TypeError("Image opacity override must be a number")
+  if (opacityOverride != null && (opacityOverride < 0 || opacityOverride > 1)) throw new TypeError("Image opacity override must be within 0..1")
+  const hasOpacityOverride = opacityOverride !== undefined && opacityOverride !== null
+  words[word + fields.flags.offset / 4] =
+    (sourceWidth === undefined || sourceWidth === null ? 0 : 1) |
+    (sourceHeight === undefined || sourceHeight === null ? 0 : 2) |
+    (hasOpacityOverride ? nativeConstants.OT_IMAGE_DRAW_OPACITY_OVERRIDE : 0)
+  new Float32Array(signed.buffer, base + fields.opacity_override.offset, 1)[0] = hasOpacityOverride ? opacityOverride : -1
   for (const [field, value] of [
     ["width", options.width],
     ["height", options.height],
@@ -1814,6 +1827,13 @@ const EMBEDDED_TERMINAL_BUTTONS = new Map<string | undefined, number>([
 function embeddedTerminalDimension(value: number, name: string) {
   if (!Number.isInteger(value) || value < 1 || value > 0xffff) {
     throw new RangeError(`Embedded terminal ${name} must be an integer between 1 and 65535`)
+  }
+  return value
+}
+
+function embeddedTerminalCellSize(value: number, name: string) {
+  if (!Number.isInteger(value) || value < 0 || value > 0xffff) {
+    throw new RangeError(`Embedded terminal ${name} must be an integer between 0 and 65535`)
   }
   return value
 }
@@ -4060,7 +4080,7 @@ export class FFIRenderLib {
 
   public createContextEmbeddedTerminal(
     context: NativeContextHandle,
-    options: { cols: number; rows: number; maxScrollback?: number },
+    options: { cols: number; rows: number; maxScrollback?: number; cellWidthPx?: number; cellHeightPx?: number },
   ): ContextEmbeddedTerminalHandle {
     const layout = nativeLayouts.ot_embedded_terminal_options
     this.getYogaHost().assertMutable()
@@ -4070,6 +4090,14 @@ export class FFIRenderLib {
     record[layout.fields.max_scrollback.offset / 4] = toSafeFFIU32Length(
       options.maxScrollback ?? 10_000,
       "Embedded terminal maxScrollback",
+    )
+    record[layout.fields.cell_width_px.offset / 4] = embeddedTerminalCellSize(
+      options.cellWidthPx ?? 0,
+      "cell width",
+    )
+    record[layout.fields.cell_height_px.offset / 4] = embeddedTerminalCellSize(
+      options.cellHeightPx ?? 0,
+      "cell height",
     )
     const output = new Uint32Array(handleWords)
     const pointer = this.nativeContextPointer(context, "ot_embedded_terminal_create")
@@ -4120,6 +4148,23 @@ export class FFIRenderLib {
     nativeResult(
       "ot_embedded_terminal_resize",
       this.opentui.symbols.ot_embedded_terminal_resize(pointer, handle, width, height),
+    )
+  }
+
+  public contextEmbeddedTerminalSetCellSize(
+    context: NativeContextHandle,
+    terminal: ContextEmbeddedTerminalHandle,
+    cellWidthPx: number,
+    cellHeightPx: number,
+  ): void {
+    this.getYogaHost().assertMutable()
+    const handle = encodeContextHandle(context, terminal)
+    const width = embeddedTerminalCellSize(cellWidthPx, "cell width")
+    const height = embeddedTerminalCellSize(cellHeightPx, "cell height")
+    const pointer = this.nativeContextPointer(context, "ot_embedded_terminal_set_cell_size")
+    nativeResult(
+      "ot_embedded_terminal_set_cell_size",
+      this.opentui.symbols.ot_embedded_terminal_set_cell_size(pointer, handle, width, height),
     )
   }
 
@@ -5894,6 +5939,8 @@ export class FFIRenderLib {
     fit: "fit" | "cover" | "fill",
     protocol: ImageRenderProtocol,
     buffer: ContextBufferHandle | null,
+    // tfm fork: 0..1 replaces the inherited render-tree opacity; null/undefined inherits.
+    placementOpacity?: number | null,
   ): void {
     const handle = encodeContextHandle(context, node)
     const source = image === null ? null : encodeContextHandle(context, image)
@@ -5901,11 +5948,16 @@ export class FFIRenderLib {
     const fitId = IMAGE_FITS.indexOf(fit)
     const protocolId = IMAGE_PROTOCOL_TO_ID[protocol]
     if (fitId < 0 || !Number.isInteger(protocolId)) throw new TypeError("Unknown image fit or protocol")
+    if (placementOpacity !== undefined && placementOpacity !== null && (typeof placementOpacity !== "number" || Number.isNaN(placementOpacity) || placementOpacity < 0 || placementOpacity > 1)) {
+      throw new TypeError("Image placement opacity must be within 0..1")
+    }
+    // Negative inherits the node opacity (matches the native default).
+    const opacityOverride = placementOpacity === undefined || placementOpacity === null ? -1 : placementOpacity
     this.getYogaHost().runMutation(() => {
       const pointer = this.nativeContextPointer(context, "ot_scene_set_image")
       nativeResult(
         "ot_scene_set_image",
-        this.opentui.symbols.ot_scene_set_image(pointer, handle, source, fitId, protocolId, storage),
+        this.opentui.symbols.ot_scene_set_image(pointer, handle, source, fitId, protocolId, storage, opacityOverride),
       )
     })
   }
@@ -7555,6 +7607,19 @@ export class FFIRenderLib {
       this.opentui.symbols.ot_scene_get_style(pointer, handle, styleGroup, styleKind, styleEdge, output),
     )
     return { unit: output[layout.fields.unit.offset / 4], value: values[layout.fields.value.offset / 4] }
+  }
+
+  /** tfm fork: a box node's translucent fill dims covered image placements
+   * instead of deleting them (the modal scrim overlay). */
+  public sceneSetFillDimsImages(context: NativeContextHandle, node: SceneNodeHandle, on: boolean): void {
+    const handle = encodeContextHandle(context, node)
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_scene_set_fill_dims_images")
+      nativeResult(
+        "ot_scene_set_fill_dims_images",
+        this.opentui.symbols.ot_scene_set_fill_dims_images(pointer, handle, on ? 1 : 0),
+      )
+    })
   }
 
   public sceneSetBoxDetails(context: NativeContextHandle, node: SceneNodeHandle, details: NativeSceneBoxDetails): void {

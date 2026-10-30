@@ -1134,7 +1134,7 @@ test "renderer deletes committed Kitty runs after a failed frame" {
     try std.testing.expect(std.mem.find(u8, recovered, ",p=2147483648,c=1,r=1,x=0,y=0,w=1,h=1") != null);
 }
 
-test "renderer splits changed background runs around clean Kitty image cells" {
+test "renderer repaints changed backgrounds under clean Kitty image cells" {
     var pools = TestPools.init(std.testing.allocator);
     defer pools.deinit();
 
@@ -1156,8 +1156,13 @@ test "renderer splits changed background runs around clean Kitty image cells" {
     try std.testing.expectEqual(renderer.RenderStatus.rendered, test_renderer.render(false));
 
     const output = test_renderer.memory.lastWrite();
-    try std.testing.expect(std.mem.find(u8, output, "\x1b[1;1H") != null);
-    try std.testing.expect(std.mem.find(u8, output, "\x1b[0m\x1b[1;4H") != null);
+    // tfm fork divergence: a changed background under a CLEAN image cell is
+    // repainted instead of being split around. The old behavior assumed the
+    // image covers the cell, which is false for an alpha placement — the
+    // pre-change background showed through it (a square behind every alpha icon
+    // under a scrim). The image is a layer above the cells, so writing its cell
+    // is safe; the placement itself is still not retransmitted.
+    try std.testing.expect(std.mem.find(u8, output, "48;2;32;43;61") != null);
     try std.testing.expect(std.mem.find(u8, output, "\x1b_G") == null);
 }
 
@@ -4496,6 +4501,155 @@ test "renderer scales kitty transmission alpha by placement opacity" {
     const retransmitted = try terminal_image_test.decodeKittyChunks(second[second_start..second_end]);
     defer std.testing.allocator.free(retransmitted);
     try std.testing.expect(@abs(@as(i16, retransmitted[3]) - 64) <= 1);
+}
+
+test "tfm fork: image opacity override replaces the inherited placement opacity" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+
+    var test_renderer = try TestRenderer.create(std.testing.allocator, 4, 2, &pools.graphemes, &pools.links);
+    defer test_renderer.deinit();
+    const value = try image.createFromRgba(std.testing.allocator, &[_]u8{ 200, 100, 50, 255 }, 1, 1, 4);
+    defer value.deinit();
+    const value_handle: u32 = 1;
+    test_renderer.renderer.terminal.caps.kitty_graphics = true;
+
+    // A dimmed ancestor (stack 0.5) plus an override of 1.0 must transmit the
+    // placement fully opaque: the override replaces the inherited opacity, it
+    // does not multiply it (this is what keeps scrim-dimmed icons crisp).
+    var next = test_renderer.renderer.getNextBuffer();
+    try next.pushOpacity(0.5);
+    try std.testing.expect(try next.drawImageWithOptions(value, value_handle, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto, 1.0));
+    next.popOpacity();
+    try std.testing.expectEqual(renderer.RenderStatus.rendered, test_renderer.render(true));
+    const output = test_renderer.memory.lastWrite();
+    const transmit_start = std.mem.find(u8, output, "\x1b_Ga=t").?;
+    const transmit_end = std.mem.findPos(u8, output, transmit_start, "\x1b\\").? + 2;
+    const transmitted = try terminal_image_test.decodeKittyChunks(output[transmit_start..transmit_end]);
+    defer std.testing.allocator.free(transmitted);
+    // No alpha scaling: the pixels are the source colors, and an RGBA transmit
+    // would still carry full alpha (an RGB transmit has no alpha channel).
+    try std.testing.expect(transmitted.len == 3 or transmitted.len == 4);
+    try std.testing.expectEqualSlices(u8, &[_]u8{ 200, 100, 50 }, transmitted[0..3]);
+    if (transmitted.len == 4) try std.testing.expectEqual(@as(u8, 255), transmitted[3]);
+
+    // An override below 1 scales the alpha independently of the stack: with no
+    // ancestor dim (stack 1.0) an override of 0.5 still transmits ~128.
+    next = test_renderer.renderer.getNextBuffer();
+    try std.testing.expect(try next.drawImageWithOptions(value, value_handle, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto, 0.5));
+    try std.testing.expectEqual(renderer.RenderStatus.rendered, test_renderer.render(false));
+    const second = test_renderer.memory.lastWrite();
+    const second_start = std.mem.find(u8, second, "\x1b_Ga=t").?;
+    const second_end = std.mem.findPos(u8, second, second_start, "\x1b\\").? + 2;
+    const retransmitted = try terminal_image_test.decodeKittyChunks(second[second_start..second_end]);
+    defer std.testing.allocator.free(retransmitted);
+    try std.testing.expect(@abs(@as(i16, retransmitted[3]) - 128) <= 1);
+}
+
+test "tfm fork: a dimming box fill keeps and dims image placements" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+
+    var test_renderer = try TestRenderer.create(std.testing.allocator, 2, 1, &pools.graphemes, &pools.links);
+    defer test_renderer.deinit();
+    const value = try image.createFromRgba(std.testing.allocator, &[_]u8{ 200, 100, 50, 255 }, 1, 1, 4);
+    defer value.deinit();
+    const border_chars = [_]u32{' '} ** 11;
+    const white = ansi.rgbColor(255, 255, 255, 255);
+
+    var next = test_renderer.renderer.getNextBuffer();
+    try std.testing.expect(try next.drawImage(value, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto));
+    // The second placement carries an explicit opacity override (the app shades
+    // those itself and expects them opaque).
+    try std.testing.expect(try next.drawImageWithOptions(value, 2, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto, 1.0));
+    try std.testing.expectEqual(@as(usize, 2), next.image_placements.items.len);
+
+    // A translucent fill via the opt-in path keeps both placements and their
+    // reservation cells and RECORDS a dim region (a placement mutated here
+    // would only be reset by a later paint pass; the region is baked once at
+    // frame end).
+    try next.drawBoxCheckedDimmingImages(0, 0, 2, 1, &border_chars, .{}, white, ansi.rgbColor(0, 0, 0, 150), white, true, null, 0, null, 0);
+    try std.testing.expectEqual(@as(usize, 2), next.image_placements.items.len);
+    try std.testing.expectEqual(@as(usize, 1), next.image_dim_regions.items.len);
+    try std.testing.expectEqual(@as(u8, 150), next.image_dim_regions.items[0].alpha);
+    try std.testing.expectEqual(@as(u8, 255), next.image_placements.items[0].opacity);
+    try std.testing.expect(gp.isImageChar(next.get(0, 0).?.char));
+    try std.testing.expect(gp.isImageChar(next.get(1, 0).?.char));
+
+    // The frame-end bake dims the inherited placement and leaves the overridden
+    // one alone. The regions stay for the rest of the frame (a later paint pass
+    // may re-place the image); they clear with the buffer.
+    next.applyImageDimRegions();
+    try std.testing.expectEqual(@as(u8, 150), next.image_placements.items[0].opacity);
+    try std.testing.expectEqual(@as(u8, 255), next.image_placements.items[1].opacity);
+    // idempotent: a second bake does not dim twice
+    next.applyImageDimRegions();
+    try std.testing.expectEqual(@as(u8, 150), next.image_placements.items[0].opacity);
+
+    // The default path is unchanged: an opaque fill replaces the reservation.
+    var plain = test_renderer.renderer.getNextBuffer();
+    try std.testing.expect(try plain.drawImage(value, 1, 0, 0, 2, 1, 0, 0, 0, 0, 1, 1, .auto));
+    try plain.drawBoxChecked(0, 0, 2, 1, &border_chars, .{}, white, ansi.rgbColor(10, 20, 30, 255), white, true, null, 0, null, 0);
+    try std.testing.expect(!gp.isImageChar(plain.get(0, 0).?.char));
+}
+
+test "tfm fork: a dimming fill blends image cells over their neighbours' backdrop" {
+    // transparent-bg force: cells carry no background and the scrim fill blends
+    // over the renderer backdrop. The reserved image cell must blend the SAME
+    // way as the plain cell beside it, or a flat square appears behind every
+    // alpha icon (the fill color left raw on a null backdrop).
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+
+    var test_renderer = try TestRenderer.create(std.testing.allocator, 2, 1, &pools.graphemes, &pools.links);
+    defer test_renderer.deinit();
+    const value = try image.createFromRgba(std.testing.allocator, &[_]u8{ 200, 100, 50, 255 }, 1, 1, 4);
+    defer value.deinit();
+    const border_chars = [_]u32{' '} ** 11;
+    const white = ansi.rgbColor(255, 255, 255, 255);
+
+    const next = test_renderer.renderer.getNextBuffer();
+    next.clear(ansi.rgbColor(0, 0, 0, 0), null);
+    next.setBlendBackdropColor(ansi.rgbColor(10, 20, 30, 255));
+    try std.testing.expect(try next.drawImage(value, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto));
+    try next.drawBoxCheckedDimmingImages(0, 0, 2, 1, &border_chars, .{}, white, ansi.rgbColor(0, 0, 0, 150), white, true, null, 0, null, 0);
+
+    const image_cell = next.get(0, 0).?;
+    const plain_cell = next.get(1, 0).?;
+    try std.testing.expect(gp.isImageChar(image_cell.char));
+    try std.testing.expectEqualDeep(plain_cell.bg, image_cell.bg);
+}
+
+test "tfm fork: a reserved image cell's changed background is emitted" {
+    // A cell whose placement is unchanged is skipped by the frame diff, but a
+    // scrim fill dims that cell's background too. Skipping the write left the
+    // pre-scrim background on the terminal, showing as a square behind alpha
+    // icons. The encoder must emit the cell when its bg/fg/attributes changed.
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+
+    var test_renderer = try TestRenderer.create(std.testing.allocator, 2, 1, &pools.graphemes, &pools.links);
+    defer test_renderer.deinit();
+    const value = try image.createFromRgba(std.testing.allocator, &[_]u8{ 200, 100, 50, 255 }, 1, 1, 4);
+    defer value.deinit();
+    test_renderer.renderer.terminal.caps.kitty_graphics = true;
+
+    // Frame 1 settles the placement on an opaque background.
+    var next = test_renderer.renderer.getNextBuffer();
+    next.clear(ansi.rgbColor(20, 20, 20, 255), null);
+    try std.testing.expect(try next.drawImage(value, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto));
+    try std.testing.expectEqual(renderer.RenderStatus.rendered, test_renderer.render(true));
+
+    // Frame 2: the same placement, a scrim-dimmed background on the reserved
+    // cell. The neighbour gets a different bg so the escape is unambiguous.
+    next = test_renderer.renderer.getNextBuffer();
+    next.clear(ansi.rgbColor(1, 2, 3, 255), null);
+    next.setCellWithAlphaBlendingRaw(1, 0, ' ', ansi.rgbColor(255, 255, 255, 255), ansi.rgbColor(9, 9, 9, 255), 0);
+    try std.testing.expect(try next.drawImage(value, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto));
+    try std.testing.expectEqual(renderer.RenderStatus.rendered, test_renderer.render(false));
+
+    const output = test_renderer.memory.lastWrite();
+    try std.testing.expect(std.mem.find(u8, output, "48;2;1;2;3") != null);
 }
 
 test "renderer bounds sixel cache entries and evicts least recently used payloads" {

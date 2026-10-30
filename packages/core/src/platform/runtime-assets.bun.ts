@@ -1,5 +1,6 @@
-import { resolve } from "node:path"
-
+import { existsSync } from "node:fs"
+import { dirname, resolve } from "node:path"
+import { fileURLToPath } from "node:url"
 import { resolveBundledDefaultParserAsset } from "../lib/tree-sitter/default-parser-assets.bun.js"
 import { getCurrentNodeAssetTarget, getNativeAssetDescriptor } from "../node-asset-target.js"
 import { resolveAssetPath, resolveAssetRootPath } from "./assets.js"
@@ -12,6 +13,30 @@ interface NativePackageModule {
 const CORE_ASSET_PREFIX = "@opentui/core/"
 const PARSER_WORKER_ASSET_KEY = `${CORE_ASSET_PREFIX}parser.worker.js`
 const TREE_SITTER_WASM_ASSET_KEY = "web-tree-sitter/tree-sitter.wasm"
+
+// tfm fork: consume this repository's own zig build output (packages/native/lib)
+// before the published platform packages. A source checkout — a path or git
+// dependency — then runs the patched libopentui without publishing a platform
+// package; a compiled consumer without the directory falls through unchanged.
+const REBUILT_LIB_OUTPUT_NAMES: Record<string, string> = {
+  "darwin-x64": "x86_64-macos",
+  "darwin-arm64": "aarch64-macos",
+  "linux-x64": "x86_64-linux",
+  "linux-arm64": "aarch64-linux",
+  "linux-x64-musl": "x86_64-linux-musl",
+  "linux-arm64-musl": "aarch64-linux-musl",
+  "win32-x64": "x86_64-windows",
+  "win32-arm64": "aarch64-windows",
+}
+
+function rebuiltNativeLibraryPath(fileName: string): string | null {
+  const target = getCurrentNodeAssetTarget()
+  const libcSuffix = target.platform === "linux" && target.libc === "musl" ? "-musl" : ""
+  const outputName = REBUILT_LIB_OUTPUT_NAMES[`${target.platform}-${target.arch}${libcSuffix}`]
+  if (outputName === undefined) return null
+  const candidate = resolve(dirname(fileURLToPath(import.meta.url)), "../../../native/lib", outputName, fileName)
+  return existsSync(candidate) ? candidate : null
+}
 
 const bundledTreeSitterWorkerPath = await resolveBundledFilePath(
   PARSER_WORKER_ASSET_KEY,
@@ -47,6 +72,11 @@ export async function resolveNativeLibraryPath(): Promise<string> {
   const configuredPath = resolveAssetRootPath(asset.key)
   if (configuredPath !== undefined) {
     return configuredPath
+  }
+
+  const rebuiltPath = rebuiltNativeLibraryPath(asset.fileName)
+  if (rebuiltPath !== null) {
+    return rebuiltPath
   }
 
   if (process.platform === "darwin") {
