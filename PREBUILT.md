@@ -111,8 +111,13 @@ To publish:
    every target, downloads them, and publishes the platform packages first and
    the core second, so an install never sees the core without its library.
 
-The workflow needs the `NPM_TOKEN` repository secret with publish rights on
-the `@clarkarch` scope. A local dry run stages the packages without publishing:
+The workflow authenticates with npm's **trusted publishing** (OIDC): the
+packages need a trusted publisher configured on npmjs.com (the repository and
+this workflow), and the workflow asks for `id-token: write`. The `NPM_TOKEN`
+repository secret is the fallback — when it is set, it is used instead, so the
+workflow still works before the trusted publisher is configured.
+
+A local dry run stages the packages without publishing:
 
 ```sh
 bun scripts/publish-fork.ts --native-dir packages/native/lib --dry-run
