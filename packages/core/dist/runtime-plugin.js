@@ -43,22 +43,29 @@
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { basename, dirname, isAbsolute, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import * as coreRuntime from "@opentui/core";
+import * as coreRuntime from "./index.bun.js";
+import { PUBLISHED_CORE_NAME } from "./published-package";
 const CORE_RUNTIME_SPECIFIER = "@opentui/core";
 const CORE_TESTING_RUNTIME_SPECIFIER = "@opentui/core/testing";
+const PUBLISHED_TESTING_RUNTIME_SPECIFIER = `${PUBLISHED_CORE_NAME}/testing`;
 const RUNTIME_MODULE_PREFIX = "opentui:runtime-module:";
 const MAX_RUNTIME_RESOLVE_PARENTS = 64;
 const DEFAULT_RUNTIME_PLUGIN_REWRITE_OPTIONS = {
     nodeModulesRuntimeSpecifiers: true,
     nodeModulesBareSpecifiers: false,
 };
-const DEFAULT_CORE_RUNTIME_MODULE_SPECIFIERS = [CORE_RUNTIME_SPECIFIER, CORE_TESTING_RUNTIME_SPECIFIER];
+const DEFAULT_CORE_RUNTIME_MODULE_SPECIFIERS = [
+    CORE_RUNTIME_SPECIFIER,
+    CORE_TESTING_RUNTIME_SPECIFIER,
+    PUBLISHED_CORE_NAME,
+    PUBLISHED_TESTING_RUNTIME_SPECIFIER,
+];
 const DEFAULT_CORE_RUNTIME_MODULE_SPECIFIER_SET = new Set(DEFAULT_CORE_RUNTIME_MODULE_SPECIFIERS);
 export const isCoreRuntimeModuleSpecifier = (specifier) => {
     return DEFAULT_CORE_RUNTIME_MODULE_SPECIFIER_SET.has(specifier);
 };
 const loadCoreTestingRuntimeModule = async () => {
-    return (await import("@opentui/core/testing"));
+    return (await import("./testing.bun.js"));
 };
 const escapeRegExp = (value) => {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -329,8 +336,14 @@ const rewriteRuntimeSpecifiers = (code, runtimeModuleIdsBySpecifier) => {
 };
 export function createRuntimePlugin(input = {}) {
     const runtimeModules = new Map();
-    runtimeModules.set(CORE_RUNTIME_SPECIFIER, input.core ?? coreRuntime);
+    const coreRuntimeExports = (input.core ?? coreRuntime);
+    runtimeModules.set(CORE_RUNTIME_SPECIFIER, coreRuntimeExports);
     runtimeModules.set(CORE_TESTING_RUNTIME_SPECIFIER, loadCoreTestingRuntimeModule);
+    // The published package is named `@clarkarch/opentui-fork`, so a plugin that
+    // imports it by that name must reach the HOST's core instance too — not a
+    // second copy of it.
+    runtimeModules.set(PUBLISHED_CORE_NAME, coreRuntimeExports);
+    runtimeModules.set(PUBLISHED_TESTING_RUNTIME_SPECIFIER, loadCoreTestingRuntimeModule);
     const rewriteOptions = resolveRuntimePluginRewriteOptions(input.rewrite);
     for (const [specifier, moduleEntry] of Object.entries(input.additional ?? {})) {
         runtimeModules.set(specifier, moduleEntry);

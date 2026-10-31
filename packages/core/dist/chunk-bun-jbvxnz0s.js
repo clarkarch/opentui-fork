@@ -5708,7 +5708,7 @@ function rebuiltNativeLibraryPath(fileName) {
   }
   return null;
 }
-var bundledTreeSitterWorkerPath = await resolveBundledFilePath2(PARSER_WORKER_ASSET_KEY, () => import("@opentui/core/parser.worker", { with: { type: "file" } }), new URL("../lib/tree-sitter/parser.worker.js", import.meta.url), import.meta.url, { useAssetRoot: false });
+var bundledTreeSitterWorkerPath = await resolveBundledFilePath2(PARSER_WORKER_ASSET_KEY, () => import("./parser.worker.js", { with: { type: "file" } }), new URL("../lib/tree-sitter/parser.worker.js", import.meta.url), import.meta.url, { useAssetRoot: false });
 function resolveDefaultParserAsset(relativePath, fallbackPath) {
   return resolveBundledDefaultParserAsset(relativePath, fallbackPath);
 }

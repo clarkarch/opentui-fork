@@ -45,6 +45,7 @@ import { basename, dirname, isAbsolute, join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { type BunPlugin } from "bun"
 import * as coreRuntime from "@opentui/core"
+import { PUBLISHED_CORE_NAME } from "./published-package"
 
 export type RuntimeModuleExports = Record<string, unknown>
 export type RuntimeModuleLoader = () => RuntimeModuleExports | Promise<RuntimeModuleExports>
@@ -70,6 +71,7 @@ export interface CreateRuntimePluginOptions {
 
 const CORE_RUNTIME_SPECIFIER = "@opentui/core"
 const CORE_TESTING_RUNTIME_SPECIFIER = "@opentui/core/testing"
+const PUBLISHED_TESTING_RUNTIME_SPECIFIER = `${PUBLISHED_CORE_NAME}/testing`
 const RUNTIME_MODULE_PREFIX = "opentui:runtime-module:"
 const MAX_RUNTIME_RESOLVE_PARENTS = 64
 const DEFAULT_RUNTIME_PLUGIN_REWRITE_OPTIONS: Required<RuntimePluginRewriteOptions> = {
@@ -77,7 +79,12 @@ const DEFAULT_RUNTIME_PLUGIN_REWRITE_OPTIONS: Required<RuntimePluginRewriteOptio
   nodeModulesBareSpecifiers: false,
 }
 
-const DEFAULT_CORE_RUNTIME_MODULE_SPECIFIERS = [CORE_RUNTIME_SPECIFIER, CORE_TESTING_RUNTIME_SPECIFIER] as const
+const DEFAULT_CORE_RUNTIME_MODULE_SPECIFIERS = [
+  CORE_RUNTIME_SPECIFIER,
+  CORE_TESTING_RUNTIME_SPECIFIER,
+  PUBLISHED_CORE_NAME,
+  PUBLISHED_TESTING_RUNTIME_SPECIFIER,
+] as const
 
 const DEFAULT_CORE_RUNTIME_MODULE_SPECIFIER_SET = new Set<string>(DEFAULT_CORE_RUNTIME_MODULE_SPECIFIERS)
 
@@ -452,8 +459,14 @@ const rewriteRuntimeSpecifiers = (code: string, runtimeModuleIdsBySpecifier: Map
 
 export function createRuntimePlugin(input: CreateRuntimePluginOptions = {}): BunPlugin {
   const runtimeModules = new Map<string, RuntimeModuleEntry>()
-  runtimeModules.set(CORE_RUNTIME_SPECIFIER, input.core ?? (coreRuntime as RuntimeModuleExports))
+  const coreRuntimeExports = (input.core ?? coreRuntime) as RuntimeModuleExports
+  runtimeModules.set(CORE_RUNTIME_SPECIFIER, coreRuntimeExports)
   runtimeModules.set(CORE_TESTING_RUNTIME_SPECIFIER, loadCoreTestingRuntimeModule)
+  // The published package is named `@clarkarch/opentui-fork`, so a plugin that
+  // imports it by that name must reach the HOST's core instance too — not a
+  // second copy of it.
+  runtimeModules.set(PUBLISHED_CORE_NAME, coreRuntimeExports)
+  runtimeModules.set(PUBLISHED_TESTING_RUNTIME_SPECIFIER, loadCoreTestingRuntimeModule)
   const rewriteOptions = resolveRuntimePluginRewriteOptions(input.rewrite)
 
   for (const [specifier, moduleEntry] of Object.entries(input.additional ?? {})) {

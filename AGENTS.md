@@ -61,6 +61,13 @@ This branch is a fork that carries patches upstream does not have. It is publish
 - The native packages carry the vendored licenses (Ghostty, wuffs, stb, libwebp, lcms2). The list lives in
   `packages/core/scripts/native-package.ts`; the build and the publish path stage through it, so a new vendored
   dependency has to be added there — a published package missing a license is a legal problem, not a style one.
+- The published package must be SELF-CONTAINED: a consumer that installs it under its own name has no `@opentui/core`
+  to resolve, so the build rewrites the package's self-imports to relative paths (`scripts/published-self-imports.ts`,
+  AST-based so generated code in a template literal survives). The build FAILS if a self-import survives, and
+  `bun run test:dist` asserts it. A new relative import in a transpiled entry point also needs its target emitted into
+  the dist — the runtime plugin is transpiled, not bundled, so `./published-package.js` has to exist as a file.
+- The runtime plugin registers the published name (`@clarkarch/opentui-fork` and `/testing`) next to `@opentui/core`,
+  so a plugin that imports the fork by either name reaches the HOST's core instance instead of loading a second copy.
 
 ## Portable FFI
 
