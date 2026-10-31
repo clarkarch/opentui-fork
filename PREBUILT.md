@@ -28,5 +28,41 @@ git commit -m "build: refresh prebuilt dist and libopentui"
 ```
 
 Committed targets: `x86_64-linux` + `aarch64-linux` (the two Linux release
-arches; `dist/` is architecture-independent JS). Add the *-musl triples if a
+arches; `dist/` is architecture-independent JS). Add the \*-musl triples if a
 musl host ever needs one.
+
+## Released artifacts (all targets)
+
+The committed Linux binaries only cover Linux hosts. The `native-artifacts`
+workflow builds **every** supported target and publishes it as the GitHub
+release `native-latest`, together with `native-artifacts.json`:
+
+```json
+{
+  "generatedAt": "...",
+  "artifacts": {
+    "x86_64-linux": {
+      "file": "libopentui.so",
+      "asset": "native-x86_64-linux-libopentui.so",
+      "sha256": "...",
+      "bytes": 5451896
+    }
+  }
+}
+```
+
+Consumers fetch the asset for their host from that manifest. The asset names
+follow `native-<target>-<file>`, where `<target>` is the directory name under
+`packages/native/lib` and `<file>` is `libopentui.so`, `libopentui.dylib` or
+`opentui.dll`.
+
+The release copies are stripped; the committed Linux copies keep their debug
+symbols. Build them locally with:
+
+```sh
+cd packages/native
+zig build -Doptimize=ReleaseFast -Dlibrary-target=x86_64-windows-gnu  # cross from Linux
+```
+
+macOS targets need a macOS build host — Zig cannot link Darwin without the
+macOS SDK.

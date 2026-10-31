@@ -1,0 +1,139 @@
+name: native-artifacts
+
+# Builds the patched native library for every supported target and publishes it
+# as a GitHub release (`native-latest`). Downstream projects (e.g. tedit) fetch
+# the asset for their host from `native-artifacts.json`.
+#
+# The Linux glibc artifacts are also committed to the branch (see PREBUILT.md);
+# the release exists so that macOS and Windows hosts — which cannot be served
+# by a committed Linux binary — get the patched library too.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tfm]
+    paths:
+      - "packages/native/**"
+      - "scripts/build-native-manifest.ts"
+      - ".github/workflows/native-artifacts.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.output }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - output: x86_64-linux
+            target: x86_64-linux-gnu.2.17
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: aarch64-linux
+            target: aarch64-linux-gnu.2.17
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: x86_64-linux-musl
+            target: x86_64-linux-musl
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: aarch64-linux-musl
+            target: aarch64-linux-musl
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: x86_64-windows
+            target: x86_64-windows-gnu
+            os: ubuntu-latest
+            file: opentui.dll
+          - output: aarch64-windows
+            target: aarch64-windows-gnu
+            os: ubuntu-latest
+            file: opentui.dll
+          # macOS needs the macOS SDK to link CoreAudio; Zig cannot cross to
+          # Darwin without it, so these build on a macOS host.
+          - output: x86_64-macos
+            target: x86_64-macos.13.0
+            os: macos-latest
+            file: libopentui.dylib
+          - output: aarch64-macos
+            target: aarch64-macos.13.0
+            os: macos-latest
+            file: libopentui.dylib
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: "0.16.0"
+
+      - name: Prepare zig dependencies
+        working-directory: packages/native
+        run: bun run prepare:zig
+
+      - name: Build
+        working-directory: packages/native
+        run: zig build -Doptimize=ReleaseFast -Dlibrary-target=${{ matrix.target }}
+
+      - name: Verify and strip
+        working-directory: packages/native
+        run: |
+          lib="lib/${{ matrix.output }}/${{ matrix.file }}"
+          if [ ! -f "$lib" ]; then
+            echo "expected $lib to exist after the build"
+            ls -R lib || true
+            exit 1
+          fi
+          # The fork keeps debug symbols in its committed artifacts; the release
+          # copies are stripped so downloads stay small.
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            strip --strip-unneeded "$lib" || echo "strip failed, keeping symbols"
+          else
+            strip -x "$lib" || echo "strip failed, keeping symbols"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.output }}
+          path: packages/native/lib/${{ matrix.output }}/${{ matrix.file }}
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Stage release assets
+        run: |
+          mkdir -p release
+          for dir in artifacts/native-*; do
+            target=$(basename "$dir" | sed 's/^native-//')
+            file=$(ls "$dir")
+            cp "$dir/$file" "release/native-${target}-${file}"
+          done
+          ls -l release
+
+      - name: Build the manifest
+        run: bun scripts/build-native-manifest.ts release
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view native-latest >/dev/null 2>&1; then
+            gh release upload native-latest release/* --clobber
+          else
+            gh release create native-latest release/* \
+              --title "native artifacts" \
+              --notes "Patched libopentui for every supported target. Fetch the asset for your host via native-artifacts.json."
+          fi
