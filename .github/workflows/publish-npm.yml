@@ -160,7 +160,13 @@ jobs:
         # Pinned to the 11.x line on purpose: a brand-new major in the publish
         # path is an untested change, and the script reads the CLI's reports
         # in both the npm 11 and npm 12 shapes.
-        run: npm install -g "npm@^11.5.1"
+        # The install goes to a user-writable prefix: the runner's global
+        # prefix (/usr/local) is not writable, so a plain `npm install -g`
+        # fails with EACCES.
+        run: |
+          npm install -g --prefix "$HOME/.npm-local" "npm@^11.5.1"
+          "$HOME/.npm-local/bin/npm" --version
+          echo "$HOME/.npm-local/bin" >> "$GITHUB_PATH"
 
       - name: Test the publish scripts
         run: bun test scripts/npm-publish.test.ts
