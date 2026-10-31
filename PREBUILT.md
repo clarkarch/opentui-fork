@@ -89,6 +89,14 @@ the platform packages with LITERAL specifiers, so the names in
 build script have to agree — `packages/core/src/published-package.test.ts`
 fails when they drift.
 
+The published output must also be **self-contained**: a consumer that installs
+the package under its own name (`@clarkarch/opentui-fork`) has no
+`@opentui/core` to resolve, so the build rewrites the package's self-imports
+to relative paths. The rewrite is AST-based, so generated code in a template
+literal (the asset updater writes the consumer's parser file with one) is left
+alone, and the build fails if a self-import survives. `bun run test:dist`
+asserts both.
+
 Versions are `0.8.0-fork.N`: the upstream version the fork is based on, plus
 the fork's own release counter. They are prereleases of the upstream version,
 so a consumer has to ask for them explicitly (`^0.8.0-fork.1`), which is what

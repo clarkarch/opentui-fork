@@ -36,13 +36,25 @@ upstream core, without changing a single import:
 
 ```jsonc
 "dependencies": {
-  "@opentui/core": "npm:@clarkarch/opentui-fork@0.8.0-fork.1"
+  "@opentui/core": "npm:@clarkarch/opentui-fork@0.8.0-fork.3"
 }
 ```
 
+Or install it under its own name, when the import name does not have to stay
+`@opentui/core`:
+
+```jsonc
+"dependencies": {
+  "@clarkarch/opentui-fork": "0.8.0-fork.3"
+}
+```
+
+The published package is self-contained: it never imports itself by the
+upstream name, so both spellings work.
+
 The versions are `0.8.0-fork.N` — the upstream version the fork tracks, plus
 the fork's release counter. They are prereleases, so ask for them explicitly
-(`^0.8.0-fork.1`); a plain `^0.8.0` does not match them.
+(`^0.8.0-fork.3`); a plain `^0.8.0` does not match them.
 
 See [PREBUILT.md](PREBUILT.md) for what the branch carries and how to publish
 it.

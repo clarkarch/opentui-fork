@@ -7,9 +7,13 @@ import { parseArgs } from "util"
 import type { FiletypeParserOptions } from "../types.js"
 import { readdir } from "fs/promises"
 import { fileURLToPath } from "node:url"
+import { PUBLISHED_CORE_NAME } from "../../../published-package.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+/** The package name upstream publishes the core under. */
+const UPSTREAM_CORE_NAME = "@opentui/core"
 
 interface ParsersConfig {
   parsers: FiletypeParserOptions[]
@@ -38,6 +42,52 @@ function getDefaultOptions(): UpdateOptions {
     configPath: path.resolve(__dirname, "../parsers-config"),
     assetsDir: path.resolve(__dirname),
     outputPath: path.resolve(__dirname, "../default-parsers.ts"),
+  }
+}
+
+/**
+ * The package name the generated file has to import.
+ *
+ * The generated file lands in the CONSUMER's project, and the consumer may
+ * have installed the core under either name: as `@opentui/core` (an npm alias
+ * for the fork, or upstream's own package) or under the fork's published name
+ * `@clarkarch/opentui-fork`. The nearest package.json above the output says
+ * which one it is.
+ */
+export async function resolveCorePackageName(outputPath: string): Promise<string> {
+  let directory = path.dirname(path.resolve(outputPath))
+
+  while (true) {
+    const manifestPath = path.join(directory, "package.json")
+    try {
+      const manifest = JSON.parse(await readFile(manifestPath, "utf-8")) as {
+        dependencies?: Record<string, string>
+        devDependencies?: Record<string, string>
+        peerDependencies?: Record<string, string>
+        optionalDependencies?: Record<string, string>
+      }
+      const declared = new Set([
+        ...Object.keys(manifest.dependencies ?? {}),
+        ...Object.keys(manifest.devDependencies ?? {}),
+        ...Object.keys(manifest.peerDependencies ?? {}),
+        ...Object.keys(manifest.optionalDependencies ?? {}),
+      ])
+
+      if (declared.has(UPSTREAM_CORE_NAME)) {
+        return UPSTREAM_CORE_NAME
+      }
+      if (declared.has(PUBLISHED_CORE_NAME)) {
+        return PUBLISHED_CORE_NAME
+      }
+    } catch {
+      // No readable package.json here — keep walking up.
+    }
+
+    const parent = path.dirname(directory)
+    if (parent === directory) {
+      return UPSTREAM_CORE_NAME
+    }
+    directory = parent
   }
 }
 
@@ -170,6 +220,7 @@ async function generateDefaultParsersFile(parsers: GeneratedParser[], outputPath
     ),
   ]
   const isDefaultOutput = path.resolve(outputPath) === getDefaultOptions().outputPath
+  const corePackageName = isDefaultOutput ? UPSTREAM_CORE_NAME : await resolveCorePackageName(outputPath)
   const bundledAssetLoaderEntries = assetPaths
     .map(
       (assetPath) =>
@@ -180,8 +231,8 @@ async function generateDefaultParsersFile(parsers: GeneratedParser[], outputPath
     ? `import { resolveDefaultParserAsset } from "#opentui/runtime-assets"
 
 import type { FiletypeParserOptions, InjectionMapping } from "./types.js"`
-    : `import { resolveBundledFilePath } from "@opentui/core"
-import type { FiletypeParserOptions, InjectionMapping } from "@opentui/core"`
+    : `import { resolveBundledFilePath } from ${JSON.stringify(corePackageName)}
+import type { FiletypeParserOptions, InjectionMapping } from ${JSON.stringify(corePackageName)}`
   const parserAssetLoaders = isDefaultOutput
     ? ""
     : `interface FileImportModule {

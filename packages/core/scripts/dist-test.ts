@@ -6,6 +6,7 @@ import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 import { requireNode26 } from "../../../scripts/node26.mjs"
+import { collectModuleSpecifiers } from "./published-self-imports"
 
 interface PackageJson {
   name: string
@@ -275,6 +276,56 @@ function assertRuntimeOutputs(): void {
   }
   if (existsSync(join(distDir, "parser.worker.bun.js"))) {
     throw new Error("Found obsolete Bun-specific parser worker")
+  }
+}
+
+function assertPublishedSelfImports(): void {
+  // The package is published under `@clarkarch/opentui-fork`, so a module
+  // specifier that names `@opentui/core` points at a package the consumer may
+  // not have installed. The published output must point at itself instead.
+  const distFiles: string[] = []
+
+  const collect = (directory: string, prefix: string): void => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const relativePath = prefix === "" ? entry.name : `${prefix}/${entry.name}`
+      if (entry.isDirectory()) {
+        collect(join(directory, entry.name), relativePath)
+        continue
+      }
+      if (entry.name.endsWith(".js")) {
+        distFiles.push(relativePath)
+      }
+    }
+  }
+
+  collect(distDir, "")
+
+  for (const relativePath of distFiles) {
+    const source = readFileSync(join(distDir, relativePath), "utf8")
+    const specifiers = collectModuleSpecifiers(source)
+    const selfImports = specifiers.filter(
+      ({ specifier }) => specifier === "@opentui/core" || specifier.startsWith("@opentui/core/"),
+    )
+    if (selfImports.length > 0) {
+      const names = selfImports.map(({ specifier }) => specifier).join(", ")
+      throw new Error(`The published output still imports the package by name (${relativePath}): ${names}`)
+    }
+
+    // A relative specifier has to resolve inside the package: the runtime
+    // plugin is transpiled rather than bundled, so a relative import of a
+    // module that was never emitted into the dist fails at load time.
+    const fileDirectory = dirname(join(distDir, relativePath))
+    for (const { specifier } of specifiers) {
+      if (!specifier.startsWith("./") && !specifier.startsWith("../")) {
+        continue
+      }
+      const target = resolve(fileDirectory, specifier)
+      if (!existsSync(target)) {
+        throw new Error(
+          `The published output imports a file that is not in the package: ${relativePath} → ${specifier}`,
+        )
+      }
+    }
   }
 }
 
@@ -641,6 +692,7 @@ try {
   ensureBuildArtifacts()
   assertPortableDeclarations()
   assertRuntimeOutputs()
+  assertPublishedSelfImports()
 
   tempRoot = mkdtempSync(join(tmpdir(), "opentui-core-dist-test-"))
   const packDir = join(tempRoot, "packs")

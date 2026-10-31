@@ -8,6 +8,7 @@ import path from "path"
 import { variants, zigOutputName, type Variant } from "./variants"
 import { separateNativeSymbols } from "./native-symbols"
 import { PUBLISHED_BUGS, PUBLISHED_CORE_NAME, PUBLISHED_HOMEPAGE, PUBLISHED_REPOSITORY } from "../src/published-package"
+import { collectModuleSpecifiers, rewritePublishedSelfImports } from "./published-self-imports"
 // The published README links into the fork's repository, not upstream's.
 import { nativeLibraryFileName, nativePackageName, replaceLinks, stageNativePackage } from "./native-package"
 
@@ -175,6 +176,57 @@ function checkStaticArchive(path: string): void {
   if (nested.length > 0) throw new Error(`${path} contains nested archives: ${nested.join(", ")}`)
 }
 
+/**
+ * Rewrites the published package's self-imports to relative paths and fails
+ * the build if any of them survives.
+ *
+ * The package is published under `@clarkarch/opentui-fork`, so a specifier
+ * that names `@opentui/core` points at a package the consumer may not have
+ * installed — the published output would fail with "Cannot find module
+ * '@opentui/core'". The asset keys and the `Symbol.for("@opentui/core/…")`
+ * registry keys are not module specifiers and stay untouched.
+ *
+ * The rewrite changes the length of a few specifier strings, so the generated
+ * positions after them shift by a few characters; the source maps stay useful
+ * as a source lookup.
+ */
+function rewritePublishedSelfImportsInDist(distDir: string): void {
+  const distFiles: string[] = []
+
+  const collect = (directory: string, prefix: string): void => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const relativePath = prefix === "" ? entry.name : `${prefix}/${entry.name}`
+      if (entry.isDirectory()) {
+        collect(join(directory, entry.name), relativePath)
+        continue
+      }
+      if (entry.name.endsWith(".js")) {
+        distFiles.push(relativePath)
+      }
+    }
+  }
+
+  collect(distDir, "")
+
+  for (const relativePath of distFiles) {
+    const fullPath = join(distDir, relativePath)
+    const source = readFileSync(fullPath, "utf8")
+    const rewritten = rewritePublishedSelfImports(source, relativePath)
+    if (rewritten !== source) {
+      writeFileSync(fullPath, rewritten)
+      console.log(`  Rewrote the published self-imports in ${relativePath}`)
+    }
+
+    const surviving = collectModuleSpecifiers(rewritten).filter(
+      ({ specifier }) => specifier === "@opentui/core" || specifier.startsWith("@opentui/core/"),
+    )
+    if (surviving.length > 0) {
+      const names = surviving.map(({ specifier }) => specifier).join(", ")
+      throw new Error(`The published output still imports the package by name (${relativePath}): ${names}`)
+    }
+  }
+}
+
 if (buildNative) {
   runCommand(
     "bun",
@@ -328,6 +380,11 @@ if (buildLib) {
     transpileEntryPoint(entryPoint, join(distDir, outputFile))
   }
 
+  // The runtime plugin is transpiled, not bundled, so its relative imports
+  // have to exist as files in the dist. The published package name lives in
+  // its own module for that reason.
+  transpileEntryPoint("src/published-package.ts", join(distDir, "published-package.js"))
+
   // Build updater as a separate entry so generator code stays out of the core runtime bundle.
   runCommand(
     "bun",
@@ -426,6 +483,8 @@ if (buildLib) {
 
   copyAssets(join(treeSitterSrcDir, "assets"), join(distDir, "assets"))
   console.log("  Copied tree-sitter assets (*.wasm, *.scm) to dist/assets/")
+
+  rewritePublishedSelfImportsInDist(distDir)
 
   const writeBunOnlyStub = (fileName: string, specifier: string, exportNames: string[]): void => {
     const errorMessage = `${specifier} is Bun-only and is not available in Node.js. Use Bun to import this entrypoint.`
