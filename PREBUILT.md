@@ -66,3 +66,47 @@ zig build -Doptimize=ReleaseFast -Dlibrary-target=x86_64-windows-gnu  # cross fr
 
 macOS targets need a macOS build host — Zig cannot link Darwin without the
 macOS SDK.
+
+## Published packages (npm)
+
+The fork is also published to npm, under its own scope:
+
+| package | contents |
+| --- | --- |
+| `@clarkarch/opentui-fork` | the JS/TS core (this is `packages/core/dist`) |
+| `@clarkarch/opentui-fork-<platform>-<arch>[-<abi>]` | one native library per target |
+
+The per-platform packages are `optionalDependencies` of the core, so an
+install pulls only the library for the host. Their `index.bun.js` imports the
+library with `{ type: "file" }`, which is what lets `bun build --compile` embed
+it in a binary.
+
+The **published** names differ from the in-repo package name (`@opentui/core`),
+on purpose: the monorepo's internal imports and the upstream rebase stay
+untouched, while the artifacts on npm carry the fork's name. The loader imports
+the platform packages with LITERAL specifiers, so the names in
+`packages/core/src/published-package.ts`, in `runtime-assets.bun.ts` and in the
+build script have to agree — `packages/core/src/published-package.test.ts`
+fails when they drift.
+
+Versions are `0.8.0-fork.N`: the upstream version the fork is based on, plus
+the fork's own release counter. They are prereleases of the upstream version,
+so a consumer has to ask for them explicitly (`^0.8.0-fork.1`), which is what
+`package.json` pins.
+
+To publish:
+
+1. Bump the version in `packages/core/package.json` and the `optionalDependencies`
+   pins to match.
+2. Rebuild and commit the prebuilt `dist/` (the recipe above).
+3. Push, then run the `publish-npm` workflow. It builds the native library for
+   every target, downloads them, and publishes the platform packages first and
+   the core second, so an install never sees the core without its library.
+
+The workflow needs the `NPM_TOKEN` repository secret with publish rights on
+the `@clarkarch` scope. A local dry run stages the packages without publishing:
+
+```sh
+bun scripts/publish-fork.ts --native-dir packages/native/lib --dry-run
+```
+

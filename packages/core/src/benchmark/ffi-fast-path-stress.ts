@@ -287,7 +287,7 @@ function buildNodeScenario(): void {
       childSource,
       "--target=node",
       `--outdir=${buildDir}`,
-      "--external=@opentui/core-*",
+      "--external=@clarkarch/opentui-fork-*",
       "--external=web-tree-sitter",
     ],
     { cwd: packageRoot, encoding: "utf8" },

@@ -1,17 +1,19 @@
 {
-  "name": "@opentui/core",
+  "name": "@clarkarch/opentui-fork",
   "module": "index.node.js",
   "main": "index.node.js",
   "types": "index.d.ts",
   "type": "module",
-  "version": "0.8.0",
+  "version": "0.8.0-fork.1",
   "description": "OpenTUI is a TypeScript library on a native Zig core for building terminal user interfaces (TUIs)",
   "license": "MIT",
+  "homepage": "https://github.com/clarkarch/opentui-fork",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anomalyco/opentui",
+    "url": "https://github.com/clarkarch/opentui-fork",
     "directory": "packages/core"
   },
+  "bugs": "https://github.com/clarkarch/opentui-fork/issues",
   "engines": {
     "bun": ">=1.3.14",
     "node": ">=26.4.0"
@@ -78,13 +80,13 @@
     "web-tree-sitter": "0.25.10"
   },
   "optionalDependencies": {
-    "@opentui/core-darwin-x64": "0.8.0",
-    "@opentui/core-darwin-arm64": "0.8.0",
-    "@opentui/core-linux-x64": "0.8.0",
-    "@opentui/core-linux-arm64": "0.8.0",
-    "@opentui/core-win32-x64": "0.8.0",
-    "@opentui/core-win32-arm64": "0.8.0",
-    "@opentui/core-linux-x64-musl": "0.8.0",
-    "@opentui/core-linux-arm64-musl": "0.8.0"
+    "@clarkarch/opentui-fork-darwin-x64": "0.8.0-fork.1",
+    "@clarkarch/opentui-fork-darwin-arm64": "0.8.0-fork.1",
+    "@clarkarch/opentui-fork-linux-x64": "0.8.0-fork.1",
+    "@clarkarch/opentui-fork-linux-arm64": "0.8.0-fork.1",
+    "@clarkarch/opentui-fork-win32-x64": "0.8.0-fork.1",
+    "@clarkarch/opentui-fork-win32-arm64": "0.8.0-fork.1",
+    "@clarkarch/opentui-fork-linux-x64-musl": "0.8.0-fork.1",
+    "@clarkarch/opentui-fork-linux-arm64-musl": "0.8.0-fork.1"
   }
 }

@@ -1,13 +1,13 @@
 // @bun
 import {
+  SystemClock2,
+  TreeSitterClient2,
   ANSI,
-  CliRenderer
-} from "./chunk-bun-j1msfd64.js";
+  CliRenderer2
+} from "./chunk-bun-c58v3j50.js";
 import {
-  SystemClock,
-  TreeSitterClient,
   nativeConstants
-} from "./chunk-bun-fsx01y4t.js";
+} from "./chunk-bun-jbvxnz0s.js";
 
 // src/testing/mock-keys.ts
 import { Buffer as Buffer2 } from "buffer";
@@ -617,8 +617,8 @@ async function createTestRenderer(options) {
     let consecutiveQuietFrames = 0;
     for (let frame = 0;frame < maxFrames; frame++) {
       await drainImmediateWork();
-      const scheduler2 = renderer.getSchedulerState();
-      if (!scheduler2.isRunning && !scheduler2.isRendering && !scheduler2.hasScheduledRender) {
+      const scheduler = renderer.getSchedulerState();
+      if (!scheduler.isRunning && !scheduler.isRendering && !scheduler.hasScheduledRender) {
         return;
       }
       const event = await waitForNextFrameOrIdle(renderer);
@@ -724,13 +724,13 @@ async function setupTestRenderer(config) {
   const width = config.width || config.stdout?.columns || process.stdout.columns || 80;
   const height = config.height || config.stdout?.rows || process.stdout.rows || 24;
   const stdout = config.stdout || createTestStdout(width, height);
-  return new CliRenderer(stdin, stdout, width, height, {
+  return new CliRenderer2(stdin, stdout, width, height, {
     ...config,
     bufferedOutput: config.bufferedOutput ?? "memory"
   });
 }
 // src/testing/mock-tree-sitter-client.ts
-class MockTreeSitterClient extends TreeSitterClient {
+class MockTreeSitterClient extends TreeSitterClient2 {
   _highlightPromises = [];
   _mockResult = { highlights: [] };
   _autoResolveTimeout;
@@ -738,7 +738,7 @@ class MockTreeSitterClient extends TreeSitterClient {
   constructor(options) {
     super({ dataPath: "/tmp/mock" }, { autoStartWorker: false });
     this._autoResolveTimeout = options?.autoResolveTimeout;
-    this._clock = options?.clock ?? new SystemClock;
+    this._clock = options?.clock ?? new SystemClock2;
   }
   async destroy() {
     this.resolveAllHighlightOnce();
@@ -980,21 +980,21 @@ class TestRecorder {
     const currentBuffer = this.renderer.currentRenderBuffer;
     const { frame, buffers } = currentBuffer.withBuffers((cells) => {
       const frameBytes = currentBuffer.getRealCharBytes(true);
-      const frame2 = this.decoder.decode(frameBytes);
-      let buffers2;
+      const frame = this.decoder.decode(frameBytes);
+      let buffers;
       if (this.recordBuffers.fg || this.recordBuffers.bg || this.recordBuffers.attributes) {
-        buffers2 = {};
+        buffers = {};
         if (this.recordBuffers.fg) {
-          buffers2.fg = new Uint16Array(cells.fg);
+          buffers.fg = new Uint16Array(cells.fg);
         }
         if (this.recordBuffers.bg) {
-          buffers2.bg = new Uint16Array(cells.bg);
+          buffers.bg = new Uint16Array(cells.bg);
         }
         if (this.recordBuffers.attributes) {
-          buffers2.attributes = new Uint8Array(cells.attributes);
+          buffers.attributes = new Uint8Array(cells.attributes);
         }
       }
-      return { frame: frame2, buffers: buffers2 };
+      return { frame, buffers };
     });
     const recordedFrame = {
       frame,
@@ -1022,5 +1022,5 @@ export {
   setRendererCapabilities
 };
 
-//# debugId=E4A00F71BE7FE87864756E2164756E21
+//# debugId=B9DEB437B63DC16764756E2164756E21
 //# sourceMappingURL=testing.bun.js.map

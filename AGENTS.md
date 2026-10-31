@@ -39,6 +39,29 @@ use its terminal tool to run, drive, and inspect the app; repository examples bi
 `renderer.console.toggle()` for captured `console.log` output. Ask for a user-run reproduction only when the required
 terminal or platform is unavailable locally.
 
+## Fork publishing (the `tfm` branch)
+
+This branch is a fork that carries patches upstream does not have. It is published to npm under its own scope,
+`@clarkarch/opentui-fork`, plus one package per native target (`@clarkarch/opentui-fork-<platform>-<arch>[-<abi>]`).
+
+- The in-repo package name stays `@opentui/core`. The monorepo's internal imports and the upstream rebase depend on it;
+  only the PUBLISHED artifacts carry the fork's name. `packages/core/src/published-package.ts` is the single source for it.
+- The loader imports the platform packages with LITERAL specifiers, because `bun build --compile` has to see the
+  `import("./libopentui.so", { type: "file" })` inside them to embed the library in a binary. A computed specifier is
+  invisible to the bundler and the compiled binary silently loses its library. Keep the literals literal.
+- Those literals, the manifest's `optionalDependencies` and the build script's package names have to agree.
+  `packages/core/src/published-package.test.ts` fails when they drift; run it after touching any of them.
+- A leftover `@opentui/core-<target>` reference loads the UNPATCHED upstream library next to the patched JS. That is an
+  ABI mismatch, not a fallback — the same guard fails on it.
+- The version is `0.8.0-fork.N` (upstream version + release counter). It is a prerelease of the upstream version, so
+  consumers have to ask for it explicitly. Bump it in `packages/core/package.json` AND in the `optionalDependencies`
+  pins together — the pins are exact versions.
+- Publish with `bun scripts/publish-fork.ts --native-dir <dir>`: the platform packages first, then the core, so an
+  install never sees the core without its library. The `publish-npm` workflow does this from CI.
+- The native packages carry the vendored licenses (Ghostty, wuffs, stb, libwebp, lcms2). The list lives in
+  `packages/core/scripts/native-package.ts`; the build and the publish path stage through it, so a new vendored
+  dependency has to be added there — a published package missing a license is a legal problem, not a style one.
+
 ## Portable FFI
 
 - Portable symbol signatures must stay within the `node:ffi`/`bun:ffi` intersection. Use explicit widths such as

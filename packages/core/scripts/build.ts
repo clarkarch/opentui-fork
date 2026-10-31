@@ -7,6 +7,8 @@ import process from "process"
 import path from "path"
 import { variants, type Variant } from "./variants"
 import { separateNativeSymbols } from "./native-symbols"
+import { PUBLISHED_BUGS, PUBLISHED_CORE_NAME, PUBLISHED_HOMEPAGE, PUBLISHED_REPOSITORY } from "../src/published-package"
+import { nativeLibraryFileName, nativePackageName, stageNativePackage, zigTargetDirectory } from "./native-package"
 
 interface PackageJson {
   name: string
@@ -77,13 +79,12 @@ const getZigTarget = (platform: string, arch: string, abi?: string): string => {
   return abi ? `${base}-${abi}` : base
 }
 
+// The published README links into the fork's repository, not upstream's.
 const replaceLinks = (text: string): string => {
-  return packageJson.homepage
-    ? text.replace(
-        /(\[.*?\]\()(\.\/.*?\))/g,
-        (_, p1: string, p2: string) => `${p1}${packageJson.homepage}/blob/HEAD/${p2.replace("./", "")}`,
-      )
-    : text
+  return text.replace(
+    /(\[.*?\]\()(\.\/.*?\))/g,
+    (_, p1: string, p2: string) => `${p1}${PUBLISHED_HOMEPAGE}/blob/HEAD/${p2.replace("./", "")}`,
+  )
 }
 
 const requiredFields: (keyof PackageJson)[] = ["name", "version", "license", "repository", "description"]
@@ -199,46 +200,38 @@ if (buildNative) {
 
   const zigArgs = ["build", `-Doptimize=${isDev ? "Debug" : "ReleaseFast"}`]
   if (buildAll) {
-    // Release builds must never fall back to building without video.
-    zigArgs.push("-Dall", "-Drequire-video")
+    // The fork ships no FFmpeg: the native video decoder stays unavailable.
+    zigArgs.push("-Dall")
   }
   if (gpaSafeStats) {
     zigArgs.push("-Dgpa-safe-stats=true")
   }
 
-  if (!skipZig) {
-    // Native video statically links FFmpeg; prepare:zig builds only the host prefixes.
-    if (buildAll) runCommand("bun", ["scripts/build-ffmpeg.ts", "--all"], nativeRoot, "Error: FFmpeg build failed")
-    runCommand("zig", zigArgs, nativeRoot, "Error: Zig build failed")
-  }
+  if (!skipZig) runCommand("zig", zigArgs, nativeRoot, "Error: Zig build failed")
 
   const variantsToPackage = buildAll ? variants : [getHostVariant()]
 
-  for (const { platform, arch, abi } of variantsToPackage) {
-    const nativeName = `${packageJson.name}-${platform}-${arch}${abi ? `-${abi}` : ""}`
+  for (const target of variantsToPackage) {
+    const { platform, arch, abi } = target
+    // The published native packages carry the fork's name, not the in-repo
+    // package name: the loader imports them by these exact names.
+    const nativeName = nativePackageName(target, PUBLISHED_CORE_NAME)
     const nativeDir = join(rootDir, "node_modules", nativeName)
-    const libDir = join(nativeRoot, "lib", getZigTarget(platform, arch, abi))
+    const libDir = join(nativeRoot, "lib", zigTargetDirectory(target))
 
-    rmSync(nativeDir, { recursive: true, force: true })
-    mkdirSync(nativeDir, { recursive: true })
-
-    let copiedFiles = 0
-    let libraryFileName: string | null = null
+    let libraryPath: string | null = null
     for (const name of ["libopentui", "opentui"]) {
       for (const ext of [".so", ".dll", ".dylib"]) {
         const src = join(libDir, `${name}${ext}`)
         if (existsSync(src)) {
-          const fileName = `${name}${ext}`
-          copyFileSync(src, join(nativeDir, fileName))
-          copiedFiles++
-          if (!libraryFileName) {
-            libraryFileName = fileName
-          }
+          libraryPath = src
+          break
         }
       }
+      if (libraryPath !== null) break
     }
 
-    if (copiedFiles === 0) {
+    if (libraryPath === null) {
       // Skip platforms that weren't built
       console.log(`Skipping ${platform}-${arch}: no libraries found`)
       rmSync(nativeDir, { recursive: true, force: true })
@@ -247,90 +240,33 @@ if (buildNative) {
 
     checkStaticArchive(join(libDir, platform === "win32" ? "opentui-static.lib" : "libopentui.a"))
 
-    if (!isDev && !skipSymbols && libraryFileName) {
+    stageNativePackage({
+      destination: nativeDir,
+      target,
+      libraryPath,
+      packageName: nativeName,
+      metadata: {
+        version: packageJson.version,
+        license: packageJson.license,
+        author: packageJson.author,
+        keywords: packageJson.keywords,
+      },
+      licenses: { licensePath, ghosttyLicensePath, nativeRoot },
+      publishedCoreName: PUBLISHED_CORE_NAME,
+    })
+
+    if (!isDev && !skipSymbols) {
       separateNativeSymbols({
-        binary: join(nativeDir, libraryFileName),
+        binary: join(nativeDir, nativeLibraryFileName(platform)),
         symbolsDir: join(nativeRoot, "symbols", `${platform}-${arch}${abi ? `-${abi}` : ""}`),
         platform,
-        target: getZigTarget(platform, arch, abi),
+        target: zigTargetDirectory(target),
         version: packageJson.version,
         commit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: rootDir, encoding: "utf8" }).trim(),
         abi: abi ?? (platform === "linux" || platform === "win32" ? "gnu" : undefined),
         pdb: join(libDir, "opentui.pdb"),
         buildDir: nativeRoot,
       })
-    }
-
-    const indexJsContent = `import { fileURLToPath } from "node:url"
-
-export default fileURLToPath(new URL("./${libraryFileName}", import.meta.url))
-`
-    writeFileSync(join(nativeDir, "index.js"), indexJsContent)
-
-    const indexBunJsContent = `const module = await import("./${libraryFileName}", { with: { type: "file" } })
-
-export default module.default
-`
-    writeFileSync(join(nativeDir, "index.bun.js"), indexBunJsContent)
-
-    writeFileSync(join(nativeDir, "index.d.ts"), "declare const path: string\nexport default path\n")
-
-    writeFileSync(
-      join(nativeDir, "package.json"),
-      JSON.stringify(
-        {
-          name: nativeName,
-          version: packageJson.version,
-          description: `Prebuilt ${platform}-${arch}${abi ? `-${abi}` : ""} binaries for ${packageJson.name}`,
-          type: "module",
-          main: "index.js",
-          module: "index.js",
-          types: "index.d.ts",
-          // The binaries statically link LGPL FFmpeg.
-          license: `${packageJson.license} AND LGPL-2.1-or-later`,
-          author: packageJson.author,
-          homepage: packageJson.homepage,
-          repository: packageJson.repository,
-          bugs: packageJson.bugs,
-          keywords: [...(packageJson.keywords ?? []), "prebuild", "prebuilt"],
-          exports: {
-            ".": {
-              bun: "./index.bun.js",
-              import: "./index.js",
-              types: "./index.d.ts",
-            },
-          },
-          os: [platform],
-          cpu: [arch],
-          ...(abi ? { libc: [abi] } : {}),
-        },
-        null,
-        2,
-      ),
-    )
-
-    writeFileSync(
-      join(nativeDir, "README.md"),
-      replaceLinks(
-        `## ${nativeName}\n\n> Prebuilt ${platform}-${arch}${abi ? `-${abi}` : ""} binaries for \`${packageJson.name}\`.`,
-      ),
-    )
-
-    if (existsSync(licensePath)) copyFileSync(licensePath, join(nativeDir, "LICENSE"))
-    for (const [source, destination] of [
-      [ghosttyLicensePath, "LICENSE-GHOSTTY"],
-      [join(nativeRoot, "src", "vendor", "wuffs", "LICENSE"), "LICENSE-WUFFS"],
-      [join(nativeRoot, "src", "vendor", "stb", "LICENSE"), "LICENSE-STB"],
-      [join(nativeRoot, "src", "vendor", "libwebp", "COPYING"), "LICENSE-LIBWEBP"],
-      [join(nativeRoot, "src", "vendor", "libwebp", "PATENTS"), "PATENTS-LIBWEBP"],
-      [join(nativeRoot, "src", "vendor", "libwebp", "AUTHORS"), "AUTHORS-LIBWEBP"],
-      [join(nativeRoot, "src", "vendor", "lcms2", "LICENSE"), "LICENSE-LCMS2"],
-      [join(nativeRoot, "src", "vendor", "ffmpeg", "COPYING.LGPLv2.1"), "LICENSE-FFMPEG"],
-      [join(nativeRoot, "src", "vendor", "ffmpeg", "README.md"), "FFMPEG-SOURCE.md"],
-      [join(nativeRoot, "src", "vendor", "ffmpeg", "LICENSE-ZLIB"), "LICENSE-ZLIB"],
-    ] as const) {
-      if (!existsSync(source)) throw new Error(`Required native license file is missing: ${source}`)
-      copyFileSync(source, join(nativeDir, destination))
     }
     console.log("Built:", nativeName)
   }
@@ -514,21 +450,21 @@ if (buildLib) {
     )
   }
 
-  writeBunOnlyStub("runtime-plugin.node.js", `${packageJson.name}/runtime-plugin`, [
+  writeBunOnlyStub("runtime-plugin.node.js", `${PUBLISHED_CORE_NAME}/runtime-plugin`, [
     "createRuntimePlugin",
     "isCoreRuntimeModuleSpecifier",
     "runtimeModuleIdForSpecifier",
   ])
-  writeBunOnlyStub("runtime-plugin-support.node.js", `${packageJson.name}/runtime-plugin-support`, [
+  writeBunOnlyStub("runtime-plugin-support.node.js", `${PUBLISHED_CORE_NAME}/runtime-plugin-support`, [
     "ensureRuntimePluginSupport",
     "createRuntimePlugin",
     "runtimeModuleIdForSpecifier",
   ])
-  writeBunOnlyStub("runtime-plugin-support-configure.node.js", `${packageJson.name}/runtime-plugin-support/configure`, [
-    "ensureRuntimePluginSupport",
-    "createRuntimePlugin",
-    "runtimeModuleIdForSpecifier",
-  ])
+  writeBunOnlyStub(
+    "runtime-plugin-support-configure.node.js",
+    `${PUBLISHED_CORE_NAME}/runtime-plugin-support/configure`,
+    ["ensureRuntimePluginSupport", "createRuntimePlugin", "runtimeModuleIdForSpecifier"],
+  )
 
   // Configure exports for multiple entry points
   const exports = {
@@ -590,7 +526,7 @@ if (buildLib) {
 
   const optionalDeps: Record<string, string> = Object.fromEntries(
     variants.map(({ platform, arch, abi }) => [
-      `${packageJson.name}-${platform}-${arch}${abi ? `-${abi}` : ""}`,
+      `${PUBLISHED_CORE_NAME}-${platform}-${arch}${abi ? `-${abi}` : ""}`,
       packageJson.version,
     ]),
   )
@@ -599,7 +535,7 @@ if (buildLib) {
     join(distDir, "package.json"),
     JSON.stringify(
       {
-        name: packageJson.name,
+        name: PUBLISHED_CORE_NAME,
         module: "index.node.js",
         main: "index.node.js",
         types: "index.d.ts",
@@ -609,9 +545,9 @@ if (buildLib) {
         keywords: packageJson.keywords,
         license: packageJson.license,
         author: packageJson.author,
-        homepage: packageJson.homepage,
-        repository: packageJson.repository,
-        bugs: packageJson.bugs,
+        homepage: PUBLISHED_HOMEPAGE,
+        repository: PUBLISHED_REPOSITORY,
+        bugs: PUBLISHED_BUGS,
         engines: packageJson.engines,
         exports,
         dependencies: packageJson.dependencies,

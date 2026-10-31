@@ -1,6 +1,3 @@
-import { createRequire } from "node:module";
-var __require = /* @__PURE__ */ createRequire(import.meta.url);
-
 // ../../node_modules/.bun/web-tree-sitter@0.25.10/node_modules/web-tree-sitter/tree-sitter.js
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -1444,8 +1441,8 @@ var Module2 = (() => {
     var ENVIRONMENT_IS_NODE = typeof process == "object" && typeof process.versions == "object" && typeof process.versions.node == "string" && process.type != "renderer";
     var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIRONMENT_IS_WORKER;
     if (ENVIRONMENT_IS_NODE) {
-      const { createRequire: createRequire2 } = await import("module");
-      var require = createRequire2(import.meta.url);
+      const { createRequire } = await import("module");
+      var require = createRequire(import.meta.url);
     }
     Module.currentQueryProgressCallback = null;
     Module.currentProgressCallback = null;
@@ -3327,8 +3324,8 @@ class DownloadUtils {
 
 // src/lib/bunfs.ts
 import { basename as basename2, join as join2 } from "node:path";
-function isBunfsPath(path2) {
-  return path2.includes("$bunfs") || /^B:[\\/]~BUN/i.test(path2);
+function isBunfsPath(path) {
+  return path.includes("$bunfs") || /^B:[\\/]~BUN/i.test(path);
 }
 function getBunfsRootPath() {
   return process.platform === "win32" ? "B:\\~BUN\\root" : "/$bunfs/root";
@@ -4244,9 +4241,9 @@ class ParserWorker {
       }
     }
     return {
-      highlights: Array.from(lineHighlights.entries()).map(([line, lineHighlights2]) => ({
+      highlights: Array.from(lineHighlights.entries()).map(([line, lineHighlights]) => ({
         line,
-        highlights: Array.from(lineHighlights2.values()),
+        highlights: Array.from(lineHighlights.values()),
         droppedHighlights: droppedHighlights.get(line) ? Array.from(droppedHighlights.get(line).values()) : []
       }))
     };
@@ -4572,5 +4569,5 @@ if (isWorkerRuntime) {
   });
 }
 
-//# debugId=712E4D5D162BD84C64756E2164756E21
+//# debugId=C84A64624AD7862C64756E2164756E21
 //# sourceMappingURL=parser.worker.js.map
