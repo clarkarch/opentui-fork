@@ -58,6 +58,26 @@ describe("published package names", () => {
     expect(descriptor.key).toBe(`${publishedPlatformPackageName("linux-x64")}/libopentui.so`)
   })
 
+  test("the native packages carry no libc filter", () => {
+    // The loader picks the musl library with a RUNTIME check, so a bundler
+    // still has to resolve the musl import on every Linux host. A package
+    // that npm/Bun skip because of its `libc` field cannot be resolved — the
+    // build of every glibc consumer breaks with "Could not resolve".
+    const { nativePackageManifest } =
+      require("../scripts/native-package.js") as typeof import("../scripts/native-package.js")
+    for (const abi of [undefined, "musl"]) {
+      const manifest = nativePackageManifest({
+        target: { platform: "linux", arch: "x64", abi },
+        packageName: publishedPlatformPackageName(`linux-x64${abi ? `-${abi}` : ""}`),
+        metadata: { version: "0.0.0" },
+        publishedCoreName: PUBLISHED_CORE_NAME,
+      })
+      expect(manifest.os).toEqual(["linux"])
+      expect(manifest.cpu).toEqual(["x64"])
+      expect(manifest.libc).toBeUndefined()
+    }
+  })
+
   test("no source file is left pointing at the upstream platform packages", () => {
     // The loader, the benchmarks and the build scripts all have to name the
     // fork's platform packages. A leftover `@opentui/core-*` would make the
