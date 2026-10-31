@@ -109,6 +109,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      # The manifest script lives in the repository: without the checkout the
+      # publish job has no source tree at all.
+      - uses: actions/checkout@v4
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.4.4"
