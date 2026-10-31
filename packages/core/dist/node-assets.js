@@ -3,6 +3,12 @@ import { statSync } from "node:fs";
 import { dirname, join as join2, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// src/published-package.ts
+var PUBLISHED_CORE_NAME = "@clarkarch/opentui-fork";
+function publishedPlatformPackageName(target) {
+  return `${PUBLISHED_CORE_NAME}-${target}`;
+}
+
 // src/node-asset-target.ts
 var NATIVE_FILE_NAMES = {
   darwin: "libopentui.dylib",
@@ -20,7 +26,7 @@ function getNativeAssetDescriptor(target) {
     throw new Error(`OpenTUI Node asset target libc is only supported on Linux, got ${target.platform}`);
   }
   const libcSuffix = target.platform === "linux" && target.libc === "musl" ? "-musl" : "";
-  const packageName = `@opentui/core-${target.platform}-${target.arch}${libcSuffix}`;
+  const packageName = publishedPlatformPackageName(`${target.platform}-${target.arch}${libcSuffix}`);
   const fileName = NATIVE_FILE_NAMES[target.platform];
   return {
     key: `${packageName}/${fileName}`,
@@ -268,5 +274,5 @@ export {
   getNodeAssets
 };
 
-//# debugId=F5C999A86A06F6F464756E2164756E21
+//# debugId=836B3BFE04965DBB64756E2164756E21
 //# sourceMappingURL=node-assets.js.map

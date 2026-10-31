@@ -1,0 +1,153 @@
+name: publish-npm
+
+# Publishes the fork to npm: the native platform packages first, then the core
+# package that depends on them.
+#
+# The native libraries are built per target (the same matrix as
+# native-artifacts.yml) and downloaded into the layout the publish script
+# expects: <native-dir>/<zig-target>/<library>.
+#
+# The npm token comes from the repository secret NPM_TOKEN and needs publish
+# rights on the @clarkarch scope. The workflow publishes the version in
+# packages/core/package.json; bump it before running.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tfm]
+    paths:
+      - "packages/core/src/**"
+      - "packages/core/scripts/**"
+      - "packages/core/package.json"
+      - "packages/native/**"
+      - "scripts/publish-fork.ts"
+      - "scripts/npm-publish.ts"
+      - ".github/workflows/publish-npm.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.output }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - output: x86_64-linux
+            target: x86_64-linux-gnu.2.17
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: aarch64-linux
+            target: aarch64-linux-gnu.2.17
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: x86_64-linux-musl
+            target: x86_64-linux-musl
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: aarch64-linux-musl
+            target: aarch64-linux-musl
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: x86_64-windows
+            target: x86_64-windows-gnu
+            os: ubuntu-latest
+            file: opentui.dll
+          - output: aarch64-windows
+            target: aarch64-windows-gnu
+            os: ubuntu-latest
+            file: opentui.dll
+          # macOS needs the macOS SDK to link CoreAudio; Zig cannot cross to
+          # Darwin without it, so these build on a macOS host.
+          - output: x86_64-macos
+            target: x86_64-macos.13.0
+            os: macos-latest
+            file: libopentui.dylib
+          - output: aarch64-macos
+            target: aarch64-macos.13.0
+            os: macos-latest
+            file: libopentui.dylib
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: "0.16.0"
+
+      - name: Prepare zig dependencies
+        working-directory: packages/native
+        run: bun run prepare:zig
+
+      - name: Build
+        working-directory: packages/native
+        run: zig build -Doptimize=ReleaseFast -Dlibrary-target=${{ matrix.target }}
+
+      - name: Verify and strip
+        working-directory: packages/native
+        run: |
+          lib="lib/${{ matrix.output }}/${{ matrix.file }}"
+          if [ ! -f "$lib" ]; then
+            echo "expected $lib to exist after the build"
+            ls -R lib || true
+            exit 1
+          fi
+          # The published packages ship without debug symbols: the library is
+          # what every consumer downloads.
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            strip --strip-unneeded "$lib" || echo "strip failed, keeping symbols"
+          else
+            strip -x "$lib" || echo "strip failed, keeping symbols"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.output }}
+          path: packages/native/lib/${{ matrix.output }}/${{ matrix.file }}
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: "0.16.0"
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Collect the libraries
+        run: |
+          mkdir -p native
+          for dir in artifacts/native-*; do
+            target=$(basename "$dir" | sed 's/^native-//')
+            file=$(ls "$dir")
+            mkdir -p "native/$target"
+            cp "$dir/$file" "native/$target/$file"
+          done
+          ls -lR native
+
+      - name: Install the workspace
+        run: bun install --frozen-lockfile
+
+      - name: Publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          printf '//registry.npmjs.org/:_authToken=%s\n' "$NPM_TOKEN" > ~/.npmrc
+          bun scripts/publish-fork.ts --native-dir native

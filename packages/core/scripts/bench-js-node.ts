@@ -38,7 +38,7 @@ try {
     "--outfile",
     benchmarkEntry,
     "--external",
-    "@opentui/core-*",
+    "@clarkarch/opentui-fork-*",
   ])
   writeFileSync(resolve(outputDirectory, "package.json"), JSON.stringify({ type: "module" }))
   const benchmark = spawnSync(

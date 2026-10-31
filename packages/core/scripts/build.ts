@@ -6,8 +6,10 @@ import { fileURLToPath } from "url"
 import process from "process"
 import path from "path"
 import { variants, zigOutputName, type Variant } from "./variants"
-import { fnv1a64 } from "./native-abi-rust"
 import { separateNativeSymbols } from "./native-symbols"
+import { PUBLISHED_BUGS, PUBLISHED_CORE_NAME, PUBLISHED_HOMEPAGE, PUBLISHED_REPOSITORY } from "../src/published-package"
+// The published README links into the fork's repository, not upstream's.
+import { nativeLibraryFileName, nativePackageName, replaceLinks, stageNativePackage } from "./native-package"
 
 interface PackageJson {
   name: string
@@ -69,15 +71,6 @@ const getHostVariant = (): Variant => {
 if (!buildLib && !buildNative) {
   console.error("Error: Please specify --lib, --native, or both")
   process.exit(1)
-}
-
-const replaceLinks = (text: string): string => {
-  return packageJson.homepage
-    ? text.replace(
-        /(\[.*?\]\()(\.\/.*?\))/g,
-        (_, p1: string, p2: string) => `${p1}${packageJson.homepage}/blob/HEAD/${p2.replace("./", "")}`,
-      )
-    : text
 }
 
 const requiredFields: (keyof PackageJson)[] = ["name", "version", "license", "repository", "description"]
@@ -193,46 +186,38 @@ if (buildNative) {
 
   const zigArgs = ["build", `-Doptimize=${isDev ? "Debug" : "ReleaseFast"}`]
   if (buildAll) {
-    // Release builds must never fall back to building without video.
-    zigArgs.push("-Dall", "-Drequire-video")
+    // The fork ships no FFmpeg: the native video decoder stays unavailable.
+    zigArgs.push("-Dall")
   }
   if (gpaSafeStats) {
     zigArgs.push("-Dgpa-safe-stats=true")
   }
 
-  if (!skipZig) {
-    // Native video statically links FFmpeg; prepare:zig builds only the host prefixes.
-    if (buildAll) runCommand("bun", ["scripts/build-ffmpeg.ts", "--all"], nativeRoot, "Error: FFmpeg build failed")
-    runCommand("zig", zigArgs, nativeRoot, "Error: Zig build failed")
-  }
+  if (!skipZig) runCommand("zig", zigArgs, nativeRoot, "Error: Zig build failed")
 
   const variantsToPackage = buildAll ? variants : [getHostVariant()]
 
-  for (const { platform, arch, abi } of variantsToPackage) {
-    const nativeName = `${packageJson.name}-${platform}-${arch}${abi ? `-${abi}` : ""}`
+  for (const target of variantsToPackage) {
+    const { platform, arch, abi } = target
+    // The published native packages carry the fork's name, not the in-repo
+    // package name: the loader imports them by these exact names.
+    const nativeName = nativePackageName(target, PUBLISHED_CORE_NAME)
     const nativeDir = join(rootDir, "node_modules", nativeName)
     const libDir = join(nativeRoot, "lib", zigOutputName({ platform, arch, abi }))
 
-    rmSync(nativeDir, { recursive: true, force: true })
-    mkdirSync(nativeDir, { recursive: true })
-
-    let copiedFiles = 0
-    let libraryFileName: string | null = null
+    let libraryPath: string | null = null
     for (const name of ["libopentui", "opentui"]) {
       for (const ext of [".so", ".dll", ".dylib"]) {
         const src = join(libDir, `${name}${ext}`)
         if (existsSync(src)) {
-          const fileName = `${name}${ext}`
-          copyFileSync(src, join(nativeDir, fileName))
-          copiedFiles++
-          if (!libraryFileName) {
-            libraryFileName = fileName
-          }
+          libraryPath = src
+          break
         }
       }
+      if (libraryPath !== null) break
     }
 
-    if (copiedFiles === 0) {
+    if (libraryPath === null) {
       // Skip platforms that weren't built
       console.log(`Skipping ${platform}-${arch}: no libraries found`)
       rmSync(nativeDir, { recursive: true, force: true })
@@ -241,21 +226,26 @@ if (buildNative) {
 
     checkStaticArchive(join(libDir, platform === "win32" ? "opentui-static.lib" : "libopentui.a"))
 
-    // The Zig build installs the header it compiled beside the libraries. A different header means the libraries
-    // are stale, and a C or Rust host would bind declarations they do not implement.
-    const header = readFileSync(join(libDir, "opentui.h"))
-    const headerHash = fnv1a64(header)
-    const sourceHash = fnv1a64(readFileSync(join(nativeRoot, "include", "opentui.h")))
-    if (headerHash !== sourceHash) {
-      throw new Error(`${libDir}/opentui.h (${headerHash}) is not include/opentui.h (${sourceHash}); rebuild native`)
-    }
-    writeFileSync(join(nativeDir, "opentui.h"), header)
-    // A Windows host links the DLL through its import library.
-    if (platform === "win32") copyFileSync(join(libDir, "opentui.lib"), join(nativeDir, "opentui.lib"))
+    const staged = stageNativePackage({
+      destination: nativeDir,
+      target,
+      libraryPath,
+      packageName: nativeName,
+      metadata: {
+        version: packageJson.version,
+        license: packageJson.license,
+        author: packageJson.author,
+        keywords: packageJson.keywords,
+      },
+      licenses: { licensePath, ghosttyLicensePath, nativeRoot },
+      publishedCoreName: PUBLISHED_CORE_NAME,
+      headerPath: join(libDir, "opentui.h"),
+      windowsImportLibraryPath: platform === "win32" ? join(libDir, "opentui.lib") : undefined,
+    })
 
-    if (!isDev && !skipSymbols && libraryFileName) {
+    if (!isDev && !skipSymbols) {
       separateNativeSymbols({
-        binary: join(nativeDir, libraryFileName),
+        binary: join(nativeDir, nativeLibraryFileName(platform)),
         symbolsDir: join(nativeRoot, "symbols", `${platform}-${arch}${abi ? `-${abi}` : ""}`),
         platform,
         target: zigOutputName({ platform, arch, abi }),
@@ -267,83 +257,7 @@ if (buildNative) {
       })
     }
 
-    const indexJsContent = `import { fileURLToPath } from "node:url"
-
-export default fileURLToPath(new URL("./${libraryFileName}", import.meta.url))
-`
-    writeFileSync(join(nativeDir, "index.js"), indexJsContent)
-
-    const indexBunJsContent = `const module = await import("./${libraryFileName}", { with: { type: "file" } })
-
-export default module.default
-`
-    writeFileSync(join(nativeDir, "index.bun.js"), indexBunJsContent)
-
-    writeFileSync(join(nativeDir, "index.d.ts"), "declare const path: string\nexport default path\n")
-
-    writeFileSync(
-      join(nativeDir, "package.json"),
-      JSON.stringify(
-        {
-          name: nativeName,
-          version: packageJson.version,
-          description: `Prebuilt ${platform}-${arch}${abi ? `-${abi}` : ""} binaries for ${packageJson.name}`,
-          type: "module",
-          main: "index.js",
-          module: "index.js",
-          types: "index.d.ts",
-          // The binaries statically link LGPL FFmpeg.
-          license: `${packageJson.license} AND LGPL-2.1-or-later`,
-          author: packageJson.author,
-          homepage: packageJson.homepage,
-          repository: packageJson.repository,
-          bugs: packageJson.bugs,
-          keywords: [...(packageJson.keywords ?? []), "prebuild", "prebuilt"],
-          exports: {
-            ".": {
-              bun: "./index.bun.js",
-              import: "./index.js",
-              types: "./index.d.ts",
-            },
-          },
-          os: [platform],
-          cpu: [arch],
-          ...(abi ? { libc: [abi] } : {}),
-        },
-        null,
-        2,
-      ),
-    )
-
-    writeFileSync(
-      join(nativeDir, "README.md"),
-      replaceLinks(
-        `## ${nativeName}\n\n> Prebuilt ${platform}-${arch}${abi ? `-${abi}` : ""} binaries for \`${packageJson.name}\`.\n\n` +
-          `\`opentui.h\` beside \`${libraryFileName}\` is the C ABI header that this library was built from ` +
-          `(FNV-1a 64 \`${headerHash}\`). A C host compiles against it and links the library in this directory` +
-          `${platform === "win32" ? " through `opentui.lib`" : ""}. For the Rust crates in packages/rust, set ` +
-          `\`OPENTUI_LIB_DIR\` to this directory${platform === "win32" ? "" : " and turn off their default `static` feature (`default-features = false`), since this package has no static library"}; their build fails when the header differs from the one their bindings were generated from. ` +
-          `See [C](https://opentui.com/docs/native/c).`,
-      ),
-    )
-
-    if (existsSync(licensePath)) copyFileSync(licensePath, join(nativeDir, "LICENSE"))
-    for (const [source, destination] of [
-      [ghosttyLicensePath, "LICENSE-GHOSTTY"],
-      [join(nativeRoot, "src", "vendor", "wuffs", "LICENSE"), "LICENSE-WUFFS"],
-      [join(nativeRoot, "src", "vendor", "stb", "LICENSE"), "LICENSE-STB"],
-      [join(nativeRoot, "src", "vendor", "libwebp", "COPYING"), "LICENSE-LIBWEBP"],
-      [join(nativeRoot, "src", "vendor", "libwebp", "PATENTS"), "PATENTS-LIBWEBP"],
-      [join(nativeRoot, "src", "vendor", "libwebp", "AUTHORS"), "AUTHORS-LIBWEBP"],
-      [join(nativeRoot, "src", "vendor", "lcms2", "LICENSE"), "LICENSE-LCMS2"],
-      [join(nativeRoot, "src", "vendor", "ffmpeg", "COPYING.LGPLv2.1"), "LICENSE-FFMPEG"],
-      [join(nativeRoot, "src", "vendor", "ffmpeg", "README.md"), "FFMPEG-SOURCE.md"],
-      [join(nativeRoot, "src", "vendor", "ffmpeg", "LICENSE-ZLIB"), "LICENSE-ZLIB"],
-    ] as const) {
-      if (!existsSync(source)) throw new Error(`Required native license file is missing: ${source}`)
-      copyFileSync(source, join(nativeDir, destination))
-    }
-    console.log("Built:", nativeName, `opentui.h FNV-1a 64 ${headerHash}`)
+    console.log("Built:", nativeName, `opentui.h FNV-1a 64 ${staged.headerHash}`)
   }
 }
 
@@ -525,21 +439,21 @@ if (buildLib) {
     )
   }
 
-  writeBunOnlyStub("runtime-plugin.node.js", `${packageJson.name}/runtime-plugin`, [
+  writeBunOnlyStub("runtime-plugin.node.js", `${PUBLISHED_CORE_NAME}/runtime-plugin`, [
     "createRuntimePlugin",
     "isCoreRuntimeModuleSpecifier",
     "runtimeModuleIdForSpecifier",
   ])
-  writeBunOnlyStub("runtime-plugin-support.node.js", `${packageJson.name}/runtime-plugin-support`, [
+  writeBunOnlyStub("runtime-plugin-support.node.js", `${PUBLISHED_CORE_NAME}/runtime-plugin-support`, [
     "ensureRuntimePluginSupport",
     "createRuntimePlugin",
     "runtimeModuleIdForSpecifier",
   ])
-  writeBunOnlyStub("runtime-plugin-support-configure.node.js", `${packageJson.name}/runtime-plugin-support/configure`, [
-    "ensureRuntimePluginSupport",
-    "createRuntimePlugin",
-    "runtimeModuleIdForSpecifier",
-  ])
+  writeBunOnlyStub(
+    "runtime-plugin-support-configure.node.js",
+    `${PUBLISHED_CORE_NAME}/runtime-plugin-support/configure`,
+    ["ensureRuntimePluginSupport", "createRuntimePlugin", "runtimeModuleIdForSpecifier"],
+  )
 
   // Configure exports for multiple entry points
   const exports = {
@@ -600,17 +514,14 @@ if (buildLib) {
   }
 
   const optionalDeps: Record<string, string> = Object.fromEntries(
-    variants.map(({ platform, arch, abi }) => [
-      `${packageJson.name}-${platform}-${arch}${abi ? `-${abi}` : ""}`,
-      packageJson.version,
-    ]),
+    variants.map((target) => [nativePackageName(target, PUBLISHED_CORE_NAME), packageJson.version]),
   )
 
   writeFileSync(
     join(distDir, "package.json"),
     JSON.stringify(
       {
-        name: packageJson.name,
+        name: PUBLISHED_CORE_NAME,
         module: "index.node.js",
         main: "index.node.js",
         types: "index.d.ts",
@@ -620,9 +531,9 @@ if (buildLib) {
         keywords: packageJson.keywords,
         license: packageJson.license,
         author: packageJson.author,
-        homepage: packageJson.homepage,
-        repository: packageJson.repository,
-        bugs: packageJson.bugs,
+        homepage: PUBLISHED_HOMEPAGE,
+        repository: PUBLISHED_REPOSITORY,
+        bugs: PUBLISHED_BUGS,
         engines: packageJson.engines,
         exports,
         dependencies: packageJson.dependencies,

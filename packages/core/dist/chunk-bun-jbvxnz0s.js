@@ -13,105 +13,104 @@ var __export = (target, all) => {
       set: __exportSetter.bind(all, name)
     });
 };
-var __require = import.meta.require;
 
 // src/yoga.ts
 var exports_yoga = {};
 __export(exports_yoga, {
-  ALIGN_AUTO: () => ALIGN_AUTO,
-  ALIGN_BASELINE: () => ALIGN_BASELINE,
-  ALIGN_CENTER: () => ALIGN_CENTER,
-  ALIGN_FLEX_END: () => ALIGN_FLEX_END,
-  ALIGN_FLEX_START: () => ALIGN_FLEX_START,
-  ALIGN_SPACE_AROUND: () => ALIGN_SPACE_AROUND,
-  ALIGN_SPACE_BETWEEN: () => ALIGN_SPACE_BETWEEN,
-  ALIGN_SPACE_EVENLY: () => ALIGN_SPACE_EVENLY,
-  ALIGN_STRETCH: () => ALIGN_STRETCH,
-  Align: () => Align,
-  BOX_SIZING_BORDER_BOX: () => BOX_SIZING_BORDER_BOX,
-  BOX_SIZING_CONTENT_BOX: () => BOX_SIZING_CONTENT_BOX,
-  BoxSizing: () => BoxSizing,
-  Config: () => Config,
-  DIMENSION_HEIGHT: () => DIMENSION_HEIGHT,
-  DIMENSION_WIDTH: () => DIMENSION_WIDTH,
-  DIRECTION_INHERIT: () => DIRECTION_INHERIT,
-  DIRECTION_LTR: () => DIRECTION_LTR,
-  DIRECTION_RTL: () => DIRECTION_RTL,
-  DISPLAY_CONTENTS: () => DISPLAY_CONTENTS,
-  DISPLAY_FLEX: () => DISPLAY_FLEX,
-  DISPLAY_NONE: () => DISPLAY_NONE,
-  Dimension: () => Dimension,
-  Direction: () => Direction,
-  Display: () => Display,
-  EDGE_ALL: () => EDGE_ALL,
-  EDGE_BOTTOM: () => EDGE_BOTTOM,
-  EDGE_END: () => EDGE_END,
-  EDGE_HORIZONTAL: () => EDGE_HORIZONTAL,
-  EDGE_LEFT: () => EDGE_LEFT,
-  EDGE_RIGHT: () => EDGE_RIGHT,
-  EDGE_START: () => EDGE_START,
-  EDGE_TOP: () => EDGE_TOP,
-  EDGE_VERTICAL: () => EDGE_VERTICAL,
-  ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE: () => ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE,
-  ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING: () => ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING,
-  ERRATA_ALL: () => ERRATA_ALL,
-  ERRATA_CLASSIC: () => ERRATA_CLASSIC,
-  ERRATA_NONE: () => ERRATA_NONE,
-  ERRATA_STRETCH_FLEX_BASIS: () => ERRATA_STRETCH_FLEX_BASIS,
-  EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS: () => EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS,
-  Edge: () => Edge,
-  Errata: () => Errata,
-  ExperimentalFeature: () => ExperimentalFeature,
-  FLEX_DIRECTION_COLUMN: () => FLEX_DIRECTION_COLUMN,
-  FLEX_DIRECTION_COLUMN_REVERSE: () => FLEX_DIRECTION_COLUMN_REVERSE,
-  FLEX_DIRECTION_ROW: () => FLEX_DIRECTION_ROW,
-  FLEX_DIRECTION_ROW_REVERSE: () => FLEX_DIRECTION_ROW_REVERSE,
-  FlexDirection: () => FlexDirection,
-  GUTTER_ALL: () => GUTTER_ALL,
-  GUTTER_COLUMN: () => GUTTER_COLUMN,
-  GUTTER_ROW: () => GUTTER_ROW,
-  Gutter: () => Gutter,
-  JUSTIFY_CENTER: () => JUSTIFY_CENTER,
-  JUSTIFY_FLEX_END: () => JUSTIFY_FLEX_END,
-  JUSTIFY_FLEX_START: () => JUSTIFY_FLEX_START,
-  JUSTIFY_SPACE_AROUND: () => JUSTIFY_SPACE_AROUND,
-  JUSTIFY_SPACE_BETWEEN: () => JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_SPACE_EVENLY: () => JUSTIFY_SPACE_EVENLY,
-  Justify: () => Justify,
-  LOG_LEVEL_DEBUG: () => LOG_LEVEL_DEBUG,
-  LOG_LEVEL_ERROR: () => LOG_LEVEL_ERROR,
-  LOG_LEVEL_FATAL: () => LOG_LEVEL_FATAL,
-  LOG_LEVEL_INFO: () => LOG_LEVEL_INFO,
-  LOG_LEVEL_VERBOSE: () => LOG_LEVEL_VERBOSE,
-  LOG_LEVEL_WARN: () => LOG_LEVEL_WARN,
-  LogLevel: () => LogLevel2,
-  MEASURE_MODE_AT_MOST: () => MEASURE_MODE_AT_MOST,
-  MEASURE_MODE_EXACTLY: () => MEASURE_MODE_EXACTLY,
-  MEASURE_MODE_UNDEFINED: () => MEASURE_MODE_UNDEFINED,
-  MeasureMode: () => MeasureMode,
-  NODE_TYPE_DEFAULT: () => NODE_TYPE_DEFAULT,
-  NODE_TYPE_TEXT: () => NODE_TYPE_TEXT,
-  Node: () => Node,
-  NodeType: () => NodeType,
-  OVERFLOW_HIDDEN: () => OVERFLOW_HIDDEN,
-  OVERFLOW_SCROLL: () => OVERFLOW_SCROLL,
-  OVERFLOW_VISIBLE: () => OVERFLOW_VISIBLE,
-  Overflow: () => Overflow,
-  POSITION_TYPE_ABSOLUTE: () => POSITION_TYPE_ABSOLUTE,
-  POSITION_TYPE_RELATIVE: () => POSITION_TYPE_RELATIVE,
-  POSITION_TYPE_STATIC: () => POSITION_TYPE_STATIC,
-  PositionType: () => PositionType,
-  UNIT_AUTO: () => UNIT_AUTO,
-  UNIT_PERCENT: () => UNIT_PERCENT,
-  UNIT_POINT: () => UNIT_POINT,
-  UNIT_UNDEFINED: () => UNIT_UNDEFINED,
-  Unit: () => Unit,
-  WRAP_NO_WRAP: () => WRAP_NO_WRAP,
-  WRAP_WRAP: () => WRAP_WRAP,
-  WRAP_WRAP_REVERSE: () => WRAP_WRAP_REVERSE,
-  Wrap: () => Wrap,
-  YogaError: () => YogaError,
-  YogaStatus: () => YogaStatus,
+  ALIGN_AUTO: () => ALIGN_AUTO2,
+  ALIGN_BASELINE: () => ALIGN_BASELINE2,
+  ALIGN_CENTER: () => ALIGN_CENTER2,
+  ALIGN_FLEX_END: () => ALIGN_FLEX_END2,
+  ALIGN_FLEX_START: () => ALIGN_FLEX_START2,
+  ALIGN_SPACE_AROUND: () => ALIGN_SPACE_AROUND2,
+  ALIGN_SPACE_BETWEEN: () => ALIGN_SPACE_BETWEEN2,
+  ALIGN_SPACE_EVENLY: () => ALIGN_SPACE_EVENLY2,
+  ALIGN_STRETCH: () => ALIGN_STRETCH2,
+  Align: () => Align2,
+  BOX_SIZING_BORDER_BOX: () => BOX_SIZING_BORDER_BOX2,
+  BOX_SIZING_CONTENT_BOX: () => BOX_SIZING_CONTENT_BOX2,
+  BoxSizing: () => BoxSizing2,
+  Config: () => Config2,
+  DIMENSION_HEIGHT: () => DIMENSION_HEIGHT2,
+  DIMENSION_WIDTH: () => DIMENSION_WIDTH2,
+  DIRECTION_INHERIT: () => DIRECTION_INHERIT2,
+  DIRECTION_LTR: () => DIRECTION_LTR2,
+  DIRECTION_RTL: () => DIRECTION_RTL2,
+  DISPLAY_CONTENTS: () => DISPLAY_CONTENTS2,
+  DISPLAY_FLEX: () => DISPLAY_FLEX2,
+  DISPLAY_NONE: () => DISPLAY_NONE2,
+  Dimension: () => Dimension2,
+  Direction: () => Direction2,
+  Display: () => Display2,
+  EDGE_ALL: () => EDGE_ALL2,
+  EDGE_BOTTOM: () => EDGE_BOTTOM2,
+  EDGE_END: () => EDGE_END2,
+  EDGE_HORIZONTAL: () => EDGE_HORIZONTAL2,
+  EDGE_LEFT: () => EDGE_LEFT2,
+  EDGE_RIGHT: () => EDGE_RIGHT2,
+  EDGE_START: () => EDGE_START2,
+  EDGE_TOP: () => EDGE_TOP2,
+  EDGE_VERTICAL: () => EDGE_VERTICAL2,
+  ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE: () => ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2,
+  ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING: () => ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2,
+  ERRATA_ALL: () => ERRATA_ALL2,
+  ERRATA_CLASSIC: () => ERRATA_CLASSIC2,
+  ERRATA_NONE: () => ERRATA_NONE2,
+  ERRATA_STRETCH_FLEX_BASIS: () => ERRATA_STRETCH_FLEX_BASIS2,
+  EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS: () => EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2,
+  Edge: () => Edge2,
+  Errata: () => Errata2,
+  ExperimentalFeature: () => ExperimentalFeature2,
+  FLEX_DIRECTION_COLUMN: () => FLEX_DIRECTION_COLUMN2,
+  FLEX_DIRECTION_COLUMN_REVERSE: () => FLEX_DIRECTION_COLUMN_REVERSE2,
+  FLEX_DIRECTION_ROW: () => FLEX_DIRECTION_ROW2,
+  FLEX_DIRECTION_ROW_REVERSE: () => FLEX_DIRECTION_ROW_REVERSE2,
+  FlexDirection: () => FlexDirection2,
+  GUTTER_ALL: () => GUTTER_ALL2,
+  GUTTER_COLUMN: () => GUTTER_COLUMN2,
+  GUTTER_ROW: () => GUTTER_ROW2,
+  Gutter: () => Gutter2,
+  JUSTIFY_CENTER: () => JUSTIFY_CENTER2,
+  JUSTIFY_FLEX_END: () => JUSTIFY_FLEX_END2,
+  JUSTIFY_FLEX_START: () => JUSTIFY_FLEX_START2,
+  JUSTIFY_SPACE_AROUND: () => JUSTIFY_SPACE_AROUND2,
+  JUSTIFY_SPACE_BETWEEN: () => JUSTIFY_SPACE_BETWEEN2,
+  JUSTIFY_SPACE_EVENLY: () => JUSTIFY_SPACE_EVENLY2,
+  Justify: () => Justify2,
+  LOG_LEVEL_DEBUG: () => LOG_LEVEL_DEBUG2,
+  LOG_LEVEL_ERROR: () => LOG_LEVEL_ERROR2,
+  LOG_LEVEL_FATAL: () => LOG_LEVEL_FATAL2,
+  LOG_LEVEL_INFO: () => LOG_LEVEL_INFO2,
+  LOG_LEVEL_VERBOSE: () => LOG_LEVEL_VERBOSE2,
+  LOG_LEVEL_WARN: () => LOG_LEVEL_WARN2,
+  LogLevel: () => LogLevel3,
+  MEASURE_MODE_AT_MOST: () => MEASURE_MODE_AT_MOST2,
+  MEASURE_MODE_EXACTLY: () => MEASURE_MODE_EXACTLY2,
+  MEASURE_MODE_UNDEFINED: () => MEASURE_MODE_UNDEFINED2,
+  MeasureMode: () => MeasureMode2,
+  NODE_TYPE_DEFAULT: () => NODE_TYPE_DEFAULT2,
+  NODE_TYPE_TEXT: () => NODE_TYPE_TEXT2,
+  Node: () => Node2,
+  NodeType: () => NodeType2,
+  OVERFLOW_HIDDEN: () => OVERFLOW_HIDDEN2,
+  OVERFLOW_SCROLL: () => OVERFLOW_SCROLL2,
+  OVERFLOW_VISIBLE: () => OVERFLOW_VISIBLE2,
+  Overflow: () => Overflow2,
+  POSITION_TYPE_ABSOLUTE: () => POSITION_TYPE_ABSOLUTE2,
+  POSITION_TYPE_RELATIVE: () => POSITION_TYPE_RELATIVE2,
+  POSITION_TYPE_STATIC: () => POSITION_TYPE_STATIC2,
+  PositionType: () => PositionType2,
+  UNIT_AUTO: () => UNIT_AUTO2,
+  UNIT_PERCENT: () => UNIT_PERCENT2,
+  UNIT_POINT: () => UNIT_POINT2,
+  UNIT_UNDEFINED: () => UNIT_UNDEFINED2,
+  Unit: () => Unit2,
+  WRAP_NO_WRAP: () => WRAP_NO_WRAP2,
+  WRAP_WRAP: () => WRAP_WRAP2,
+  WRAP_WRAP_REVERSE: () => WRAP_WRAP_REVERSE2,
+  Wrap: () => Wrap2,
+  YogaError: () => YogaError2,
+  YogaStatus: () => YogaStatus2,
   default: () => yoga_default
 });
 
@@ -2869,7 +2868,7 @@ var emoji_regex_default = () => {
 // ../../node_modules/.bun/string-width@7.2.0/node_modules/string-width/index.js
 var segmenter = new Intl.Segmenter;
 var defaultIgnorableCodePointRegex = /^\p{Default_Ignorable_Code_Point}$/u;
-function stringWidth(string, options = {}) {
+function stringWidth2(string, options = {}) {
   if (typeof string !== "string" || string.length === 0) {
     return 0;
   }
@@ -2940,16 +2939,16 @@ function destroySingleton(key) {
 }
 
 // src/lib/env.ts
-var envRegistry = singleton("env-registry", () => ({}));
-function registerEnvVar(config) {
-  const existing = envRegistry[config.name];
+var envRegistry2 = singleton("env-registry", () => ({}));
+function registerEnvVar2(config) {
+  const existing = envRegistry2[config.name];
   if (existing) {
     if (existing.description !== config.description || existing.type !== config.type || existing.default !== config.default || existing.required !== config.required) {
       throw new Error(`Environment variable "${config.name}" is already registered with different configuration. ` + `Existing: ${JSON.stringify(existing)}, New: ${JSON.stringify(config)}`);
     }
     return;
   }
-  envRegistry[config.name] = config;
+  envRegistry2[config.name] = config;
 }
 function normalizeBoolean(value) {
   const lowerValue = value.toLowerCase();
@@ -2987,11 +2986,11 @@ class EnvStore {
     if (this.parsedValues.has(key)) {
       return this.parsedValues.get(key);
     }
-    if (!(key in envRegistry)) {
+    if (!(key in envRegistry2)) {
       throw new Error(`Environment variable ${key} is not registered.`);
     }
     try {
-      const value = parseEnvValue(envRegistry[key]);
+      const value = parseEnvValue(envRegistry2[key]);
       this.parsedValues.set(key, value);
       return value;
     } catch (error) {
@@ -2999,18 +2998,18 @@ class EnvStore {
     }
   }
   has(key) {
-    return key in envRegistry;
+    return key in envRegistry2;
   }
   clearCache() {
     this.parsedValues.clear();
   }
 }
 var envStore = singleton("env-store", () => new EnvStore);
-function clearEnvCache() {
+function clearEnvCache2() {
   envStore.clearCache();
 }
-function generateEnvMarkdown() {
-  const configs = Object.values(envRegistry);
+function generateEnvMarkdown2() {
+  const configs = Object.values(envRegistry2);
   if (configs.length === 0) {
     return `# Environment Variables
 
@@ -3045,8 +3044,8 @@ No environment variables registered.
   }
   return markdown;
 }
-function generateEnvColored() {
-  const configs = Object.values(envRegistry);
+function generateEnvColored2() {
+  const configs = Object.values(envRegistry2);
   if (configs.length === 0) {
     return `\x1B[1;36mEnvironment Variables\x1B[0m
 
@@ -3079,7 +3078,7 @@ No environment variables registered.
   }
   return output;
 }
-var env = new Proxy({}, {
+var env2 = new Proxy({}, {
   get(target, prop) {
     if (typeof prop !== "string") {
       return;
@@ -3090,7 +3089,7 @@ var env = new Proxy({}, {
     return envStore.has(prop);
   },
   ownKeys() {
-    return Object.keys(envRegistry);
+    return Object.keys(envRegistry2);
   },
   getOwnPropertyDescriptor(target, prop) {
     if (envStore.has(prop)) {
@@ -3105,7 +3104,7 @@ var env = new Proxy({}, {
 });
 
 // src/platform/assets.ts
-registerEnvVar({
+registerEnvVar2({
   name: "OTUI_ASSET_ROOT",
   description: "Absolute directory containing relocatable OpenTUI runtime assets",
   type: "string",
@@ -3152,9 +3151,9 @@ function validateAssetKey(key) {
 var TEXT_ENCODER = new TextEncoder;
 var bun = globalThis.Bun;
 var sleep = bun?.sleep ?? standardSleep;
-var stringWidth2 = bun?.stringWidth ?? stringWidth;
+var stringWidth = bun?.stringWidth ?? stringWidth2;
 var writeFile = bun?.write ?? writeFilePortable;
-async function resolveBundledFilePath(key, loadBundledFile, fallbackPath, metaUrl, options = {}) {
+async function resolveBundledFilePath2(key, loadBundledFile, fallbackPath, metaUrl, options = {}) {
   if (options.useAssetRoot ?? true) {
     const configuredPath = resolveAssetRootPath(key);
     if (configuredPath !== undefined) {
@@ -3213,7 +3212,7 @@ function extractBundledImportSpecifier(loadBundledFile) {
 }
 function standardSleep(msOrDate) {
   const ms = msOrDate instanceof Date ? msOrDate.getTime() - Date.now() : msOrDate;
-  return new Promise((resolve2) => setTimeout(resolve2, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 async function writeFilePortable(destination, data, options) {
   const destinationPath = destination instanceof URL ? fileURLToPath3(destination) : destination;
@@ -3480,7 +3479,7 @@ function setGlobalWorkerMessageHandler(handler) {
 import { existsSync as existsSync3, writeFileSync } from "fs";
 
 // src/types.ts
-var TextAttributes = {
+var TextAttributes2 = {
   NONE: 0,
   BOLD: 1 << 0,
   DIM: 1 << 1,
@@ -3491,28 +3490,28 @@ var TextAttributes = {
   HIDDEN: 1 << 6,
   STRIKETHROUGH: 1 << 7
 };
-var ATTRIBUTE_BASE_BITS = 8;
-var ATTRIBUTE_BASE_MASK = 255;
-function getBaseAttributes(attr) {
-  return attr & ATTRIBUTE_BASE_MASK;
+var ATTRIBUTE_BASE_BITS2 = 8;
+var ATTRIBUTE_BASE_MASK2 = 255;
+function getBaseAttributes2(attr) {
+  return attr & ATTRIBUTE_BASE_MASK2;
 }
-var DebugOverlayCorner;
-((DebugOverlayCorner2) => {
-  DebugOverlayCorner2[DebugOverlayCorner2["topLeft"] = 0] = "topLeft";
-  DebugOverlayCorner2[DebugOverlayCorner2["topRight"] = 1] = "topRight";
-  DebugOverlayCorner2[DebugOverlayCorner2["bottomLeft"] = 2] = "bottomLeft";
-  DebugOverlayCorner2[DebugOverlayCorner2["bottomRight"] = 3] = "bottomRight";
-})(DebugOverlayCorner ||= {});
-var TargetChannel;
-((TargetChannel2) => {
-  TargetChannel2[TargetChannel2["FG"] = 1] = "FG";
-  TargetChannel2[TargetChannel2["BG"] = 2] = "BG";
-  TargetChannel2[TargetChannel2["Both"] = 3] = "Both";
-})(TargetChannel ||= {});
+var DebugOverlayCorner2;
+((DebugOverlayCorner) => {
+  DebugOverlayCorner[DebugOverlayCorner["topLeft"] = 0] = "topLeft";
+  DebugOverlayCorner[DebugOverlayCorner["topRight"] = 1] = "topRight";
+  DebugOverlayCorner[DebugOverlayCorner["bottomLeft"] = 2] = "bottomLeft";
+  DebugOverlayCorner[DebugOverlayCorner["bottomRight"] = 3] = "bottomRight";
+})(DebugOverlayCorner2 ||= {});
+var TargetChannel2;
+((TargetChannel) => {
+  TargetChannel[TargetChannel["FG"] = 1] = "FG";
+  TargetChannel[TargetChannel["BG"] = 2] = "BG";
+  TargetChannel[TargetChannel["Both"] = 3] = "Both";
+})(TargetChannel2 ||= {});
 
 // src/lib/RGBA.ts
-var DEFAULT_FOREGROUND_RGB = [255, 255, 255];
-var DEFAULT_BACKGROUND_RGB = [0, 0, 0];
+var DEFAULT_FOREGROUND_RGB2 = [255, 255, 255];
+var DEFAULT_BACKGROUND_RGB2 = [0, 0, 0];
 var INTENT_RGB = 0;
 var INTENT_INDEXED = 1;
 var INTENT_DEFAULT = 2;
@@ -3546,7 +3545,7 @@ function toByte(value) {
   return Math.round(Math.max(0, Math.min(255, Number.isFinite(value) ? value : 0)));
 }
 function packRGBA8(r, g, b, a, meta) {
-  const rgba = new RGBA(ZERO_RGBA_BUFFER);
+  const rgba = new RGBA2(ZERO_RGBA_BUFFER);
   rgba.buffer[0] = toByte(r) & 255 | (meta >>> 0 & 255) << 8;
   rgba.buffer[1] = toByte(g) & 255 | (meta >>> 8 & 255) << 8;
   rgba.buffer[2] = toByte(b) & 255 | (meta >>> 16 & 255) << 8;
@@ -3554,17 +3553,17 @@ function packRGBA8(r, g, b, a, meta) {
   return rgba;
 }
 function rgbaForAnsi256Index(index) {
-  const [r, g, b] = ansi256IndexToRgb(index);
-  return RGBA.fromInts(r, g, b);
+  const [r, g, b] = ansi256IndexToRgb2(index);
+  return RGBA2.fromInts(r, g, b);
 }
-function normalizeIndexedColorIndex(index) {
+function normalizeIndexedColorIndex2(index) {
   if (!Number.isInteger(index) || index < 0 || index > 255) {
     throw new RangeError(`Indexed color must be an integer in the range 0..255, got ${index}`);
   }
   return index;
 }
-function ansi256IndexToRgb(index) {
-  const normalizedIndex = normalizeIndexedColorIndex(index);
+function ansi256IndexToRgb2(index) {
+  const normalizedIndex = normalizeIndexedColorIndex2(index);
   if (normalizedIndex < ANSI16_RGB.length) {
     return ANSI16_RGB[normalizedIndex];
   }
@@ -3579,7 +3578,7 @@ function ansi256IndexToRgb(index) {
   return [value, value, value];
 }
 
-class RGBA {
+class RGBA2 {
   buffer;
   constructor(buffer) {
     const copy = new Uint16Array(4);
@@ -3594,33 +3593,33 @@ class RGBA {
     this.buffer = copy;
   }
   static fromArray(array) {
-    return new RGBA(array);
+    return new RGBA2(array);
   }
   static fromValues(r, g, b, a = 1) {
     return packRGBA8(toU8(r), toU8(g), toU8(b), toU8(a), packMeta(INTENT_RGB));
   }
   static clone(rgba) {
-    return new RGBA(rgba.buffer);
+    return new RGBA2(rgba.buffer);
   }
   static fromInts(r, g, b, a = 255) {
     return packRGBA8(r, g, b, a, packMeta(INTENT_RGB));
   }
   static fromHex(hex) {
-    return hexToRgb(hex);
+    return hexToRgb2(hex);
   }
   static fromIndex(index, snapshot) {
-    const normalized = normalizeIndexedColorIndex(index);
-    const rgba = snapshot ? parseColor(snapshot) : rgbaForAnsi256Index(normalized);
+    const normalized = normalizeIndexedColorIndex2(index);
+    const rgba = snapshot ? parseColor2(snapshot) : rgbaForAnsi256Index(normalized);
     const [r, g, b, a] = rgba.toInts();
     return packRGBA8(r, g, b, a, packMeta(INTENT_INDEXED, normalized));
   }
   static defaultForeground(snapshot) {
-    const rgba = snapshot ? parseColor(snapshot) : RGBA.fromInts(...DEFAULT_FOREGROUND_RGB);
+    const rgba = snapshot ? parseColor2(snapshot) : RGBA2.fromInts(...DEFAULT_FOREGROUND_RGB2);
     const [r, g, b, a] = rgba.toInts();
     return packRGBA8(r, g, b, a, packMeta(INTENT_DEFAULT));
   }
   static defaultBackground(snapshot) {
-    const rgba = snapshot ? parseColor(snapshot) : RGBA.fromInts(...DEFAULT_BACKGROUND_RGB);
+    const rgba = snapshot ? parseColor2(snapshot) : RGBA2.fromInts(...DEFAULT_BACKGROUND_RGB2);
     const [r, g, b, a] = rgba.toInts();
     return packRGBA8(r, g, b, a, packMeta(INTENT_DEFAULT));
   }
@@ -3679,12 +3678,12 @@ class RGBA {
     return this.buffer[0] === other.buffer[0] && this.buffer[1] === other.buffer[1] && this.buffer[2] === other.buffer[2] && this.buffer[3] === other.buffer[3];
   }
 }
-function normalizeColorValue(value) {
+function normalizeColorValue2(value) {
   if (value == null)
     return null;
-  return { rgba: parseColor(value) };
+  return { rgba: parseColor2(value) };
 }
-function hexToRgb(hex) {
+function hexToRgb2(hex) {
   hex = hex.replace(/^#/, "");
   if (hex.length === 3) {
     hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
@@ -3693,20 +3692,20 @@ function hexToRgb(hex) {
   }
   if (!/^[0-9A-Fa-f]{6}$/.test(hex) && !/^[0-9A-Fa-f]{8}$/.test(hex)) {
     console.warn(`Invalid hex color: ${hex}, defaulting to magenta`);
-    return RGBA.fromValues(1, 0, 1, 1);
+    return RGBA2.fromValues(1, 0, 1, 1);
   }
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
   const a = hex.length === 8 ? parseInt(hex.substring(6, 8), 16) : 255;
-  return RGBA.fromInts(r, g, b, a);
+  return RGBA2.fromInts(r, g, b, a);
 }
-function rgbToHex(rgb) {
+function rgbToHex2(rgb) {
   const [r, g, b, a] = rgb.toInts();
   const components = a === 255 ? [r, g, b] : [r, g, b, a];
   return "#" + components.map((x) => x.toString(16).padStart(2, "0")).join("");
 }
-function hsvToRgb(h, s, v) {
+function hsvToRgb2(h, s, v) {
   let r = 0, g = 0, b = 0;
   const i = Math.floor(h / 60) % 6;
   const f = h / 60 - Math.floor(h / 60);
@@ -3745,7 +3744,7 @@ function hsvToRgb(h, s, v) {
       b = q;
       break;
   }
-  return RGBA.fromValues(r, g, b, 1);
+  return RGBA2.fromValues(r, g, b, 1);
 }
 var CSS_COLOR_NAMES = {
   black: "#000000",
@@ -3777,22 +3776,22 @@ var CSS_COLOR_NAMES = {
   brightmagenta: "#FF66FF",
   brightwhite: "#FFFFFF"
 };
-function parseColor(color) {
+function parseColor2(color) {
   if (typeof color === "string") {
     const lowerColor = color.toLowerCase();
     if (lowerColor === "transparent") {
-      return RGBA.fromValues(0, 0, 0, 0);
+      return RGBA2.fromValues(0, 0, 0, 0);
     }
     if (CSS_COLOR_NAMES[lowerColor]) {
-      return hexToRgb(CSS_COLOR_NAMES[lowerColor]);
+      return hexToRgb2(CSS_COLOR_NAMES[lowerColor]);
     }
-    return hexToRgb(color);
+    return hexToRgb2(color);
   }
   return color;
 }
 
 // src/utils.ts
-function createTextAttributes({
+function createTextAttributes2({
   bold = false,
   italic = false,
   underline = false,
@@ -3803,37 +3802,37 @@ function createTextAttributes({
   hidden = false,
   strikethrough = false
 } = {}) {
-  let attributes = TextAttributes.NONE;
+  let attributes = TextAttributes2.NONE;
   if (bold)
-    attributes |= TextAttributes.BOLD;
+    attributes |= TextAttributes2.BOLD;
   if (italic)
-    attributes |= TextAttributes.ITALIC;
+    attributes |= TextAttributes2.ITALIC;
   if (underline)
-    attributes |= TextAttributes.UNDERLINE;
+    attributes |= TextAttributes2.UNDERLINE;
   if (dim)
-    attributes |= TextAttributes.DIM;
+    attributes |= TextAttributes2.DIM;
   if (blink)
-    attributes |= TextAttributes.BLINK;
+    attributes |= TextAttributes2.BLINK;
   if (inverse || reverse)
-    attributes |= TextAttributes.INVERSE;
+    attributes |= TextAttributes2.INVERSE;
   if (hidden)
-    attributes |= TextAttributes.HIDDEN;
+    attributes |= TextAttributes2.HIDDEN;
   if (strikethrough)
-    attributes |= TextAttributes.STRIKETHROUGH;
+    attributes |= TextAttributes2.STRIKETHROUGH;
   return attributes;
 }
-var ATTRIBUTE_BASE_MASK2 = 255;
+var ATTRIBUTE_BASE_MASK = 255;
 var LINK_ID_SHIFT = 8;
 var LINK_ID_PAYLOAD_MASK = 16777215;
-function attributesWithLink(baseAttributes, linkId) {
-  const base = baseAttributes & ATTRIBUTE_BASE_MASK2;
+function attributesWithLink2(baseAttributes, linkId) {
+  const base = baseAttributes & ATTRIBUTE_BASE_MASK;
   const linkBits = (linkId & LINK_ID_PAYLOAD_MASK) << LINK_ID_SHIFT;
   return base | linkBits;
 }
-function getLinkId(attributes) {
+function getLinkId2(attributes) {
   return attributes >>> LINK_ID_SHIFT & LINK_ID_PAYLOAD_MASK;
 }
-function visualizeRenderableTree(renderable, maxDepth = 10) {
+function visualizeRenderableTree2(renderable, maxDepth = 10) {
   function buildTreeLines(node, prefix = "", parentPrefix = "", isLastChild = true, depth = 0) {
     if (depth >= maxDepth) {
       return [`${prefix}${node.id} ... (max depth reached)`];
@@ -3861,30 +3860,30 @@ function visualizeRenderableTree(renderable, maxDepth = 10) {
 
 // src/lib/styled-text.ts
 var BrandedStyledText = Symbol.for("@opentui/core/StyledText");
-function isStyledText(obj) {
+function isStyledText2(obj) {
   return obj && obj[BrandedStyledText];
 }
 
-class StyledText {
+class StyledText2 {
   [BrandedStyledText] = true;
   chunks;
   constructor(chunks) {
     this.chunks = chunks;
   }
 }
-function stringToStyledText(content) {
+function stringToStyledText2(content) {
   const chunk = {
     __isChunk: true,
     text: content
   };
-  return new StyledText([chunk]);
+  return new StyledText2([chunk]);
 }
 function applyStyle(input, style) {
   if (typeof input === "object" && "__isChunk" in input) {
     const existingChunk = input;
-    const fg = style.fg ? parseColor(style.fg) : existingChunk.fg;
-    const bg = style.bg ? parseColor(style.bg) : existingChunk.bg;
-    const newAttrs = createTextAttributes(style);
+    const fg = style.fg ? parseColor2(style.fg) : existingChunk.fg;
+    const bg = style.bg ? parseColor2(style.bg) : existingChunk.bg;
+    const newAttrs = createTextAttributes2(style);
     const mergedAttrs = existingChunk.attributes ? existingChunk.attributes | newAttrs : newAttrs;
     return {
       __isChunk: true,
@@ -3896,9 +3895,9 @@ function applyStyle(input, style) {
     };
   } else {
     const plainTextStr = String(input);
-    const fg = style.fg ? parseColor(style.fg) : undefined;
-    const bg = style.bg ? parseColor(style.bg) : undefined;
-    const attributes = createTextAttributes(style);
+    const fg = style.fg ? parseColor2(style.fg) : undefined;
+    const bg = style.bg ? parseColor2(style.bg) : undefined;
+    const attributes = createTextAttributes2(style);
     return {
       __isChunk: true,
       text: plainTextStr,
@@ -3908,40 +3907,40 @@ function applyStyle(input, style) {
     };
   }
 }
-var black = (input) => applyStyle(input, { fg: "black" });
-var red = (input) => applyStyle(input, { fg: "red" });
-var green = (input) => applyStyle(input, { fg: "green" });
-var yellow = (input) => applyStyle(input, { fg: "yellow" });
-var blue = (input) => applyStyle(input, { fg: "blue" });
-var magenta = (input) => applyStyle(input, { fg: "magenta" });
-var cyan = (input) => applyStyle(input, { fg: "cyan" });
-var white = (input) => applyStyle(input, { fg: "white" });
-var brightBlack = (input) => applyStyle(input, { fg: "brightBlack" });
-var brightRed = (input) => applyStyle(input, { fg: "brightRed" });
-var brightGreen = (input) => applyStyle(input, { fg: "brightGreen" });
-var brightYellow = (input) => applyStyle(input, { fg: "brightYellow" });
-var brightBlue = (input) => applyStyle(input, { fg: "brightBlue" });
-var brightMagenta = (input) => applyStyle(input, { fg: "brightMagenta" });
-var brightCyan = (input) => applyStyle(input, { fg: "brightCyan" });
-var brightWhite = (input) => applyStyle(input, { fg: "brightWhite" });
-var bgBlack = (input) => applyStyle(input, { bg: "black" });
-var bgRed = (input) => applyStyle(input, { bg: "red" });
-var bgGreen = (input) => applyStyle(input, { bg: "green" });
-var bgYellow = (input) => applyStyle(input, { bg: "yellow" });
-var bgBlue = (input) => applyStyle(input, { bg: "blue" });
-var bgMagenta = (input) => applyStyle(input, { bg: "magenta" });
-var bgCyan = (input) => applyStyle(input, { bg: "cyan" });
-var bgWhite = (input) => applyStyle(input, { bg: "white" });
-var bold = (input) => applyStyle(input, { bold: true });
-var italic = (input) => applyStyle(input, { italic: true });
-var underline = (input) => applyStyle(input, { underline: true });
-var strikethrough = (input) => applyStyle(input, { strikethrough: true });
-var dim = (input) => applyStyle(input, { dim: true });
-var reverse = (input) => applyStyle(input, { reverse: true });
-var blink = (input) => applyStyle(input, { blink: true });
-var fg = (color) => (input) => applyStyle(input, { fg: color });
-var bg = (color) => (input) => applyStyle(input, { bg: color });
-var link = (url) => (input) => {
+var black2 = (input) => applyStyle(input, { fg: "black" });
+var red2 = (input) => applyStyle(input, { fg: "red" });
+var green2 = (input) => applyStyle(input, { fg: "green" });
+var yellow2 = (input) => applyStyle(input, { fg: "yellow" });
+var blue2 = (input) => applyStyle(input, { fg: "blue" });
+var magenta2 = (input) => applyStyle(input, { fg: "magenta" });
+var cyan2 = (input) => applyStyle(input, { fg: "cyan" });
+var white2 = (input) => applyStyle(input, { fg: "white" });
+var brightBlack2 = (input) => applyStyle(input, { fg: "brightBlack" });
+var brightRed2 = (input) => applyStyle(input, { fg: "brightRed" });
+var brightGreen2 = (input) => applyStyle(input, { fg: "brightGreen" });
+var brightYellow2 = (input) => applyStyle(input, { fg: "brightYellow" });
+var brightBlue2 = (input) => applyStyle(input, { fg: "brightBlue" });
+var brightMagenta2 = (input) => applyStyle(input, { fg: "brightMagenta" });
+var brightCyan2 = (input) => applyStyle(input, { fg: "brightCyan" });
+var brightWhite2 = (input) => applyStyle(input, { fg: "brightWhite" });
+var bgBlack2 = (input) => applyStyle(input, { bg: "black" });
+var bgRed2 = (input) => applyStyle(input, { bg: "red" });
+var bgGreen2 = (input) => applyStyle(input, { bg: "green" });
+var bgYellow2 = (input) => applyStyle(input, { bg: "yellow" });
+var bgBlue2 = (input) => applyStyle(input, { bg: "blue" });
+var bgMagenta2 = (input) => applyStyle(input, { bg: "magenta" });
+var bgCyan2 = (input) => applyStyle(input, { bg: "cyan" });
+var bgWhite2 = (input) => applyStyle(input, { bg: "white" });
+var bold2 = (input) => applyStyle(input, { bold: true });
+var italic2 = (input) => applyStyle(input, { italic: true });
+var underline2 = (input) => applyStyle(input, { underline: true });
+var strikethrough2 = (input) => applyStyle(input, { strikethrough: true });
+var dim2 = (input) => applyStyle(input, { dim: true });
+var reverse2 = (input) => applyStyle(input, { reverse: true });
+var blink2 = (input) => applyStyle(input, { blink: true });
+var fg2 = (color) => (input) => applyStyle(input, { fg: color });
+var bg2 = (color) => (input) => applyStyle(input, { bg: color });
+var link2 = (url) => (input) => {
   const chunk = typeof input === "object" && "__isChunk" in input ? input : {
     __isChunk: true,
     text: String(input)
@@ -3951,7 +3950,7 @@ var link = (url) => (input) => {
     link: { url }
   };
 };
-function t(strings, ...values) {
+function t2(strings, ...values) {
   const chunks = [];
   for (let i = 0;i < strings.length; i++) {
     const raw = strings[i];
@@ -3974,7 +3973,7 @@ function t(strings, ...values) {
       });
     }
   }
-  return new StyledText(chunks);
+  return new StyledText2(chunks);
 }
 
 // src/yoga.internal.ts
@@ -4011,16 +4010,16 @@ var YogaValueKind = {
   Gap: nativeConstants.OT_STYLE_VALUE_GAP
 };
 function sceneSetEnum(scene, node, kind, value, flags = NativeStyleFlags.None) {
-  scene.setStyle(node, NativeStyleGroup.Enum, kind, NATIVE_EDGE_NONE, Unit.Undefined, value, flags);
+  scene.setStyle(node, NativeStyleGroup.Enum, kind, NATIVE_EDGE_NONE2, Unit2.Undefined, value, flags);
 }
 function sceneGetEnum(scene, node, kind) {
-  return scene.getStyle(node, NativeStyleGroup.Enum, kind, NATIVE_EDGE_NONE).value;
+  return scene.getStyle(node, NativeStyleGroup.Enum, kind, NATIVE_EDGE_NONE2).value;
 }
 function sceneSetFloat(scene, node, kind, value, flags = NativeStyleFlags.None) {
-  scene.setStyle(node, NativeStyleGroup.Float, kind, NATIVE_EDGE_NONE, Unit.Undefined, value ?? NaN, flags);
+  scene.setStyle(node, NativeStyleGroup.Float, kind, NATIVE_EDGE_NONE2, Unit2.Undefined, value ?? NaN, flags);
 }
 function sceneGetFloat(scene, node, kind) {
-  return scene.getStyle(node, NativeStyleGroup.Float, kind, NATIVE_EDGE_NONE).value;
+  return scene.getStyle(node, NativeStyleGroup.Float, kind, NATIVE_EDGE_NONE2).value;
 }
 function sceneSetValue(scene, node, kind, edge, valueInput, flags = NativeStyleFlags.None) {
   const value = parseYogaValue(valueInput);
@@ -4031,7 +4030,7 @@ function sceneGetValue(scene, node, kind, edge) {
 }
 function sceneSetDimension(scene, node, dimension, input, disableFlexShrink = false) {
   const value = parseYogaValue(input);
-  scene.setStyle(node, NativeStyleGroup.Dimension, dimension, NATIVE_EDGE_NONE, value.unit, value.value, disableFlexShrink ? NativeStyleFlags.DisableFlexShrink : NativeStyleFlags.None);
+  scene.setStyle(node, NativeStyleGroup.Dimension, dimension, NATIVE_EDGE_NONE2, value.unit, value.value, disableFlexShrink ? NativeStyleFlags.DisableFlexShrink : NativeStyleFlags.None);
 }
 var UNDEFINED_VALUE = { unit: nativeConstants.OT_UNIT_UNDEFINED, value: NaN };
 
@@ -4048,7 +4047,7 @@ class YogaHost {
   }
   getDefaultConfig() {
     if (!this.defaultConfig || this.configs.get(this.defaultConfig.ptr) !== this.defaultConfig) {
-      this.defaultConfig = Config.create(this.renderLib);
+      this.defaultConfig = Config2.create(this.renderLib);
     }
     return this.defaultConfig;
   }
@@ -4138,7 +4137,7 @@ function parseYogaValue(value) {
     return UNDEFINED_VALUE;
   }
   if (value === "auto") {
-    return { unit: Unit.Auto, value: NaN };
+    return { unit: Unit2.Auto, value: NaN };
   }
   if (typeof value === "string") {
     if (!value.endsWith("%")) {
@@ -4148,9 +4147,9 @@ function parseYogaValue(value) {
     if (Number.isNaN(numberValue)) {
       throw new Error(`Invalid Yoga percentage value: ${value}`);
     }
-    return { unit: Unit.Percent, value: numberValue };
+    return { unit: Unit2.Percent, value: numberValue };
   }
-  return { unit: Unit.Point, value };
+  return { unit: Unit2.Point, value };
 }
 
 // ../../node_modules/.bun/bun-ffi-structs@0.3.1+1fb4c65d43e298b9/node_modules/bun-ffi-structs/dist/index.js
@@ -4184,11 +4183,11 @@ async function loadBackend2() {
 function importModule(specifier) {
   return import(specifier).then((module) => module.default ?? module);
 }
-function createBunBackend2(bun2) {
+function createBunBackend2(bun) {
   return {
-    ptr: bun2.ptr,
+    ptr: bun.ptr,
     toArrayBuffer(pointer, offset, length) {
-      return bun2.toArrayBuffer(toBunPointer2(pointer), offset, length);
+      return bun.toArrayBuffer(toBunPointer2(pointer), offset, length);
     }
   };
 }
@@ -4291,7 +4290,7 @@ function enumTypeError(value) {
   throw new TypeError(`Invalid enum value: ${value}`);
 }
 function defineEnum(mapping, base = "u32") {
-  const reverse2 = Object.fromEntries(Object.entries(mapping).map(([k, v]) => [v, k]));
+  const reverse = Object.fromEntries(Object.entries(mapping).map(([k, v]) => [v, k]));
   return {
     __type: "enum",
     type: base,
@@ -4299,7 +4298,7 @@ function defineEnum(mapping, base = "u32") {
       return typeof value === "number" ? value : mapping[value] ?? enumTypeError(String(value));
     },
     from(value) {
-      return reverse2[value] ?? enumTypeError(String(value));
+      return reverse[value] ?? enumTypeError(String(value));
     },
     enum: mapping
   };
@@ -5498,12 +5497,12 @@ var ReserveInfoStruct = defineStruct([
     len: value.len
   })
 });
-var NativeAudioStreamFormat = {
+var NativeAudioStreamFormat2 = {
   Mp3: 1,
   Flac: 2,
   Pcm: 3
 };
-var NativeAudioStreamState = {
+var NativeAudioStreamState2 = {
   Initializing: 0,
   Buffering: 1,
   Playing: 2,
@@ -5521,7 +5520,7 @@ var NativeAudioStreamStateNames = [
   "disposed",
   "reconnecting"
 ];
-var NativeAudioStreamCloseReason = {
+var NativeAudioStreamCloseReason2 = {
   PreserveNativeTerminal: 0,
   TransportError: 1,
   Disposed: 2
@@ -5634,7 +5633,13 @@ function resolveBundledDefaultParserAsset(relativePath, fallbackPath) {
   if (!loadBundledFile) {
     throw new Error(`Unknown OpenTUI default parser asset: ${JSON.stringify(relativePath)}`);
   }
-  return resolveBundledFilePath(`@opentui/core/${relativePath}`, loadBundledFile, fallbackPath, import.meta.url);
+  return resolveBundledFilePath2(`@opentui/core/${relativePath}`, loadBundledFile, fallbackPath, import.meta.url);
+}
+
+// src/published-package.ts
+var PUBLISHED_CORE_NAME = "@clarkarch/opentui-fork";
+function publishedPlatformPackageName(target) {
+  return `${PUBLISHED_CORE_NAME}-${target}`;
 }
 
 // src/node-asset-target.ts
@@ -5654,7 +5659,7 @@ function getNativeAssetDescriptor(target) {
     throw new Error(`OpenTUI Node asset target libc is only supported on Linux, got ${target.platform}`);
   }
   const libcSuffix = target.platform === "linux" && target.libc === "musl" ? "-musl" : "";
-  const packageName = `@opentui/core-${target.platform}-${target.arch}${libcSuffix}`;
+  const packageName = publishedPlatformPackageName(`${target.platform}-${target.arch}${libcSuffix}`);
   const fileName = NATIVE_FILE_NAMES[target.platform];
   return {
     key: `${packageName}/${fileName}`,
@@ -5688,16 +5693,22 @@ var REBUILT_LIB_OUTPUT_NAMES = {
   "win32-x64": "x86_64-windows",
   "win32-arm64": "aarch64-windows"
 };
+var REBUILT_LIB_ROOTS = ["../../../native/lib", "../../native/lib"];
 function rebuiltNativeLibraryPath(fileName) {
   const target = getCurrentNodeAssetTarget();
   const libcSuffix = target.platform === "linux" && target.libc === "musl" ? "-musl" : "";
   const outputName = REBUILT_LIB_OUTPUT_NAMES[`${target.platform}-${target.arch}${libcSuffix}`];
   if (outputName === undefined)
     return null;
-  const candidate = resolve2(dirname2(fileURLToPath4(import.meta.url)), "../../../native/lib", outputName, fileName);
-  return existsSync2(candidate) ? candidate : null;
+  const moduleDir = dirname2(fileURLToPath4(import.meta.url));
+  for (const root of REBUILT_LIB_ROOTS) {
+    const candidate = resolve2(moduleDir, root, outputName, fileName);
+    if (existsSync2(candidate))
+      return candidate;
+  }
+  return null;
 }
-var bundledTreeSitterWorkerPath = await resolveBundledFilePath(PARSER_WORKER_ASSET_KEY, () => import("@opentui/core/parser.worker", { with: { type: "file" } }), new URL("../lib/tree-sitter/parser.worker.js", import.meta.url), import.meta.url, { useAssetRoot: false });
+var bundledTreeSitterWorkerPath = await resolveBundledFilePath2(PARSER_WORKER_ASSET_KEY, () => import("@opentui/core/parser.worker", { with: { type: "file" } }), new URL("../lib/tree-sitter/parser.worker.js", import.meta.url), import.meta.url, { useAssetRoot: false });
 function resolveDefaultParserAsset(relativePath, fallbackPath) {
   return resolveBundledDefaultParserAsset(relativePath, fallbackPath);
 }
@@ -5705,7 +5716,7 @@ function resolveDefaultTreeSitterWorkerPath(_fallbackPath) {
   return resolveAssetPath(PARSER_WORKER_ASSET_KEY, bundledTreeSitterWorkerPath);
 }
 function resolveTreeSitterWasm() {
-  return resolveBundledFilePath(TREE_SITTER_WASM_ASSET_KEY, () => import("web-tree-sitter/tree-sitter.wasm", { with: { type: "wasm" } }), () => import.meta.resolve(TREE_SITTER_WASM_ASSET_KEY), import.meta.url);
+  return resolveBundledFilePath2(TREE_SITTER_WASM_ASSET_KEY, () => import("web-tree-sitter/tree-sitter.wasm", { with: { type: "wasm" } }), () => import.meta.resolve(TREE_SITTER_WASM_ASSET_KEY), import.meta.url);
 }
 async function resolveNativeLibraryPath() {
   const asset = getNativeAssetDescriptor(getCurrentNodeAssetTarget());
@@ -5719,42 +5730,42 @@ async function resolveNativeLibraryPath() {
   }
   if (process.platform === "darwin") {
     if (process.arch === "x64") {
-      return (await import("@opentui/core-darwin-x64")).default;
+      return (await import("@clarkarch/opentui-fork-darwin-x64")).default;
     }
     if (process.arch === "arm64") {
-      return (await import("@opentui/core-darwin-arm64")).default;
+      return (await import("@clarkarch/opentui-fork-darwin-arm64")).default;
     }
   }
   if (process.platform === "linux") {
     if (process.arch === "x64") {
       if (process.env.OPENTUI_LIBC === "musl") {
-        return (await import("@opentui/core-linux-x64-musl")).default;
+        return (await import("@clarkarch/opentui-fork-linux-x64-musl")).default;
       }
-      return (await import("@opentui/core-linux-x64")).default;
+      return (await import("@clarkarch/opentui-fork-linux-x64")).default;
     }
     if (process.arch === "arm64") {
       if (process.env.OPENTUI_LIBC === "musl") {
-        return (await import("@opentui/core-linux-arm64-musl")).default;
+        return (await import("@clarkarch/opentui-fork-linux-arm64-musl")).default;
       }
-      return (await import("@opentui/core-linux-arm64")).default;
+      return (await import("@clarkarch/opentui-fork-linux-arm64")).default;
     }
   }
   if (process.platform === "win32") {
     if (process.arch === "x64") {
-      return (await import("@opentui/core-win32-x64")).default;
+      return (await import("@clarkarch/opentui-fork-win32-x64")).default;
     }
     if (process.arch === "arm64") {
-      return (await import("@opentui/core-win32-arm64")).default;
+      return (await import("@clarkarch/opentui-fork-win32-arm64")).default;
     }
   }
   throw new Error(`OpenTUI is not supported on the current platform: ${asset.packageName}`);
 }
 
 // src/zig.ts
-var NativeAudioStreamState2 = NativeAudioStreamState;
-var NativeAudioStreamCloseReason2 = NativeAudioStreamCloseReason;
-var NativeAudioStreamFormat2 = NativeAudioStreamFormat;
-registerEnvVar({
+var NativeAudioStreamState3 = NativeAudioStreamState2;
+var NativeAudioStreamCloseReason3 = NativeAudioStreamCloseReason2;
+var NativeAudioStreamFormat3 = NativeAudioStreamFormat2;
+registerEnvVar2({
   name: "OPENTUI_LIBC",
   description: "Select Linux native libc package. Supported values: glibc, musl.",
   type: "string",
@@ -5766,152 +5777,152 @@ function nextStandaloneHandle() {
     throw new RangeError("Native handle limit reached");
   return ++lastStandaloneHandle;
 }
-var MAX_LINK_URL_BYTES = 512;
+var MAX_LINK_URL_BYTES2 = 512;
 function allocFFIStruct(structDefinition) {
   const storage = allocStruct(structDefinition);
   return { ...storage, ffiView: new Uint8Array(storage.buffer) };
 }
-var NativeTextViewCommand;
-((NativeTextViewCommand2) => {
-  NativeTextViewCommand2[NativeTextViewCommand2["WrapWidth"] = 0] = "WrapWidth";
-  NativeTextViewCommand2[NativeTextViewCommand2["WrapMode"] = 1] = "WrapMode";
-  NativeTextViewCommand2[NativeTextViewCommand2["FirstLineOffset"] = 2] = "FirstLineOffset";
-  NativeTextViewCommand2[NativeTextViewCommand2["TabIndicator"] = 3] = "TabIndicator";
-  NativeTextViewCommand2[NativeTextViewCommand2["Truncate"] = 4] = "Truncate";
-  NativeTextViewCommand2[NativeTextViewCommand2["TextAlign"] = 5] = "TextAlign";
-})(NativeTextViewCommand ||= {});
-var NativeEditCommand;
-((NativeEditCommand2) => {
-  NativeEditCommand2[NativeEditCommand2["DeleteForward"] = 0] = "DeleteForward";
-  NativeEditCommand2[NativeEditCommand2["Backspace"] = 1] = "Backspace";
-  NativeEditCommand2[NativeEditCommand2["NewLine"] = 2] = "NewLine";
-  NativeEditCommand2[NativeEditCommand2["DeleteLine"] = 3] = "DeleteLine";
-  NativeEditCommand2[NativeEditCommand2["MoveLeft"] = 4] = "MoveLeft";
-  NativeEditCommand2[NativeEditCommand2["MoveRight"] = 5] = "MoveRight";
-  NativeEditCommand2[NativeEditCommand2["MoveUp"] = 6] = "MoveUp";
-  NativeEditCommand2[NativeEditCommand2["MoveDown"] = 7] = "MoveDown";
-  NativeEditCommand2[NativeEditCommand2["GotoLine"] = 8] = "GotoLine";
-  NativeEditCommand2[NativeEditCommand2["CursorOffset"] = 9] = "CursorOffset";
-  NativeEditCommand2[NativeEditCommand2["Clear"] = 10] = "Clear";
-  NativeEditCommand2[NativeEditCommand2["ClearHistory"] = 11] = "ClearHistory";
-  NativeEditCommand2[NativeEditCommand2["DebugRope"] = 12] = "DebugRope";
-})(NativeEditCommand ||= {});
-var NativeEditPositionQuery;
-((NativeEditPositionQuery2) => {
-  NativeEditPositionQuery2[NativeEditPositionQuery2["Cursor"] = 0] = "Cursor";
-  NativeEditPositionQuery2[NativeEditPositionQuery2["NextWord"] = 1] = "NextWord";
-  NativeEditPositionQuery2[NativeEditPositionQuery2["PrevWord"] = 2] = "PrevWord";
-  NativeEditPositionQuery2[NativeEditPositionQuery2["Eol"] = 3] = "Eol";
-  NativeEditPositionQuery2[NativeEditPositionQuery2["Offset"] = 4] = "Offset";
-  NativeEditPositionQuery2[NativeEditPositionQuery2["Coords"] = 5] = "Coords";
-  NativeEditPositionQuery2[NativeEditPositionQuery2["LineStart"] = 6] = "LineStart";
-  NativeEditPositionQuery2[NativeEditPositionQuery2["End"] = 7] = "End";
-  NativeEditPositionQuery2[NativeEditPositionQuery2["PrevChar"] = 8] = "PrevChar";
-})(NativeEditPositionQuery ||= {});
-var NativeEditorStyleMask;
-((NativeEditorStyleMask2) => {
-  NativeEditorStyleMask2[NativeEditorStyleMask2["Foreground"] = 1] = "Foreground";
-  NativeEditorStyleMask2[NativeEditorStyleMask2["Background"] = 2] = "Background";
-  NativeEditorStyleMask2[NativeEditorStyleMask2["Attributes"] = 4] = "Attributes";
-  NativeEditorStyleMask2[NativeEditorStyleMask2["All"] = 7] = "All";
-})(NativeEditorStyleMask ||= {});
-var NativeEditHighlightOperation;
-((NativeEditHighlightOperation2) => {
-  NativeEditHighlightOperation2[NativeEditHighlightOperation2["AddLine"] = 0] = "AddLine";
-  NativeEditHighlightOperation2[NativeEditHighlightOperation2["AddRange"] = 1] = "AddRange";
-  NativeEditHighlightOperation2[NativeEditHighlightOperation2["RemoveRef"] = 2] = "RemoveRef";
-  NativeEditHighlightOperation2[NativeEditHighlightOperation2["ClearLine"] = 3] = "ClearLine";
-  NativeEditHighlightOperation2[NativeEditHighlightOperation2["ClearAll"] = 4] = "ClearAll";
-})(NativeEditHighlightOperation ||= {});
-var NativeEditorCommand;
-((NativeEditorCommand2) => {
-  NativeEditorCommand2[NativeEditorCommand2["MoveUp"] = 0] = "MoveUp";
-  NativeEditorCommand2[NativeEditorCommand2["MoveDown"] = 1] = "MoveDown";
-  NativeEditorCommand2[NativeEditorCommand2["GotoLineEnd"] = 2] = "GotoLineEnd";
-  NativeEditorCommand2[NativeEditorCommand2["DeleteSelection"] = 3] = "DeleteSelection";
-  NativeEditorCommand2[NativeEditorCommand2["CursorOffset"] = 4] = "CursorOffset";
-  NativeEditorCommand2[NativeEditorCommand2["WrapMode"] = 5] = "WrapMode";
-  NativeEditorCommand2[NativeEditorCommand2["TabIndicator"] = 6] = "TabIndicator";
-})(NativeEditorCommand ||= {});
-var NativeEditorSelectionOperation;
-((NativeEditorSelectionOperation2) => {
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["Set"] = 0] = "Set";
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["Update"] = 1] = "Update";
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["Reset"] = 2] = "Reset";
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["Local"] = 3] = "Local";
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["LocalUpdate"] = 4] = "LocalUpdate";
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["LocalReset"] = 5] = "LocalReset";
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["Cell"] = 6] = "Cell";
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["Occupancy"] = 7] = "Occupancy";
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["Inclusive"] = 8] = "Inclusive";
-  NativeEditorSelectionOperation2[NativeEditorSelectionOperation2["Colors"] = 9] = "Colors";
-})(NativeEditorSelectionOperation ||= {});
-var NativeEditorPositionQuery;
-((NativeEditorPositionQuery2) => {
-  NativeEditorPositionQuery2[NativeEditorPositionQuery2["Cursor"] = 0] = "Cursor";
-  NativeEditorPositionQuery2[NativeEditorPositionQuery2["NextWord"] = 1] = "NextWord";
-  NativeEditorPositionQuery2[NativeEditorPositionQuery2["PrevWord"] = 2] = "PrevWord";
-  NativeEditorPositionQuery2[NativeEditorPositionQuery2["Eol"] = 3] = "Eol";
-  NativeEditorPositionQuery2[NativeEditorPositionQuery2["VisualSol"] = 4] = "VisualSol";
-  NativeEditorPositionQuery2[NativeEditorPositionQuery2["VisualEol"] = 5] = "VisualEol";
-})(NativeEditorPositionQuery ||= {});
-var NativeEditEvent;
-((NativeEditEvent2) => {
-  NativeEditEvent2[NativeEditEvent2["CursorChanged"] = 1] = "CursorChanged";
-  NativeEditEvent2[NativeEditEvent2["ContentChanged"] = 2] = "ContentChanged";
-  NativeEditEvent2[NativeEditEvent2["HistoryCursorChanged"] = 4] = "HistoryCursorChanged";
-})(NativeEditEvent ||= {});
+var NativeTextViewCommand2;
+((NativeTextViewCommand) => {
+  NativeTextViewCommand[NativeTextViewCommand["WrapWidth"] = 0] = "WrapWidth";
+  NativeTextViewCommand[NativeTextViewCommand["WrapMode"] = 1] = "WrapMode";
+  NativeTextViewCommand[NativeTextViewCommand["FirstLineOffset"] = 2] = "FirstLineOffset";
+  NativeTextViewCommand[NativeTextViewCommand["TabIndicator"] = 3] = "TabIndicator";
+  NativeTextViewCommand[NativeTextViewCommand["Truncate"] = 4] = "Truncate";
+  NativeTextViewCommand[NativeTextViewCommand["TextAlign"] = 5] = "TextAlign";
+})(NativeTextViewCommand2 ||= {});
+var NativeEditCommand2;
+((NativeEditCommand) => {
+  NativeEditCommand[NativeEditCommand["DeleteForward"] = 0] = "DeleteForward";
+  NativeEditCommand[NativeEditCommand["Backspace"] = 1] = "Backspace";
+  NativeEditCommand[NativeEditCommand["NewLine"] = 2] = "NewLine";
+  NativeEditCommand[NativeEditCommand["DeleteLine"] = 3] = "DeleteLine";
+  NativeEditCommand[NativeEditCommand["MoveLeft"] = 4] = "MoveLeft";
+  NativeEditCommand[NativeEditCommand["MoveRight"] = 5] = "MoveRight";
+  NativeEditCommand[NativeEditCommand["MoveUp"] = 6] = "MoveUp";
+  NativeEditCommand[NativeEditCommand["MoveDown"] = 7] = "MoveDown";
+  NativeEditCommand[NativeEditCommand["GotoLine"] = 8] = "GotoLine";
+  NativeEditCommand[NativeEditCommand["CursorOffset"] = 9] = "CursorOffset";
+  NativeEditCommand[NativeEditCommand["Clear"] = 10] = "Clear";
+  NativeEditCommand[NativeEditCommand["ClearHistory"] = 11] = "ClearHistory";
+  NativeEditCommand[NativeEditCommand["DebugRope"] = 12] = "DebugRope";
+})(NativeEditCommand2 ||= {});
+var NativeEditPositionQuery2;
+((NativeEditPositionQuery) => {
+  NativeEditPositionQuery[NativeEditPositionQuery["Cursor"] = 0] = "Cursor";
+  NativeEditPositionQuery[NativeEditPositionQuery["NextWord"] = 1] = "NextWord";
+  NativeEditPositionQuery[NativeEditPositionQuery["PrevWord"] = 2] = "PrevWord";
+  NativeEditPositionQuery[NativeEditPositionQuery["Eol"] = 3] = "Eol";
+  NativeEditPositionQuery[NativeEditPositionQuery["Offset"] = 4] = "Offset";
+  NativeEditPositionQuery[NativeEditPositionQuery["Coords"] = 5] = "Coords";
+  NativeEditPositionQuery[NativeEditPositionQuery["LineStart"] = 6] = "LineStart";
+  NativeEditPositionQuery[NativeEditPositionQuery["End"] = 7] = "End";
+  NativeEditPositionQuery[NativeEditPositionQuery["PrevChar"] = 8] = "PrevChar";
+})(NativeEditPositionQuery2 ||= {});
+var NativeEditorStyleMask2;
+((NativeEditorStyleMask) => {
+  NativeEditorStyleMask[NativeEditorStyleMask["Foreground"] = 1] = "Foreground";
+  NativeEditorStyleMask[NativeEditorStyleMask["Background"] = 2] = "Background";
+  NativeEditorStyleMask[NativeEditorStyleMask["Attributes"] = 4] = "Attributes";
+  NativeEditorStyleMask[NativeEditorStyleMask["All"] = 7] = "All";
+})(NativeEditorStyleMask2 ||= {});
+var NativeEditHighlightOperation2;
+((NativeEditHighlightOperation) => {
+  NativeEditHighlightOperation[NativeEditHighlightOperation["AddLine"] = 0] = "AddLine";
+  NativeEditHighlightOperation[NativeEditHighlightOperation["AddRange"] = 1] = "AddRange";
+  NativeEditHighlightOperation[NativeEditHighlightOperation["RemoveRef"] = 2] = "RemoveRef";
+  NativeEditHighlightOperation[NativeEditHighlightOperation["ClearLine"] = 3] = "ClearLine";
+  NativeEditHighlightOperation[NativeEditHighlightOperation["ClearAll"] = 4] = "ClearAll";
+})(NativeEditHighlightOperation2 ||= {});
+var NativeEditorCommand2;
+((NativeEditorCommand) => {
+  NativeEditorCommand[NativeEditorCommand["MoveUp"] = 0] = "MoveUp";
+  NativeEditorCommand[NativeEditorCommand["MoveDown"] = 1] = "MoveDown";
+  NativeEditorCommand[NativeEditorCommand["GotoLineEnd"] = 2] = "GotoLineEnd";
+  NativeEditorCommand[NativeEditorCommand["DeleteSelection"] = 3] = "DeleteSelection";
+  NativeEditorCommand[NativeEditorCommand["CursorOffset"] = 4] = "CursorOffset";
+  NativeEditorCommand[NativeEditorCommand["WrapMode"] = 5] = "WrapMode";
+  NativeEditorCommand[NativeEditorCommand["TabIndicator"] = 6] = "TabIndicator";
+})(NativeEditorCommand2 ||= {});
+var NativeEditorSelectionOperation2;
+((NativeEditorSelectionOperation) => {
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["Set"] = 0] = "Set";
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["Update"] = 1] = "Update";
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["Reset"] = 2] = "Reset";
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["Local"] = 3] = "Local";
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["LocalUpdate"] = 4] = "LocalUpdate";
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["LocalReset"] = 5] = "LocalReset";
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["Cell"] = 6] = "Cell";
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["Occupancy"] = 7] = "Occupancy";
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["Inclusive"] = 8] = "Inclusive";
+  NativeEditorSelectionOperation[NativeEditorSelectionOperation["Colors"] = 9] = "Colors";
+})(NativeEditorSelectionOperation2 ||= {});
+var NativeEditorPositionQuery2;
+((NativeEditorPositionQuery) => {
+  NativeEditorPositionQuery[NativeEditorPositionQuery["Cursor"] = 0] = "Cursor";
+  NativeEditorPositionQuery[NativeEditorPositionQuery["NextWord"] = 1] = "NextWord";
+  NativeEditorPositionQuery[NativeEditorPositionQuery["PrevWord"] = 2] = "PrevWord";
+  NativeEditorPositionQuery[NativeEditorPositionQuery["Eol"] = 3] = "Eol";
+  NativeEditorPositionQuery[NativeEditorPositionQuery["VisualSol"] = 4] = "VisualSol";
+  NativeEditorPositionQuery[NativeEditorPositionQuery["VisualEol"] = 5] = "VisualEol";
+})(NativeEditorPositionQuery2 ||= {});
+var NativeEditEvent2;
+((NativeEditEvent) => {
+  NativeEditEvent[NativeEditEvent["CursorChanged"] = 1] = "CursorChanged";
+  NativeEditEvent[NativeEditEvent["ContentChanged"] = 2] = "ContentChanged";
+  NativeEditEvent[NativeEditEvent["HistoryCursorChanged"] = 4] = "HistoryCursorChanged";
+})(NativeEditEvent2 ||= {});
 var NATIVE_SCENE_MUTATIONS_MAX = nativeConstants.OT_SCENE_MUTATIONS_MAX;
 var NativeStyleGroup;
-((NativeStyleGroup2) => {
-  NativeStyleGroup2[NativeStyleGroup2["Enum"] = nativeConstants.OT_STYLE_ENUM] = "Enum";
-  NativeStyleGroup2[NativeStyleGroup2["Float"] = nativeConstants.OT_STYLE_FLOAT] = "Float";
-  NativeStyleGroup2[NativeStyleGroup2["Value"] = nativeConstants.OT_STYLE_VALUE] = "Value";
-  NativeStyleGroup2[NativeStyleGroup2["Border"] = nativeConstants.OT_STYLE_BORDER] = "Border";
-  NativeStyleGroup2[NativeStyleGroup2["Dimension"] = nativeConstants.OT_STYLE_DIMENSION] = "Dimension";
+((NativeStyleGroup) => {
+  NativeStyleGroup[NativeStyleGroup["Enum"] = nativeConstants.OT_STYLE_ENUM] = "Enum";
+  NativeStyleGroup[NativeStyleGroup["Float"] = nativeConstants.OT_STYLE_FLOAT] = "Float";
+  NativeStyleGroup[NativeStyleGroup["Value"] = nativeConstants.OT_STYLE_VALUE] = "Value";
+  NativeStyleGroup[NativeStyleGroup["Border"] = nativeConstants.OT_STYLE_BORDER] = "Border";
+  NativeStyleGroup[NativeStyleGroup["Dimension"] = nativeConstants.OT_STYLE_DIMENSION] = "Dimension";
 })(NativeStyleGroup ||= {});
 var NativeStyleFlags;
-((NativeStyleFlags2) => {
-  NativeStyleFlags2[NativeStyleFlags2["None"] = nativeConstants.OT_STYLE_FLAGS_NONE] = "None";
-  NativeStyleFlags2[NativeStyleFlags2["DisableFlexShrink"] = nativeConstants.OT_STYLE_DISABLE_FLEX_SHRINK] = "DisableFlexShrink";
-  NativeStyleFlags2[NativeStyleFlags2["Content"] = nativeConstants.OT_STYLE_CONTENT] = "Content";
+((NativeStyleFlags) => {
+  NativeStyleFlags[NativeStyleFlags["None"] = nativeConstants.OT_STYLE_FLAGS_NONE] = "None";
+  NativeStyleFlags[NativeStyleFlags["DisableFlexShrink"] = nativeConstants.OT_STYLE_DISABLE_FLEX_SHRINK] = "DisableFlexShrink";
+  NativeStyleFlags[NativeStyleFlags["Content"] = nativeConstants.OT_STYLE_CONTENT] = "Content";
 })(NativeStyleFlags ||= {});
-var NATIVE_EDGE_NONE = nativeConstants.OT_EDGE_NONE;
-var NativeBorder;
-((NativeBorder2) => {
-  NativeBorder2[NativeBorder2["None"] = nativeConstants.OT_BORDER_NONE] = "None";
-  NativeBorder2[NativeBorder2["Left"] = nativeConstants.OT_BORDER_LEFT] = "Left";
-  NativeBorder2[NativeBorder2["Bottom"] = nativeConstants.OT_BORDER_BOTTOM] = "Bottom";
-  NativeBorder2[NativeBorder2["Right"] = nativeConstants.OT_BORDER_RIGHT] = "Right";
-  NativeBorder2[NativeBorder2["Top"] = nativeConstants.OT_BORDER_TOP] = "Top";
-  NativeBorder2[NativeBorder2["All"] = nativeConstants.OT_BORDER_ALL] = "All";
-})(NativeBorder ||= {});
-var NativeSceneHook;
-((NativeSceneHook2) => {
-  NativeSceneHook2[NativeSceneHook2["Update"] = nativeConstants.OT_SCENE_HOOK_UPDATE] = "Update";
-  NativeSceneHook2[NativeSceneHook2["Resize"] = nativeConstants.OT_SCENE_HOOK_RESIZE] = "Resize";
-  NativeSceneHook2[NativeSceneHook2["LayoutChanged"] = nativeConstants.OT_SCENE_HOOK_LAYOUT_CHANGED] = "LayoutChanged";
-  NativeSceneHook2[NativeSceneHook2["RenderBefore"] = nativeConstants.OT_SCENE_HOOK_RENDER_BEFORE] = "RenderBefore";
-  NativeSceneHook2[NativeSceneHook2["RenderAfter"] = nativeConstants.OT_SCENE_HOOK_RENDER_AFTER] = "RenderAfter";
-  NativeSceneHook2[NativeSceneHook2["RenderSelf"] = nativeConstants.OT_SCENE_HOOK_RENDER_SELF] = "RenderSelf";
-  NativeSceneHook2[NativeSceneHook2["IdleUpdate"] = nativeConstants.OT_SCENE_HOOK_IDLE_UPDATE] = "IdleUpdate";
-  NativeSceneHook2[NativeSceneHook2["Scroll"] = nativeConstants.OT_SCENE_HOOK_SCROLL] = "Scroll";
-})(NativeSceneHook ||= {});
-var NativeSceneFrame;
-((NativeSceneFrame2) => {
-  NativeSceneFrame2[NativeSceneFrame2["Done"] = nativeConstants.OT_SCENE_FRAME_DONE] = "Done";
-  NativeSceneFrame2[NativeSceneFrame2["Update"] = nativeConstants.OT_SCENE_FRAME_UPDATE] = "Update";
-  NativeSceneFrame2[NativeSceneFrame2["Resize"] = nativeConstants.OT_SCENE_FRAME_RESIZE] = "Resize";
-  NativeSceneFrame2[NativeSceneFrame2["LayoutChanged"] = nativeConstants.OT_SCENE_FRAME_LAYOUT_CHANGED] = "LayoutChanged";
-  NativeSceneFrame2[NativeSceneFrame2["Record"] = nativeConstants.OT_SCENE_FRAME_RECORD] = "Record";
-  NativeSceneFrame2[NativeSceneFrame2["Scroll"] = nativeConstants.OT_SCENE_FRAME_SCROLL] = "Scroll";
-})(NativeSceneFrame ||= {});
-var NativeScenePaintPhase;
-((NativeScenePaintPhase2) => {
-  NativeScenePaintPhase2[NativeScenePaintPhase2["Before"] = nativeConstants.OT_SCENE_RECORD_PHASE_BEFORE] = "Before";
-  NativeScenePaintPhase2[NativeScenePaintPhase2["Self"] = nativeConstants.OT_SCENE_RECORD_PHASE_SELF] = "Self";
-  NativeScenePaintPhase2[NativeScenePaintPhase2["After"] = nativeConstants.OT_SCENE_RECORD_PHASE_AFTER] = "After";
-})(NativeScenePaintPhase ||= {});
+var NATIVE_EDGE_NONE2 = nativeConstants.OT_EDGE_NONE;
+var NativeBorder2;
+((NativeBorder) => {
+  NativeBorder[NativeBorder["None"] = nativeConstants.OT_BORDER_NONE] = "None";
+  NativeBorder[NativeBorder["Left"] = nativeConstants.OT_BORDER_LEFT] = "Left";
+  NativeBorder[NativeBorder["Bottom"] = nativeConstants.OT_BORDER_BOTTOM] = "Bottom";
+  NativeBorder[NativeBorder["Right"] = nativeConstants.OT_BORDER_RIGHT] = "Right";
+  NativeBorder[NativeBorder["Top"] = nativeConstants.OT_BORDER_TOP] = "Top";
+  NativeBorder[NativeBorder["All"] = nativeConstants.OT_BORDER_ALL] = "All";
+})(NativeBorder2 ||= {});
+var NativeSceneHook2;
+((NativeSceneHook) => {
+  NativeSceneHook[NativeSceneHook["Update"] = nativeConstants.OT_SCENE_HOOK_UPDATE] = "Update";
+  NativeSceneHook[NativeSceneHook["Resize"] = nativeConstants.OT_SCENE_HOOK_RESIZE] = "Resize";
+  NativeSceneHook[NativeSceneHook["LayoutChanged"] = nativeConstants.OT_SCENE_HOOK_LAYOUT_CHANGED] = "LayoutChanged";
+  NativeSceneHook[NativeSceneHook["RenderBefore"] = nativeConstants.OT_SCENE_HOOK_RENDER_BEFORE] = "RenderBefore";
+  NativeSceneHook[NativeSceneHook["RenderAfter"] = nativeConstants.OT_SCENE_HOOK_RENDER_AFTER] = "RenderAfter";
+  NativeSceneHook[NativeSceneHook["RenderSelf"] = nativeConstants.OT_SCENE_HOOK_RENDER_SELF] = "RenderSelf";
+  NativeSceneHook[NativeSceneHook["IdleUpdate"] = nativeConstants.OT_SCENE_HOOK_IDLE_UPDATE] = "IdleUpdate";
+  NativeSceneHook[NativeSceneHook["Scroll"] = nativeConstants.OT_SCENE_HOOK_SCROLL] = "Scroll";
+})(NativeSceneHook2 ||= {});
+var NativeSceneFrame2;
+((NativeSceneFrame) => {
+  NativeSceneFrame[NativeSceneFrame["Done"] = nativeConstants.OT_SCENE_FRAME_DONE] = "Done";
+  NativeSceneFrame[NativeSceneFrame["Update"] = nativeConstants.OT_SCENE_FRAME_UPDATE] = "Update";
+  NativeSceneFrame[NativeSceneFrame["Resize"] = nativeConstants.OT_SCENE_FRAME_RESIZE] = "Resize";
+  NativeSceneFrame[NativeSceneFrame["LayoutChanged"] = nativeConstants.OT_SCENE_FRAME_LAYOUT_CHANGED] = "LayoutChanged";
+  NativeSceneFrame[NativeSceneFrame["Record"] = nativeConstants.OT_SCENE_FRAME_RECORD] = "Record";
+  NativeSceneFrame[NativeSceneFrame["Scroll"] = nativeConstants.OT_SCENE_FRAME_SCROLL] = "Scroll";
+})(NativeSceneFrame2 ||= {});
+var NativeScenePaintPhase2;
+((NativeScenePaintPhase) => {
+  NativeScenePaintPhase[NativeScenePaintPhase["Before"] = nativeConstants.OT_SCENE_RECORD_PHASE_BEFORE] = "Before";
+  NativeScenePaintPhase[NativeScenePaintPhase["Self"] = nativeConstants.OT_SCENE_RECORD_PHASE_SELF] = "Self";
+  NativeScenePaintPhase[NativeScenePaintPhase["After"] = nativeConstants.OT_SCENE_RECORD_PHASE_AFTER] = "After";
+})(NativeScenePaintPhase2 ||= {});
 var SCENE_SCROLL_FOLLOW = ["none", "top", "bottom", "left", "right"];
 var SCENE_SCROLL_BAR_POLICY = ["auto", "always", "never"];
 var SCENE_SCROLL_REQUESTS = ["into-view", "anchor", "layout"];
@@ -5948,81 +5959,81 @@ function readSceneScrollState(record) {
     bars: [readBar(0), readBar(1)]
   };
 }
-var NATIVE_BUFFER_TEXT_BYTES_MAX = nativeConstants.OT_BUFFER_TEXT_BYTES_MAX;
-var NativeSessionState;
-((NativeSessionState2) => {
-  NativeSessionState2[NativeSessionState2["Open"] = 0] = "Open";
-  NativeSessionState2[NativeSessionState2["Closing"] = 1] = "Closing";
-  NativeSessionState2[NativeSessionState2["Closed"] = 2] = "Closed";
-  NativeSessionState2[NativeSessionState2["Failed"] = 3] = "Failed";
-  NativeSessionState2[NativeSessionState2["Cancelled"] = 4] = "Cancelled";
-})(NativeSessionState ||= {});
-var NativeSessionRenderStatus;
-((NativeSessionRenderStatus2) => {
-  NativeSessionRenderStatus2[NativeSessionRenderStatus2["Presented"] = 0] = "Presented";
-  NativeSessionRenderStatus2[NativeSessionRenderStatus2["Pending"] = 1] = "Pending";
-  NativeSessionRenderStatus2[NativeSessionRenderStatus2["Skipped"] = 2] = "Skipped";
-  NativeSessionRenderStatus2[NativeSessionRenderStatus2["Failed"] = 3] = "Failed";
-})(NativeSessionRenderStatus ||= {});
-var NATIVE_SESSION_CONTROL_PACKET_BYTES = nativeConstants.OT_SESSION_CONTROL_PACKET_BYTES;
-var NativeSessionTerminalPhase;
-((NativeSessionTerminalPhase2) => {
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["Uninitialized"] = 0] = "Uninitialized";
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["SettingUp"] = 1] = "SettingUp";
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["Active"] = 2] = "Active";
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["Suspending"] = 3] = "Suspending";
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["Suspended"] = 4] = "Suspended";
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["Resuming"] = 5] = "Resuming";
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["Closing"] = 6] = "Closing";
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["Restored"] = 7] = "Restored";
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["Failed"] = 8] = "Failed";
-  NativeSessionTerminalPhase2[NativeSessionTerminalPhase2["Cancelled"] = 9] = "Cancelled";
-})(NativeSessionTerminalPhase ||= {});
-var NativeSessionPumpStatus;
-((NativeSessionPumpStatus2) => {
-  NativeSessionPumpStatus2[NativeSessionPumpStatus2["Idle"] = 0] = "Idle";
-  NativeSessionPumpStatus2[NativeSessionPumpStatus2["Again"] = 1] = "Again";
-  NativeSessionPumpStatus2[NativeSessionPumpStatus2["OutputPending"] = 2] = "OutputPending";
-  NativeSessionPumpStatus2[NativeSessionPumpStatus2["WaitUntil"] = 3] = "WaitUntil";
-  NativeSessionPumpStatus2[NativeSessionPumpStatus2["Closed"] = 4] = "Closed";
-})(NativeSessionPumpStatus ||= {});
-var NativeStatus;
-((NativeStatus2) => {
-  NativeStatus2[NativeStatus2["Ok"] = 0] = "Ok";
-  NativeStatus2[NativeStatus2["InvalidArgument"] = -1] = "InvalidArgument";
-  NativeStatus2[NativeStatus2["UnsupportedVersion"] = -2] = "UnsupportedVersion";
-  NativeStatus2[NativeStatus2["OutOfMemory"] = -3] = "OutOfMemory";
-  NativeStatus2[NativeStatus2["WrongThread"] = -4] = "WrongThread";
-  NativeStatus2[NativeStatus2["InternalError"] = -5] = "InternalError";
-  NativeStatus2[NativeStatus2["ContextBusy"] = -6] = "ContextBusy";
-  NativeStatus2[NativeStatus2["WrongContext"] = -7] = "WrongContext";
-  NativeStatus2[NativeStatus2["WrongKind"] = -8] = "WrongKind";
-  NativeStatus2[NativeStatus2["StaleHandle"] = -9] = "StaleHandle";
-  NativeStatus2[NativeStatus2["WrongSession"] = -10] = "WrongSession";
-  NativeStatus2[NativeStatus2["OutputBackpressure"] = -11] = "OutputBackpressure";
-  NativeStatus2[NativeStatus2["SessionClosed"] = -12] = "SessionClosed";
-  NativeStatus2[NativeStatus2["OutputBusy"] = -13] = "OutputBusy";
-  NativeStatus2[NativeStatus2["StaleOutput"] = -14] = "StaleOutput";
-  NativeStatus2[NativeStatus2["OutputFailed"] = -15] = "OutputFailed";
-  NativeStatus2[NativeStatus2["ObjectLimit"] = -16] = "ObjectLimit";
-  NativeStatus2[NativeStatus2["RendererAttached"] = -17] = "RendererAttached";
-  NativeStatus2[NativeStatus2["RendererNotAttached"] = -18] = "RendererNotAttached";
-  NativeStatus2[NativeStatus2["InvalidPhase"] = -19] = "InvalidPhase";
-  NativeStatus2[NativeStatus2["ControlPacketLimit"] = -20] = "ControlPacketLimit";
-  NativeStatus2[NativeStatus2["LeaseLimit"] = -21] = "LeaseLimit";
-  NativeStatus2[NativeStatus2["LeaseBytesLimit"] = -22] = "LeaseBytesLimit";
-  NativeStatus2[NativeStatus2["StaleLease"] = -23] = "StaleLease";
-  NativeStatus2[NativeStatus2["UnsupportedResource"] = -24] = "UnsupportedResource";
-  NativeStatus2[NativeStatus2["StaleFrame"] = -25] = "StaleFrame";
-  NativeStatus2[NativeStatus2["LayoutLimit"] = -26] = "LayoutLimit";
-  NativeStatus2[NativeStatus2["FrameBusy"] = -27] = "FrameBusy";
-  NativeStatus2[NativeStatus2["FrameRequestLimit"] = -28] = "FrameRequestLimit";
-})(NativeStatus ||= {});
+var NATIVE_BUFFER_TEXT_BYTES_MAX2 = nativeConstants.OT_BUFFER_TEXT_BYTES_MAX;
+var NativeSessionState2;
+((NativeSessionState) => {
+  NativeSessionState[NativeSessionState["Open"] = 0] = "Open";
+  NativeSessionState[NativeSessionState["Closing"] = 1] = "Closing";
+  NativeSessionState[NativeSessionState["Closed"] = 2] = "Closed";
+  NativeSessionState[NativeSessionState["Failed"] = 3] = "Failed";
+  NativeSessionState[NativeSessionState["Cancelled"] = 4] = "Cancelled";
+})(NativeSessionState2 ||= {});
+var NativeSessionRenderStatus2;
+((NativeSessionRenderStatus) => {
+  NativeSessionRenderStatus[NativeSessionRenderStatus["Presented"] = 0] = "Presented";
+  NativeSessionRenderStatus[NativeSessionRenderStatus["Pending"] = 1] = "Pending";
+  NativeSessionRenderStatus[NativeSessionRenderStatus["Skipped"] = 2] = "Skipped";
+  NativeSessionRenderStatus[NativeSessionRenderStatus["Failed"] = 3] = "Failed";
+})(NativeSessionRenderStatus2 ||= {});
+var NATIVE_SESSION_CONTROL_PACKET_BYTES2 = nativeConstants.OT_SESSION_CONTROL_PACKET_BYTES;
+var NativeSessionTerminalPhase2;
+((NativeSessionTerminalPhase) => {
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["Uninitialized"] = 0] = "Uninitialized";
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["SettingUp"] = 1] = "SettingUp";
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["Active"] = 2] = "Active";
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["Suspending"] = 3] = "Suspending";
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["Suspended"] = 4] = "Suspended";
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["Resuming"] = 5] = "Resuming";
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["Closing"] = 6] = "Closing";
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["Restored"] = 7] = "Restored";
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["Failed"] = 8] = "Failed";
+  NativeSessionTerminalPhase[NativeSessionTerminalPhase["Cancelled"] = 9] = "Cancelled";
+})(NativeSessionTerminalPhase2 ||= {});
+var NativeSessionPumpStatus2;
+((NativeSessionPumpStatus) => {
+  NativeSessionPumpStatus[NativeSessionPumpStatus["Idle"] = 0] = "Idle";
+  NativeSessionPumpStatus[NativeSessionPumpStatus["Again"] = 1] = "Again";
+  NativeSessionPumpStatus[NativeSessionPumpStatus["OutputPending"] = 2] = "OutputPending";
+  NativeSessionPumpStatus[NativeSessionPumpStatus["WaitUntil"] = 3] = "WaitUntil";
+  NativeSessionPumpStatus[NativeSessionPumpStatus["Closed"] = 4] = "Closed";
+})(NativeSessionPumpStatus2 ||= {});
+var NativeStatus2;
+((NativeStatus) => {
+  NativeStatus[NativeStatus["Ok"] = 0] = "Ok";
+  NativeStatus[NativeStatus["InvalidArgument"] = -1] = "InvalidArgument";
+  NativeStatus[NativeStatus["UnsupportedVersion"] = -2] = "UnsupportedVersion";
+  NativeStatus[NativeStatus["OutOfMemory"] = -3] = "OutOfMemory";
+  NativeStatus[NativeStatus["WrongThread"] = -4] = "WrongThread";
+  NativeStatus[NativeStatus["InternalError"] = -5] = "InternalError";
+  NativeStatus[NativeStatus["ContextBusy"] = -6] = "ContextBusy";
+  NativeStatus[NativeStatus["WrongContext"] = -7] = "WrongContext";
+  NativeStatus[NativeStatus["WrongKind"] = -8] = "WrongKind";
+  NativeStatus[NativeStatus["StaleHandle"] = -9] = "StaleHandle";
+  NativeStatus[NativeStatus["WrongSession"] = -10] = "WrongSession";
+  NativeStatus[NativeStatus["OutputBackpressure"] = -11] = "OutputBackpressure";
+  NativeStatus[NativeStatus["SessionClosed"] = -12] = "SessionClosed";
+  NativeStatus[NativeStatus["OutputBusy"] = -13] = "OutputBusy";
+  NativeStatus[NativeStatus["StaleOutput"] = -14] = "StaleOutput";
+  NativeStatus[NativeStatus["OutputFailed"] = -15] = "OutputFailed";
+  NativeStatus[NativeStatus["ObjectLimit"] = -16] = "ObjectLimit";
+  NativeStatus[NativeStatus["RendererAttached"] = -17] = "RendererAttached";
+  NativeStatus[NativeStatus["RendererNotAttached"] = -18] = "RendererNotAttached";
+  NativeStatus[NativeStatus["InvalidPhase"] = -19] = "InvalidPhase";
+  NativeStatus[NativeStatus["ControlPacketLimit"] = -20] = "ControlPacketLimit";
+  NativeStatus[NativeStatus["LeaseLimit"] = -21] = "LeaseLimit";
+  NativeStatus[NativeStatus["LeaseBytesLimit"] = -22] = "LeaseBytesLimit";
+  NativeStatus[NativeStatus["StaleLease"] = -23] = "StaleLease";
+  NativeStatus[NativeStatus["UnsupportedResource"] = -24] = "UnsupportedResource";
+  NativeStatus[NativeStatus["StaleFrame"] = -25] = "StaleFrame";
+  NativeStatus[NativeStatus["LayoutLimit"] = -26] = "LayoutLimit";
+  NativeStatus[NativeStatus["FrameBusy"] = -27] = "FrameBusy";
+  NativeStatus[NativeStatus["FrameRequestLimit"] = -28] = "FrameRequestLimit";
+})(NativeStatus2 ||= {});
 
-class NativeError extends Error {
+class NativeError2 extends Error {
   operation;
   status;
-  constructor(operation, status, reason = NativeStatus[status] ?? `status ${status}`) {
+  constructor(operation, status, reason = NativeStatus2[status] ?? `status ${status}`) {
     super(`${operation} failed: ${reason}`);
     this.operation = operation;
     this.status = status;
@@ -6044,55 +6055,55 @@ var imageStatusCodes = new Map([
   [nativeConstants.OT_IMAGE_UNSUPPORTED_FEATURE, 11],
   [nativeConstants.OT_IMAGE_BUSY, 12]
 ]);
-var NativeClipboardOperationStatus;
-((NativeClipboardOperationStatus2) => {
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["Pending"] = nativeConstants.OT_CLIPBOARD_OPERATION_PENDING] = "Pending";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["Read"] = nativeConstants.OT_CLIPBOARD_OPERATION_READ] = "Read";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["Empty"] = nativeConstants.OT_CLIPBOARD_OPERATION_EMPTY] = "Empty";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["Written"] = nativeConstants.OT_CLIPBOARD_OPERATION_WRITTEN] = "Written";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["Cleared"] = nativeConstants.OT_CLIPBOARD_OPERATION_CLEARED] = "Cleared";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["Unsupported"] = nativeConstants.OT_CLIPBOARD_OPERATION_UNSUPPORTED] = "Unsupported";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["Cancelled"] = nativeConstants.OT_CLIPBOARD_OPERATION_CANCELLED] = "Cancelled";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["TimedOut"] = nativeConstants.OT_CLIPBOARD_OPERATION_TIMED_OUT] = "TimedOut";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["LimitExceeded"] = nativeConstants.OT_CLIPBOARD_OPERATION_LIMIT_EXCEEDED] = "LimitExceeded";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["Failed"] = nativeConstants.OT_CLIPBOARD_OPERATION_FAILED] = "Failed";
-  NativeClipboardOperationStatus2[NativeClipboardOperationStatus2["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_OPERATION_INVALID_HANDLE] = "InvalidHandle";
-})(NativeClipboardOperationStatus ||= {});
-var NativeClipboardStartStatus;
-((NativeClipboardStartStatus2) => {
-  NativeClipboardStartStatus2[NativeClipboardStartStatus2["Ok"] = nativeConstants.OT_CLIPBOARD_START_OK] = "Ok";
-  NativeClipboardStartStatus2[NativeClipboardStartStatus2["InvalidService"] = nativeConstants.OT_CLIPBOARD_START_INVALID_SERVICE] = "InvalidService";
-  NativeClipboardStartStatus2[NativeClipboardStartStatus2["ShuttingDown"] = nativeConstants.OT_CLIPBOARD_START_SHUTTING_DOWN] = "ShuttingDown";
-  NativeClipboardStartStatus2[NativeClipboardStartStatus2["LimitExceeded"] = nativeConstants.OT_CLIPBOARD_START_LIMIT_EXCEEDED] = "LimitExceeded";
-  NativeClipboardStartStatus2[NativeClipboardStartStatus2["InvalidArgument"] = nativeConstants.OT_CLIPBOARD_START_INVALID_ARGUMENT] = "InvalidArgument";
-  NativeClipboardStartStatus2[NativeClipboardStartStatus2["OutOfMemory"] = nativeConstants.OT_CLIPBOARD_START_OUT_OF_MEMORY] = "OutOfMemory";
-})(NativeClipboardStartStatus ||= {});
-var NativeClipboardCancelStatus;
-((NativeClipboardCancelStatus2) => {
-  NativeClipboardCancelStatus2[NativeClipboardCancelStatus2["Requested"] = nativeConstants.OT_CLIPBOARD_CANCEL_REQUESTED] = "Requested";
-  NativeClipboardCancelStatus2[NativeClipboardCancelStatus2["AlreadyTerminal"] = nativeConstants.OT_CLIPBOARD_CANCEL_ALREADY_TERMINAL] = "AlreadyTerminal";
-  NativeClipboardCancelStatus2[NativeClipboardCancelStatus2["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_CANCEL_INVALID_HANDLE] = "InvalidHandle";
-})(NativeClipboardCancelStatus ||= {});
-var NativeClipboardCopyStatus;
-((NativeClipboardCopyStatus2) => {
-  NativeClipboardCopyStatus2[NativeClipboardCopyStatus2["Ok"] = nativeConstants.OT_CLIPBOARD_COPY_OK] = "Ok";
-  NativeClipboardCopyStatus2[NativeClipboardCopyStatus2["BufferTooSmall"] = nativeConstants.OT_CLIPBOARD_COPY_BUFFER_TOO_SMALL] = "BufferTooSmall";
-  NativeClipboardCopyStatus2[NativeClipboardCopyStatus2["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_COPY_INVALID_HANDLE] = "InvalidHandle";
-  NativeClipboardCopyStatus2[NativeClipboardCopyStatus2["InvalidState"] = nativeConstants.OT_CLIPBOARD_COPY_INVALID_STATE] = "InvalidState";
-  NativeClipboardCopyStatus2[NativeClipboardCopyStatus2["InvalidArgument"] = nativeConstants.OT_CLIPBOARD_COPY_INVALID_ARGUMENT] = "InvalidArgument";
-})(NativeClipboardCopyStatus ||= {});
-var NativeClipboardDestroyStatus;
-((NativeClipboardDestroyStatus2) => {
-  NativeClipboardDestroyStatus2[NativeClipboardDestroyStatus2["Destroyed"] = nativeConstants.OT_CLIPBOARD_DESTROY_DESTROYED] = "Destroyed";
-  NativeClipboardDestroyStatus2[NativeClipboardDestroyStatus2["NotReady"] = nativeConstants.OT_CLIPBOARD_DESTROY_NOT_READY] = "NotReady";
-  NativeClipboardDestroyStatus2[NativeClipboardDestroyStatus2["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_DESTROY_INVALID_HANDLE] = "InvalidHandle";
-})(NativeClipboardDestroyStatus ||= {});
-var NativeClipboardShutdownStatus;
-((NativeClipboardShutdownStatus2) => {
-  NativeClipboardShutdownStatus2[NativeClipboardShutdownStatus2["Pending"] = nativeConstants.OT_CLIPBOARD_SHUTDOWN_PENDING] = "Pending";
-  NativeClipboardShutdownStatus2[NativeClipboardShutdownStatus2["Ready"] = nativeConstants.OT_CLIPBOARD_SHUTDOWN_READY] = "Ready";
-  NativeClipboardShutdownStatus2[NativeClipboardShutdownStatus2["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_SHUTDOWN_INVALID_HANDLE] = "InvalidHandle";
-})(NativeClipboardShutdownStatus ||= {});
+var NativeClipboardOperationStatus2;
+((NativeClipboardOperationStatus) => {
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["Pending"] = nativeConstants.OT_CLIPBOARD_OPERATION_PENDING] = "Pending";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["Read"] = nativeConstants.OT_CLIPBOARD_OPERATION_READ] = "Read";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["Empty"] = nativeConstants.OT_CLIPBOARD_OPERATION_EMPTY] = "Empty";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["Written"] = nativeConstants.OT_CLIPBOARD_OPERATION_WRITTEN] = "Written";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["Cleared"] = nativeConstants.OT_CLIPBOARD_OPERATION_CLEARED] = "Cleared";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["Unsupported"] = nativeConstants.OT_CLIPBOARD_OPERATION_UNSUPPORTED] = "Unsupported";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["Cancelled"] = nativeConstants.OT_CLIPBOARD_OPERATION_CANCELLED] = "Cancelled";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["TimedOut"] = nativeConstants.OT_CLIPBOARD_OPERATION_TIMED_OUT] = "TimedOut";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["LimitExceeded"] = nativeConstants.OT_CLIPBOARD_OPERATION_LIMIT_EXCEEDED] = "LimitExceeded";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["Failed"] = nativeConstants.OT_CLIPBOARD_OPERATION_FAILED] = "Failed";
+  NativeClipboardOperationStatus[NativeClipboardOperationStatus["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_OPERATION_INVALID_HANDLE] = "InvalidHandle";
+})(NativeClipboardOperationStatus2 ||= {});
+var NativeClipboardStartStatus2;
+((NativeClipboardStartStatus) => {
+  NativeClipboardStartStatus[NativeClipboardStartStatus["Ok"] = nativeConstants.OT_CLIPBOARD_START_OK] = "Ok";
+  NativeClipboardStartStatus[NativeClipboardStartStatus["InvalidService"] = nativeConstants.OT_CLIPBOARD_START_INVALID_SERVICE] = "InvalidService";
+  NativeClipboardStartStatus[NativeClipboardStartStatus["ShuttingDown"] = nativeConstants.OT_CLIPBOARD_START_SHUTTING_DOWN] = "ShuttingDown";
+  NativeClipboardStartStatus[NativeClipboardStartStatus["LimitExceeded"] = nativeConstants.OT_CLIPBOARD_START_LIMIT_EXCEEDED] = "LimitExceeded";
+  NativeClipboardStartStatus[NativeClipboardStartStatus["InvalidArgument"] = nativeConstants.OT_CLIPBOARD_START_INVALID_ARGUMENT] = "InvalidArgument";
+  NativeClipboardStartStatus[NativeClipboardStartStatus["OutOfMemory"] = nativeConstants.OT_CLIPBOARD_START_OUT_OF_MEMORY] = "OutOfMemory";
+})(NativeClipboardStartStatus2 ||= {});
+var NativeClipboardCancelStatus2;
+((NativeClipboardCancelStatus) => {
+  NativeClipboardCancelStatus[NativeClipboardCancelStatus["Requested"] = nativeConstants.OT_CLIPBOARD_CANCEL_REQUESTED] = "Requested";
+  NativeClipboardCancelStatus[NativeClipboardCancelStatus["AlreadyTerminal"] = nativeConstants.OT_CLIPBOARD_CANCEL_ALREADY_TERMINAL] = "AlreadyTerminal";
+  NativeClipboardCancelStatus[NativeClipboardCancelStatus["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_CANCEL_INVALID_HANDLE] = "InvalidHandle";
+})(NativeClipboardCancelStatus2 ||= {});
+var NativeClipboardCopyStatus2;
+((NativeClipboardCopyStatus) => {
+  NativeClipboardCopyStatus[NativeClipboardCopyStatus["Ok"] = nativeConstants.OT_CLIPBOARD_COPY_OK] = "Ok";
+  NativeClipboardCopyStatus[NativeClipboardCopyStatus["BufferTooSmall"] = nativeConstants.OT_CLIPBOARD_COPY_BUFFER_TOO_SMALL] = "BufferTooSmall";
+  NativeClipboardCopyStatus[NativeClipboardCopyStatus["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_COPY_INVALID_HANDLE] = "InvalidHandle";
+  NativeClipboardCopyStatus[NativeClipboardCopyStatus["InvalidState"] = nativeConstants.OT_CLIPBOARD_COPY_INVALID_STATE] = "InvalidState";
+  NativeClipboardCopyStatus[NativeClipboardCopyStatus["InvalidArgument"] = nativeConstants.OT_CLIPBOARD_COPY_INVALID_ARGUMENT] = "InvalidArgument";
+})(NativeClipboardCopyStatus2 ||= {});
+var NativeClipboardDestroyStatus2;
+((NativeClipboardDestroyStatus) => {
+  NativeClipboardDestroyStatus[NativeClipboardDestroyStatus["Destroyed"] = nativeConstants.OT_CLIPBOARD_DESTROY_DESTROYED] = "Destroyed";
+  NativeClipboardDestroyStatus[NativeClipboardDestroyStatus["NotReady"] = nativeConstants.OT_CLIPBOARD_DESTROY_NOT_READY] = "NotReady";
+  NativeClipboardDestroyStatus[NativeClipboardDestroyStatus["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_DESTROY_INVALID_HANDLE] = "InvalidHandle";
+})(NativeClipboardDestroyStatus2 ||= {});
+var NativeClipboardShutdownStatus2;
+((NativeClipboardShutdownStatus) => {
+  NativeClipboardShutdownStatus[NativeClipboardShutdownStatus["Pending"] = nativeConstants.OT_CLIPBOARD_SHUTDOWN_PENDING] = "Pending";
+  NativeClipboardShutdownStatus[NativeClipboardShutdownStatus["Ready"] = nativeConstants.OT_CLIPBOARD_SHUTDOWN_READY] = "Ready";
+  NativeClipboardShutdownStatus[NativeClipboardShutdownStatus["InvalidHandle"] = nativeConstants.OT_CLIPBOARD_SHUTDOWN_INVALID_HANDLE] = "InvalidHandle";
+})(NativeClipboardShutdownStatus2 ||= {});
 var targetLibPath;
 var targetLibError;
 try {
@@ -6106,43 +6117,43 @@ try {
 } catch (error) {
   targetLibError = error instanceof Error ? error : new Error(String(error));
 }
-registerEnvVar({
+registerEnvVar2({
   name: "OTUI_DEBUG_FFI",
   description: "Enable debug logging for the FFI bindings.",
   type: "boolean",
   default: false
 });
-registerEnvVar({
+registerEnvVar2({
   name: "OTUI_TRACE_FFI",
   description: "Enable tracing for the FFI bindings.",
   type: "boolean",
   default: false
 });
-registerEnvVar({
+registerEnvVar2({
   name: "OPENTUI_FORCE_WCWIDTH",
   description: "Use wcwidth for character width calculations when the variable is present",
   type: "string",
   required: false
 });
-registerEnvVar({
+registerEnvVar2({
   name: "OPENTUI_FORCE_UNICODE",
   description: "Use the Unicode width method (mode 2027) when the variable is present",
   type: "string",
   required: false
 });
-registerEnvVar({
+registerEnvVar2({
   name: "OPENTUI_GRAPHICS",
   description: "Control Kitty and Sixel graphics detection with the exact value true, 1, false, or 0",
   type: "string",
   required: false
 });
-registerEnvVar({
+registerEnvVar2({
   name: "OPENTUI_IMAGE_PROTOCOL",
   description: "Override image rendering protocol: auto, kitty, sixel, or blocks",
   type: "string",
   default: "auto"
 });
-registerEnvVar({
+registerEnvVar2({
   name: "OPENTUI_FORCE_NOZWJ",
   description: "Use no_zwj width mode when the variable is present",
   type: "string",
@@ -6299,7 +6310,7 @@ function toFFIF32(value, label, allowNaN = false) {
 }
 function nativeResult(operation, status) {
   if (status !== 0 /* Ok */)
-    throw new NativeError(operation, status);
+    throw new NativeError2(operation, status);
 }
 function createContextRecord(layout) {
   const record = new Uint32Array(layout.size / 4);
@@ -6315,7 +6326,7 @@ function sessionBytes(bytes, label) {
   }
   return new Uint8Array(typedArrayAccessors.buffer.get.call(bytes), typedArrayAccessors.byteOffset.get.call(bytes), length);
 }
-function programStatusPayload(status, encoder2) {
+function programStatusPayload(status, encoder) {
   const layout = nativeLayouts.ot_session_program_status;
   const { state, kind, progress, id, app, title, message } = status;
   const stateId = typeof state === "string" ? PROGRAM_STATE_TO_ID[state] : undefined;
@@ -6346,7 +6357,7 @@ function programStatusPayload(status, encoder2) {
       return new Uint8Array(0);
     if (typeof value !== "string")
       throw new TypeError(`Program status ${name} must be a string`);
-    const bytes = encoder2.encode(value.slice(0, NATIVE_SESSION_CONTROL_PACKET_BYTES + 1));
+    const bytes = encoder.encode(value.slice(0, NATIVE_SESSION_CONTROL_PACKET_BYTES2 + 1));
     header[layout.fields[`${name}_len`].offset / 4] = bytes.byteLength;
     return bytes;
   });
@@ -6392,7 +6403,7 @@ class IssuedContextHandle {
 }
 function encodedContextHandle(context, handle) {
   if (handle.context !== context)
-    throw new NativeError("Context handle", -7 /* WrongContext */);
+    throw new NativeError2("Context handle", -7 /* WrongContext */);
   const issued = IssuedContextHandle.wordsOf(handle);
   if (issued !== undefined)
     return issued;
@@ -6860,11 +6871,11 @@ class SceneStaging {
   checkHandle(context, handle) {
     this.assertWritable();
     if (this.context !== undefined && (this.context !== context || this.contextWords[0] !== handle[0] || this.contextWords[1] !== handle[1])) {
-      throw new NativeError("Context handle", -7 /* WrongContext */);
+      throw new NativeError2("Context handle", -7 /* WrongContext */);
     }
     const entry = this.paintBySlot.get(handle[2]);
     if (entry !== undefined && this.words[entry + 3] !== handle[3]) {
-      throw new NativeError("Context handle", -9 /* StaleHandle */);
+      throw new NativeError2("Context handle", -9 /* StaleHandle */);
     }
     return entry;
   }
@@ -6885,7 +6896,7 @@ class SceneStaging {
   }
   reserve(handle, fields) {
     if (this.full)
-      throw new NativeError("ot_scene_flush", -16 /* ObjectLimit */);
+      throw new NativeError2("ot_scene_flush", -16 /* ObjectLimit */);
     const length = propertyWordLength(fields);
     this.ensureWords(this.encodedWords + length);
     const base = this.encodedWords;
@@ -6912,7 +6923,7 @@ class SceneStaging {
     value = SceneStaging.checkStyleValue(group, value);
     flags = toSafeFFIU32Length(flags, "Scene style flags");
     if (Math.max(group, kind, edge, unit) > 255)
-      throw new NativeError("ot_scene_set_style", -1 /* InvalidArgument */);
+      throw new NativeError2("ot_scene_set_style", -1 /* InvalidArgument */);
     if (group === nativeConstants.OT_STYLE_VALUE && kind < nativeConstants.OT_STYLE_VALUE_MARGIN)
       edge = 0;
     const handle = encodedContextHandle(context, node);
@@ -6929,8 +6940,8 @@ class SceneStaging {
       if (this.rewriteStyleRun(last, packed, valueWord))
         return false;
       const previous = last;
-      const base2 = this.reserve(handle, propertyStyle);
-      this.writeStyle(base2, packed, flags, valueWord);
+      const base = this.reserve(handle, propertyStyle);
+      this.writeStyle(base, packed, flags, valueWord);
       if (this.stylesDiffer(words[previous + 6], words[previous + 8], packed, valueWord))
         this.runBase = previous;
       return false;
@@ -7105,7 +7116,7 @@ class SceneStaging {
   _views(context) {
     this.assertWritable();
     if (this.context !== context)
-      throw new NativeError("ot_scene_flush", -7 /* WrongContext */);
+      throw new NativeError2("ot_scene_flush", -7 /* WrongContext */);
     this.borrowed = true;
     return this.words;
   }
@@ -7248,8 +7259,8 @@ class NativePaintRecorder {
     this.transaction(() => {
       if (options.operation === "respectAlpha")
         throw new Error("Paint hooks cannot change the frame alpha mode");
-      const textBytes = this.textBytes ??= new Uint8Array(NATIVE_BUFFER_TEXT_BYTES_MAX);
-      const bottomBytes = this.bottomBytes ??= new Uint8Array(NATIVE_BUFFER_TEXT_BYTES_MAX);
+      const textBytes = this.textBytes ??= new Uint8Array(NATIVE_BUFFER_TEXT_BYTES_MAX2);
+      const bottomBytes = this.bottomBytes ??= new Uint8Array(NATIVE_BUFFER_TEXT_BYTES_MAX2);
       const textLength = encodeDrawText(text, textBytes);
       const bottomLength = encodeDrawText(bottom, bottomBytes);
       const layout = nativeLayouts.ot_scene_record_draw;
@@ -7285,14 +7296,14 @@ class NativePaintRecorder {
         return this.currentOpacity;
       case "pushScissor":
         if (width > 2147483647 || height > 2147483647 || x + width > 2147483647 || y + height > 2147483647) {
-          throw new NativeError("ot_buffer_stack", -1 /* InvalidArgument */);
+          throw new NativeError2("ot_buffer_stack", -1 /* InvalidArgument */);
         }
         if (this.scissors >= stackDepthMax)
-          throw new NativeError("ot_buffer_stack", -16 /* ObjectLimit */);
+          throw new NativeError2("ot_buffer_stack", -16 /* ObjectLimit */);
         break;
       case "pushOpacity":
         if (this.opacity.length - 1 >= stackDepthMax)
-          throw new NativeError("ot_buffer_stack", -16 /* ObjectLimit */);
+          throw new NativeError2("ot_buffer_stack", -16 /* ObjectLimit */);
         break;
     }
     this.transaction(() => {
@@ -7538,16 +7549,16 @@ function encodeEditorStyle(style) {
   const layout = nativeLayouts.ot_editor_style;
   const record = new Uint32Array(layout.size / 4);
   const colors = new Uint16Array(record.buffer);
-  const { fg: fg2, bg: bg2, attributes } = style;
+  const { fg, bg, attributes } = style;
   record[layout.fields.struct_size.offset / 4] = layout.size;
   record[layout.fields.abi_version.offset / 4] = nativeConstants.OT_CONTEXT_ABI_VERSION;
-  if (fg2 != null) {
+  if (fg != null) {
     record[layout.fields.flags.offset / 4] |= 1 /* Foreground */;
-    contextBufferColor(fg2, colors, layout.fields.foreground.offset / 2);
+    contextBufferColor(fg, colors, layout.fields.foreground.offset / 2);
   }
-  if (bg2 != null) {
+  if (bg != null) {
     record[layout.fields.flags.offset / 4] |= 2 /* Background */;
-    contextBufferColor(bg2, colors, layout.fields.background.offset / 2);
+    contextBufferColor(bg, colors, layout.fields.background.offset / 2);
   }
   if (attributes != null) {
     record[layout.fields.flags.offset / 4] |= 4 /* Attributes */;
@@ -7598,14 +7609,14 @@ function encodeEditorSelection(selection, scratch = createEditorSelectionRecord(
   coordinates[layout.fields.focus_y.offset / 4] = toFFII32(selection.focusY ?? 0, "Editor selection focusY");
   record[layout.fields.update_cursor.offset / 4] = toFFIBool(selection.updateCursor ?? false, "Editor selection updateCursor");
   record[layout.fields.follow_cursor.offset / 4] = toFFIBool(selection.followCursor ?? false, "Editor selection followCursor");
-  const { fg: fg2, bg: bg2 } = selection;
-  if (fg2 != null) {
+  const { fg, bg } = selection;
+  if (fg != null) {
     record[layout.fields.flags.offset / 4] |= 1 /* Foreground */;
-    contextBufferColor(fg2, colors, layout.fields.foreground.offset / 2);
+    contextBufferColor(fg, colors, layout.fields.foreground.offset / 2);
   }
-  if (bg2 != null) {
+  if (bg != null) {
     record[layout.fields.flags.offset / 4] |= 2 /* Background */;
-    contextBufferColor(bg2, colors, layout.fields.background.offset / 2);
+    contextBufferColor(bg, colors, layout.fields.background.offset / 2);
   }
   return record;
 }
@@ -7964,7 +7975,7 @@ function getOpenTUILib(libPath) {
       returns: "void"
     }
   });
-  if (env.OTUI_DEBUG_FFI || env.OTUI_TRACE_FFI) {
+  if (env2.OTUI_DEBUG_FFI || env2.OTUI_TRACE_FFI) {
     return {
       ...rawSymbols,
       symbols: convertToDebugSymbols(rawSymbols.symbols)
@@ -7976,7 +7987,7 @@ function convertToDebugSymbols(symbols) {
   if (!globalTraceSymbols) {
     globalTraceSymbols = {};
   }
-  if (env.OTUI_DEBUG_FFI && !globalFFILogPath) {
+  if (env2.OTUI_DEBUG_FFI && !globalFFILogPath) {
     const now = new Date;
     const timestamp = now.toISOString().replace(/[:.]/g, "-").replace(/T/, "_").split("Z")[0];
     globalFFILogPath = `ffi_otui_debug_${timestamp}.log`;
@@ -7985,7 +7996,7 @@ function convertToDebugSymbols(symbols) {
   Object.entries(symbols).forEach(([key, value]) => {
     debugSymbols[key] = value;
   });
-  if (env.OTUI_DEBUG_FFI && globalFFILogPath) {
+  if (env2.OTUI_DEBUG_FFI && globalFFILogPath) {
     const logPath = globalFFILogPath;
     let loggingDisabled = false;
     const writeSync = (msg) => {
@@ -8009,7 +8020,7 @@ function convertToDebugSymbols(symbols) {
       }
     });
   }
-  if (env.OTUI_TRACE_FFI) {
+  if (env2.OTUI_TRACE_FFI) {
     Object.entries(symbols).forEach(([key, value]) => {
       if (typeof value === "function") {
         if (!globalTraceSymbols[key]) {
@@ -8026,7 +8037,7 @@ function convertToDebugSymbols(symbols) {
       }
     });
   }
-  if ((env.OTUI_DEBUG_FFI || env.OTUI_TRACE_FFI) && !exitHandlerRegistered) {
+  if ((env2.OTUI_DEBUG_FFI || env2.OTUI_TRACE_FFI) && !exitHandlerRegistered) {
     exitHandlerRegistered = true;
     process.on("exit", () => {
       if (globalTraceSymbols) {
@@ -8037,7 +8048,7 @@ function convertToDebugSymbols(symbols) {
           }
           const sortedTimings = [...timings].sort((a, b) => a - b);
           const count = sortedTimings.length;
-          const total = sortedTimings.reduce((acc, t2) => acc + t2, 0);
+          const total = sortedTimings.reduce((acc, t) => acc + t, 0);
           const average = total / count;
           const min = sortedTimings[0];
           const max = sortedTimings[count - 1];
@@ -8111,16 +8122,16 @@ function convertToDebugSymbols(symbols) {
   }
   return debugSymbols;
 }
-var LogLevel;
-((LogLevel2) => {
-  LogLevel2[LogLevel2["Error"] = 0] = "Error";
-  LogLevel2[LogLevel2["Warn"] = 1] = "Warn";
-  LogLevel2[LogLevel2["Info"] = 2] = "Info";
-  LogLevel2[LogLevel2["Debug"] = 3] = "Debug";
-})(LogLevel ||= {});
+var LogLevel2;
+((LogLevel) => {
+  LogLevel[LogLevel["Error"] = 0] = "Error";
+  LogLevel[LogLevel["Warn"] = 1] = "Warn";
+  LogLevel[LogLevel["Info"] = 2] = "Info";
+  LogLevel[LogLevel["Debug"] = 3] = "Debug";
+})(LogLevel2 ||= {});
 var LOG_METHODS = ["error", "warn", "info", "debug"];
 
-class FFIRenderLib {
+class FFIRenderLib2 {
   bufferDrawRecord;
   sceneLayoutRecord;
   sceneFrameRecord = createSceneFrameRecord();
@@ -8140,8 +8151,8 @@ class FFIRenderLib {
   hitTestOutput = new Uint32Array(1);
   bufferStackInput = new Float32Array(1);
   bufferStackOutput = new Float32Array(1);
-  drawTextBytes = new Uint8Array(NATIVE_BUFFER_TEXT_BYTES_MAX);
-  drawBottomBytes = new Uint8Array(NATIVE_BUFFER_TEXT_BYTES_MAX);
+  drawTextBytes = new Uint8Array(NATIVE_BUFFER_TEXT_BYTES_MAX2);
+  drawBottomBytes = new Uint8Array(NATIVE_BUFFER_TEXT_BYTES_MAX2);
   opentui;
   iccCacheClient = false;
   yogaLayout = new Float32Array(6);
@@ -8199,7 +8210,7 @@ class FFIRenderLib {
   nativeContextPointer(context, operation) {
     const pointer = this.nativeContexts.get(context);
     if (pointer === undefined)
-      throw new NativeError(operation, -7 /* WrongContext */);
+      throw new NativeError2(operation, -7 /* WrongContext */);
     return pointer;
   }
   destroyContext(context) {
@@ -8229,12 +8240,12 @@ class FFIRenderLib {
   }
   contextGetLinkUrl(context, linkId) {
     const id = toSafeFFIU32Length(linkId, "Link id");
-    const bytes = new Uint8Array(MAX_LINK_URL_BYTES);
+    const bytes = new Uint8Array(MAX_LINK_URL_BYTES2);
     const count = new Uint32Array(1);
     const pointer = this.nativeContextPointer(context, "ot_context_get_link_url");
     nativeResult("ot_context_get_link_url", this.opentui.symbols.ot_context_get_link_url(pointer, id, bytes, bytes.length, count));
     if (count[0] > bytes.length)
-      throw new NativeError("ot_context_get_link_url", -5 /* InternalError */);
+      throw new NativeError2("ot_context_get_link_url", -5 /* InternalError */);
     return count[0] === 0 ? "" : this.decoder.decode(bytes.subarray(0, count[0]));
   }
   createContextTextBuffer(context, options = {}) {
@@ -8299,10 +8310,10 @@ class FFIRenderLib {
     const fields = new Uint32Array(records.buffer);
     for (let index = 0;index < count; index++) {
       const snapshot = snapshots[index];
-      const offset2 = index * layout.size;
-      encodeContextHandle(context, snapshot.snapshot, new BigUint64Array(records.buffer, offset2 + layout.fields.buffer.offset, nativeLayouts.ot_handle.size / 8));
-      fields[(offset2 + layout.fields.row_columns.offset) / 4] = toSafeFFIU32Length(snapshot.rowColumns, "Split snapshot row columns");
-      fields[(offset2 + layout.fields.flags.offset) / 4] = toFFIBool(snapshot.startOnNewLine, "Split start on new line") | toFFIBool(snapshot.trailingNewline, "Split trailing newline") << 1;
+      const offset = index * layout.size;
+      encodeContextHandle(context, snapshot.snapshot, new BigUint64Array(records.buffer, offset + layout.fields.buffer.offset, nativeLayouts.ot_handle.size / 8));
+      fields[(offset + layout.fields.row_columns.offset) / 4] = toSafeFFIU32Length(snapshot.rowColumns, "Split snapshot row columns");
+      fields[(offset + layout.fields.flags.offset) / 4] = toFFIBool(snapshot.startOnNewLine, "Split start on new line") | toFFIBool(snapshot.trailingNewline, "Split trailing newline") << 1;
     }
     const offset = toSafeFFIU32Length(pinnedRenderOffset, "Split pinned render offset");
     const forced = toFFIBool(force, "Split force render");
@@ -8399,12 +8410,12 @@ class FFIRenderLib {
     const item = toSafeFFIU32Length(index, "Unicode character index");
     const column = toFFII32(x, "Unicode x");
     const row = toFFII32(y, "Unicode y");
-    const fg2 = contextBufferColor(foreground);
-    const bg2 = contextBufferColor(background);
+    const fg = contextBufferColor(foreground);
+    const bg = contextBufferColor(background);
     const attrs = toSafeFFIU32Length(attributes, "Unicode attributes");
     this.getYogaHost().assertMutable();
     const pointer = this.nativeContextPointer(context, "ot_buffer_draw_unicode");
-    nativeResult("ot_buffer_draw_unicode", this.opentui.symbols.ot_buffer_draw_unicode(pointer, handle, ticket, source, item, column, row, fg2, bg2, attrs));
+    nativeResult("ot_buffer_draw_unicode", this.opentui.symbols.ot_buffer_draw_unicode(pointer, handle, ticket, source, item, column, row, fg, bg, attrs));
   }
   createContextEmbeddedTerminal(context, options) {
     const layout = nativeLayouts.ot_embedded_terminal_options;
@@ -8745,7 +8756,7 @@ class FFIRenderLib {
     const bytes = new Uint8Array(count[0]);
     nativeResult(operation, read(viewOrNull(bytes), bytes.length, count));
     if (count[0] !== bytes.length) {
-      throw new NativeError(operation, -5 /* InternalError */);
+      throw new NativeError2(operation, -5 /* InternalError */);
     }
     return this.decoder.decode(bytes);
   }
@@ -8800,7 +8811,7 @@ class FFIRenderLib {
     const records = new Uint32Array(capacity * (nativeLayouts.ot_edit_highlight.size / 4));
     nativeResult("ot_text_buffer_get_highlights", this.opentui.symbols.ot_text_buffer_get_highlights(pointer, handle, row, records, capacity, count));
     if (count[0] !== capacity)
-      throw new NativeError("ot_text_buffer_get_highlights", -5 /* InternalError */);
+      throw new NativeError2("ot_text_buffer_get_highlights", -5 /* InternalError */);
     return decodeContextHighlights(records);
   }
   contextTextBufferViewSetViewport(context, view, viewport, sizeOnly = false) {
@@ -8899,7 +8910,7 @@ class FFIRenderLib {
     if (count !== 0) {
       nativeResult("ot_text_buffer_view_get_lines", this.opentui.symbols.ot_text_buffer_view_get_lines(pointer, handle, mode, first, lines, count, output));
       if (output[layout.fields.line_count.offset / 4] !== total)
-        throw new NativeError("ot_text_buffer_view_get_lines", -5 /* InternalError */);
+        throw new NativeError2("ot_text_buffer_view_get_lines", -5 /* InternalError */);
     }
     return decodeContextTextLines(lines, output[layout.fields.width_cols_max.offset / 4]);
   }
@@ -9106,7 +9117,7 @@ class FFIRenderLib {
       nativeResult("ot_edit_buffer_history", this.opentui.symbols.ot_edit_buffer_history(pointer, handle, direction, bytes, bytes.length, count));
     });
     if (count[0] > bytes.length)
-      throw new NativeError("ot_edit_buffer_history", -5 /* InternalError */);
+      throw new NativeError2("ot_edit_buffer_history", -5 /* InternalError */);
     return count[0] === 0 ? null : this.decoder.decode(bytes.subarray(0, count[0]));
   }
   contextEditBufferGetPosition(context, editBuffer, query, a = 0, b = 0) {
@@ -9214,7 +9225,7 @@ class FFIRenderLib {
     const records = new Uint32Array(capacity * (nativeLayouts.ot_edit_highlight.size / 4));
     nativeResult("ot_edit_buffer_get_highlights", this.opentui.symbols.ot_edit_buffer_get_highlights(pointer, handle, row, records, capacity, count));
     if (count[0] !== capacity)
-      throw new NativeError("ot_edit_buffer_get_highlights", -5 /* InternalError */);
+      throw new NativeError2("ot_edit_buffer_get_highlights", -5 /* InternalError */);
     return decodeContextHighlights(records);
   }
   contextEditorViewSetViewport(context, view, viewport, sizeOnly = false, moveCursor = false) {
@@ -9360,7 +9371,7 @@ class FFIRenderLib {
     if (count !== 0) {
       nativeResult("ot_editor_view_get_lines", this.opentui.symbols.ot_editor_view_get_lines(pointer, handle, mode, lines, count, output));
       if (output[layout.fields.line_count.offset / 4] !== count)
-        throw new NativeError("ot_editor_view_get_lines", -5 /* InternalError */);
+        throw new NativeError2("ot_editor_view_get_lines", -5 /* InternalError */);
     }
     return decodeContextTextLines(lines, output[layout.fields.width_cols_max.offset / 4]);
   }
@@ -9401,19 +9412,19 @@ class FFIRenderLib {
       };
       const callback = this.opentui.createCallback((contextId, slot, generation, event) => {
         this.getYogaHost().invokeCallback(() => {
-          const entry2 = buffers.get(slot);
-          if (!entry2 || entry2.handle.contextId !== contextId || entry2.handle.generation !== generation)
+          const entry = buffers.get(slot);
+          if (!entry || entry.handle.contextId !== contextId || entry.handle.generation !== generation)
             return;
           const name = names[event];
           if (name === undefined)
             throw new Error("Native editor returned an unknown event");
-          const listeners = [...entry2.listeners];
+          const listeners = [...entry.listeners];
           queueMicrotask(() => {
-            for (const listener2 of listeners) {
-              if (!this.nativeContexts.has(context) || buffers.get(slot) !== entry2)
+            for (const listener of listeners) {
+              if (!this.nativeContexts.has(context) || buffers.get(slot) !== entry)
                 return;
-              if (entry2.listeners.has(listener2))
-                listener2.handler(name);
+              if (entry.listeners.has(listener))
+                listener.handler(name);
             }
           });
         });
@@ -9695,11 +9706,11 @@ class FFIRenderLib {
     toFFII32(y, "Grayscale y");
     const sourceWidth = toSafeFFIU32Length(width, "Grayscale source width");
     const sourceHeight = toSafeFFIU32Length(height, "Grayscale source height");
-    const fg2 = foreground === null ? null : contextBufferColor(foreground);
-    const bg2 = background === null ? null : contextBufferColor(background);
+    const fg = foreground === null ? null : contextBufferColor(foreground);
+    const bg = background === null ? null : contextBufferColor(background);
     const doubled = toFFIBool(supersampled, "Grayscale supersampling");
     const pointer = this.nativeContextPointer(context, "ot_buffer_draw_grayscale");
-    nativeResult("ot_buffer_draw_grayscale", this.opentui.symbols.ot_buffer_draw_grayscale(pointer, handle, ticket, input, count, x, y, sourceWidth, sourceHeight, fg2, bg2, doubled));
+    nativeResult("ot_buffer_draw_grayscale", this.opentui.symbols.ot_buffer_draw_grayscale(pointer, handle, ticket, input, count, x, y, sourceWidth, sourceHeight, fg, bg, doubled));
   }
   contextColorMatrixBuffer({ context, target, frame }, matrix, mask, strength, channel) {
     this.getYogaHost().assertMutable();
@@ -10031,8 +10042,8 @@ class FFIRenderLib {
         const title = command.title;
         if (typeof title !== "string")
           throw new TypeError("Session title must be a string");
-        if (title.length > NATIVE_SESSION_CONTROL_PACKET_BYTES - "\x1B]0;\x07".length) {
-          throw new NativeError("ot_session_control", -1 /* InvalidArgument */);
+        if (title.length > NATIVE_SESSION_CONTROL_PACKET_BYTES2 - "\x1B]0;\x07".length) {
+          throw new NativeError2("ot_session_control", -1 /* InvalidArgument */);
         }
         bytes = this.encoder.encode(title);
         break;
@@ -10088,7 +10099,7 @@ class FFIRenderLib {
     if (typeof message !== "string" || title !== undefined && typeof title !== "string") {
       throw new TypeError("Notification message and title must be strings");
     }
-    const limit = NATIVE_SESSION_CONTROL_PACKET_BYTES + 1;
+    const limit = NATIVE_SESSION_CONTROL_PACKET_BYTES2 + 1;
     const body = this.encoder.encode(message.slice(0, limit));
     const heading = title === undefined ? null : this.encoder.encode(title.slice(0, limit));
     const output = new Uint32Array(1);
@@ -10105,11 +10116,11 @@ class FFIRenderLib {
     const input = new Uint16Array(count * 4);
     for (let index = 0;index < count; index++)
       contextBufferColor(palette[index], input, index * 4);
-    const fg2 = contextBufferColor(foreground);
-    const bg2 = contextBufferColor(background);
+    const fg = contextBufferColor(foreground);
+    const bg = contextBufferColor(background);
     const revision = toSafeFFIU32Length(epoch, "Session palette epoch");
     const pointer = this.nativeContextPointer(context, "ot_session_set_palette_state");
-    nativeResult("ot_session_set_palette_state", this.opentui.symbols.ot_session_set_palette_state(pointer, handle, input, count, fg2, bg2, revision));
+    nativeResult("ot_session_set_palette_state", this.opentui.symbols.ot_session_set_palette_state(pointer, handle, input, count, fg, bg, revision));
   }
   sessionSetCursor(context, session, options) {
     const layout = nativeLayouts.ot_session_cursor_update;
@@ -10258,7 +10269,7 @@ class FFIRenderLib {
       try {
         this.sceneHasMeasure(context, entry.handle);
       } catch (error) {
-        if (!(error instanceof NativeError) || error.status !== -9 /* StaleHandle */)
+        if (!(error instanceof NativeError2) || error.status !== -9 /* StaleHandle */)
           throw error;
         registrations.delete(slot);
       }
@@ -10369,7 +10380,7 @@ class FFIRenderLib {
       const pointer = this.nativeContextPointer(context, "ot_scene_move_node");
       const status = this.opentui.symbols.ot_scene_move_node(pointer, handle, destination, childIndex);
       if (status === -16 /* ObjectLimit */)
-        throw new NativeError("ot_scene_move_node", status, "Scene nesting depth exceeds the native limit");
+        throw new NativeError2("ot_scene_move_node", status, "Scene nesting depth exceeds the native limit");
       nativeResult("ot_scene_move_node", status);
     } finally {
       this.sceneMoveRecord ??= scratch;
@@ -10471,7 +10482,7 @@ class FFIRenderLib {
         staging.consume(applied[0] + rejected);
       }
       if (status !== 0 /* Ok */) {
-        const error = new NativeError(operation, status);
+        const error = new NativeError2(operation, status);
         error.message += ` after ${applied[0]} of ${count} staged entries`;
         throw error;
       }
@@ -10493,7 +10504,7 @@ class FFIRenderLib {
     nativeResult("ot_scene_set_styled_text", this.opentui.symbols.ot_scene_set_styled_text(pointer, handle, viewOrNull(bytes), bytes.length, count === 0 ? null : records, count, viewOrNull(urlBytes), urlBytes.length));
   }
   encodeStyledText(content, allowLinks = true, preserveChunkOrdinals = false) {
-    if (typeof content !== "object" || content === null || isStyledText(content) !== true) {
+    if (typeof content !== "object" || content === null || isStyledText2(content) !== true) {
       throw new TypeError("Native scene text requires a string or branded StyledText");
     }
     const chunks = content.chunks;
@@ -10512,46 +10523,46 @@ class FFIRenderLib {
       const chunk = chunks[index];
       if (typeof chunk !== "object" || chunk === null)
         throw new TypeError("Invalid native scene StyledText chunk");
-      const { __isChunk, text, fg: fg2, bg: bg2, attributes, link: link2 } = chunk;
+      const { __isChunk, text, fg, bg, attributes, link } = chunk;
       if (__isChunk !== true || typeof text !== "string")
         throw new TypeError("Invalid native scene StyledText chunk");
-      const foreground = fg2 === undefined ? undefined : contextBufferColor(fg2);
-      const background = bg2 === undefined ? undefined : contextBufferColor(bg2);
+      const foreground = fg === undefined ? undefined : contextBufferColor(fg);
+      const background = bg === undefined ? undefined : contextBufferColor(bg);
       const attrs = attributes === undefined ? 0 : toSafeFFIU32Length(attributes, "Scene styled chunk attributes");
-      if (attrs > ATTRIBUTE_BASE_MASK)
+      if (attrs > ATTRIBUTE_BASE_MASK2)
         throw new RangeError("Native scene StyledText supports only base attributes");
-      let urlBytes2;
-      if (link2 !== undefined) {
+      let urlBytes;
+      if (link !== undefined) {
         if (!allowLinks)
           throw new TypeError("Native editor placeholder does not support links");
-        if (typeof link2 !== "object" || link2 === null)
+        if (typeof link !== "object" || link === null)
           throw new TypeError("Invalid native scene StyledText link");
-        const url = link2.url;
+        const url = link.url;
         if (typeof url !== "string")
           throw new TypeError("Native scene StyledText link requires a URL string");
-        urlBytes2 = this.encoder.encode(url);
+        urlBytes = this.encoder.encode(url);
       }
-      const bytes2 = this.encoder.encode(text);
-      if (bytes2.length === 0 && !preserveChunkOrdinals)
+      const bytes = this.encoder.encode(text);
+      if (bytes.length === 0 && !preserveChunkOrdinals)
         continue;
-      byteCount = toSafeFFIU32Length(byteCount + bytes2.length, "Scene styled text length");
-      const offset2 = parts.length * stride;
-      records[offset2 + layout.fields.struct_size.offset / 4] = layout.size;
-      records[offset2 + layout.fields.abi_version.offset / 4] = nativeConstants.OT_CONTEXT_ABI_VERSION;
-      records[offset2 + layout.fields.byte_count.offset / 4] = bytes2.length;
-      records[offset2 + layout.fields.flags.offset / 4] = (foreground ? 1 : 0) | (background ? 2 : 0) | (urlBytes2 ? 4 : 0);
+      byteCount = toSafeFFIU32Length(byteCount + bytes.length, "Scene styled text length");
+      const offset = parts.length * stride;
+      records[offset + layout.fields.struct_size.offset / 4] = layout.size;
+      records[offset + layout.fields.abi_version.offset / 4] = nativeConstants.OT_CONTEXT_ABI_VERSION;
+      records[offset + layout.fields.byte_count.offset / 4] = bytes.length;
+      records[offset + layout.fields.flags.offset / 4] = (foreground ? 1 : 0) | (background ? 2 : 0) | (urlBytes ? 4 : 0);
       if (foreground)
-        colors.set(foreground, offset2 * 2 + layout.fields.foreground.offset / 2);
+        colors.set(foreground, offset * 2 + layout.fields.foreground.offset / 2);
       if (background)
-        colors.set(background, offset2 * 2 + layout.fields.background.offset / 2);
-      records[offset2 + layout.fields.attributes.offset / 4] = attrs;
-      if (urlBytes2) {
-        records[offset2 + layout.fields.link_offset.offset / 4] = urlByteCount;
-        records[offset2 + layout.fields.link_byte_count.offset / 4] = urlBytes2.length;
-        urlByteCount = toSafeFFIU32Length(urlByteCount + urlBytes2.length, "Scene styled URL length");
-        urls.push(urlBytes2);
+        colors.set(background, offset * 2 + layout.fields.background.offset / 2);
+      records[offset + layout.fields.attributes.offset / 4] = attrs;
+      if (urlBytes) {
+        records[offset + layout.fields.link_offset.offset / 4] = urlByteCount;
+        records[offset + layout.fields.link_byte_count.offset / 4] = urlBytes.length;
+        urlByteCount = toSafeFFIU32Length(urlByteCount + urlBytes.length, "Scene styled URL length");
+        urls.push(urlBytes);
       }
-      parts.push(bytes2);
+      parts.push(bytes);
     }
     const bytes = new Uint8Array(byteCount);
     let offset = 0;
@@ -10621,7 +10632,7 @@ class FFIRenderLib {
     if (text !== undefined && typeof text !== "string")
       throw new TypeError("Scene arrow text must be a string");
     const bytes = text === undefined ? null : sessionBytes(this.encoder.encode(text), "Scene arrow text length");
-    if (bytes && bytes.length > NATIVE_BUFFER_TEXT_BYTES_MAX)
+    if (bytes && bytes.length > NATIVE_BUFFER_TEXT_BYTES_MAX2)
       throw new RangeError("Scene arrow text is too long");
     const pointer = this.nativeContextPointer(context, "ot_scene_set_arrow");
     nativeResult("ot_scene_set_arrow", this.opentui.symbols.ot_scene_set_arrow(pointer, handle, record, bytes?.length === 0 ? new Uint8Array(1) : bytes, bytes?.length ?? 0));
@@ -10680,7 +10691,7 @@ class FFIRenderLib {
     contextBufferColor(options.backgroundColor, colors, layout.fields.background.offset / 2);
     const text = options.text;
     const bytes = text === undefined ? null : sessionBytes(this.encoder.encode(text), "Scene arrow text length");
-    if (bytes && bytes.length > NATIVE_BUFFER_TEXT_BYTES_MAX)
+    if (bytes && bytes.length > NATIVE_BUFFER_TEXT_BYTES_MAX2)
       throw new RangeError("Scene arrow text is too long");
     const pointer = this.nativeContextPointer(context, "ot_scene_set_scroll_arrow");
     nativeResult("ot_scene_set_scroll_arrow", this.opentui.symbols.ot_scene_set_scroll_arrow(pointer, handle, toSafeFFIU32Length(axis, "Scene scroll axis"), toSafeFFIU32Length(end, "Scene scroll arrow end"), record, bytes?.length === 0 ? new Uint8Array(1) : bytes, bytes?.length ?? 0));
@@ -10774,15 +10785,15 @@ class FFIRenderLib {
       coordinates[layout.fields[field].offset / 4] = Math.trunc(value);
     }
     const colors = new Uint16Array(record.buffer);
-    const bg2 = options.bg;
-    const fg2 = options.fg;
-    if (bg2 !== undefined) {
+    const bg = options.bg;
+    const fg = options.fg;
+    if (bg !== undefined) {
       record[layout.fields.flags.offset / 4] |= 1;
-      contextBufferColor(bg2, colors, layout.fields.background.offset / 2);
+      contextBufferColor(bg, colors, layout.fields.background.offset / 2);
     }
-    if (fg2 !== undefined) {
+    if (fg !== undefined) {
       record[layout.fields.flags.offset / 4] |= 2;
-      contextBufferColor(fg2, colors, layout.fields.foreground.offset / 2);
+      contextBufferColor(fg, colors, layout.fields.foreground.offset / 2);
     }
     const changed = new Uint32Array(1);
     const pointer = this.nativeContextPointer(context, "ot_scene_set_text_selection");
@@ -10831,7 +10842,7 @@ class FFIRenderLib {
     const count = new Uint32Array(1);
     nativeResult("ot_scene_get_text_lines", this.opentui.symbols.ot_scene_get_text_lines(this.nativeContextPointer(context, "ot_scene_get_text_lines"), handle, first, capacity === 0 ? null : lines, capacity, count));
     if (count[0] !== metrics.virtualLineCount)
-      throw new NativeError("ot_scene_get_text_lines", -5 /* InternalError */);
+      throw new NativeError2("ot_scene_get_text_lines", -5 /* InternalError */);
     return decodeContextTextLines(lines, metrics.widthColsMax);
   }
   sceneGetLayout(context, node, observation = false) {
@@ -11069,7 +11080,7 @@ class FFIRenderLib {
       visible: output[layout.fields.visible.offset / 4] !== 0,
       style: CURSOR_ID_TO_STYLE[output[layout.fields.style.offset / 4]] ?? "block",
       blinking: output[layout.fields.blinking.offset / 4] !== 0,
-      color: RGBA.fromValues(colors[layout.fields.r.offset / 4], colors[layout.fields.g.offset / 4], colors[layout.fields.b.offset / 4], colors[layout.fields.a.offset / 4])
+      color: RGBA2.fromValues(colors[layout.fields.r.offset / 4], colors[layout.fields.g.offset / 4], colors[layout.fields.b.offset / 4], colors[layout.fields.a.offset / 4])
     };
   }
   constructor(libPath) {
@@ -11161,7 +11172,7 @@ class FFIRenderLib {
       throw new Error("Cannot dispose OpenTUI native library while clipboard services are active");
     }
     if (this.nativeContexts.size !== this.audioEngines.size + Number(this.editMeasureContext !== undefined)) {
-      throw new NativeError("dispose", -6 /* ContextBusy */);
+      throw new NativeError2("dispose", -6 /* ContextBusy */);
     }
     this.yogaHost?.dispose();
     if (this.editMeasureContext)
@@ -11250,9 +11261,9 @@ class FFIRenderLib {
   clipboardServiceDestroy(service) {
     const context = this.clipboardServices.get(service);
     if (!context)
-      return NativeClipboardDestroyStatus.InvalidHandle;
+      return NativeClipboardDestroyStatus2.InvalidHandle;
     const status = this.opentui.symbols.ot_clipboard_service_destroy(this.clipboardContext(service));
-    if (status === NativeClipboardDestroyStatus.Destroyed) {
+    if (status === NativeClipboardDestroyStatus2.Destroyed) {
       this.releaseContext(context);
       this.clipboardServices.delete(service);
       for (const [id, operation] of this.clipboardOperations) {
@@ -11267,14 +11278,14 @@ class FFIRenderLib {
   }
   clipboardStart(service, start, args) {
     if (!this.clipboardServices.has(service))
-      return { status: NativeClipboardStartStatus.InvalidService, operation: null };
+      return { status: NativeClipboardStartStatus2.InvalidService, operation: null };
     const operation = nextStandaloneHandle();
     const handle = new BigUint64Array(nativeLayouts.ot_handle.size / 8);
     this.clipboardOperations.set(operation, { service, handle });
     let retained = false;
     try {
       const status = start(this.clipboardContext(service), ...args, handle);
-      retained = status === NativeClipboardStartStatus.Ok;
+      retained = status === NativeClipboardStartStatus2.Ok;
       return { status, operation: retained ? operation : null };
     } finally {
       if (!retained)
@@ -11345,7 +11356,7 @@ class FFIRenderLib {
   }
   clipboardOperationDestroy(operation) {
     const status = this.opentui.symbols.ot_clipboard_operation_destroy(...this.clipboardOperationArgs(operation));
-    if (status === NativeClipboardDestroyStatus.Destroyed)
+    if (status === NativeClipboardDestroyStatus2.Destroyed)
       this.clipboardOperations.delete(operation);
     return status;
   }
@@ -11365,12 +11376,12 @@ class FFIRenderLib {
           continue;
         const value = args[index];
         if (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > 4294967295) {
-          throw new YogaError(operation, 1 /* InvalidArgument */);
+          throw new YogaError2(operation, 1 /* InvalidArgument */);
         }
       }
       const status = this.opentui.symbols[operation](...args);
       if (status !== 0 /* Ok */)
-        throw new YogaError(operation, status);
+        throw new YogaError2(operation, status);
     };
     if (mutation)
       this.getYogaHost().runMutation(call);
@@ -11601,7 +11612,7 @@ class FFIRenderLib {
     try {
       return this.createContext({ objectCapacity, renderCellsMax: 1 });
     } catch (error) {
-      if (error instanceof NativeError)
+      if (error instanceof NativeError2)
         return null;
       throw error;
     }
@@ -11743,7 +11754,7 @@ class FFIRenderLib {
     return this.opentui.symbols.audioStop(this.audioContext(engine));
   }
   audioCreateStream(engine, options) {
-    if (!isFFIU32(options.groupId) || !isFFIU32(options.sampleRate ?? 0) || !isFFIU32(options.channels ?? 0) || !Object.values(NativeAudioStreamFormat2).includes(options.format)) {
+    if (!isFFIU32(options.groupId) || !isFFIU32(options.sampleRate ?? 0) || !isFFIU32(options.channels ?? 0) || !Object.values(NativeAudioStreamFormat3).includes(options.format)) {
       return { status: -1, streamId: null };
     }
     const optionsBuffer = new Uint8Array(AudioStreamCreateOptionsStruct.pack(options));
@@ -12138,22 +12149,22 @@ class FFIRenderLib {
 var opentuiLibPath;
 var opentuiLib;
 var renderLibResolved = false;
-function setRenderLibPath(libPath) {
+function setRenderLibPath2(libPath) {
   if (opentuiLibPath !== libPath) {
     if (renderLibResolved) {
       throw new Error("setRenderLibPath() must be called before resolveRenderLib()");
     }
-    if (opentuiLib instanceof FFIRenderLib) {
+    if (opentuiLib instanceof FFIRenderLib2) {
       opentuiLib.dispose();
     }
     opentuiLibPath = libPath;
     opentuiLib = undefined;
   }
 }
-function resolveRenderLib() {
+function resolveRenderLib2() {
   if (!opentuiLib) {
     try {
-      opentuiLib = new FFIRenderLib(opentuiLibPath);
+      opentuiLib = new FFIRenderLib2(opentuiLibPath);
     } catch (error) {
       throw new Error(`Failed to initialize OpenTUI render library: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
@@ -12162,230 +12173,230 @@ function resolveRenderLib() {
   return opentuiLib;
 }
 try {
-  opentuiLib = new FFIRenderLib(opentuiLibPath);
+  opentuiLib = new FFIRenderLib2(opentuiLibPath);
 } catch (error) {}
 
 // src/yoga.ts
-var Align;
-((Align2) => {
-  Align2[Align2["Auto"] = nativeConstants.OT_ALIGN_AUTO] = "Auto";
-  Align2[Align2["FlexStart"] = nativeConstants.OT_ALIGN_FLEX_START] = "FlexStart";
-  Align2[Align2["Center"] = nativeConstants.OT_ALIGN_CENTER] = "Center";
-  Align2[Align2["FlexEnd"] = nativeConstants.OT_ALIGN_FLEX_END] = "FlexEnd";
-  Align2[Align2["Stretch"] = nativeConstants.OT_ALIGN_STRETCH] = "Stretch";
-  Align2[Align2["Baseline"] = nativeConstants.OT_ALIGN_BASELINE] = "Baseline";
-  Align2[Align2["SpaceBetween"] = nativeConstants.OT_ALIGN_SPACE_BETWEEN] = "SpaceBetween";
-  Align2[Align2["SpaceAround"] = nativeConstants.OT_ALIGN_SPACE_AROUND] = "SpaceAround";
-  Align2[Align2["SpaceEvenly"] = nativeConstants.OT_ALIGN_SPACE_EVENLY] = "SpaceEvenly";
-})(Align ||= {});
-var BoxSizing;
-((BoxSizing2) => {
-  BoxSizing2[BoxSizing2["BorderBox"] = nativeConstants.OT_BOX_SIZING_BORDER_BOX] = "BorderBox";
-  BoxSizing2[BoxSizing2["ContentBox"] = nativeConstants.OT_BOX_SIZING_CONTENT_BOX] = "ContentBox";
-})(BoxSizing ||= {});
-var Dimension;
-((Dimension2) => {
-  Dimension2[Dimension2["Width"] = nativeConstants.OT_DIMENSION_WIDTH] = "Width";
-  Dimension2[Dimension2["Height"] = nativeConstants.OT_DIMENSION_HEIGHT] = "Height";
-})(Dimension ||= {});
-var Direction;
-((Direction2) => {
-  Direction2[Direction2["Inherit"] = nativeConstants.OT_DIRECTION_INHERIT] = "Inherit";
-  Direction2[Direction2["LTR"] = nativeConstants.OT_DIRECTION_LTR] = "LTR";
-  Direction2[Direction2["RTL"] = nativeConstants.OT_DIRECTION_RTL] = "RTL";
-})(Direction ||= {});
-var Display;
-((Display2) => {
-  Display2[Display2["Flex"] = 0] = "Flex";
-  Display2[Display2["None"] = 1] = "None";
-  Display2[Display2["Contents"] = 2] = "Contents";
-})(Display ||= {});
-var Edge;
-((Edge2) => {
-  Edge2[Edge2["Left"] = nativeConstants.OT_EDGE_LEFT] = "Left";
-  Edge2[Edge2["Top"] = nativeConstants.OT_EDGE_TOP] = "Top";
-  Edge2[Edge2["Right"] = nativeConstants.OT_EDGE_RIGHT] = "Right";
-  Edge2[Edge2["Bottom"] = nativeConstants.OT_EDGE_BOTTOM] = "Bottom";
-  Edge2[Edge2["Start"] = nativeConstants.OT_EDGE_START] = "Start";
-  Edge2[Edge2["End"] = nativeConstants.OT_EDGE_END] = "End";
-  Edge2[Edge2["Horizontal"] = nativeConstants.OT_EDGE_HORIZONTAL] = "Horizontal";
-  Edge2[Edge2["Vertical"] = nativeConstants.OT_EDGE_VERTICAL] = "Vertical";
-  Edge2[Edge2["All"] = nativeConstants.OT_EDGE_ALL] = "All";
-})(Edge ||= {});
-var Errata;
-((Errata2) => {
-  Errata2[Errata2["None"] = 0] = "None";
-  Errata2[Errata2["StretchFlexBasis"] = 1] = "StretchFlexBasis";
-  Errata2[Errata2["AbsolutePositionWithoutInsetsExcludesPadding"] = 2] = "AbsolutePositionWithoutInsetsExcludesPadding";
-  Errata2[Errata2["AbsolutePercentAgainstInnerSize"] = 4] = "AbsolutePercentAgainstInnerSize";
-  Errata2[Errata2["All"] = 2147483647] = "All";
-  Errata2[Errata2["Classic"] = 2147483646] = "Classic";
-})(Errata ||= {});
-var ExperimentalFeature;
-((ExperimentalFeature2) => {
-  ExperimentalFeature2[ExperimentalFeature2["WebFlexBasis"] = 0] = "WebFlexBasis";
-})(ExperimentalFeature ||= {});
-var FlexDirection;
-((FlexDirection2) => {
-  FlexDirection2[FlexDirection2["Column"] = nativeConstants.OT_FLEX_DIRECTION_COLUMN] = "Column";
-  FlexDirection2[FlexDirection2["ColumnReverse"] = nativeConstants.OT_FLEX_DIRECTION_COLUMN_REVERSE] = "ColumnReverse";
-  FlexDirection2[FlexDirection2["Row"] = nativeConstants.OT_FLEX_DIRECTION_ROW] = "Row";
-  FlexDirection2[FlexDirection2["RowReverse"] = nativeConstants.OT_FLEX_DIRECTION_ROW_REVERSE] = "RowReverse";
-})(FlexDirection ||= {});
-var Gutter;
-((Gutter2) => {
-  Gutter2[Gutter2["Column"] = nativeConstants.OT_GUTTER_COLUMN] = "Column";
-  Gutter2[Gutter2["Row"] = nativeConstants.OT_GUTTER_ROW] = "Row";
-  Gutter2[Gutter2["All"] = nativeConstants.OT_GUTTER_ALL] = "All";
-})(Gutter ||= {});
-var Justify;
-((Justify2) => {
-  Justify2[Justify2["FlexStart"] = nativeConstants.OT_JUSTIFY_FLEX_START] = "FlexStart";
-  Justify2[Justify2["Center"] = nativeConstants.OT_JUSTIFY_CENTER] = "Center";
-  Justify2[Justify2["FlexEnd"] = nativeConstants.OT_JUSTIFY_FLEX_END] = "FlexEnd";
-  Justify2[Justify2["SpaceBetween"] = nativeConstants.OT_JUSTIFY_SPACE_BETWEEN] = "SpaceBetween";
-  Justify2[Justify2["SpaceAround"] = nativeConstants.OT_JUSTIFY_SPACE_AROUND] = "SpaceAround";
-  Justify2[Justify2["SpaceEvenly"] = nativeConstants.OT_JUSTIFY_SPACE_EVENLY] = "SpaceEvenly";
-})(Justify ||= {});
-var LogLevel2;
-((LogLevel3) => {
-  LogLevel3[LogLevel3["Error"] = 0] = "Error";
-  LogLevel3[LogLevel3["Warn"] = 1] = "Warn";
-  LogLevel3[LogLevel3["Info"] = 2] = "Info";
-  LogLevel3[LogLevel3["Debug"] = 3] = "Debug";
-  LogLevel3[LogLevel3["Verbose"] = 4] = "Verbose";
-  LogLevel3[LogLevel3["Fatal"] = 5] = "Fatal";
-})(LogLevel2 ||= {});
-var MeasureMode;
-((MeasureMode2) => {
-  MeasureMode2[MeasureMode2["Undefined"] = nativeConstants.OT_MEASURE_UNDEFINED] = "Undefined";
-  MeasureMode2[MeasureMode2["Exactly"] = nativeConstants.OT_MEASURE_EXACTLY] = "Exactly";
-  MeasureMode2[MeasureMode2["AtMost"] = nativeConstants.OT_MEASURE_AT_MOST] = "AtMost";
-})(MeasureMode ||= {});
-var NodeType;
-((NodeType2) => {
-  NodeType2[NodeType2["Default"] = 0] = "Default";
-  NodeType2[NodeType2["Text"] = 1] = "Text";
-})(NodeType ||= {});
-var Overflow;
-((Overflow2) => {
-  Overflow2[Overflow2["Visible"] = nativeConstants.OT_OVERFLOW_VISIBLE] = "Visible";
-  Overflow2[Overflow2["Hidden"] = nativeConstants.OT_OVERFLOW_HIDDEN] = "Hidden";
-  Overflow2[Overflow2["Scroll"] = nativeConstants.OT_OVERFLOW_SCROLL] = "Scroll";
-})(Overflow ||= {});
-var PositionType;
-((PositionType2) => {
-  PositionType2[PositionType2["Static"] = nativeConstants.OT_POSITION_STATIC] = "Static";
-  PositionType2[PositionType2["Relative"] = nativeConstants.OT_POSITION_RELATIVE] = "Relative";
-  PositionType2[PositionType2["Absolute"] = nativeConstants.OT_POSITION_ABSOLUTE] = "Absolute";
-})(PositionType ||= {});
-var Unit;
-((Unit2) => {
-  Unit2[Unit2["Undefined"] = nativeConstants.OT_UNIT_UNDEFINED] = "Undefined";
-  Unit2[Unit2["Point"] = nativeConstants.OT_UNIT_POINT] = "Point";
-  Unit2[Unit2["Percent"] = nativeConstants.OT_UNIT_PERCENT] = "Percent";
-  Unit2[Unit2["Auto"] = nativeConstants.OT_UNIT_AUTO] = "Auto";
-})(Unit ||= {});
-var Wrap;
+var Align2;
+((Align) => {
+  Align[Align["Auto"] = nativeConstants.OT_ALIGN_AUTO] = "Auto";
+  Align[Align["FlexStart"] = nativeConstants.OT_ALIGN_FLEX_START] = "FlexStart";
+  Align[Align["Center"] = nativeConstants.OT_ALIGN_CENTER] = "Center";
+  Align[Align["FlexEnd"] = nativeConstants.OT_ALIGN_FLEX_END] = "FlexEnd";
+  Align[Align["Stretch"] = nativeConstants.OT_ALIGN_STRETCH] = "Stretch";
+  Align[Align["Baseline"] = nativeConstants.OT_ALIGN_BASELINE] = "Baseline";
+  Align[Align["SpaceBetween"] = nativeConstants.OT_ALIGN_SPACE_BETWEEN] = "SpaceBetween";
+  Align[Align["SpaceAround"] = nativeConstants.OT_ALIGN_SPACE_AROUND] = "SpaceAround";
+  Align[Align["SpaceEvenly"] = nativeConstants.OT_ALIGN_SPACE_EVENLY] = "SpaceEvenly";
+})(Align2 ||= {});
+var BoxSizing2;
+((BoxSizing) => {
+  BoxSizing[BoxSizing["BorderBox"] = nativeConstants.OT_BOX_SIZING_BORDER_BOX] = "BorderBox";
+  BoxSizing[BoxSizing["ContentBox"] = nativeConstants.OT_BOX_SIZING_CONTENT_BOX] = "ContentBox";
+})(BoxSizing2 ||= {});
+var Dimension2;
+((Dimension) => {
+  Dimension[Dimension["Width"] = nativeConstants.OT_DIMENSION_WIDTH] = "Width";
+  Dimension[Dimension["Height"] = nativeConstants.OT_DIMENSION_HEIGHT] = "Height";
+})(Dimension2 ||= {});
+var Direction2;
+((Direction) => {
+  Direction[Direction["Inherit"] = nativeConstants.OT_DIRECTION_INHERIT] = "Inherit";
+  Direction[Direction["LTR"] = nativeConstants.OT_DIRECTION_LTR] = "LTR";
+  Direction[Direction["RTL"] = nativeConstants.OT_DIRECTION_RTL] = "RTL";
+})(Direction2 ||= {});
+var Display2;
+((Display) => {
+  Display[Display["Flex"] = 0] = "Flex";
+  Display[Display["None"] = 1] = "None";
+  Display[Display["Contents"] = 2] = "Contents";
+})(Display2 ||= {});
+var Edge2;
+((Edge) => {
+  Edge[Edge["Left"] = nativeConstants.OT_EDGE_LEFT] = "Left";
+  Edge[Edge["Top"] = nativeConstants.OT_EDGE_TOP] = "Top";
+  Edge[Edge["Right"] = nativeConstants.OT_EDGE_RIGHT] = "Right";
+  Edge[Edge["Bottom"] = nativeConstants.OT_EDGE_BOTTOM] = "Bottom";
+  Edge[Edge["Start"] = nativeConstants.OT_EDGE_START] = "Start";
+  Edge[Edge["End"] = nativeConstants.OT_EDGE_END] = "End";
+  Edge[Edge["Horizontal"] = nativeConstants.OT_EDGE_HORIZONTAL] = "Horizontal";
+  Edge[Edge["Vertical"] = nativeConstants.OT_EDGE_VERTICAL] = "Vertical";
+  Edge[Edge["All"] = nativeConstants.OT_EDGE_ALL] = "All";
+})(Edge2 ||= {});
+var Errata2;
+((Errata) => {
+  Errata[Errata["None"] = 0] = "None";
+  Errata[Errata["StretchFlexBasis"] = 1] = "StretchFlexBasis";
+  Errata[Errata["AbsolutePositionWithoutInsetsExcludesPadding"] = 2] = "AbsolutePositionWithoutInsetsExcludesPadding";
+  Errata[Errata["AbsolutePercentAgainstInnerSize"] = 4] = "AbsolutePercentAgainstInnerSize";
+  Errata[Errata["All"] = 2147483647] = "All";
+  Errata[Errata["Classic"] = 2147483646] = "Classic";
+})(Errata2 ||= {});
+var ExperimentalFeature2;
+((ExperimentalFeature) => {
+  ExperimentalFeature[ExperimentalFeature["WebFlexBasis"] = 0] = "WebFlexBasis";
+})(ExperimentalFeature2 ||= {});
+var FlexDirection2;
+((FlexDirection) => {
+  FlexDirection[FlexDirection["Column"] = nativeConstants.OT_FLEX_DIRECTION_COLUMN] = "Column";
+  FlexDirection[FlexDirection["ColumnReverse"] = nativeConstants.OT_FLEX_DIRECTION_COLUMN_REVERSE] = "ColumnReverse";
+  FlexDirection[FlexDirection["Row"] = nativeConstants.OT_FLEX_DIRECTION_ROW] = "Row";
+  FlexDirection[FlexDirection["RowReverse"] = nativeConstants.OT_FLEX_DIRECTION_ROW_REVERSE] = "RowReverse";
+})(FlexDirection2 ||= {});
+var Gutter2;
+((Gutter) => {
+  Gutter[Gutter["Column"] = nativeConstants.OT_GUTTER_COLUMN] = "Column";
+  Gutter[Gutter["Row"] = nativeConstants.OT_GUTTER_ROW] = "Row";
+  Gutter[Gutter["All"] = nativeConstants.OT_GUTTER_ALL] = "All";
+})(Gutter2 ||= {});
+var Justify2;
+((Justify) => {
+  Justify[Justify["FlexStart"] = nativeConstants.OT_JUSTIFY_FLEX_START] = "FlexStart";
+  Justify[Justify["Center"] = nativeConstants.OT_JUSTIFY_CENTER] = "Center";
+  Justify[Justify["FlexEnd"] = nativeConstants.OT_JUSTIFY_FLEX_END] = "FlexEnd";
+  Justify[Justify["SpaceBetween"] = nativeConstants.OT_JUSTIFY_SPACE_BETWEEN] = "SpaceBetween";
+  Justify[Justify["SpaceAround"] = nativeConstants.OT_JUSTIFY_SPACE_AROUND] = "SpaceAround";
+  Justify[Justify["SpaceEvenly"] = nativeConstants.OT_JUSTIFY_SPACE_EVENLY] = "SpaceEvenly";
+})(Justify2 ||= {});
+var LogLevel3;
+((LogLevel) => {
+  LogLevel[LogLevel["Error"] = 0] = "Error";
+  LogLevel[LogLevel["Warn"] = 1] = "Warn";
+  LogLevel[LogLevel["Info"] = 2] = "Info";
+  LogLevel[LogLevel["Debug"] = 3] = "Debug";
+  LogLevel[LogLevel["Verbose"] = 4] = "Verbose";
+  LogLevel[LogLevel["Fatal"] = 5] = "Fatal";
+})(LogLevel3 ||= {});
+var MeasureMode2;
+((MeasureMode) => {
+  MeasureMode[MeasureMode["Undefined"] = nativeConstants.OT_MEASURE_UNDEFINED] = "Undefined";
+  MeasureMode[MeasureMode["Exactly"] = nativeConstants.OT_MEASURE_EXACTLY] = "Exactly";
+  MeasureMode[MeasureMode["AtMost"] = nativeConstants.OT_MEASURE_AT_MOST] = "AtMost";
+})(MeasureMode2 ||= {});
+var NodeType2;
+((NodeType) => {
+  NodeType[NodeType["Default"] = 0] = "Default";
+  NodeType[NodeType["Text"] = 1] = "Text";
+})(NodeType2 ||= {});
+var Overflow2;
+((Overflow) => {
+  Overflow[Overflow["Visible"] = nativeConstants.OT_OVERFLOW_VISIBLE] = "Visible";
+  Overflow[Overflow["Hidden"] = nativeConstants.OT_OVERFLOW_HIDDEN] = "Hidden";
+  Overflow[Overflow["Scroll"] = nativeConstants.OT_OVERFLOW_SCROLL] = "Scroll";
+})(Overflow2 ||= {});
+var PositionType2;
+((PositionType) => {
+  PositionType[PositionType["Static"] = nativeConstants.OT_POSITION_STATIC] = "Static";
+  PositionType[PositionType["Relative"] = nativeConstants.OT_POSITION_RELATIVE] = "Relative";
+  PositionType[PositionType["Absolute"] = nativeConstants.OT_POSITION_ABSOLUTE] = "Absolute";
+})(PositionType2 ||= {});
+var Unit2;
+((Unit) => {
+  Unit[Unit["Undefined"] = nativeConstants.OT_UNIT_UNDEFINED] = "Undefined";
+  Unit[Unit["Point"] = nativeConstants.OT_UNIT_POINT] = "Point";
+  Unit[Unit["Percent"] = nativeConstants.OT_UNIT_PERCENT] = "Percent";
+  Unit[Unit["Auto"] = nativeConstants.OT_UNIT_AUTO] = "Auto";
+})(Unit2 ||= {});
+var Wrap2;
 ((_Wrap) => {
   _Wrap[_Wrap["NoWrap"] = nativeConstants.OT_FLEX_WRAP_NONE] = "NoWrap";
   _Wrap[_Wrap["Wrap"] = nativeConstants.OT_FLEX_WRAP_WRAP] = "Wrap";
   _Wrap[_Wrap["WrapReverse"] = nativeConstants.OT_FLEX_WRAP_REVERSE] = "WrapReverse";
-})(Wrap ||= {});
-var ALIGN_AUTO = Align.Auto;
-var ALIGN_FLEX_START = Align.FlexStart;
-var ALIGN_CENTER = Align.Center;
-var ALIGN_FLEX_END = Align.FlexEnd;
-var ALIGN_STRETCH = Align.Stretch;
-var ALIGN_BASELINE = Align.Baseline;
-var ALIGN_SPACE_BETWEEN = Align.SpaceBetween;
-var ALIGN_SPACE_AROUND = Align.SpaceAround;
-var ALIGN_SPACE_EVENLY = Align.SpaceEvenly;
-var BOX_SIZING_BORDER_BOX = BoxSizing.BorderBox;
-var BOX_SIZING_CONTENT_BOX = BoxSizing.ContentBox;
-var DIMENSION_WIDTH = Dimension.Width;
-var DIMENSION_HEIGHT = Dimension.Height;
-var DIRECTION_INHERIT = Direction.Inherit;
-var DIRECTION_LTR = Direction.LTR;
-var DIRECTION_RTL = Direction.RTL;
-var DISPLAY_FLEX = 0 /* Flex */;
-var DISPLAY_NONE = 1 /* None */;
-var DISPLAY_CONTENTS = 2 /* Contents */;
-var EDGE_LEFT = Edge.Left;
-var EDGE_TOP = Edge.Top;
-var EDGE_RIGHT = Edge.Right;
-var EDGE_BOTTOM = Edge.Bottom;
-var EDGE_START = Edge.Start;
-var EDGE_END = Edge.End;
-var EDGE_HORIZONTAL = Edge.Horizontal;
-var EDGE_VERTICAL = Edge.Vertical;
-var EDGE_ALL = Edge.All;
-var ERRATA_NONE = 0 /* None */;
-var ERRATA_STRETCH_FLEX_BASIS = 1 /* StretchFlexBasis */;
-var ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING = 2 /* AbsolutePositionWithoutInsetsExcludesPadding */;
-var ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE = 4 /* AbsolutePercentAgainstInnerSize */;
-var ERRATA_ALL = 2147483647 /* All */;
-var ERRATA_CLASSIC = 2147483646 /* Classic */;
-var EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS = 0 /* WebFlexBasis */;
-var FLEX_DIRECTION_COLUMN = FlexDirection.Column;
-var FLEX_DIRECTION_COLUMN_REVERSE = FlexDirection.ColumnReverse;
-var FLEX_DIRECTION_ROW = FlexDirection.Row;
-var FLEX_DIRECTION_ROW_REVERSE = FlexDirection.RowReverse;
-var GUTTER_COLUMN = Gutter.Column;
-var GUTTER_ROW = Gutter.Row;
-var GUTTER_ALL = Gutter.All;
-var JUSTIFY_FLEX_START = Justify.FlexStart;
-var JUSTIFY_CENTER = Justify.Center;
-var JUSTIFY_FLEX_END = Justify.FlexEnd;
-var JUSTIFY_SPACE_BETWEEN = Justify.SpaceBetween;
-var JUSTIFY_SPACE_AROUND = Justify.SpaceAround;
-var JUSTIFY_SPACE_EVENLY = Justify.SpaceEvenly;
-var LOG_LEVEL_ERROR = 0 /* Error */;
-var LOG_LEVEL_WARN = 1 /* Warn */;
-var LOG_LEVEL_INFO = 2 /* Info */;
-var LOG_LEVEL_DEBUG = 3 /* Debug */;
-var LOG_LEVEL_VERBOSE = 4 /* Verbose */;
-var LOG_LEVEL_FATAL = 5 /* Fatal */;
-var MEASURE_MODE_UNDEFINED = MeasureMode.Undefined;
-var MEASURE_MODE_EXACTLY = MeasureMode.Exactly;
-var MEASURE_MODE_AT_MOST = MeasureMode.AtMost;
-var NODE_TYPE_DEFAULT = 0 /* Default */;
-var NODE_TYPE_TEXT = 1 /* Text */;
-var OVERFLOW_VISIBLE = Overflow.Visible;
-var OVERFLOW_HIDDEN = Overflow.Hidden;
-var OVERFLOW_SCROLL = Overflow.Scroll;
-var POSITION_TYPE_STATIC = PositionType.Static;
-var POSITION_TYPE_RELATIVE = PositionType.Relative;
-var POSITION_TYPE_ABSOLUTE = PositionType.Absolute;
-var UNIT_UNDEFINED = Unit.Undefined;
-var UNIT_POINT = Unit.Point;
-var UNIT_PERCENT = Unit.Percent;
-var UNIT_AUTO = Unit.Auto;
-var WRAP_NO_WRAP = Wrap.NoWrap;
-var WRAP_WRAP = Wrap.Wrap;
-var WRAP_WRAP_REVERSE = Wrap.WrapReverse;
+})(Wrap2 ||= {});
+var ALIGN_AUTO2 = Align2.Auto;
+var ALIGN_FLEX_START2 = Align2.FlexStart;
+var ALIGN_CENTER2 = Align2.Center;
+var ALIGN_FLEX_END2 = Align2.FlexEnd;
+var ALIGN_STRETCH2 = Align2.Stretch;
+var ALIGN_BASELINE2 = Align2.Baseline;
+var ALIGN_SPACE_BETWEEN2 = Align2.SpaceBetween;
+var ALIGN_SPACE_AROUND2 = Align2.SpaceAround;
+var ALIGN_SPACE_EVENLY2 = Align2.SpaceEvenly;
+var BOX_SIZING_BORDER_BOX2 = BoxSizing2.BorderBox;
+var BOX_SIZING_CONTENT_BOX2 = BoxSizing2.ContentBox;
+var DIMENSION_WIDTH2 = Dimension2.Width;
+var DIMENSION_HEIGHT2 = Dimension2.Height;
+var DIRECTION_INHERIT2 = Direction2.Inherit;
+var DIRECTION_LTR2 = Direction2.LTR;
+var DIRECTION_RTL2 = Direction2.RTL;
+var DISPLAY_FLEX2 = 0 /* Flex */;
+var DISPLAY_NONE2 = 1 /* None */;
+var DISPLAY_CONTENTS2 = 2 /* Contents */;
+var EDGE_LEFT2 = Edge2.Left;
+var EDGE_TOP2 = Edge2.Top;
+var EDGE_RIGHT2 = Edge2.Right;
+var EDGE_BOTTOM2 = Edge2.Bottom;
+var EDGE_START2 = Edge2.Start;
+var EDGE_END2 = Edge2.End;
+var EDGE_HORIZONTAL2 = Edge2.Horizontal;
+var EDGE_VERTICAL2 = Edge2.Vertical;
+var EDGE_ALL2 = Edge2.All;
+var ERRATA_NONE2 = 0 /* None */;
+var ERRATA_STRETCH_FLEX_BASIS2 = 1 /* StretchFlexBasis */;
+var ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2 = 2 /* AbsolutePositionWithoutInsetsExcludesPadding */;
+var ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2 = 4 /* AbsolutePercentAgainstInnerSize */;
+var ERRATA_ALL2 = 2147483647 /* All */;
+var ERRATA_CLASSIC2 = 2147483646 /* Classic */;
+var EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2 = 0 /* WebFlexBasis */;
+var FLEX_DIRECTION_COLUMN2 = FlexDirection2.Column;
+var FLEX_DIRECTION_COLUMN_REVERSE2 = FlexDirection2.ColumnReverse;
+var FLEX_DIRECTION_ROW2 = FlexDirection2.Row;
+var FLEX_DIRECTION_ROW_REVERSE2 = FlexDirection2.RowReverse;
+var GUTTER_COLUMN2 = Gutter2.Column;
+var GUTTER_ROW2 = Gutter2.Row;
+var GUTTER_ALL2 = Gutter2.All;
+var JUSTIFY_FLEX_START2 = Justify2.FlexStart;
+var JUSTIFY_CENTER2 = Justify2.Center;
+var JUSTIFY_FLEX_END2 = Justify2.FlexEnd;
+var JUSTIFY_SPACE_BETWEEN2 = Justify2.SpaceBetween;
+var JUSTIFY_SPACE_AROUND2 = Justify2.SpaceAround;
+var JUSTIFY_SPACE_EVENLY2 = Justify2.SpaceEvenly;
+var LOG_LEVEL_ERROR2 = 0 /* Error */;
+var LOG_LEVEL_WARN2 = 1 /* Warn */;
+var LOG_LEVEL_INFO2 = 2 /* Info */;
+var LOG_LEVEL_DEBUG2 = 3 /* Debug */;
+var LOG_LEVEL_VERBOSE2 = 4 /* Verbose */;
+var LOG_LEVEL_FATAL2 = 5 /* Fatal */;
+var MEASURE_MODE_UNDEFINED2 = MeasureMode2.Undefined;
+var MEASURE_MODE_EXACTLY2 = MeasureMode2.Exactly;
+var MEASURE_MODE_AT_MOST2 = MeasureMode2.AtMost;
+var NODE_TYPE_DEFAULT2 = 0 /* Default */;
+var NODE_TYPE_TEXT2 = 1 /* Text */;
+var OVERFLOW_VISIBLE2 = Overflow2.Visible;
+var OVERFLOW_HIDDEN2 = Overflow2.Hidden;
+var OVERFLOW_SCROLL2 = Overflow2.Scroll;
+var POSITION_TYPE_STATIC2 = PositionType2.Static;
+var POSITION_TYPE_RELATIVE2 = PositionType2.Relative;
+var POSITION_TYPE_ABSOLUTE2 = PositionType2.Absolute;
+var UNIT_UNDEFINED2 = Unit2.Undefined;
+var UNIT_POINT2 = Unit2.Point;
+var UNIT_PERCENT2 = Unit2.Percent;
+var UNIT_AUTO2 = Unit2.Auto;
+var WRAP_NO_WRAP2 = Wrap2.NoWrap;
+var WRAP_WRAP2 = Wrap2.Wrap;
+var WRAP_WRAP_REVERSE2 = Wrap2.WrapReverse;
 var YogaEdgeLayoutKind = {
   Margin: 0,
   Padding: 1,
   Border: 2
 };
-var YogaStatus;
-((YogaStatus2) => {
-  YogaStatus2[YogaStatus2["Ok"] = 0] = "Ok";
-  YogaStatus2[YogaStatus2["InvalidArgument"] = 1] = "InvalidArgument";
-  YogaStatus2[YogaStatus2["OutOfMemory"] = 2] = "OutOfMemory";
-  YogaStatus2[YogaStatus2["Exception"] = 3] = "Exception";
-  YogaStatus2[YogaStatus2["Poisoned"] = 4] = "Poisoned";
-  YogaStatus2[YogaStatus2["Busy"] = 5] = "Busy";
-  YogaStatus2[YogaStatus2["DepthLimit"] = 6] = "DepthLimit";
-})(YogaStatus ||= {});
+var YogaStatus2;
+((YogaStatus) => {
+  YogaStatus[YogaStatus["Ok"] = 0] = "Ok";
+  YogaStatus[YogaStatus["InvalidArgument"] = 1] = "InvalidArgument";
+  YogaStatus[YogaStatus["OutOfMemory"] = 2] = "OutOfMemory";
+  YogaStatus[YogaStatus["Exception"] = 3] = "Exception";
+  YogaStatus[YogaStatus["Poisoned"] = 4] = "Poisoned";
+  YogaStatus[YogaStatus["Busy"] = 5] = "Busy";
+  YogaStatus[YogaStatus["DepthLimit"] = 6] = "DepthLimit";
+})(YogaStatus2 ||= {});
 
-class YogaError extends Error {
+class YogaError2 extends Error {
   operation;
   status;
   name = "YogaError";
   constructor(operation, status) {
-    super(`${operation} failed: ${YogaStatus[status] ?? "Unknown"} (status ${status})`);
+    super(`${operation} failed: ${YogaStatus2[status] ?? "Unknown"} (status ${status})`);
     this.operation = operation;
     this.status = status;
   }
@@ -12403,7 +12414,7 @@ function normalizeLayoutInput(value) {
   return value === undefined || value === "auto" ? NaN : value;
 }
 
-class Config {
+class Config2 {
   renderLib;
   ownsConfig;
   ptr;
@@ -12413,17 +12424,17 @@ class Config {
   freed = false;
   measureCallback;
   dirtiedCallback;
-  constructor(ptr3, renderLib, ownsConfig) {
+  constructor(ptr, renderLib, ownsConfig) {
     this.renderLib = renderLib;
     this.ownsConfig = ownsConfig;
-    this.ptr = ptr3;
-    renderLib.getYogaHost().configs.set(ptr3, this);
+    this.ptr = ptr;
+    renderLib.getYogaHost().configs.set(ptr, this);
   }
-  static create(renderLib = resolveRenderLib()) {
-    return new Config(renderLib.yogaConfigCreate(), renderLib, true);
+  static create(renderLib = resolveRenderLib2()) {
+    return new Config2(renderLib.yogaConfigCreate(), renderLib, true);
   }
-  static fromBorrowedPointer(ptr3, renderLib = resolveRenderLib()) {
-    return renderLib.getYogaHost().configs.get(ptr3) ?? new Config(ptr3, renderLib, false);
+  static fromBorrowedPointer(ptr, renderLib = resolveRenderLib2()) {
+    return renderLib.getYogaHost().configs.get(ptr) ?? new Config2(ptr, renderLib, false);
   }
   static destroy(config) {
     config.free();
@@ -12522,42 +12533,42 @@ class Config {
   }
 }
 
-class Node {
+class Node2 {
   ptr;
   config;
   freed = false;
-  constructor(ptr3, config) {
-    this.ptr = ptr3;
+  constructor(ptr, config) {
+    this.ptr = ptr;
     this.config = config;
-    config.nodes.set(ptr3, this);
+    config.nodes.set(ptr, this);
   }
   get renderLib() {
     return this.config.renderLib;
   }
   static create(config) {
-    config ??= resolveRenderLib().getYogaHost().getDefaultConfig();
+    config ??= resolveRenderLib2().getYogaHost().getDefaultConfig();
     config.assertAlive();
-    return Node.fromPointer(config.renderLib.yogaNodeCreateWithConfig(config.ptr), config.renderLib);
+    return Node2.fromPointer(config.renderLib.yogaNodeCreateWithConfig(config.ptr), config.renderLib);
   }
   static createForOpenTUI() {
-    const renderLib = resolveRenderLib();
-    return Node.fromPointer(renderLib.yogaNodeCreateForOpenTUI(), renderLib);
+    const renderLib = resolveRenderLib2();
+    return Node2.fromPointer(renderLib.yogaNodeCreateForOpenTUI(), renderLib);
   }
   static createDefault() {
-    return Node.create();
+    return Node2.create();
   }
   static createWithConfig(config) {
-    return Node.create(config);
+    return Node2.create(config);
   }
   static destroy(node) {
     node.free();
   }
-  static fromPointer(ptr3, renderLib) {
-    const config = Config.fromBorrowedPointer(renderLib.yogaNodeGetConfig(ptr3), renderLib);
-    const existing = config.nodes.get(ptr3);
+  static fromPointer(ptr, renderLib) {
+    const config = Config2.fromBorrowedPointer(renderLib.yogaNodeGetConfig(ptr), renderLib);
+    const existing = config.nodes.get(ptr);
     if (existing)
       return existing;
-    return new Node(ptr3, config);
+    return new Node2(ptr, config);
   }
   isFreed() {
     return this.freed;
@@ -12623,7 +12634,7 @@ class Node {
     if (this.freed)
       return null;
     const child = this.renderLib.yogaNodeGetChild(this.ptr, index);
-    return child ? Node.fromPointer(child, this.renderLib) : null;
+    return child ? Node2.fromPointer(child, this.renderLib) : null;
   }
   getChildCount() {
     if (this.freed)
@@ -12634,9 +12645,9 @@ class Node {
     if (this.freed)
       return null;
     const parent = this.renderLib.yogaNodeGetParent(this.ptr);
-    return parent ? Node.fromPointer(parent, this.renderLib) : null;
+    return parent ? Node2.fromPointer(parent, this.renderLib) : null;
   }
-  calculateLayout(width, height, direction = Direction.LTR) {
+  calculateLayout(width, height, direction = Direction2.LTR) {
     if (this.freed)
       return;
     this.renderLib.yogaNodeCalculateLayout(this.ptr, normalizeLayoutInput(width), normalizeLayoutInput(height), direction);
@@ -12703,55 +12714,55 @@ class Node {
     this.setEnum(YogaEnumKind.Direction, direction);
   }
   getDirection() {
-    return this.getEnum(YogaEnumKind.Direction, Direction.Inherit);
+    return this.getEnum(YogaEnumKind.Direction, Direction2.Inherit);
   }
   setFlexDirection(flexDirection) {
     this.setEnum(YogaEnumKind.FlexDirection, flexDirection);
   }
   getFlexDirection() {
-    return this.getEnum(YogaEnumKind.FlexDirection, FlexDirection.Column);
+    return this.getEnum(YogaEnumKind.FlexDirection, FlexDirection2.Column);
   }
   setJustifyContent(justifyContent) {
     this.setEnum(YogaEnumKind.JustifyContent, justifyContent);
   }
   getJustifyContent() {
-    return this.getEnum(YogaEnumKind.JustifyContent, Justify.FlexStart);
+    return this.getEnum(YogaEnumKind.JustifyContent, Justify2.FlexStart);
   }
   setAlignContent(alignContent) {
     this.setEnum(YogaEnumKind.AlignContent, alignContent);
   }
   getAlignContent() {
-    return this.getEnum(YogaEnumKind.AlignContent, Align.FlexStart);
+    return this.getEnum(YogaEnumKind.AlignContent, Align2.FlexStart);
   }
   setAlignItems(alignItems) {
     this.setEnum(YogaEnumKind.AlignItems, alignItems);
   }
   getAlignItems() {
-    return this.getEnum(YogaEnumKind.AlignItems, Align.Stretch);
+    return this.getEnum(YogaEnumKind.AlignItems, Align2.Stretch);
   }
   setAlignSelf(alignSelf) {
     this.setEnum(YogaEnumKind.AlignSelf, alignSelf);
   }
   getAlignSelf() {
-    return this.getEnum(YogaEnumKind.AlignSelf, Align.Auto);
+    return this.getEnum(YogaEnumKind.AlignSelf, Align2.Auto);
   }
   setPositionType(positionType) {
     this.setEnum(YogaEnumKind.PositionType, positionType);
   }
   getPositionType() {
-    return this.getEnum(YogaEnumKind.PositionType, PositionType.Relative);
+    return this.getEnum(YogaEnumKind.PositionType, PositionType2.Relative);
   }
   setFlexWrap(flexWrap) {
     this.setEnum(YogaEnumKind.FlexWrap, flexWrap);
   }
   getFlexWrap() {
-    return this.getEnum(YogaEnumKind.FlexWrap, Wrap.NoWrap);
+    return this.getEnum(YogaEnumKind.FlexWrap, Wrap2.NoWrap);
   }
   setOverflow(overflow) {
     this.setEnum(YogaEnumKind.Overflow, overflow);
   }
   getOverflow() {
-    return this.getEnum(YogaEnumKind.Overflow, Overflow.Visible);
+    return this.getEnum(YogaEnumKind.Overflow, Overflow2.Visible);
   }
   setDisplay(display) {
     this.setEnum(YogaEnumKind.Display, display);
@@ -12763,7 +12774,7 @@ class Node {
     this.setEnum(YogaEnumKind.BoxSizing, boxSizing);
   }
   getBoxSizing() {
-    return this.getEnum(YogaEnumKind.BoxSizing, BoxSizing.BorderBox);
+    return this.getEnum(YogaEnumKind.BoxSizing, BoxSizing2.BorderBox);
   }
   setFlex(flex) {
     this.setFloat(YogaFloatKind.Flex, flex);
@@ -12790,82 +12801,82 @@ class Node {
     return this.getFloat(YogaFloatKind.AspectRatio);
   }
   setFlexBasis(flexBasis) {
-    this.setValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE, flexBasis);
+    this.setValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE2, flexBasis);
   }
   setFlexBasisPercent(flexBasis) {
-    this.setValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE, flexBasis === undefined ? undefined : { unit: Unit.Percent, value: flexBasis });
+    this.setValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE2, flexBasis === undefined ? undefined : { unit: Unit2.Percent, value: flexBasis });
   }
   setFlexBasisAuto() {
-    this.setValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE, "auto");
+    this.setValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE2, "auto");
   }
   getFlexBasis() {
-    return this.getValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE);
+    return this.getValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE2);
   }
   setWidth(width) {
-    this.setValue(YogaValueKind.Width, NATIVE_EDGE_NONE, width);
+    this.setValue(YogaValueKind.Width, NATIVE_EDGE_NONE2, width);
   }
   setWidthPercent(width) {
-    this.setValue(YogaValueKind.Width, NATIVE_EDGE_NONE, width === undefined ? undefined : { unit: Unit.Percent, value: width });
+    this.setValue(YogaValueKind.Width, NATIVE_EDGE_NONE2, width === undefined ? undefined : { unit: Unit2.Percent, value: width });
   }
   setWidthAuto() {
-    this.setValue(YogaValueKind.Width, NATIVE_EDGE_NONE, "auto");
+    this.setValue(YogaValueKind.Width, NATIVE_EDGE_NONE2, "auto");
   }
   getWidth() {
-    return this.getValue(YogaValueKind.Width, NATIVE_EDGE_NONE);
+    return this.getValue(YogaValueKind.Width, NATIVE_EDGE_NONE2);
   }
   setHeight(height) {
-    this.setValue(YogaValueKind.Height, NATIVE_EDGE_NONE, height);
+    this.setValue(YogaValueKind.Height, NATIVE_EDGE_NONE2, height);
   }
   setHeightPercent(height) {
-    this.setValue(YogaValueKind.Height, NATIVE_EDGE_NONE, height === undefined ? undefined : { unit: Unit.Percent, value: height });
+    this.setValue(YogaValueKind.Height, NATIVE_EDGE_NONE2, height === undefined ? undefined : { unit: Unit2.Percent, value: height });
   }
   setHeightAuto() {
-    this.setValue(YogaValueKind.Height, NATIVE_EDGE_NONE, "auto");
+    this.setValue(YogaValueKind.Height, NATIVE_EDGE_NONE2, "auto");
   }
   getHeight() {
-    return this.getValue(YogaValueKind.Height, NATIVE_EDGE_NONE);
+    return this.getValue(YogaValueKind.Height, NATIVE_EDGE_NONE2);
   }
   setMinWidth(minWidth) {
-    this.setValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE, minWidth);
+    this.setValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE2, minWidth);
   }
   setMinWidthPercent(minWidth) {
-    this.setValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE, minWidth === undefined ? undefined : { unit: Unit.Percent, value: minWidth });
+    this.setValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE2, minWidth === undefined ? undefined : { unit: Unit2.Percent, value: minWidth });
   }
   getMinWidth() {
-    return this.getValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE);
+    return this.getValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE2);
   }
   setMinHeight(minHeight) {
-    this.setValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE, minHeight);
+    this.setValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE2, minHeight);
   }
   setMinHeightPercent(minHeight) {
-    this.setValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE, minHeight === undefined ? undefined : { unit: Unit.Percent, value: minHeight });
+    this.setValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE2, minHeight === undefined ? undefined : { unit: Unit2.Percent, value: minHeight });
   }
   getMinHeight() {
-    return this.getValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE);
+    return this.getValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE2);
   }
   setMaxWidth(maxWidth) {
-    this.setValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE, maxWidth);
+    this.setValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE2, maxWidth);
   }
   setMaxWidthPercent(maxWidth) {
-    this.setValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE, maxWidth === undefined ? undefined : { unit: Unit.Percent, value: maxWidth });
+    this.setValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE2, maxWidth === undefined ? undefined : { unit: Unit2.Percent, value: maxWidth });
   }
   getMaxWidth() {
-    return this.getValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE);
+    return this.getValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE2);
   }
   setMaxHeight(maxHeight) {
-    this.setValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE, maxHeight);
+    this.setValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE2, maxHeight);
   }
   setMaxHeightPercent(maxHeight) {
-    this.setValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE, maxHeight === undefined ? undefined : { unit: Unit.Percent, value: maxHeight });
+    this.setValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE2, maxHeight === undefined ? undefined : { unit: Unit2.Percent, value: maxHeight });
   }
   getMaxHeight() {
-    return this.getValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE);
+    return this.getValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE2);
   }
   setMargin(edge, margin) {
     this.setValue(YogaValueKind.Margin, edge, margin);
   }
   setMarginPercent(edge, margin) {
-    this.setValue(YogaValueKind.Margin, edge, margin === undefined ? undefined : { unit: Unit.Percent, value: margin });
+    this.setValue(YogaValueKind.Margin, edge, margin === undefined ? undefined : { unit: Unit2.Percent, value: margin });
   }
   setMarginAuto(edge) {
     this.setValue(YogaValueKind.Margin, edge, "auto");
@@ -12877,7 +12888,7 @@ class Node {
     this.setValue(YogaValueKind.Padding, edge, padding);
   }
   setPaddingPercent(edge, padding) {
-    this.setValue(YogaValueKind.Padding, edge, padding === undefined ? undefined : { unit: Unit.Percent, value: padding });
+    this.setValue(YogaValueKind.Padding, edge, padding === undefined ? undefined : { unit: Unit2.Percent, value: padding });
   }
   getPadding(edge) {
     return this.getValue(YogaValueKind.Padding, edge);
@@ -12886,7 +12897,7 @@ class Node {
     this.setValue(YogaValueKind.Position, edge, position);
   }
   setPositionPercent(edge, position) {
-    this.setValue(YogaValueKind.Position, edge, position === undefined ? undefined : { unit: Unit.Percent, value: position });
+    this.setValue(YogaValueKind.Position, edge, position === undefined ? undefined : { unit: Unit2.Percent, value: position });
   }
   setPositionAuto(edge) {
     this.setValue(YogaValueKind.Position, edge, "auto");
@@ -12898,7 +12909,7 @@ class Node {
     this.setValue(YogaValueKind.Gap, gutter, gap);
   }
   setGapPercent(gutter, gap) {
-    this.setValue(YogaValueKind.Gap, gutter, gap === undefined ? undefined : { unit: Unit.Percent, value: gap });
+    this.setValue(YogaValueKind.Gap, gutter, gap === undefined ? undefined : { unit: Unit2.Percent, value: gap });
   }
   getGap(gutter) {
     return this.getValue(YogaValueKind.Gap, gutter);
@@ -13031,12636 +13042,102 @@ class Node {
   }
 }
 var Yoga = {
-  Config,
-  Node,
-  Align,
-  BoxSizing,
-  Dimension,
-  Direction,
-  Display,
-  Edge,
-  Errata,
-  ExperimentalFeature,
-  FlexDirection,
-  Gutter,
-  Justify,
-  LogLevel: LogLevel2,
-  MeasureMode,
-  NodeType,
-  Overflow,
-  PositionType,
-  Unit,
-  Wrap,
-  ALIGN_AUTO,
-  ALIGN_FLEX_START,
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
-  ALIGN_STRETCH,
-  ALIGN_BASELINE,
-  ALIGN_SPACE_BETWEEN,
-  ALIGN_SPACE_AROUND,
-  ALIGN_SPACE_EVENLY,
-  BOX_SIZING_BORDER_BOX,
-  BOX_SIZING_CONTENT_BOX,
-  DIMENSION_WIDTH,
-  DIMENSION_HEIGHT,
-  DIRECTION_INHERIT,
-  DIRECTION_LTR,
-  DIRECTION_RTL,
-  DISPLAY_FLEX,
-  DISPLAY_NONE,
-  DISPLAY_CONTENTS,
-  EDGE_LEFT,
-  EDGE_TOP,
-  EDGE_RIGHT,
-  EDGE_BOTTOM,
-  EDGE_START,
-  EDGE_END,
-  EDGE_HORIZONTAL,
-  EDGE_VERTICAL,
-  EDGE_ALL,
-  ERRATA_NONE,
-  ERRATA_STRETCH_FLEX_BASIS,
-  ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING,
-  ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE,
-  ERRATA_ALL,
-  ERRATA_CLASSIC,
-  EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS,
-  FLEX_DIRECTION_COLUMN,
-  FLEX_DIRECTION_COLUMN_REVERSE,
-  FLEX_DIRECTION_ROW,
-  FLEX_DIRECTION_ROW_REVERSE,
-  GUTTER_COLUMN,
-  GUTTER_ROW,
-  GUTTER_ALL,
-  JUSTIFY_FLEX_START,
-  JUSTIFY_CENTER,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_SPACE_AROUND,
-  JUSTIFY_SPACE_EVENLY,
-  LOG_LEVEL_ERROR,
-  LOG_LEVEL_WARN,
-  LOG_LEVEL_INFO,
-  LOG_LEVEL_DEBUG,
-  LOG_LEVEL_VERBOSE,
-  LOG_LEVEL_FATAL,
-  MEASURE_MODE_UNDEFINED,
-  MEASURE_MODE_EXACTLY,
-  MEASURE_MODE_AT_MOST,
-  NODE_TYPE_DEFAULT,
-  NODE_TYPE_TEXT,
-  OVERFLOW_VISIBLE,
-  OVERFLOW_HIDDEN,
-  OVERFLOW_SCROLL,
-  POSITION_TYPE_STATIC,
-  POSITION_TYPE_RELATIVE,
-  POSITION_TYPE_ABSOLUTE,
-  UNIT_UNDEFINED,
-  UNIT_POINT,
-  UNIT_PERCENT,
-  UNIT_AUTO,
-  WRAP_NO_WRAP,
-  WRAP_WRAP,
-  WRAP_WRAP_REVERSE
+  Config: Config2,
+  Node: Node2,
+  Align: Align2,
+  BoxSizing: BoxSizing2,
+  Dimension: Dimension2,
+  Direction: Direction2,
+  Display: Display2,
+  Edge: Edge2,
+  Errata: Errata2,
+  ExperimentalFeature: ExperimentalFeature2,
+  FlexDirection: FlexDirection2,
+  Gutter: Gutter2,
+  Justify: Justify2,
+  LogLevel: LogLevel3,
+  MeasureMode: MeasureMode2,
+  NodeType: NodeType2,
+  Overflow: Overflow2,
+  PositionType: PositionType2,
+  Unit: Unit2,
+  Wrap: Wrap2,
+  ALIGN_AUTO: ALIGN_AUTO2,
+  ALIGN_FLEX_START: ALIGN_FLEX_START2,
+  ALIGN_CENTER: ALIGN_CENTER2,
+  ALIGN_FLEX_END: ALIGN_FLEX_END2,
+  ALIGN_STRETCH: ALIGN_STRETCH2,
+  ALIGN_BASELINE: ALIGN_BASELINE2,
+  ALIGN_SPACE_BETWEEN: ALIGN_SPACE_BETWEEN2,
+  ALIGN_SPACE_AROUND: ALIGN_SPACE_AROUND2,
+  ALIGN_SPACE_EVENLY: ALIGN_SPACE_EVENLY2,
+  BOX_SIZING_BORDER_BOX: BOX_SIZING_BORDER_BOX2,
+  BOX_SIZING_CONTENT_BOX: BOX_SIZING_CONTENT_BOX2,
+  DIMENSION_WIDTH: DIMENSION_WIDTH2,
+  DIMENSION_HEIGHT: DIMENSION_HEIGHT2,
+  DIRECTION_INHERIT: DIRECTION_INHERIT2,
+  DIRECTION_LTR: DIRECTION_LTR2,
+  DIRECTION_RTL: DIRECTION_RTL2,
+  DISPLAY_FLEX: DISPLAY_FLEX2,
+  DISPLAY_NONE: DISPLAY_NONE2,
+  DISPLAY_CONTENTS: DISPLAY_CONTENTS2,
+  EDGE_LEFT: EDGE_LEFT2,
+  EDGE_TOP: EDGE_TOP2,
+  EDGE_RIGHT: EDGE_RIGHT2,
+  EDGE_BOTTOM: EDGE_BOTTOM2,
+  EDGE_START: EDGE_START2,
+  EDGE_END: EDGE_END2,
+  EDGE_HORIZONTAL: EDGE_HORIZONTAL2,
+  EDGE_VERTICAL: EDGE_VERTICAL2,
+  EDGE_ALL: EDGE_ALL2,
+  ERRATA_NONE: ERRATA_NONE2,
+  ERRATA_STRETCH_FLEX_BASIS: ERRATA_STRETCH_FLEX_BASIS2,
+  ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING: ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2,
+  ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE: ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2,
+  ERRATA_ALL: ERRATA_ALL2,
+  ERRATA_CLASSIC: ERRATA_CLASSIC2,
+  EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS: EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2,
+  FLEX_DIRECTION_COLUMN: FLEX_DIRECTION_COLUMN2,
+  FLEX_DIRECTION_COLUMN_REVERSE: FLEX_DIRECTION_COLUMN_REVERSE2,
+  FLEX_DIRECTION_ROW: FLEX_DIRECTION_ROW2,
+  FLEX_DIRECTION_ROW_REVERSE: FLEX_DIRECTION_ROW_REVERSE2,
+  GUTTER_COLUMN: GUTTER_COLUMN2,
+  GUTTER_ROW: GUTTER_ROW2,
+  GUTTER_ALL: GUTTER_ALL2,
+  JUSTIFY_FLEX_START: JUSTIFY_FLEX_START2,
+  JUSTIFY_CENTER: JUSTIFY_CENTER2,
+  JUSTIFY_FLEX_END: JUSTIFY_FLEX_END2,
+  JUSTIFY_SPACE_BETWEEN: JUSTIFY_SPACE_BETWEEN2,
+  JUSTIFY_SPACE_AROUND: JUSTIFY_SPACE_AROUND2,
+  JUSTIFY_SPACE_EVENLY: JUSTIFY_SPACE_EVENLY2,
+  LOG_LEVEL_ERROR: LOG_LEVEL_ERROR2,
+  LOG_LEVEL_WARN: LOG_LEVEL_WARN2,
+  LOG_LEVEL_INFO: LOG_LEVEL_INFO2,
+  LOG_LEVEL_DEBUG: LOG_LEVEL_DEBUG2,
+  LOG_LEVEL_VERBOSE: LOG_LEVEL_VERBOSE2,
+  LOG_LEVEL_FATAL: LOG_LEVEL_FATAL2,
+  MEASURE_MODE_UNDEFINED: MEASURE_MODE_UNDEFINED2,
+  MEASURE_MODE_EXACTLY: MEASURE_MODE_EXACTLY2,
+  MEASURE_MODE_AT_MOST: MEASURE_MODE_AT_MOST2,
+  NODE_TYPE_DEFAULT: NODE_TYPE_DEFAULT2,
+  NODE_TYPE_TEXT: NODE_TYPE_TEXT2,
+  OVERFLOW_VISIBLE: OVERFLOW_VISIBLE2,
+  OVERFLOW_HIDDEN: OVERFLOW_HIDDEN2,
+  OVERFLOW_SCROLL: OVERFLOW_SCROLL2,
+  POSITION_TYPE_STATIC: POSITION_TYPE_STATIC2,
+  POSITION_TYPE_RELATIVE: POSITION_TYPE_RELATIVE2,
+  POSITION_TYPE_ABSOLUTE: POSITION_TYPE_ABSOLUTE2,
+  UNIT_UNDEFINED: UNIT_UNDEFINED2,
+  UNIT_POINT: UNIT_POINT2,
+  UNIT_PERCENT: UNIT_PERCENT2,
+  UNIT_AUTO: UNIT_AUTO2,
+  WRAP_NO_WRAP: WRAP_NO_WRAP2,
+  WRAP_WRAP: WRAP_WRAP2,
+  WRAP_WRAP_REVERSE: WRAP_WRAP_REVERSE2
 };
 var yoga_default = Yoga;
 
-// src/lib/border.ts
-var VALID_BORDER_STYLES = ["single", "double", "rounded", "heavy"];
-function isValidBorderStyle(value) {
-  return typeof value === "string" && VALID_BORDER_STYLES.includes(value);
-}
-function parseBorderStyle(value, fallback = "single") {
-  if (isValidBorderStyle(value)) {
-    return value;
-  }
-  if (value !== undefined && value !== null) {
-    console.warn(`Invalid borderStyle "${value}", falling back to "${fallback}". Valid values are: ${VALID_BORDER_STYLES.join(", ")}`);
-  }
-  return fallback;
-}
-var BorderChars = {
-  single: {
-    topLeft: "\u250C",
-    topRight: "\u2510",
-    bottomLeft: "\u2514",
-    bottomRight: "\u2518",
-    horizontal: "\u2500",
-    vertical: "\u2502",
-    topT: "\u252C",
-    bottomT: "\u2534",
-    leftT: "\u251C",
-    rightT: "\u2524",
-    cross: "\u253C"
-  },
-  double: {
-    topLeft: "\u2554",
-    topRight: "\u2557",
-    bottomLeft: "\u255A",
-    bottomRight: "\u255D",
-    horizontal: "\u2550",
-    vertical: "\u2551",
-    topT: "\u2566",
-    bottomT: "\u2569",
-    leftT: "\u2560",
-    rightT: "\u2563",
-    cross: "\u256C"
-  },
-  rounded: {
-    topLeft: "\u256D",
-    topRight: "\u256E",
-    bottomLeft: "\u2570",
-    bottomRight: "\u256F",
-    horizontal: "\u2500",
-    vertical: "\u2502",
-    topT: "\u252C",
-    bottomT: "\u2534",
-    leftT: "\u251C",
-    rightT: "\u2524",
-    cross: "\u253C"
-  },
-  heavy: {
-    topLeft: "\u250F",
-    topRight: "\u2513",
-    bottomLeft: "\u2517",
-    bottomRight: "\u251B",
-    horizontal: "\u2501",
-    vertical: "\u2503",
-    topT: "\u2533",
-    bottomT: "\u253B",
-    leftT: "\u2523",
-    rightT: "\u252B",
-    cross: "\u254B"
-  }
-};
-function getBorderFromSides(sides) {
-  const result = [];
-  if (sides.top)
-    result.push("top");
-  if (sides.right)
-    result.push("right");
-  if (sides.bottom)
-    result.push("bottom");
-  if (sides.left)
-    result.push("left");
-  return result.length > 0 ? result : false;
-}
-function getBorderSides(border) {
-  return border === true ? { top: true, right: true, bottom: true, left: true } : Array.isArray(border) ? {
-    top: border.includes("top"),
-    right: border.includes("right"),
-    bottom: border.includes("bottom"),
-    left: border.includes("left")
-  } : { top: false, right: false, bottom: false, left: false };
-}
-function borderCharsToArray(chars) {
-  const array = new Uint32Array(11);
-  array[0] = chars.topLeft.codePointAt(0) ?? 32;
-  array[1] = chars.topRight.codePointAt(0) ?? 32;
-  array[2] = chars.bottomLeft.codePointAt(0) ?? 32;
-  array[3] = chars.bottomRight.codePointAt(0) ?? 32;
-  array[4] = chars.horizontal.codePointAt(0) ?? 32;
-  array[5] = chars.vertical.codePointAt(0) ?? 32;
-  array[6] = chars.topT.codePointAt(0) ?? 32;
-  array[7] = chars.bottomT.codePointAt(0) ?? 32;
-  array[8] = chars.leftT.codePointAt(0) ?? 32;
-  array[9] = chars.rightT.codePointAt(0) ?? 32;
-  array[10] = chars.cross.codePointAt(0) ?? 32;
-  return array;
-}
-var BorderCharArrays = {
-  single: borderCharsToArray(BorderChars.single),
-  double: borderCharsToArray(BorderChars.double),
-  rounded: borderCharsToArray(BorderChars.rounded),
-  heavy: borderCharsToArray(BorderChars.heavy)
-};
+export { nativeLayouts, nativeConstants, toArrayBuffer, singleton, getSingleton, destroySingleton, envRegistry2, registerEnvVar2, clearEnvCache2, generateEnvMarkdown2, generateEnvColored2, env2, stringWidth, resolveBundledFilePath2, Worker, TextAttributes2, ATTRIBUTE_BASE_BITS2, ATTRIBUTE_BASE_MASK2, getBaseAttributes2, DebugOverlayCorner2, TargetChannel2, DEFAULT_FOREGROUND_RGB2, DEFAULT_BACKGROUND_RGB2, normalizeIndexedColorIndex2, ansi256IndexToRgb2, RGBA2, normalizeColorValue2, hexToRgb2, rgbToHex2, hsvToRgb2, parseColor2, createTextAttributes2, attributesWithLink2, getLinkId2, visualizeRenderableTree2, isStyledText2, StyledText2, stringToStyledText2, black2, red2, green2, yellow2, blue2, magenta2, cyan2, white2, brightBlack2, brightRed2, brightGreen2, brightYellow2, brightBlue2, brightMagenta2, brightCyan2, brightWhite2, bgBlack2, bgRed2, bgGreen2, bgYellow2, bgBlue2, bgMagenta2, bgCyan2, bgWhite2, bold2, italic2, underline2, strikethrough2, dim2, reverse2, blink2, fg2, bg2, link2, t2, YogaEnumKind, YogaFloatKind, YogaValueKind, sceneSetEnum, sceneGetEnum, sceneSetFloat, sceneGetFloat, sceneSetValue, sceneGetValue, sceneSetDimension, UNDEFINED_VALUE, parseYogaValue, SpanInfoStruct, NativeAudioStreamFormat2, NativeAudioStreamState2, NativeAudioStreamStateNames, NativeAudioStreamCloseReason2, isBunfsPath, normalizeBunfsPath, resolveDefaultParserAsset, resolveDefaultTreeSitterWorkerPath, resolveTreeSitterWasm, NativeAudioStreamState3, NativeAudioStreamCloseReason3, NativeAudioStreamFormat3, MAX_LINK_URL_BYTES2, NativeTextViewCommand2, NativeEditCommand2, NativeEditPositionQuery2, NativeEditorStyleMask2, NativeEditHighlightOperation2, NativeEditorCommand2, NativeEditorSelectionOperation2, NativeEditorPositionQuery2, NativeEditEvent2, NativeStyleGroup, NativeStyleFlags, NATIVE_EDGE_NONE2, NativeBorder2, NativeSceneHook2, NativeSceneFrame2, NativeScenePaintPhase2, emptySceneScrollState, NATIVE_BUFFER_TEXT_BYTES_MAX2, NativeSessionState2, NativeSessionRenderStatus2, NATIVE_SESSION_CONTROL_PACKET_BYTES2, NativeSessionTerminalPhase2, NativeSessionPumpStatus2, NativeStatus2, NativeError2, NativeClipboardOperationStatus2, NativeClipboardStartStatus2, NativeClipboardCancelStatus2, NativeClipboardCopyStatus2, NativeClipboardDestroyStatus2, NativeClipboardShutdownStatus2, SceneStaging, NativePaintRecorder, LogLevel2, FFIRenderLib2, setRenderLibPath2, resolveRenderLib2, Align2, BoxSizing2, Dimension2, Direction2, Display2, Edge2, Errata2, ExperimentalFeature2, FlexDirection2, Gutter2, Justify2, LogLevel3, MeasureMode2, NodeType2, Overflow2, PositionType2, Unit2, Wrap2, ALIGN_AUTO2, ALIGN_FLEX_START2, ALIGN_CENTER2, ALIGN_FLEX_END2, ALIGN_STRETCH2, ALIGN_BASELINE2, ALIGN_SPACE_BETWEEN2, ALIGN_SPACE_AROUND2, ALIGN_SPACE_EVENLY2, BOX_SIZING_BORDER_BOX2, BOX_SIZING_CONTENT_BOX2, DIMENSION_WIDTH2, DIMENSION_HEIGHT2, DIRECTION_INHERIT2, DIRECTION_LTR2, DIRECTION_RTL2, DISPLAY_FLEX2, DISPLAY_NONE2, DISPLAY_CONTENTS2, EDGE_LEFT2, EDGE_TOP2, EDGE_RIGHT2, EDGE_BOTTOM2, EDGE_START2, EDGE_END2, EDGE_HORIZONTAL2, EDGE_VERTICAL2, EDGE_ALL2, ERRATA_NONE2, ERRATA_STRETCH_FLEX_BASIS2, ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2, ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2, ERRATA_ALL2, ERRATA_CLASSIC2, EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2, FLEX_DIRECTION_COLUMN2, FLEX_DIRECTION_COLUMN_REVERSE2, FLEX_DIRECTION_ROW2, FLEX_DIRECTION_ROW_REVERSE2, GUTTER_COLUMN2, GUTTER_ROW2, GUTTER_ALL2, JUSTIFY_FLEX_START2, JUSTIFY_CENTER2, JUSTIFY_FLEX_END2, JUSTIFY_SPACE_BETWEEN2, JUSTIFY_SPACE_AROUND2, JUSTIFY_SPACE_EVENLY2, LOG_LEVEL_ERROR2, LOG_LEVEL_WARN2, LOG_LEVEL_INFO2, LOG_LEVEL_DEBUG2, LOG_LEVEL_VERBOSE2, LOG_LEVEL_FATAL2, MEASURE_MODE_UNDEFINED2, MEASURE_MODE_EXACTLY2, MEASURE_MODE_AT_MOST2, NODE_TYPE_DEFAULT2, NODE_TYPE_TEXT2, OVERFLOW_VISIBLE2, OVERFLOW_HIDDEN2, OVERFLOW_SCROLL2, POSITION_TYPE_STATIC2, POSITION_TYPE_RELATIVE2, POSITION_TYPE_ABSOLUTE2, UNIT_UNDEFINED2, UNIT_POINT2, UNIT_PERCENT2, UNIT_AUTO2, WRAP_NO_WRAP2, WRAP_WRAP2, WRAP_WRAP_REVERSE2, YogaStatus2, YogaError2, Config2, Node2, exports_yoga, yoga_default };
 
-// src/lib/KeyHandler.ts
-import { EventEmitter } from "events";
-
-class KeyEvent {
-  name;
-  ctrl;
-  meta;
-  shift;
-  option;
-  sequence;
-  number;
-  raw;
-  eventType;
-  source;
-  code;
-  super;
-  hyper;
-  capsLock;
-  numLock;
-  baseCode;
-  repeated;
-  _defaultPrevented = false;
-  _propagationStopped = false;
-  constructor(key) {
-    this.name = key.name;
-    this.ctrl = key.ctrl;
-    this.meta = key.meta;
-    this.shift = key.shift;
-    this.option = key.option;
-    this.sequence = key.sequence;
-    this.number = key.number;
-    this.raw = key.raw;
-    this.eventType = key.eventType;
-    this.source = key.source;
-    this.code = key.code;
-    this.super = key.super;
-    this.hyper = key.hyper;
-    this.capsLock = key.capsLock;
-    this.numLock = key.numLock;
-    this.baseCode = key.baseCode;
-    this.repeated = key.repeated;
-  }
-  get defaultPrevented() {
-    return this._defaultPrevented;
-  }
-  get propagationStopped() {
-    return this._propagationStopped;
-  }
-  preventDefault() {
-    this._defaultPrevented = true;
-  }
-  stopPropagation() {
-    this._propagationStopped = true;
-  }
-}
-
-class PasteEvent {
-  type = "paste";
-  bytes;
-  metadata;
-  _defaultPrevented = false;
-  _propagationStopped = false;
-  constructor(bytes, metadata) {
-    this.bytes = bytes;
-    this.metadata = metadata;
-  }
-  get defaultPrevented() {
-    return this._defaultPrevented;
-  }
-  get propagationStopped() {
-    return this._propagationStopped;
-  }
-  preventDefault() {
-    this._defaultPrevented = true;
-  }
-  stopPropagation() {
-    this._propagationStopped = true;
-  }
-}
-
-class KeyHandler extends EventEmitter {
-  processParsedKey(parsedKey) {
-    try {
-      switch (parsedKey.eventType) {
-        case "press":
-          this.emit("keypress", new KeyEvent(parsedKey));
-          break;
-        case "release":
-          this.emit("keyrelease", new KeyEvent(parsedKey));
-          break;
-        default:
-          this.emit("keypress", new KeyEvent(parsedKey));
-          break;
-      }
-    } catch (error) {
-      console.error(`[KeyHandler] Error processing parsed key:`, error);
-      return true;
-    }
-    return true;
-  }
-  processPaste(bytes, metadata) {
-    try {
-      this.emit("paste", new PasteEvent(bytes, metadata));
-    } catch (error) {
-      console.error(`[KeyHandler] Error processing paste:`, error);
-    }
-  }
-}
-
-class InternalKeyHandler extends KeyHandler {
-  renderableHandlers = new Map;
-  emit(event, ...args) {
-    return this.emitWithPriority(event, ...args);
-  }
-  emitWithPriority(event, ...args) {
-    let hasGlobalListeners = false;
-    const globalListeners = this.listeners(event);
-    if (globalListeners.length > 0) {
-      hasGlobalListeners = true;
-      for (const listener of globalListeners) {
-        try {
-          listener(...args);
-        } catch (error) {
-          console.error(`[KeyHandler] Error in global ${event} handler:`, error);
-        }
-        if (event === "keypress" || event === "keyrelease" || event === "paste") {
-          const keyEvent = args[0];
-          if (keyEvent.propagationStopped) {
-            return hasGlobalListeners;
-          }
-        }
-      }
-    }
-    const renderableSet = this.renderableHandlers.get(event);
-    const renderableHandlers = renderableSet && renderableSet.size > 0 ? [...renderableSet] : [];
-    let hasRenderableListeners = false;
-    if (renderableSet && renderableSet.size > 0) {
-      hasRenderableListeners = true;
-      if (event === "keypress" || event === "keyrelease" || event === "paste") {
-        const keyEvent = args[0];
-        if (keyEvent.defaultPrevented)
-          return hasGlobalListeners || hasRenderableListeners;
-        if (keyEvent.propagationStopped)
-          return hasGlobalListeners || hasRenderableListeners;
-      }
-      for (const handler of renderableHandlers) {
-        try {
-          handler(...args);
-        } catch (error) {
-          console.error(`[KeyHandler] Error in renderable ${event} handler:`, error);
-        }
-        if (event === "keypress" || event === "keyrelease" || event === "paste") {
-          const keyEvent = args[0];
-          if (keyEvent.propagationStopped) {
-            return hasGlobalListeners || hasRenderableListeners;
-          }
-        }
-      }
-    }
-    return hasGlobalListeners || hasRenderableListeners;
-  }
-  onInternal(event, handler) {
-    if (!this.renderableHandlers.has(event)) {
-      this.renderableHandlers.set(event, new Set);
-    }
-    this.renderableHandlers.get(event).add(handler);
-  }
-  offInternal(event, handler) {
-    const handlers = this.renderableHandlers.get(event);
-    if (handlers) {
-      handlers.delete(handler);
-    }
-  }
-}
-// src/lib/fonts/block.json
-var block_default = {
-  name: "block",
-  version: "0.2.0",
-  homepage: "https://github.com/dominikwilkowski/cfonts",
-  colors: 2,
-  lines: 6,
-  buffer: ["", "", "", "", "", ""],
-  letterspace: [" ", " ", " ", " ", " ", " "],
-  letterspace_size: 1,
-  chars: {
-    A: [
-      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2> ",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
-    ],
-    B: [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    C: [
-      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
-    ],
-    D: [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    E: [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557  </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u255D  </c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
-    ],
-    F: [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557  </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u255D  </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
-      "<c2>\u255A\u2550\u255D     </c2>"
-    ],
-    G: [
-      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    H: [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
-    ],
-    I: [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u255D</c2>"
-    ],
-    J: [
-      "<c1>     \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>     \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>     \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    K: [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1> \u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
-    ],
-    L: [
-      "<c1>\u2588\u2588</c1><c2>\u2557     </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
-    ],
-    M: [
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551\u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551 \u255A\u2550\u255D</c2><c1> \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u255D     \u255A\u2550\u255D</c2>"
-    ],
-    N: [
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551 \u255A</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u255D  \u255A\u2550\u2550\u2550\u255D</c2>"
-    ],
-    O: [
-      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    P: [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u255D </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
-      "<c2>\u255A\u2550\u255D     </c2>"
-    ],
-    Q: [
-      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2584\u2584 \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550</c2><c1>\u2580\u2580</c1><c2>\u2550\u255D </c2>"
-    ],
-    R: [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
-    ],
-    S: [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
-    ],
-    T: [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u255D</c2>",
-      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
-      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
-      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
-      "<c2>   \u255A\u2550\u255D   </c2>"
-    ],
-    U: [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    V: [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
-      "<c2>  \u255A\u2550\u2550\u2550\u255D  </c2>"
-    ],
-    W: [
-      "<c1>\u2588\u2588</c1><c2>\u2557    </c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551    </c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1> \u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588\u2588</c1><c2>\u2557</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u255D\u255A\u2550\u2550\u255D </c2>"
-    ],
-    X: [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A</c2><c1>\u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
-      " <c1>\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u255D</c2><c1> \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
-    ],
-    Y: [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
-      "<c2>  \u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D  </c2>",
-      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
-      "<c2>   \u255A\u2550\u255D   </c2>"
-    ],
-    Z: [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550</c2><c1>\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>  \u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
-      " <c1>\u2588\u2588\u2588</c1><c2>\u2554\u255D  </c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
-    ],
-    "0": [
-      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    "1": [
-      " <c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      " <c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      " <c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2> \u255A\u2550\u255D</c2>"
-    ],
-    "2": [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u255D </c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
-    ],
-    "3": [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    "4": [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>     \u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>     \u255A\u2550\u255D</c2>"
-    ],
-    "5": [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
-    ],
-    "6": [
-      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D </c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    "7": [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>    \u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>   \u2588\u2588</c1><c2>\u2554\u255D </c2>",
-      "<c1>   \u2588\u2588</c1><c2>\u2551  </c2>",
-      "<c2>   \u255A\u2550\u255D  </c2>"
-    ],
-    "8": [
-      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    "9": [
-      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2> \u255A\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u2550\u2550\u2550\u255D </c2>"
-    ],
-    "!": [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550\u255D</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u255D</c2>"
-    ],
-    "?": [
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>  \u2584\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>  \u2580\u2580</c1><c2>\u2550\u2550\u255D </c2>",
-      "<c1>  \u2588\u2588</c1><c2>\u2557   </c2>",
-      "<c2>  \u255A\u2550\u255D   </c2>"
-    ],
-    ".": ["   ", "   ", "   ", "   ", "<c1>\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u255D</c2>"],
-    "+": [
-      "       ",
-      "<c1>  \u2588\u2588</c1><c2>\u2557  </c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2> \u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550\u255D</c2>",
-      "<c2>  \u255A\u2550\u255D  </c2>",
-      "       "
-    ],
-    "-": ["      ", "      ", "<c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u2550\u2550\u2550\u255D</c2>", "      ", "      "],
-    _: ["        ", "        ", "        ", "        ", "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"],
-    "=": [
-      "       ",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D</c2>",
-      "       "
-    ],
-    "@": [
-      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A</c2><c1>\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u255D\u255A\u2550\u2550\u2550\u255D </c2>"
-    ],
-    "#": [
-      " <c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2> \u255A\u2550\u255D \u255A\u2550\u255D </c2>"
-    ],
-    $: [
-      "<c1>\u2584\u2584\u2588\u2588\u2588\u2584\u2584</c1><c2>\xB7</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c2>\u255A\u2550</c2><c1>\u2580\u2580\u2580</c1><c2>\u2550\u2550\u255D</c2>"
-    ],
-    "%": [
-      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u255D</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>  \u2588\u2588</c1><c2>\u2554\u255D </c2>",
-      " <c1>\u2588\u2588</c1><c2>\u2554\u255D  </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u255D</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2>\u255A\u2550\u255D \u255A\u2550\u255D</c2>"
-    ],
-    "&": [
-      "<c1>   \u2588\u2588</c1><c2>\u2557   </c2>",
-      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550\u255D</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551  </c2>",
-      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D  </c2>"
-    ],
-    "(": [
-      " <c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2551 ",
-      "<c1>\u2588\u2588</c1><c2>\u2551 ",
-      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      "<c2> \u255A\u2550\u255D</c2>"
-    ],
-    ")": [
-      "<c1>\u2588\u2588</c1><c2>\u2557 </c2>",
-      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
-      " <c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      " <c1>\u2588\u2588</c1><c2>\u2551</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c2>\u255A\u2550\u255D </c2>"
-    ],
-    "/": [
-      "<c1>    \u2588\u2588</c1><c2>\u2557</c2>",
-      "<c1>   \u2588\u2588</c1><c2>\u2554\u255D</c2>",
-      "<c1>  \u2588\u2588</c1><c2>\u2554\u255D </c2>",
-      " <c1>\u2588\u2588</c1><c2>\u2554\u255D  </c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2554\u255D   </c2>",
-      "<c2>\u255A\u2550\u255D    </c2>"
-    ],
-    ":": ["   ", "<c1>\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u255D</c2>", "<c1>\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u255D</c2>", "   "],
-    ";": ["   ", "   ", "<c1>\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u255D</c2>", "<c1>\u2584\u2588</c1><c2>\u2557</c2>", "<c1>\u2580</c1><c2>\u2550\u255D</c2>"],
-    ",": ["   ", "   ", "   ", "   ", "<c1>\u2584\u2588</c1><c2>\u2557</c2>", "<c1>\u2580</c1><c2>\u2550\u255D</c2>"],
-    "'": ["<c1>\u2588</c1><c2>\u2557</c2> ", "<c2>\u255A\u255D</c2> ", "   ", "   ", "   ", "   "],
-    '"': ["<c1>\u2588</c1><c2>\u2557</c2><c1>\u2588</c1><c2>\u2557</c2> ", "<c2>\u255A\u255D\u255A\u255D</c2> ", "     ", "     ", "     ", "     "],
-    " ": ["   ", "   ", "   ", "   ", "   ", "   "]
-  }
-};
-// src/lib/fonts/shade.json
-var shade_default = {
-  name: "shade",
-  version: "0.2.0",
-  homepage: "https://github.com/dominikwilkowski/cfonts",
-  colors: 2,
-  lines: 8,
-  buffer: ["", "", "", "", "", "", "", ""],
-  letterspace: [
-    "<c2>\u2591</c2>",
-    "<c2>\u2591</c2>",
-    "<c2>\u2591</c2>",
-    "<c2>\u2591</c2>",
-    "<c2>\u2591</c2>",
-    "<c2>\u2591</c2>",
-    "<c2>\u2591</c2>",
-    "<c2>\u2591</c2>"
-  ],
-  letterspace_size: 1,
-  chars: {
-    A: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c2>\u2591\u2591</c2> ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    B: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "   <c2>\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    C: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "<c1>\u2588</c1>   ",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    D: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "   <c2>\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    E: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "<c1>\u2588</c1>   ",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588</c1>  <c2>\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    F: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "<c1>\u2588</c1>   ",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588</c1>  <c2>\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      " <c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    G: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
-      "<c1>\u2588</c1>   ",
-      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591</c2> <c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "   <c2>\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    H: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c2>\u2591\u2591</c2> ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    I: [
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1>",
-      " <c1>\u2588</c1> ",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1>",
-      "   ",
-      "<c2>\u2591\u2591\u2591</c2>"
-    ],
-    J: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "  <c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "   <c2>\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    K: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c2>\u2591\u2591</c2> ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    L: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    M: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c2>\u2591\u2591</c2> ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    N: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588\u2588</c1><c2>\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588 \u2588\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591</c2> <c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c2>\u2591\u2591</c2> ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    O: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c1>\u2588\u2588</c1> ",
-      "<c2>\u2591  \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    P: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "<c1>\u2588</c1>  <c2>\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      " <c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    Q: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c1>\u2588\u2588\u2588</c1>",
-      "<c2>\u2591</c2>   ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    R: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c2>\u2591\u2591</c2> ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    S: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
-      "<c1>\u2588</c1>   ",
-      " <c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2>  <c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "   <c2>\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    T: [
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1>",
-      " <c1>\u2588</c1> ",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591 \u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2>"
-    ],
-    U: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c1>\u2588\u2588</c1> ",
-      "<c2>\u2591  \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    V: [
-      "<c2>\u2591\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1> ",
-      "<c2>\u2591</c2> <c1>\u2588</c1> <c2>\u2591</c2>",
-      "<c2>\u2591\u2591 \u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591\u2591</c2>"
-    ],
-    W: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "<c1>\u2588  \u2588</c1>",
-      " <c2>\u2591\u2591</c2> ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    X: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c1>\u2588\u2588</c1> ",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
-      " <c2>\u2591\u2591</c2> ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    Y: [
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1>",
-      " <c1>\u2588</c1> ",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591 \u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2>"
-    ],
-    Z: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "  <c1>\u2588</c1> ",
-      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
-      "<c1>\u2588</c1> <c2>\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "0": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u258C\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591</c2> <c1>\u2588</c1>",
-      " <c1>\u2588\u2588</c1> ",
-      "<c2>\u2591  \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "1": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588</c1><c2>\u2591\u2591</c2>",
-      " <c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "   <c2>\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "2": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2590\u2588\u2588</c1><c2>\u2591</c2>",
-      "   <c1>\u2588</c1>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
-      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "3": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "   <c1>\u2588</c1>",
-      "<c2>\u2591\u2591</c2><c1>\u2588\u2588</c1>",
-      "<c2>\u2591\u2591</c2> <c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "4": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "   <c1>\u2588</c1>",
-      "<c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c2>\u2591\u2591\u2591</c2> ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "5": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "<c1>\u2588</c1>   ",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "   <c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "   <c2>\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "6": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
-      "<c1>\u2588</c1>   ",
-      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      " <c1>\u2588\u2588</c1> ",
-      "<c2>\u2591  \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "7": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "   <c1>\u2588</c1>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      " <c1>\u2588</c1>  ",
-      "<c1>\u2588</c1> <c2>\u2591\u2591</c2>",
-      " <c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "8": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      " <c1>\u2588\u2588</c1> ",
-      "<c1>\u2588  \u2588</c1>",
-      " <c1>\u2588\u2588</c1> ",
-      "<c2>\u2591  \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "9": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      " <c1>\u2588\u2588\u2588</c1>",
-      "<c2>\u2591</c2>  <c1>\u2588</c1>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
-      "<c2>\u2591\u2591 \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "!": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591  \u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591  \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "?": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2590\u2588\u2588</c1><c2>\u2591</c2>",
-      "   <c1>\u2588</c1>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
-      "<c2>\u2591\u2591 \u2591</c2>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591\u2591 \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    ".": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591\u2591 \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "+": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
-      "<c2>\u2591</c2> <c1>\u2588</c1> ",
-      "<c2>\u2591\u2591 \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "-": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    _: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    "
-    ],
-    "=": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "@": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c1>\u2588  \u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u258C\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1> ",
-      " <c1>\u2588\u2588\u2588</c1>",
-      "    ",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "#": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      " <c1>\u258C\u2590</c1> ",
-      "<c1>\u2588\u2588\u2588\u2588</c1>",
-      " <c1>\u258C\u2590</c1> ",
-      "<c2>\u2591  \u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    $: [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591</c2><c1>\u258C</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
-      "<c1>\u2588 \u2588</c1> ",
-      " <c1>\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591\u2591</c2><c1>\u258C\u2588</c1>",
-      "<c1>\u2588\u2588\u2588</c1> ",
-      "   <c2>\u2591</c2>"
-    ],
-    "%": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1> ",
-      " <c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1>",
-      "<c1>\u2588</c1> <c2>\u2591</c2> ",
-      " <c2>\u2591\u2591\u2591</c2>"
-    ],
-    "&": [
-      "<c2>\u2591\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      "<c1>\u2588\u2588\u2588\u2588\u2588</c1>",
-      "<c1>\u2588  \u2588</c1> ",
-      "<c1>\u2588\u2588\u2588\u2588</c1><c2>\u2591</c2>",
-      "<c2>    </c2> ",
-      "<c2>\u2591\u2591\u2591\u2591\u2591</c2>"
-    ],
-    "(": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
-      "<c1>\u2588</c1> <c2>\u2591\u2591</c2>",
-      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
-      " <c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591</c2> <c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591\u2591 \u2591</c2>"
-    ],
-    ")": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591</c2> <c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591\u2591</c2> <c1>\u2588</c1>",
-      "<c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
-      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
-      "<c2>\u2591 \u2591\u2591</c2>"
-    ],
-    "/": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c1>\u2588</c1> <c2>\u2591\u2591</c2>",
-      " <c2>\u2591\u2591\u2591</c2>"
-    ],
-    ":": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591 \u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591 \u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    ";": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591 \u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>"
-    ],
-    ",": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>"
-    ],
-    "'": [
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591 \u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591</c2>"
-    ],
-    '"': [
-      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
-      "<c2>\u2591 \u2591 \u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>"
-    ],
-    " ": [
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2>",
-      "<c2>\u2591\u2591\u2591</c2>"
-    ]
-  }
-};
-// src/lib/fonts/slick.json
-var slick_default = {
-  name: "slick",
-  version: "0.1.0",
-  homepage: "https://github.com/dominikwilkowski/cfonts",
-  colors: 2,
-  lines: 6,
-  buffer: ["", "", "", "", "", ""],
-  letterspace: ["<c2>\u2571</c2>", "<c2>\u2571</c2>", "<c2>\u2571</c2>", "<c2>\u2571</c2>", "<c2>\u2571</c2>", "<c2>\u2571</c2>"],
-  letterspace_size: 1,
-  chars: {
-    A: [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2570\u256F</c1><c2>\u2571</c2><c1>\u2570\u256F</c1>"
-    ],
-    B: [
-      "<c1>\u256D\u2501\u2501\u256E</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u256D\u256E\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u2570\u256F\u2570\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
-    ],
-    C: [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2570\u256F</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
-    ],
-    D: [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2570\u256E\u256D\u256E\u2503</c1>",
-      "<c2>\u2571</c2><c1>\u2503\u2503\u2503\u2503</c1>",
-      "<c2>\u2571</c2><c1>\u2503\u2503\u2503\u2503</c1>",
-      "<c1>\u256D\u256F\u2570\u256F\u2503</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
-    ],
-    E: ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u2501\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u2501\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    F: [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u2501\u256F</c1>",
-      "<c1>\u2503\u2570\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u2501\u256F</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571\u2571\u2571</c2>",
-      "<c1>\u2570\u256F</c1><c2>\u2571\u2571\u2571</c2>"
-    ],
-    G: [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2570\u256F</c1>",
-      "<c1>\u2503\u2503\u256D\u2501\u256E</c1>",
-      "<c1>\u2503\u2570\u253B\u2501\u2503</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
-    ],
-    H: [
-      "<c1>\u256D\u256E</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2570\u256F</c1><c2>\u2571</c2><c1>\u2570\u256F</c1>"
-    ],
-    I: [
-      "<c1>\u256D\u2501\u2501\u256E</c1>",
-      "<c1>\u2570\u252B\u2523\u256F</c1>",
-      "<c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
-      "<c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u256D\u252B\u2523\u256E</c1>",
-      "<c1>\u2570\u2501\u2501\u256F</c1>"
-    ],
-    J: [
-      "<c2>\u2571\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u256D\u256E\u2503\u2503</c1>",
-      "<c1>\u2503\u2570\u256F\u2503</c1>",
-      "<c1>\u2570\u2501\u2501\u256F</c1>"
-    ],
-    K: [
-      "<c1>\u256D\u256E\u256D\u2501\u256E</c1>",
-      "<c1>\u2503\u2503\u2503\u256D\u256F</c1>",
-      "<c1>\u2503\u2570\u256F\u256F</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u256D\u256E\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u2503\u2503\u2570\u256E</c1>",
-      "<c1>\u2570\u256F\u2570\u2501\u256F</c1>"
-    ],
-    L: [
-      "<c1>\u256D\u256E</c1><c2>\u2571\u2571\u2571</c2>",
-      "<c1>\u2503\u2503</c1><c2>\u2571\u2571\u2571</c2>",
-      "<c1>\u2503\u2503</c1><c2>\u2571\u2571\u2571</c2>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
-    ],
-    M: [
-      "<c1>\u256D\u2501\u256E\u256D\u2501\u256E</c1>",
-      "<c1>\u2503\u2503\u2570\u256F\u2503\u2503</c1>",
-      "<c1>\u2503\u256D\u256E\u256D\u256E\u2503</c1>",
-      "<c1>\u2503\u2503\u2503\u2503\u2503\u2503</c1>",
-      "<c1>\u2503\u2503\u2503\u2503\u2503\u2503</c1>",
-      "<c1>\u2570\u256F\u2570\u256F\u2570\u256F</c1>"
-    ],
-    N: [
-      "<c1>\u256D\u2501\u256E</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c1>\u2503\u2503\u2570\u256E\u2503\u2503</c1>",
-      "<c1>\u2503\u256D\u256E\u2570\u256F\u2503</c1>",
-      "<c1>\u2503\u2503\u2570\u256E\u2503\u2503</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503\u2503</c1>",
-      "<c1>\u2570\u256F</c1><c2>\u2571</c2><c1>\u2570\u2501\u256F</c1>"
-    ],
-    O: [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
-    ],
-    P: [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
-      "<c1>\u2503\u256D\u2501\u2501\u256F</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571\u2571\u2571</c2>",
-      "<c1>\u2570\u256F</c1><c2>\u2571\u2571\u2571</c2>"
-    ],
-    Q: [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503\u256E</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u2501\u256F</c1>"
-    ],
-    R: ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2503\u256D\u256E\u256D\u256F</c1>", "<c1>\u2503\u2503\u2503\u2570\u256E</c1>", "<c1>\u2570\u256F\u2570\u2501\u256F</c1>"],
-    S: ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    T: [
-      "<c1>\u256D\u2501\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u256E\u256D\u256E\u2503</c1>",
-      "<c1>\u2570\u256F\u2503\u2503\u2570\u256F</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571\u2571</c2>",
-      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571\u2571</c2>",
-      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571\u2571</c2>"
-    ],
-    U: [
-      "<c1>\u256D\u256E</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
-    ],
-    V: [
-      "<c1>\u256D\u256E</c1><c2>\u2571\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c1>\u2503\u2570\u256E\u256D\u256F\u2503</c1>",
-      "<c1>\u2570\u256E\u2503\u2503\u256D\u256F</c1>",
-      "<c2>\u2571</c2><c1>\u2503\u2570\u256F\u2503</c1><c2>\u2571</c2>",
-      "<c2>\u2571</c2><c1>\u2570\u256E\u256D\u256F</c1><c2>\u2571</c2>",
-      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571\u2571</c2>"
-    ],
-    W: [
-      "<c1>\u256D\u256E\u256D\u256E\u256D\u256E</c1>",
-      "<c1>\u2503\u2503\u2503\u2503\u2503\u2503</c1>",
-      "<c1>\u2503\u2503\u2503\u2503\u2503\u2503</c1>",
-      "<c1>\u2503\u2570\u256F\u2570\u256F\u2503</c1>",
-      "<c1>\u2570\u256E\u256D\u256E\u256D\u256F</c1>",
-      "<c2>\u2571</c2><c1>\u2570\u256F\u2570\u256F</c1><c2>\u2571</c2>"
-    ],
-    X: [
-      "<c1>\u256D\u2501\u256E\u256D\u2501\u256E</c1>",
-      "<c1>\u2570\u256E\u2570\u256F\u256D\u256F</c1>",
-      "<c2>\u2571</c2><c1>\u2570\u256E\u256D\u256F</c1><c2>\u2571</c2>",
-      "<c2>\u2571</c2><c1>\u256D\u256F\u2570\u256E</c1><c2>\u2571</c2>",
-      "<c1>\u256D\u256F\u256D\u256E\u2570\u256E</c1>",
-      "<c1>\u2570\u2501\u256F\u2570\u2501\u256F</c1>"
-    ],
-    Y: [
-      "<c1>\u256D\u256E</c1><c2>\u2571\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c1>\u2503\u2570\u256E\u256D\u256F\u2503</c1>",
-      "<c1>\u2570\u256E\u2570\u256F\u256D\u256F</c1>",
-      "<c2>\u2571</c2><c1>\u2570\u256E\u256D\u256F</c1><c2>\u2571</c2>",
-      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571\u2571</c2>",
-      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571\u2571</c2>"
-    ],
-    Z: [
-      "<c1>\u256D\u2501\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2570\u2501\u2501\u256E\u2501\u2503</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
-      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
-      "<c1>\u256D\u256F\u2501\u2570\u2501\u256E</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u2501\u256F</c1>"
-    ],
-    "0": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    "1": [
-      "<c2>\u2571</c2><c1>\u256D\u256E</c1><c2>\u2571</c2>",
-      "<c1>\u256D\u256F\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2570\u256E\u2503</c1><c2>\u2571</c2>",
-      "<c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u256D\u256F\u2570\u256E</c1>",
-      "<c1>\u2570\u2501\u2501\u256F</c1>"
-    ],
-    "2": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2570\u256F\u256D\u256F\u2503</c1>", "<c1>\u256D\u2501\u256F\u256D\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    "3": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2570\u256F\u256D\u256F\u2503</c1>", "<c1>\u256D\u256E\u2570\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    "4": [
-      "<c1>\u256D\u256E</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
-      "<c1>\u2570\u2501\u2501\u256E\u2503</c1>",
-      "<c2>\u2571\u2571\u2571</c2><c1>\u2503\u2503</c1>",
-      "<c2>\u2571\u2571\u2571</c2><c1>\u2570\u256F</c1>"
-    ],
-    "5": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u2501\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u256E\u2503</c1>", "<c1>\u256D\u2501\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    "6": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u2501\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    "7": [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2570\u256F\u256D\u256F\u2503</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u2503\u256D\u256F</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
-      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571</c2>"
-    ],
-    "8": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    "9": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u256E\u2503</c1>", "<c1>\u256D\u2501\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    "!": ["<c1>\u256D\u256E</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2570\u256F</c1>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>"],
-    "?": [
-      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
-      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
-      "<c1>\u2570\u256F\u256D\u256F\u2503</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u2503\u256D\u256F</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u256D\u256E</c1><c2>\u2571</c2>",
-      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571</c2>"
-    ],
-    ".": ["<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>"],
-    "+": [
-      "<c2>\u2571\u2571\u2571\u2571</c2>",
-      "<c2>\u2571\u2571\u2571\u2571</c2>",
-      "<c2>\u2571</c2><c1>\u256D\u256E</c1><c2>\u2571</c2>",
-      "<c1>\u256D\u256F\u2570\u256E</c1>",
-      "<c1>\u2570\u256E\u256D\u256F</c1>",
-      "<c2>\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571</c2>"
-    ],
-    "-": ["<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c1>\u256D\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u256F</c1>", "<c2>\u2571\u2571\u2571\u2571</c2>"],
-    _: ["<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c1>\u256D\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u256F</c1>"],
-    "=": ["<c2>\u2571\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571\u2571</c2>", "<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>", "<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
-    "@": [
-      "<c1>\u256D\u2501\u2501\u2501\u2501\u256E</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u256D\u2501\u2501\u256E\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u2503\u256D\u2501\u2503\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u2503\u2570\u256F\u2503\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u2570\u2501\u2501\u256F\u2501\u256E</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u2501\u2501\u256F</c1>"
-    ],
-    "#": [
-      "<c2>\u2571</c2><c1>\u256D\u2501\u2501\u256E</c1><c2>\u2571</c2>",
-      "<c1>\u256D\u256F\u256D\u256E\u2570\u256E</c1>",
-      "<c1>\u2570\u256E\u2503\u2503\u256D\u256F</c1>",
-      "<c1>\u256D\u256F\u2503\u2503\u2570\u256E</c1>",
-      "<c1>\u2570\u256E\u2570\u256F\u256D\u256F</c1>",
-      "<c2>\u2571</c2><c1>\u2570\u2501\u2501\u256F</c1><c2>\u2571</c2>"
-    ],
-    $: [
-      "<c2>\u2571\u2571</c2><c1>\u256D\u256E</c1><c2>\u2571</c2>",
-      "<c1>\u256D\u2501\u256F\u2570\u256E</c1>",
-      "<c1>\u2503\u2570\u2501\u2501\u256E</c1>",
-      "<c1>\u2570\u2501\u2501\u256E\u2503</c1>",
-      "<c1>\u2570\u256E\u256D\u2501\u256F</c1>",
-      "<c2>\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571\u2571</c2>"
-    ],
-    "%": [
-      "<c1>\u256D\u256E</c1><c2>\u2571\u2571</c2><c1>\u256D\u2501\u256E</c1>",
-      "<c1>\u2570\u256F</c1><c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
-      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571\u2571</c2>",
-      "<c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
-      "<c1>\u2570\u2501\u256F</c1><c2>\u2571\u2571</c2><c1>\u2570\u256F</c1>"
-    ],
-    "&": [
-      "<c2>\u2571</c2><c1>\u256D\u2501\u2501\u256E</c1>",
-      "<c2>\u2571</c2><c1>\u2503\u256D\u2501\u256F</c1>",
-      "<c1>\u256D\u256F\u2570\u256E</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u256D\u256E\u2503</c1><c2>\u2571</c2>",
-      "<c1>\u2503\u2570\u256F\u2503\u256E</c1>",
-      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
-    ],
-    "(": [
-      "<c2>\u2571\u2571</c2><c1>\u256D\u2501\u256E</c1>",
-      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
-      "<c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
-      "<c1>\u2570\u256E\u2570\u256E</c1><c2>\u2571</c2>",
-      "<c2>\u2571</c2><c1>\u2570\u256E\u2570\u256E</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u2570\u2501\u256F</c1>"
-    ],
-    ")": [
-      "<c1>\u256D\u2501\u256E</c1><c2>\u2571\u2571</c2>",
-      "<c1>\u2570\u256E\u2570\u256E</c1><c2>\u2571</c2>",
-      "<c2>\u2571</c2><c1>\u2570\u256E\u2570\u256E</c1>",
-      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
-      "<c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
-      "<c1>\u2570\u2501\u256F</c1><c2>\u2571\u2571</c2>"
-    ],
-    "/": [
-      "<c2>\u2571\u2571\u2571\u2571</c2><c1>\u256D\u2501\u256E</c1>",
-      "<c2>\u2571\u2571\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
-      "<c2>\u2571\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
-      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571\u2571</c2>",
-      "<c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571\u2571\u2571</c2>",
-      "<c1>\u2570\u2501\u256F</c1><c2>\u2571\u2571\u2571\u2571</c2>"
-    ],
-    ":": ["<c2>\u2571\u2571</c2>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>", "<c2>\u2571\u2571</c2>"],
-    ";": ["<c1>\u256D\u256E</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2570\u256F</c1>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u252B</c1>", "<c2>\u2571</c2><c1>\u256F</c1>"],
-    ",": ["<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u252B</c1>", "<c2>\u2571</c2><c1>\u256F</c1>"],
-    "'": ["<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>"],
-    '"': ["<c1>\u256D\u256E\u256D\u256E</c1>", "<c1>\u2570\u256F\u2570\u256F</c1>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>"],
-    " ": ["<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>"]
-  }
-};
-// src/lib/fonts/tiny.json
-var tiny_default = {
-  name: "tiny",
-  version: "0.2.0",
-  homepage: "https://github.com/dominikwilkowski/cfonts",
-  colors: 1,
-  lines: 2,
-  buffer: ["", ""],
-  letterspace: [" ", " "],
-  letterspace_size: 1,
-  chars: {
-    A: ["\u2584\u2580\u2588", "\u2588\u2580\u2588"],
-    B: ["\u2588\u2584\u2584", "\u2588\u2584\u2588"],
-    C: ["\u2588\u2580\u2580", "\u2588\u2584\u2584"],
-    D: ["\u2588\u2580\u2584", "\u2588\u2584\u2580"],
-    E: ["\u2588\u2580\u2580", "\u2588\u2588\u2584"],
-    F: ["\u2588\u2580\u2580", "\u2588\u2580 "],
-    G: ["\u2588\u2580\u2580", "\u2588\u2584\u2588"],
-    H: ["\u2588 \u2588", "\u2588\u2580\u2588"],
-    I: ["\u2588", "\u2588"],
-    J: ["  \u2588", "\u2588\u2584\u2588"],
-    K: ["\u2588\u2584\u2580", "\u2588 \u2588"],
-    L: ["\u2588  ", "\u2588\u2584\u2584"],
-    M: ["\u2588\u2580\u2584\u2580\u2588", "\u2588 \u2580 \u2588"],
-    N: ["\u2588\u2584 \u2588", "\u2588 \u2580\u2588"],
-    O: ["\u2588\u2580\u2588", "\u2588\u2584\u2588"],
-    P: ["\u2588\u2580\u2588", "\u2588\u2580\u2580"],
-    Q: ["\u2588\u2580\u2588", "\u2580\u2580\u2588"],
-    R: ["\u2588\u2580\u2588", "\u2588\u2580\u2584"],
-    S: ["\u2588\u2580\u2580", "\u2584\u2584\u2588"],
-    T: ["\u2580\u2588\u2580", " \u2588 "],
-    U: ["\u2588 \u2588", "\u2588\u2584\u2588"],
-    V: ["\u2588 \u2588", "\u2580\u2584\u2580"],
-    W: ["\u2588 \u2588 \u2588", "\u2580\u2584\u2580\u2584\u2580"],
-    X: ["\u2580\u2584\u2580", "\u2588 \u2588"],
-    Y: ["\u2588\u2584\u2588", " \u2588 "],
-    Z: ["\u2580\u2588", "\u2588\u2584"],
-    "0": ["\u259E\u2588\u259A", "\u259A\u2588\u259E"],
-    "1": ["\u2584\u2588", " \u2588"],
-    "2": ["\u2580\u2588", "\u2588\u2584"],
-    "3": ["\u2580\u2580\u2588", "\u2584\u2588\u2588"],
-    "4": ["\u2588 \u2588", "\u2580\u2580\u2588"],
-    "5": ["\u2588\u2580", "\u2584\u2588"],
-    "6": ["\u2588\u2584\u2584", "\u2588\u2584\u2588"],
-    "7": ["\u2580\u2580\u2588", "  \u2588"],
-    "8": ["\u2588\u2588\u2588", "\u2588\u2584\u2588"],
-    "9": ["\u2588\u2580\u2588", "\u2580\u2580\u2588"],
-    "!": ["\u2588", "\u2584"],
-    "?": ["\u2580\u2588", " \u2584"],
-    ".": [" ", "\u2584"],
-    "+": ["\u2584\u2588\u2584", " \u2580 "],
-    "-": ["\u2584\u2584", "  "],
-    _: ["  ", "\u2584\u2584"],
-    "=": ["\u2580\u2580", "\u2580\u2580"],
-    "@": ["\u259B\u2588\u259C", "\u2599\u259F\u2583"],
-    "#": ["\u259F\u2584\u2599", "\u259C\u2580\u259B"],
-    $: ["\u2596\u2588\u2597", "\u2598\u2588\u259D"],
-    "%": ["\u2580 \u2584\u2580", "\u2584\u2580 \u2584"],
-    "&": ["\u2584\u2584\u2588", "\u2588\u2584\u2588"],
-    "(": ["\u2584\u2580", "\u2580\u2584"],
-    ")": ["\u2580\u2584", "\u2584\u2580"],
-    "/": ["  \u2584\u2580", "\u2584\u2580  "],
-    ":": ["\u2580", "\u2584"],
-    ";": ["  ", "\u2584\u2580"],
-    ",": [" ", "\u2588"],
-    "'": ["\u2580", " "],
-    '"': ["\u259B \u259C", "   "],
-    " ": [" ", " "]
-  }
-};
-// src/lib/fonts/huge.json
-var huge_default = {
-  name: "huge",
-  version: "0.2.0",
-  homepage: "https://github.com/dominikwilkowski/cfonts",
-  colors: 2,
-  lines: 11,
-  buffer: ["", "", "", "", "", "", "", "", "", "", ""],
-  letterspace: [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
-  letterspace_size: 1,
-  chars: {
-    A: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580         \u2580</c1> "
-    ],
-    B: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>  ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1>  "
-    ],
-    C: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    D: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>  ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1>  "
-    ],
-    E: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    F: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      " <c1>\u2580</c1>           "
-    ],
-    G: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    H: [
-      " <c1>\u2584         \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580         \u2580</c1> "
-    ],
-    I: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      " <c1>\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    J: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580</c1> ",
-      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>    ",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1>     "
-    ],
-    K: [
-      " <c1>\u2584    \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580    \u2580</c1> "
-    ],
-    L: [
-      " <c1>\u2584</c1>           ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    M: [
-      " <c1>\u2584\u2584       \u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2580   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580         \u2580</c1> "
-    ],
-    N: [
-      " <c1>\u2584\u2584        \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C      \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C    \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C    \u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C      \u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580        \u2580\u2580</c1> "
-    ],
-    O: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    P: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      " <c1>\u2580</c1>           "
-    ],
-    Q: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580</c1> ",
-      "        <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "         <c1>\u2580</c1>   "
-    ],
-    R: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C      \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580         \u2580</c1> "
-    ],
-    S: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    T: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "      <c1>\u2580</c1>      "
-    ],
-    U: [
-      " <c1>\u2584         \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    V: [
-      " <c1>\u2584               \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C             \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C           \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C         \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>      ",
-      "       <c1>\u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>       ",
-      "        <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>        ",
-      "         <c1>\u2580</c1>         "
-    ],
-    W: [
-      " <c1>\u2584         \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2584   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580       \u2580\u2580</c1> "
-    ],
-    X: [
-      " <c1>\u2584       \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580       \u2580</c1> "
-    ],
-    Y: [
-      " <c1>\u2584         \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "      <c1>\u2580</c1>      "
-    ],
-    Z: [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    "0": [
-      "  <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>  ",
-      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C    \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C    \u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      "  <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1>  "
-    ],
-    "1": [
-      "    <c1>\u2584\u2584\u2584\u2584</c1>     ",
-      "  <c1>\u2584\u2588</c1><c2>\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>    ",
-      " <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "  <c1>\u2580\u2580 \u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "     <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "     <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "     <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "     <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      " <c1>\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    "2": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    "3": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    "4": [
-      " <c1>\u2584         \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "           <c1>\u2580</c1> "
-    ],
-    "5": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    "6": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    "7": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "         <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "        <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "       <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>      ",
-      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>       ",
-      "    <c1>\u2580</c1>        "
-    ],
-    "8": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    "9": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    "!": [
-      " <c1>\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580</c1> ",
-      " <c1>\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580</c1> "
-    ],
-    "?": [
-      "    <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>  ",
-      "  <c1>\u2584\u2588</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u2588\u2584</c1> ",
-      " <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "  <c1>\u2580\u2580  \u2584\u2584\u2584\u2588</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "    <c1>\u2584\u2588</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u2588</c1> ",
-      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C\u2580\u2580\u2580\u2580</c1>  ",
-      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>      ",
-      "    <c1>\u2580\u2580</c1>       ",
-      "    <c1>\u2584\u2584</c1>       ",
-      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>      ",
-      "    <c1>\u2580\u2580</c1>       "
-    ],
-    ".": [
-      "    ",
-      "    ",
-      "    ",
-      "    ",
-      "    ",
-      "    ",
-      "    ",
-      "    ",
-      " <c1>\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580</c1> "
-    ],
-    "+": [
-      "          ",
-      "          ",
-      "    <c1>\u2584\u2584</c1>    ",
-      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>   ",
-      " <c1>\u2584\u2584\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588\u2580\u2580</c1> ",
-      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>   ",
-      "    <c1>\u2580\u2580</c1>    ",
-      "          ",
-      "          "
-    ],
-    "-": [
-      "       ",
-      "       ",
-      "       ",
-      "       ",
-      " <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "       ",
-      "       ",
-      "       ",
-      "       "
-    ],
-    _: [
-      "       ",
-      "       ",
-      "       ",
-      "       ",
-      "       ",
-      "       ",
-      "       ",
-      " <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "       "
-    ],
-    "=": [
-      "       ",
-      "       ",
-      " <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "       ",
-      " <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580</c1> ",
-      "       ",
-      "       "
-    ],
-    "@": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C        \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2584\u2584\u2584\u2584  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2588</c1><c2>\u2591\u2591\u2591\u2591</c2><c1>\u2588 \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2591</c2><c1>\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2588</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2584\u2584\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    "#": [
-      "   <c1>\u2584         \u2584</c1>   ",
-      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      " <c1>\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580</c1> ",
-      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      " <c1>\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580</c1> ",
-      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "   <c1>\u2580         \u2580</c1>   "
-    ],
-    $: [
-      "      <c1>\u2584</c1>      ",
-      " <c1>\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
-      "      <c1>\u2580</c1>      "
-    ],
-    "%": [
-      "         <c1>\u2584</c1> ",
-      "  <c1>\u2584     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "  <c1>\u2580   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2584</c1>  ",
-      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2580</c1>  ",
-      " <c1>\u2580</c1>         "
-    ],
-    "&": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>     ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580  \u2580</c1>   "
-    ],
-    "(": [
-      "  <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
-      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u2588\u2580\u2580\u2580</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u2588\u2584\u2584\u2584</c1> ",
-      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
-      "  <c1>\u2580\u2580\u2580\u2580\u2580</c1> "
-    ],
-    ")": [
-      " <c1>\u2584\u2584\u2584\u2584\u2584</c1>  ",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      " <c1>\u2580\u2580\u2580\u2588</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2584\u2584\u2584\u2588</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
-      " <c1>\u2580\u2580\u2580\u2580\u2580</c1>  "
-    ],
-    "/": [
-      "         <c1>\u2584</c1> ",
-      "        <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
-      "       <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
-      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
-      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
-      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
-      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
-      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>      ",
-      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>       ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>        ",
-      " <c1>\u2580</c1>         "
-    ],
-    ":": [
-      "    ",
-      "    ",
-      " <c1>\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580</c1> ",
-      "    ",
-      " <c1>\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580</c1> ",
-      "    ",
-      "    "
-    ],
-    ";": [
-      "    ",
-      "    ",
-      " <c1>\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u2580</c1> ",
-      "    ",
-      " <c1>\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u258C</c1> ",
-      " <c1>\u2580</c1>  ",
-      "    "
-    ],
-    ",": [
-      "    ",
-      "    ",
-      "    ",
-      "    ",
-      "    ",
-      "    ",
-      "    ",
-      " <c1>\u2584\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
-      " <c1>\u2580\u258C</c1> ",
-      " <c1>\u2580</c1>  "
-    ],
-    "'": [
-      " <c1>\u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2590</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2590</c1>",
-      " <c1>\u2580</c1> ",
-      "   ",
-      "   ",
-      "   ",
-      "   ",
-      "   ",
-      "   ",
-      "   "
-    ],
-    '"': [
-      " <c1>\u2584  \u2584</c1> ",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2590\u2590</c1><c2>\u2591</c2><c1>\u2590</c1>",
-      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2590\u2590</c1><c2>\u2591</c2><c1>\u2590</c1>",
-      " <c1>\u2580  \u2580</c1> ",
-      "      ",
-      "      ",
-      "      ",
-      "      ",
-      "      ",
-      "      ",
-      "      "
-    ],
-    " ": ["    ", "    ", "    ", "    ", "    ", "    ", "    ", "    ", "    ", "    ", "    "]
-  }
-};
-// src/lib/fonts/grid.json
-var grid_default = {
-  name: "grid",
-  version: "0.1.0",
-  homepage: "https://github.com/dominikwilkowski/cfonts",
-  colors: 2,
-  lines: 6,
-  buffer: ["", "", "", "", "", ""],
-  letterspace: ["<c2>\u254B</c2>", "<c2>\u254B</c2>", "<c2>\u254B</c2>", "<c2>\u254B</c2>", "<c2>\u254B</c2>", "<c2>\u254B</c2>"],
-  letterspace_size: 1,
-  chars: {
-    A: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2513\u2503</c1>", "<c1>\u2503\u250F\u2513\u2503</c1>", "<c1>\u2517\u251B\u2517\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    B: [
-      "<c1>\u250F\u2513</c1><c2>\u254B\u254B</c2>",
-      "<c1>\u2503\u2517\u2501\u2513</c1>",
-      "<c1>\u2503\u250F\u2513\u2503</c1>",
-      "<c1>\u2503\u2517\u251B\u2503</c1>",
-      "<c1>\u2517\u2501\u2501\u251B</c1>",
-      "<c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    C: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u251B</c1>", "<c1>\u2503\u2517\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    D: [
-      "<c2>\u254B\u254B</c2><c1>\u250F\u2513</c1>",
-      "<c1>\u250F\u2501\u251B\u2503</c1>",
-      "<c1>\u2503\u250F\u2513\u2503</c1>",
-      "<c1>\u2503\u2517\u251B\u2503</c1>",
-      "<c1>\u2517\u2501\u2501\u251B</c1>",
-      "<c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    E: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u2503\u2501\u252B</c1>", "<c1>\u2503\u2503\u2501\u252B</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    F: [
-      "<c2>\u254B</c2><c1>\u250F\u2501\u2513</c1>",
-      "<c1>\u250F\u251B\u2517\u2513</c1>",
-      "<c1>\u2517\u2513\u250F\u251B</c1>",
-      "<c2>\u254B</c2><c1>\u2503\u2503</c1><c2>\u254B</c2>",
-      "<c2>\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>",
-      "<c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    G: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2513\u2503</c1>", "<c1>\u2503\u2517\u251B\u2503</c1>", "<c1>\u2517\u2501\u2513\u2503</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>"],
-    H: [
-      "<c1>\u250F\u2513</c1><c2>\u254B\u254B</c2>",
-      "<c1>\u2503\u2517\u2501\u2513</c1>",
-      "<c1>\u2503\u250F\u2513\u2503</c1>",
-      "<c1>\u2503\u2503\u2503\u2503</c1>",
-      "<c1>\u2517\u251B\u2517\u251B</c1>",
-      "<c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    I: ["<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c1>\u250F\u2513</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2517\u251B</c1>", "<c2>\u254B\u254B</c2>"],
-    J: [
-      "<c2>\u254B</c2><c1>\u250F\u2513</c1>",
-      "<c2>\u254B</c2><c1>\u2517\u251B</c1>",
-      "<c2>\u254B</c2><c1>\u250F\u2513</c1>",
-      "<c2>\u254B</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u250F\u251B\u2503</c1>",
-      "<c1>\u2517\u2501\u251B</c1>"
-    ],
-    K: [
-      "<c1>\u250F\u2513</c1><c2>\u254B\u254B</c2>",
-      "<c1>\u2503\u2503\u250F\u2513</c1>",
-      "<c1>\u2503\u2517\u251B\u251B</c1>",
-      "<c1>\u2503\u250F\u2513\u2513</c1>",
-      "<c1>\u2517\u251B\u2517\u251B</c1>",
-      "<c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    L: [
-      "<c1>\u250F\u2513</c1><c2>\u254B</c2>",
-      "<c1>\u2503\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u2503\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u2503\u2517\u2513</c1>",
-      "<c1>\u2517\u2501\u251B</c1>",
-      "<c2>\u254B\u254B\u254B</c2>"
-    ],
-    M: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2513\u250F\u2513</c1>", "<c1>\u2503\u2517\u251B\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503</c1>", "<c1>\u2517\u253B\u253B\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    N: [
-      "<c2>\u254B\u254B\u254B\u254B</c2>",
-      "<c1>\u250F\u2501\u2513</c1><c2>\u254B</c2>",
-      "<c1>\u2503\u250F\u2513\u2513</c1>",
-      "<c1>\u2503\u2503\u2503\u2503</c1>",
-      "<c1>\u2517\u251B\u2517\u251B</c1>",
-      "<c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    O: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2513\u2503</c1>", "<c1>\u2503\u2517\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    P: [
-      "<c2>\u254B\u254B\u254B\u254B</c2>",
-      "<c1>\u250F\u2501\u2501\u2513</c1>",
-      "<c1>\u2503\u250F\u2513\u2503</c1>",
-      "<c1>\u2503\u2517\u251B\u2503</c1>",
-      "<c1>\u2503\u250F\u2501\u251B</c1>",
-      "<c1>\u2517\u251B</c1><c2>\u254B\u254B</c2>"
-    ],
-    Q: [
-      "<c2>\u254B\u254B\u254B\u254B</c2>",
-      "<c1>\u250F\u2501\u2501\u2513</c1>",
-      "<c1>\u2503\u250F\u2513\u2503</c1>",
-      "<c1>\u2503\u2517\u251B\u2503</c1>",
-      "<c1>\u2517\u2501\u2513\u2503</c1>",
-      "<c2>\u254B\u254B</c2><c1>\u2517\u251B</c1>"
-    ],
-    R: [
-      "<c2>\u254B\u254B\u254B</c2>",
-      "<c1>\u250F\u2501\u2513</c1>",
-      "<c1>\u2503\u250F\u251B</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u2517\u251B</c1><c2>\u254B</c2>",
-      "<c2>\u254B\u254B\u254B</c2>"
-    ],
-    S: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u2501\u2501\u252B</c1>", "<c1>\u2523\u2501\u2501\u2503</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    T: [
-      "<c2>\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
-      "<c1>\u250F\u251B\u2517\u2513</c1>",
-      "<c1>\u2517\u2513\u250F\u251B</c1>",
-      "<c2>\u254B</c2><c1>\u2503\u2517\u2513</c1>",
-      "<c2>\u254B</c2><c1>\u2517\u2501\u251B</c1>",
-      "<c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    U: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2513\u250F\u2513</c1>", "<c1>\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2517\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    V: [
-      "<c2>\u254B\u254B\u254B\u254B</c2>",
-      "<c1>\u250F\u2513\u250F\u2513</c1>",
-      "<c1>\u2503\u2517\u251B\u2503</c1>",
-      "<c1>\u2517\u2513\u250F\u251B</c1>",
-      "<c2>\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>",
-      "<c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    W: [
-      "<c2>\u254B\u254B\u254B\u254B\u254B\u254B</c2>",
-      "<c1>\u250F\u2513\u250F\u2513\u250F\u2513</c1>",
-      "<c1>\u2503\u2517\u251B\u2517\u251B\u2503</c1>",
-      "<c1>\u2517\u2513\u250F\u2513\u250F\u251B</c1>",
-      "<c2>\u254B</c2><c1>\u2517\u251B\u2517\u251B</c1><c2>\u254B</c2>",
-      "<c2>\u254B\u254B\u254B\u254B\u254B\u254B</c2>"
-    ],
-    X: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2513\u250F\u2513</c1>", "<c1>\u2517\u254B\u254B\u251B</c1>", "<c1>\u250F\u254B\u254B\u2513</c1>", "<c1>\u2517\u251B\u2517\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    Y: [
-      "<c2>\u254B\u254B\u254B\u254B\u254B</c2>",
-      "<c1>\u250F\u2513</c1><c2>\u254B</c2><c1>\u250F\u2513</c1>",
-      "<c1>\u2503\u2517\u2501\u251B\u2503</c1>",
-      "<c1>\u2517\u2501\u2513\u250F\u251B</c1>",
-      "<c1>\u2517\u2501\u2501\u251B</c1><c2>\u254B</c2>",
-      "<c2>\u254B\u254B\u254B\u254B\u254B</c2>"
-    ],
-    Z: ["<c2>\u254B\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2523\u2501\u2501\u2503\u2503</c1>", "<c1>\u2503\u2503\u2501\u2501\u252B</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B\u254B</c2>"],
-    "0": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
-    "1": [
-      "<c2>\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
-      "<c1>\u250F\u251B\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u2517\u2513\u2503</c1><c2>\u254B</c2>",
-      "<c2>\u254B</c2><c1>\u2503\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u250F\u251B\u2517\u2513</c1>",
-      "<c1>\u2517\u2501\u2501\u251B</c1>"
-    ],
-    "2": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2517\u251B\u250F\u251B\u2503</c1>", "<c1>\u250F\u2501\u251B\u250F\u251B</c1>", "<c1>\u2503\u2517\u2501\u253B\u2513</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
-    "3": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2517\u251B\u250F\u251B\u2503</c1>", "<c1>\u250F\u2513\u2517\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
-    "4": [
-      "<c1>\u250F\u2513</c1><c2>\u254B</c2><c1>\u250F\u2513</c1>",
-      "<c1>\u2503\u2503</c1><c2>\u254B</c2><c1>\u2503\u2503</c1>",
-      "<c1>\u2503\u2517\u2501\u251B\u2503</c1>",
-      "<c1>\u2517\u2501\u2501\u2513\u2503</c1>",
-      "<c2>\u254B\u254B\u254B</c2><c1>\u2503\u2503</c1>",
-      "<c2>\u254B\u254B\u254B</c2><c1>\u2517\u251B</c1>"
-    ],
-    "5": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2501\u251B</c1>", "<c1>\u2503\u2517\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u2513\u2503</c1>", "<c1>\u250F\u2501\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
-    "6": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2501\u251B</c1>", "<c1>\u2503\u2517\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
-    "7": [
-      "<c1>\u250F\u2501\u2501\u2501\u2513</c1>",
-      "<c1>\u2503\u250F\u2501\u2513\u2503</c1>",
-      "<c1>\u2517\u251B\u250F\u251B\u2503</c1>",
-      "<c2>\u254B\u254B</c2><c1>\u2503\u250F\u251B</c1>",
-      "<c2>\u254B\u254B</c2><c1>\u2503\u2503</c1><c2>\u254B</c2>",
-      "<c2>\u254B\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>"
-    ],
-    "8": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
-    "9": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2513\u2503</c1>", "<c1>\u250F\u2501\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
-    "!": ["<c1>\u250F\u2513</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2517\u251B</c1>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>"],
-    "?": [
-      "<c1>\u250F\u2501\u2501\u2501\u2513</c1>",
-      "<c1>\u2503\u250F\u2501\u2513\u2503</c1>",
-      "<c1>\u2517\u251B\u250F\u251B\u2503</c1>",
-      "<c2>\u254B\u254B</c2><c1>\u2503\u250F\u251B</c1>",
-      "<c2>\u254B\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
-      "<c2>\u254B\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>"
-    ],
-    ".": ["<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>"],
-    "+": [
-      "<c2>\u254B\u254B\u254B\u254B</c2>",
-      "<c2>\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
-      "<c1>\u250F\u251B\u2517\u2513</c1>",
-      "<c1>\u2517\u2513\u250F\u251B</c1>",
-      "<c2>\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>",
-      "<c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    "-": ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    _: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>"],
-    "=": ["<c2>\u254B\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>", "<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B\u254B</c2>"],
-    "@": [
-      "<c1>\u250F\u2501\u2501\u2501\u2501\u2513</c1><c2>\u254B</c2>",
-      "<c1>\u2503\u250F\u2501\u2501\u2513\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u2503\u2503\u250F\u2501\u2503\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u2503\u2503\u2517\u251B\u2503\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u2503\u2517\u2501\u2501\u251B\u2517\u2513</c1>",
-      "<c1>\u2517\u2501\u2501\u2501\u2501\u2501\u251B</c1>"
-    ],
-    "#": [
-      "<c2>\u254B</c2><c1>\u250F\u2501\u2501\u2501\u2513</c1><c2>\u254B</c2>",
-      "<c1>\u250F\u251B\u250F\u2501\u2513\u2517\u2513</c1>",
-      "<c1>\u2517\u2513\u2503\u2503\u2503\u250F\u251B</c1>",
-      "<c1>\u250F\u251B\u2503\u2503\u2503\u2517\u2513</c1>",
-      "<c1>\u2517\u2513\u2517\u2501\u251B\u250F\u251B</c1>",
-      "<c2>\u254B</c2><c1>\u2517\u2501\u2501\u2501\u251B</c1><c2>\u254B</c2>"
-    ],
-    $: [
-      "<c2>\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
-      "<c1>\u250F\u251B\u2517\u2513</c1>",
-      "<c1>\u2503\u2501\u2501\u252B</c1>",
-      "<c1>\u2523\u2501\u2501\u2503</c1>",
-      "<c1>\u2517\u2513\u250F\u251B</c1>",
-      "<c2>\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>"
-    ],
-    "%": [
-      "<c1>\u250F\u2513</c1><c2>\u254B\u254B</c2><c1>\u250F\u2501\u2513</c1>",
-      "<c1>\u2517\u251B</c1><c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1>",
-      "<c2>\u254B\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2>",
-      "<c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B\u254B</c2>",
-      "<c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2><c1>\u250F\u2513</c1>",
-      "<c1>\u2517\u2501\u251B</c1><c2>\u254B\u254B</c2><c1>\u2517\u251B</c1>"
-    ],
-    "&": [
-      "<c2>\u254B\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
-      "<c2>\u254B\u254B</c2><c1>\u2503\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u250F\u2501\u251B\u2517\u2513</c1>",
-      "<c1>\u2503\u250F\u2513\u250F\u251B</c1>",
-      "<c1>\u2503\u2517\u251B\u2503</c1><c2>\u254B</c2>",
-      "<c1>\u2517\u2501\u2501\u251B</c1><c2>\u254B</c2>"
-    ],
-    "(": [
-      "<c2>\u254B\u254B</c2><c1>\u250F\u2501\u2513</c1>",
-      "<c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1>",
-      "<c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2>",
-      "<c1>\u2517\u2513\u2517\u2513</c1><c2>\u254B</c2>",
-      "<c2>\u254B</c2><c1>\u2517\u2513\u2517\u2513</c1>",
-      "<c2>\u254B\u254B</c2><c1>\u2517\u2501\u251B</c1>"
-    ],
-    ")": [
-      "<c1>\u250F\u2501\u2513</c1><c2>\u254B\u254B</c2>",
-      "<c1>\u2517\u2513\u2517\u2513</c1><c2>\u254B</c2>",
-      "<c2>\u254B</c2><c1>\u2517\u2513\u2517\u2513</c1>",
-      "<c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1>",
-      "<c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2>",
-      "<c1>\u2517\u2501\u251B</c1><c2>\u254B\u254B</c2>"
-    ],
-    "/": [
-      "<c2>\u254B\u254B\u254B\u254B</c2><c1>\u250F\u2501\u2513</c1>",
-      "<c2>\u254B\u254B\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1>",
-      "<c2>\u254B\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2>",
-      "<c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B\u254B</c2>",
-      "<c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B\u254B\u254B</c2>",
-      "<c1>\u2517\u2501\u251B</c1><c2>\u254B\u254B\u254B\u254B</c2>"
-    ],
-    ":": ["<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c2>\u254B\u254B</c2>"],
-    ";": ["<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u252B</c1>"],
-    ",": ["<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u252B</c1>"],
-    "'": ["<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>"],
-    '"': ["<c1>\u250F\u2513\u250F\u2513</c1>", "<c1>\u2517\u251B\u2517\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
-    " ": ["<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>"]
-  }
-};
-// src/lib/fonts/pallet.json
-var pallet_default = {
-  name: "pallet",
-  version: "0.1.0",
-  homepage: "https://github.com/dominikwilkowski/cfonts",
-  colors: 2,
-  lines: 6,
-  buffer: ["", "", "", "", "", ""],
-  letterspace: ["<c2>\u2500</c2>", "<c2>\u2500</c2>", "<c2>\u2500</c2>", "<c2>\u2500</c2>", "<c2>\u2500</c2>", "<c2>\u2500</c2>"],
-  letterspace_size: 1,
-  chars: {
-    A: [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u255A\u255D</c1><c2>\u2500</c2><c1>\u255A\u255D</c1>"
-    ],
-    B: [
-      "<c1>\u2554\u2550\u2550\u2557</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u2554\u2557\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u255A\u255D\u255A\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
-    ],
-    C: [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u255A\u255D</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
-    ],
-    D: [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u255A\u2557\u2554\u2557\u2551</c1>",
-      "<c2>\u2500</c2><c1>\u2551\u2551\u2551\u2551</c1>",
-      "<c2>\u2500</c2><c1>\u2551\u2551\u2551\u2551</c1>",
-      "<c1>\u2554\u255D\u255A\u255D\u2551</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
-    ],
-    E: ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2550\u255D</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2550\u255D</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
-    F: [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2550\u255D</c1>",
-      "<c1>\u2551\u255A\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2550\u255D</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500\u2500\u2500</c2>",
-      "<c1>\u255A\u255D</c1><c2>\u2500\u2500\u2500</c2>"
-    ],
-    G: [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u255A\u255D</c1>",
-      "<c1>\u2551\u2551\u2554\u2550\u2557</c1>",
-      "<c1>\u2551\u255A\u2569\u2550\u2551</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
-    ],
-    H: [
-      "<c1>\u2554\u2557</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u255A\u255D</c1><c2>\u2500</c2><c1>\u255A\u255D</c1>"
-    ],
-    I: [
-      "<c1>\u2554\u2550\u2550\u2557</c1>",
-      "<c1>\u255A\u2563\u2560\u255D</c1>",
-      "<c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
-      "<c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2554\u2563\u2560\u2557</c1>",
-      "<c1>\u255A\u2550\u2550\u255D</c1>"
-    ],
-    J: [
-      "<c2>\u2500\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u2554\u2557\u2551\u2551</c1>",
-      "<c1>\u2551\u255A\u255D\u2551</c1>",
-      "<c1>\u255A\u2550\u2550\u255D</c1>"
-    ],
-    K: [
-      "<c1>\u2554\u2557\u2554\u2550\u2557</c1>",
-      "<c1>\u2551\u2551\u2551\u2554\u255D</c1>",
-      "<c1>\u2551\u255A\u255D\u255D</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u2554\u2557\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u2551\u2551\u255A\u2557</c1>",
-      "<c1>\u255A\u255D\u255A\u2550\u255D</c1>"
-    ],
-    L: [
-      "<c1>\u2554\u2557</c1><c2>\u2500\u2500\u2500</c2>",
-      "<c1>\u2551\u2551</c1><c2>\u2500\u2500\u2500</c2>",
-      "<c1>\u2551\u2551</c1><c2>\u2500\u2500\u2500</c2>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
-    ],
-    M: [
-      "<c1>\u2554\u2550\u2557\u2554\u2550\u2557</c1>",
-      "<c1>\u2551\u2551\u255A\u255D\u2551\u2551</c1>",
-      "<c1>\u2551\u2554\u2557\u2554\u2557\u2551</c1>",
-      "<c1>\u2551\u2551\u2551\u2551\u2551\u2551</c1>",
-      "<c1>\u2551\u2551\u2551\u2551\u2551\u2551</c1>",
-      "<c1>\u255A\u255D\u255A\u255D\u255A\u255D</c1>"
-    ],
-    N: [
-      "<c1>\u2554\u2550\u2557</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c1>\u2551\u2551\u255A\u2557\u2551\u2551</c1>",
-      "<c1>\u2551\u2554\u2557\u255A\u255D\u2551</c1>",
-      "<c1>\u2551\u2551\u255A\u2557\u2551\u2551</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551\u2551</c1>",
-      "<c1>\u255A\u255D</c1><c2>\u2500</c2><c1>\u255A\u2550\u255D</c1>"
-    ],
-    O: [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
-    ],
-    P: [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
-      "<c1>\u2551\u2554\u2550\u2550\u255D</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500\u2500\u2500</c2>",
-      "<c1>\u255A\u255D</c1><c2>\u2500\u2500\u2500</c2>"
-    ],
-    Q: [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u255A\u2550\u255D\u2560\u2557</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u2550\u255D</c1>"
-    ],
-    R: ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u2551\u2554\u2557\u2554\u255D</c1>", "<c1>\u2551\u2551\u2551\u255A\u2557</c1>", "<c1>\u255A\u255D\u255A\u2550\u255D</c1>"],
-    S: ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
-    T: [
-      "<c1>\u2554\u2550\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2557\u2554\u2557\u2551</c1>",
-      "<c1>\u255A\u255D\u2551\u2551\u255A\u255D</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500\u2500</c2>",
-      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500\u2500</c2>",
-      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500\u2500</c2>"
-    ],
-    U: [
-      "<c1>\u2554\u2557</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
-    ],
-    V: [
-      "<c1>\u2554\u2557</c1><c2>\u2500\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c1>\u2551\u255A\u2557\u2554\u255D\u2551</c1>",
-      "<c1>\u255A\u2557\u2551\u2551\u2554\u255D</c1>",
-      "<c2>\u2500</c2><c1>\u2551\u255A\u255D\u2551</c1><c2>\u2500</c2>",
-      "<c2>\u2500</c2><c1>\u255A\u2557\u2554\u255D</c1><c2>\u2500</c2>",
-      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500\u2500</c2>"
-    ],
-    W: [
-      "<c1>\u2554\u2557\u2554\u2557\u2554\u2557</c1>",
-      "<c1>\u2551\u2551\u2551\u2551\u2551\u2551</c1>",
-      "<c1>\u2551\u2551\u2551\u2551\u2551\u2551</c1>",
-      "<c1>\u2551\u255A\u255D\u255A\u255D\u2551</c1>",
-      "<c1>\u255A\u2557\u2554\u2557\u2554\u255D</c1>",
-      "<c2>\u2500</c2><c1>\u255A\u255D\u255A\u255D</c1><c2>\u2500</c2>"
-    ],
-    X: [
-      "<c1>\u2554\u2550\u2557\u2554\u2550\u2557</c1>",
-      "<c1>\u255A\u2557\u255A\u255D\u2554\u255D</c1>",
-      "<c2>\u2500</c2><c1>\u255A\u2557\u2554\u255D</c1><c2>\u2500</c2>",
-      "<c2>\u2500</c2><c1>\u2554\u255D\u255A\u2557</c1><c2>\u2500</c2>",
-      "<c1>\u2554\u255D\u2554\u2557\u255A\u2557</c1>",
-      "<c1>\u255A\u2550\u255D\u255A\u2550\u255D</c1>"
-    ],
-    Y: [
-      "<c1>\u2554\u2557</c1><c2>\u2500\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c1>\u2551\u255A\u2557\u2554\u255D\u2551</c1>",
-      "<c1>\u255A\u2557\u255A\u255D\u2554\u255D</c1>",
-      "<c2>\u2500</c2><c1>\u255A\u2557\u2554\u255D</c1><c2>\u2500</c2>",
-      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500\u2500</c2>",
-      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500\u2500</c2>"
-    ],
-    Z: [
-      "<c1>\u2554\u2550\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u255A\u2550\u2550\u2557\u2550\u2551</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
-      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
-      "<c1>\u2554\u255D\u2550\u255A\u2550\u2557</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u2550\u255D</c1>"
-    ],
-    "0": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u2551\u2551\u2551\u2551</c1>", "<c1>\u2551\u2551\u2551\u2551\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
-    "1": [
-      "<c2>\u2500</c2><c1>\u2554\u2557</c1><c2>\u2500</c2>",
-      "<c1>\u2554\u255D\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u255A\u2557\u2551</c1><c2>\u2500</c2>",
-      "<c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2554\u255D\u255A\u2557</c1>",
-      "<c1>\u255A\u2550\u2550\u255D</c1>"
-    ],
-    "2": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u255A\u255D\u2554\u255D\u2551</c1>", "<c1>\u2554\u2550\u255D\u2554\u255D</c1>", "<c1>\u2551\u2551\u255A\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
-    "3": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u255A\u255D\u2554\u255D\u2551</c1>", "<c1>\u2554\u2557\u255A\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
-    "4": [
-      "<c1>\u2554\u2557</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
-      "<c1>\u255A\u2550\u2550\u2557\u2551</c1>",
-      "<c2>\u2500\u2500\u2500</c2><c1>\u2551\u2551</c1>",
-      "<c2>\u2500\u2500\u2500</c2><c1>\u255A\u255D</c1>"
-    ],
-    "5": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2550\u255D</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2557\u2551</c1>", "<c1>\u2554\u2550\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
-    "6": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2550\u255D</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
-    "7": [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u255A\u255D\u2554\u255D\u2551</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2551\u2554\u255D</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
-      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500</c2>"
-    ],
-    "8": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
-    "9": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2557\u2551</c1>", "<c1>\u2554\u2550\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
-    "!": ["<c1>\u2554\u2557</c1>", "<c1>\u2551\u2551</c1>", "<c1>\u2551\u2551</c1>", "<c1>\u255A\u255D</c1>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u255D</c1>"],
-    "?": [
-      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
-      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
-      "<c1>\u255A\u255D\u2554\u255D\u2551</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2551\u2554\u255D</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2554\u2557</c1><c2>\u2500</c2>",
-      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500</c2>"
-    ],
-    ".": ["<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u255D</c1>"],
-    "+": [
-      "<c2>\u2500\u2500\u2500\u2500</c2>",
-      "<c2>\u2500\u2500\u2500\u2500</c2>",
-      "<c2>\u2500</c2><c1>\u2554\u2557</c1><c2>\u2500</c2>",
-      "<c1>\u2554\u255D\u255A\u2557</c1>",
-      "<c1>\u255A\u2557\u2554\u255D</c1>",
-      "<c2>\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500</c2>"
-    ],
-    "-": ["<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c1>\u2554\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u255D</c1>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>"],
-    _: ["<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c1>\u2554\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u255D</c1>"],
-    "=": ["<c2>\u2500\u2500\u2500\u2500\u2500</c2>", "<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>", "<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>", "<c2>\u2500\u2500\u2500\u2500\u2500</c2>"],
-    "@": [
-      "<c1>\u2554\u2550\u2550\u2550\u2550\u2557</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u2554\u2550\u2550\u2557\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u2551\u2554\u2550\u2551\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u2551\u255A\u255D\u2551\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2551\u255A\u2550\u2550\u255D\u2560\u2557</c1>",
-      "<c1>\u255A\u2550\u2550\u2550\u2550\u2550\u255D</c1>"
-    ],
-    "#": [
-      "<c2>\u2500</c2><c1>\u2554\u2569\u2569\u2569\u2557</c1><c2>\u2500</c2>",
-      "<c1>\u2554\u255D\u2554\u2550\u2557\u255A\u2557</c1>",
-      "<c1>\u255A\u2557\u2560\u2550\u2563\u2554\u255D</c1>",
-      "<c1>\u2554\u255D\u2560\u2550\u2563\u255A\u2557</c1>",
-      "<c1>\u255A\u2557\u255A\u2550\u255D\u2554\u255D</c1>",
-      "<c2>\u2500</c2><c1>\u255A\u2566\u2566\u2566\u255D</c1><c2>\u2500</c2>"
-    ],
-    $: ["<c1>\u2554\u255D\u2569\u255A\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2557\u2566\u2554\u255D</c1>"],
-    "%": [
-      "<c1>\u2554\u2557</c1><c2>\u2500\u2500</c2><c1>\u2554\u2550\u2557</c1>",
-      "<c1>\u255A\u255D</c1><c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
-      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500\u2500</c2>",
-      "<c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
-      "<c1>\u255A\u2550\u255D</c1><c2>\u2500\u2500</c2><c1>\u255A\u255D</c1>"
-    ],
-    "&": [
-      "<c2>\u2500\u2500</c2><c1>\u2554\u2557</c1><c2>\u2500</c2>",
-      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u2554\u2550\u255D\u255A\u2557</c1>",
-      "<c1>\u2551\u2554\u2557\u2554\u255D</c1>",
-      "<c1>\u2551\u255A\u255D\u2551</c1><c2>\u2500</c2>",
-      "<c1>\u255A\u2550\u2550\u255D</c1><c2>\u2500</c2>"
-    ],
-    "(": [
-      "<c2>\u2500\u2500</c2><c1>\u2554\u2550\u2557</c1>",
-      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
-      "<c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
-      "<c1>\u255A\u2557\u255A\u2557</c1><c2>\u2500</c2>",
-      "<c2>\u2500</c2><c1>\u255A\u2557\u255A\u2557</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u255A\u2550\u255D</c1>"
-    ],
-    ")": [
-      "<c1>\u2554\u2550\u2557</c1><c2>\u2500\u2500</c2>",
-      "<c1>\u255A\u2557\u255A\u2557</c1><c2>\u2500</c2>",
-      "<c2>\u2500</c2><c1>\u255A\u2557\u255A\u2557</c1>",
-      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
-      "<c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
-      "<c1>\u255A\u2550\u255D</c1><c2>\u2500\u2500</c2>"
-    ],
-    "/": [
-      "<c2>\u2500\u2500\u2500\u2500</c2><c1>\u2554\u2550\u2557</c1>",
-      "<c2>\u2500\u2500\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
-      "<c2>\u2500\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
-      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500\u2500</c2>",
-      "<c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500\u2500\u2500</c2>",
-      "<c1>\u255A\u2550\u255D</c1><c2>\u2500\u2500\u2500\u2500</c2>"
-    ],
-    ":": ["<c2>\u2500\u2500</c2>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u255D</c1>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u255D</c1>", "<c2>\u2500\u2500</c2>"],
-    ";": ["<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u2563</c1>", "<c2>\u2500</c2><c1>\u255D</c1>"],
-    ",": ["<c1>\u2554\u2557</c1>", "<c1>\u2551\u2551</c1>", "<c1>\u255A\u255D</c1>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u2563</c1>", "<c2>\u2500</c2><c1>\u255D</c1>"],
-    "'": ["<c1>\u2554\u2557</c1>", "<c1>\u2551\u2551</c1>", "<c1>\u255A\u255D</c1>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>"],
-    '"': ["<c1>\u2554\u2557\u2554\u2557</c1>", "<c1>\u2551\u2551\u2551\u2551</c1>", "<c1>\u255A\u255D\u255A\u255D</c1>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>"],
-    " ": ["<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>"]
-  }
-};
-
-// src/lib/ascii.font.ts
-var fonts = {
-  tiny: tiny_default,
-  block: block_default,
-  shade: shade_default,
-  slick: slick_default,
-  huge: huge_default,
-  grid: grid_default,
-  pallet: pallet_default
-};
-var parsedFonts = {};
-function parseColorTags(text) {
-  const segments = [];
-  let currentIndex = 0;
-  const colorTagRegex = /<c(\d+)>(.*?)<\/c\d+>/g;
-  let lastIndex = 0;
-  let match;
-  while ((match = colorTagRegex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      const plainText = text.slice(lastIndex, match.index);
-      if (plainText) {
-        segments.push({ text: plainText, colorIndex: 0 });
-      }
-    }
-    const colorIndex = parseInt(match[1]) - 1;
-    const taggedText = match[2];
-    segments.push({ text: taggedText, colorIndex: Math.max(0, colorIndex) });
-    lastIndex = match.index + match[0].length;
-  }
-  if (lastIndex < text.length) {
-    const remainingText = text.slice(lastIndex);
-    if (remainingText) {
-      segments.push({ text: remainingText, colorIndex: 0 });
-    }
-  }
-  return segments;
-}
-function getParsedFont(fontKey) {
-  if (!parsedFonts[fontKey]) {
-    const fontDef = fonts[fontKey];
-    const parsedChars = {};
-    for (const [char, lines] of Object.entries(fontDef.chars)) {
-      parsedChars[char] = lines.map((line) => parseColorTags(line));
-    }
-    parsedFonts[fontKey] = {
-      ...fontDef,
-      colors: fontDef.colors || 1,
-      chars: parsedChars
-    };
-  }
-  return parsedFonts[fontKey];
-}
-function measureText({ text, font = "tiny" }) {
-  const fontDef = getParsedFont(font);
-  if (!fontDef) {
-    console.warn(`Font '${font}' not found`);
-    return { width: 0, height: 0 };
-  }
-  let currentX = 0;
-  for (let i = 0;i < text.length; i++) {
-    const char = text[i].toUpperCase();
-    const charDef = fontDef.chars[char];
-    if (!charDef) {
-      const spaceChar = fontDef.chars[" "];
-      if (spaceChar && spaceChar[0]) {
-        let spaceWidth = 0;
-        for (const segment of spaceChar[0]) {
-          spaceWidth += segment.text.length;
-        }
-        currentX += spaceWidth;
-      } else {
-        currentX += 1;
-      }
-      continue;
-    }
-    let charWidth = 0;
-    if (charDef[0]) {
-      for (const segment of charDef[0]) {
-        charWidth += segment.text.length;
-      }
-    }
-    currentX += charWidth;
-    if (i < text.length - 1) {
-      currentX += fontDef.letterspace_size;
-    }
-  }
-  return {
-    width: currentX,
-    height: fontDef.lines
-  };
-}
-function getCharacterPositions(text, font = "tiny") {
-  const fontDef = getParsedFont(font);
-  if (!fontDef) {
-    return [0];
-  }
-  const positions = [0];
-  let currentX = 0;
-  for (let i = 0;i < text.length; i++) {
-    const char = text[i].toUpperCase();
-    const charDef = fontDef.chars[char];
-    let charWidth = 0;
-    if (!charDef) {
-      const spaceChar = fontDef.chars[" "];
-      if (spaceChar && spaceChar[0]) {
-        for (const segment of spaceChar[0]) {
-          charWidth += segment.text.length;
-        }
-      } else {
-        charWidth = 1;
-      }
-    } else if (charDef[0]) {
-      for (const segment of charDef[0]) {
-        charWidth += segment.text.length;
-      }
-    }
-    currentX += charWidth;
-    if (i < text.length - 1) {
-      currentX += fontDef.letterspace_size;
-    }
-    positions.push(currentX);
-  }
-  return positions;
-}
-function coordinateToCharacterIndex(x, text, font = "tiny") {
-  const positions = getCharacterPositions(text, font);
-  if (x < 0) {
-    return 0;
-  }
-  for (let i = 0;i < positions.length - 1; i++) {
-    const currentPos = positions[i];
-    const nextPos = positions[i + 1];
-    if (x >= currentPos && x < nextPos) {
-      const charMidpoint = currentPos + (nextPos - currentPos) / 2;
-      return x < charMidpoint ? i : i + 1;
-    }
-  }
-  if (positions.length > 0 && x >= positions[positions.length - 1]) {
-    return text.length;
-  }
-  return 0;
-}
-function renderFontToFrameBuffer(buffer, {
-  text,
-  x = 0,
-  y = 0,
-  color = [RGBA.fromInts(255, 255, 255, 255)],
-  backgroundColor = RGBA.fromInts(0, 0, 0, 255),
-  font = "tiny"
-}) {
-  const width = buffer.width;
-  const height = buffer.height;
-  const fontDef = getParsedFont(font);
-  if (!fontDef) {
-    console.warn(`Font '${font}' not found`);
-    return { width: 0, height: 0 };
-  }
-  const colors = Array.isArray(color) ? color : [color];
-  if (y < 0 || y + fontDef.lines > height) {
-    return { width: 0, height: fontDef.lines };
-  }
-  let currentX = x;
-  const startX = x;
-  for (let i = 0;i < text.length; i++) {
-    const char = text[i].toUpperCase();
-    const charDef = fontDef.chars[char];
-    if (!charDef) {
-      const spaceChar = fontDef.chars[" "];
-      if (spaceChar && spaceChar[0]) {
-        let spaceWidth = 0;
-        for (const segment of spaceChar[0]) {
-          spaceWidth += segment.text.length;
-        }
-        currentX += spaceWidth;
-      } else {
-        currentX += 1;
-      }
-      continue;
-    }
-    let charWidth = 0;
-    if (charDef[0]) {
-      for (const segment of charDef[0]) {
-        charWidth += segment.text.length;
-      }
-    }
-    if (currentX >= width)
-      break;
-    if (currentX + charWidth < 0) {
-      currentX += charWidth + fontDef.letterspace_size;
-      continue;
-    }
-    for (let lineIdx = 0;lineIdx < fontDef.lines && lineIdx < charDef.length; lineIdx++) {
-      const segments = charDef[lineIdx];
-      const renderY = y + lineIdx;
-      if (renderY >= 0 && renderY < height) {
-        let segmentX = currentX;
-        for (const segment of segments) {
-          const segmentColor = colors[segment.colorIndex] || colors[0];
-          for (let charIdx = 0;charIdx < segment.text.length; charIdx++) {
-            const renderX = segmentX + charIdx;
-            if (renderX >= 0 && renderX < width) {
-              const fontChar = segment.text[charIdx];
-              if (fontChar !== " ") {
-                buffer.setCellWithAlphaBlending(renderX, renderY, fontChar, parseColor(segmentColor), parseColor(backgroundColor));
-              }
-            }
-          }
-          segmentX += segment.text.length;
-        }
-      }
-    }
-    currentX += charWidth;
-    if (i < text.length - 1) {
-      currentX += fontDef.letterspace_size;
-    }
-  }
-  return {
-    width: currentX - startX,
-    height: fontDef.lines
-  };
-}
-
-// src/syntax-style.ts
-function cloneStyle(style) {
-  return {
-    ...style,
-    fg: style.fg ? RGBA.clone(style.fg) : undefined,
-    bg: style.bg ? RGBA.clone(style.bg) : undefined
-  };
-}
-function convertThemeToStyles(theme) {
-  const flatStyles = {};
-  for (const tokenStyle of theme) {
-    const styleDefinition = {};
-    if (tokenStyle.style.foreground) {
-      styleDefinition.fg = parseColor(tokenStyle.style.foreground);
-    }
-    if (tokenStyle.style.background) {
-      styleDefinition.bg = parseColor(tokenStyle.style.background);
-    }
-    if (tokenStyle.style.bold !== undefined) {
-      styleDefinition.bold = tokenStyle.style.bold;
-    }
-    if (tokenStyle.style.italic !== undefined) {
-      styleDefinition.italic = tokenStyle.style.italic;
-    }
-    if (tokenStyle.style.underline !== undefined) {
-      styleDefinition.underline = tokenStyle.style.underline;
-    }
-    if (tokenStyle.style.dim !== undefined) {
-      styleDefinition.dim = tokenStyle.style.dim;
-    }
-    for (const scope of tokenStyle.scope) {
-      flatStyles[scope] = cloneStyle(styleDefinition);
-    }
-  }
-  return flatStyles;
-}
-
-class SyntaxStyle {
-  lib;
-  native;
-  _destroyed = false;
-  nameCache = new Map;
-  styleDefs = new Map;
-  mergedCache = new Map;
-  constructor(lib, handle, source) {
-    const owner = source?.resourceContext;
-    if (!owner)
-      throw new Error("SyntaxStyle requires an explicit resource owner");
-    owner.assertAlive();
-    if (owner.renderLib !== lib || !handle || typeof handle !== "object" || handle.context !== owner.context) {
-      throw new Error("SyntaxStyle Context owner mismatch");
-    }
-    this.lib = lib;
-    this.native = { owner, handle };
-  }
-  static create(source) {
-    const owner = source?.resourceContext;
-    if (!owner)
-      throw new Error("SyntaxStyle requires an explicit resource owner: pass renderer.nativeScene, or a ResourceContext when there is no renderer");
-    owner.assertAlive();
-    const lib = owner.renderLib;
-    const handle = lib.createContextSyntaxStyle(owner.context);
-    try {
-      return new SyntaxStyle(lib, handle, owner);
-    } catch (error) {
-      lib.destroyContextSyntaxStyle(owner.context, handle);
-      throw error;
-    }
-  }
-  static fromTheme(theme, owner) {
-    return SyntaxStyle.fromStyles(convertThemeToStyles(theme), owner);
-  }
-  static fromStyles(styles, owner) {
-    const style = SyntaxStyle.create(owner);
-    try {
-      for (const [name, styleDef] of styles instanceof Map ? styles : Object.entries(styles)) {
-        style.registerStyle(name, styleDef);
-      }
-      return style;
-    } catch (error) {
-      style.destroy();
-      throw error;
-    }
-  }
-  guard() {
-    if (this._destroyed)
-      throw new Error("NativeSyntaxStyle is destroyed");
-    this.native.owner.assertAlive();
-  }
-  _getSceneHandle(scene) {
-    this.guard();
-    if (this.native.owner !== scene.resourceContext)
-      throw new Error("SyntaxStyle owner mismatch: bind definitions in the destination Context");
-    return this.native.handle;
-  }
-  registerStyle(name, style) {
-    this.guard();
-    const { bold: bold2, italic: italic2, underline: underline2, dim: dim2, fg: foreground, bg: background } = style;
-    const definition = {
-      bold: bold2,
-      italic: italic2,
-      underline: underline2,
-      dim: dim2,
-      fg: foreground ? RGBA.clone(parseColor(foreground)) : undefined,
-      bg: background ? RGBA.clone(parseColor(background)) : undefined
-    };
-    const attributes = createTextAttributes(definition);
-    const fg2 = definition.fg ?? null;
-    const bg2 = definition.bg ?? null;
-    return this.lib.getYogaHost().runMutation(() => {
-      const id = this.lib.contextSyntaxStyleRegister(this.native.handle.context, this.native.handle, name, {
-        fg: fg2,
-        bg: bg2,
-        attributes
-      });
-      this.nameCache.set(name, id);
-      this.styleDefs.set(name, definition);
-      this.mergedCache.clear();
-      return id;
-    });
-  }
-  resolveStyleId(name) {
-    this.guard();
-    const cached = this.nameCache.get(name);
-    if (cached !== undefined)
-      return cached;
-    const id = this.lib.contextSyntaxStyleResolveByName(this.native.handle.context, this.native.handle, name);
-    if (id !== null) {
-      this.nameCache.set(name, id);
-    }
-    return id;
-  }
-  getStyleId(name) {
-    this.guard();
-    const id = this.resolveStyleId(name);
-    if (id !== null)
-      return id;
-    if (name.includes(".")) {
-      const baseName = name.split(".")[0];
-      return this.resolveStyleId(baseName);
-    }
-    return null;
-  }
-  getStyleCount() {
-    this.guard();
-    return this.lib.contextSyntaxStyleGetStyleCount(this.native.handle.context, this.native.handle);
-  }
-  clearNameCache() {
-    this.guard();
-    this.nameCache.clear();
-  }
-  getStyle(name) {
-    this.guard();
-    const style = this.styleDefs.get(name);
-    if (style)
-      return cloneStyle(style);
-    if (name.includes(".")) {
-      const baseName = name.split(".")[0];
-      const base = this.styleDefs.get(baseName);
-      return base ? cloneStyle(base) : undefined;
-    }
-    return;
-  }
-  mergeStyles(...styleNames) {
-    this.guard();
-    const cacheKey = styleNames.join(":");
-    const cached = this.mergedCache.get(cacheKey);
-    if (cached)
-      return cloneStyle(cached);
-    const styleDefinition = {};
-    for (const name of styleNames) {
-      const style = this.getStyle(name);
-      if (!style)
-        continue;
-      if (style.fg)
-        styleDefinition.fg = style.fg;
-      if (style.bg)
-        styleDefinition.bg = style.bg;
-      if (style.bold !== undefined)
-        styleDefinition.bold = style.bold;
-      if (style.italic !== undefined)
-        styleDefinition.italic = style.italic;
-      if (style.underline !== undefined)
-        styleDefinition.underline = style.underline;
-      if (style.dim !== undefined)
-        styleDefinition.dim = style.dim;
-    }
-    const attributes = createTextAttributes({
-      bold: styleDefinition.bold,
-      italic: styleDefinition.italic,
-      underline: styleDefinition.underline,
-      dim: styleDefinition.dim
-    });
-    const merged = {
-      fg: styleDefinition.fg,
-      bg: styleDefinition.bg,
-      attributes
-    };
-    this.mergedCache.set(cacheKey, merged);
-    return cloneStyle(merged);
-  }
-  clearCache() {
-    this.guard();
-    this.mergedCache.clear();
-  }
-  getCacheSize() {
-    this.guard();
-    return this.mergedCache.size;
-  }
-  getAllStyles() {
-    this.guard();
-    return new Map(Array.from(this.styleDefs, ([name, style]) => [name, cloneStyle(style)]));
-  }
-  getRegisteredNames() {
-    this.guard();
-    return Array.from(this.styleDefs.keys());
-  }
-  destroy() {
-    if (this._destroyed)
-      return;
-    this.lib.getYogaHost().runMutation(() => {
-      if (!this.native.owner.disposed)
-        this.lib.destroyContextSyntaxStyle(this.native.handle.context, this.native.handle);
-      this._destroyed = true;
-      this.nameCache.clear();
-      this.styleDefs.clear();
-      this.mergedCache.clear();
-    });
-  }
-}
-
-// src/lib/hast-styled-text.ts
-function hastToTextChunks(node, syntaxStyle, parentStyles = []) {
-  const chunks = [];
-  if (node.type === "text") {
-    const stylesToMerge = parentStyles.length > 0 ? parentStyles : ["default"];
-    const mergedStyle = syntaxStyle.mergeStyles(...stylesToMerge);
-    chunks.push({
-      __isChunk: true,
-      text: node.value,
-      fg: mergedStyle.fg,
-      bg: mergedStyle.bg,
-      attributes: mergedStyle.attributes
-    });
-  } else if (node.type === "element") {
-    let currentStyles = [...parentStyles];
-    if (node.properties?.className) {
-      const classes = node.properties.className.split(" ");
-      for (const cls of classes) {
-        currentStyles.push(cls);
-      }
-    }
-    for (const child of node.children) {
-      chunks.push(...hastToTextChunks(child, syntaxStyle, currentStyles));
-    }
-  }
-  return chunks;
-}
-function hastToStyledText(hast, syntaxStyle) {
-  const chunks = hastToTextChunks(hast, syntaxStyle);
-  return new StyledText(chunks);
-}
-
-// src/lib/clock.ts
-class SystemClock {
-  now() {
-    if (!globalThis.performance || typeof globalThis.performance.now !== "function") {
-      throw new Error("SystemClock requires globalThis.performance.now()");
-    }
-    return globalThis.performance.now();
-  }
-  setTimeout(fn, delayMs) {
-    return globalThis.setTimeout(fn, delayMs);
-  }
-  clearTimeout(handle) {
-    globalThis.clearTimeout(handle);
-  }
-  setInterval(fn, delayMs) {
-    return globalThis.setInterval(fn, delayMs);
-  }
-  clearInterval(handle) {
-    globalThis.clearInterval(handle);
-  }
-}
-
-// src/lib/parse.keypress.ts
-import { Buffer as Buffer2 } from "buffer";
-
-// src/lib/parse.keypress-kitty.ts
-var kittyKeyMap = {
-  27: "escape",
-  9: "tab",
-  13: "return",
-  127: "backspace",
-  57344: "escape",
-  57345: "return",
-  57346: "tab",
-  57347: "backspace",
-  57348: "insert",
-  57349: "delete",
-  57350: "left",
-  57351: "right",
-  57352: "up",
-  57353: "down",
-  57354: "pageup",
-  57355: "pagedown",
-  57356: "home",
-  57357: "end",
-  57358: "capslock",
-  57359: "scrolllock",
-  57360: "numlock",
-  57361: "printscreen",
-  57362: "pause",
-  57363: "menu",
-  57364: "f1",
-  57365: "f2",
-  57366: "f3",
-  57367: "f4",
-  57368: "f5",
-  57369: "f6",
-  57370: "f7",
-  57371: "f8",
-  57372: "f9",
-  57373: "f10",
-  57374: "f11",
-  57375: "f12",
-  57376: "f13",
-  57377: "f14",
-  57378: "f15",
-  57379: "f16",
-  57380: "f17",
-  57381: "f18",
-  57382: "f19",
-  57383: "f20",
-  57384: "f21",
-  57385: "f22",
-  57386: "f23",
-  57387: "f24",
-  57388: "f25",
-  57389: "f26",
-  57390: "f27",
-  57391: "f28",
-  57392: "f29",
-  57393: "f30",
-  57394: "f31",
-  57395: "f32",
-  57396: "f33",
-  57397: "f34",
-  57398: "f35",
-  57399: "kp0",
-  57400: "kp1",
-  57401: "kp2",
-  57402: "kp3",
-  57403: "kp4",
-  57404: "kp5",
-  57405: "kp6",
-  57406: "kp7",
-  57407: "kp8",
-  57408: "kp9",
-  57409: "kpdecimal",
-  57410: "kpdivide",
-  57411: "kpmultiply",
-  57412: "kpminus",
-  57413: "kpplus",
-  57414: "kpenter",
-  57415: "kpequal",
-  57416: "kpseparator",
-  57417: "kpleft",
-  57418: "kpright",
-  57419: "kpup",
-  57420: "kpdown",
-  57421: "kppageup",
-  57422: "kppagedown",
-  57423: "kphome",
-  57424: "kpend",
-  57425: "kpinsert",
-  57426: "kpdelete",
-  57427: "clear",
-  57428: "mediaplay",
-  57429: "mediapause",
-  57430: "mediaplaypause",
-  57431: "mediareverse",
-  57432: "mediastop",
-  57433: "mediafastforward",
-  57434: "mediarewind",
-  57435: "medianext",
-  57436: "mediaprev",
-  57437: "mediarecord",
-  57438: "volumedown",
-  57439: "volumeup",
-  57440: "mute",
-  57441: "leftshift",
-  57442: "leftctrl",
-  57443: "leftalt",
-  57444: "leftsuper",
-  57445: "lefthyper",
-  57446: "leftmeta",
-  57447: "rightshift",
-  57448: "rightctrl",
-  57449: "rightalt",
-  57450: "rightsuper",
-  57451: "righthyper",
-  57452: "rightmeta",
-  57453: "iso_level3_shift",
-  57454: "iso_level5_shift"
-};
-var kittyNamedSingleStrokeKeys = [...new Set(Object.values(kittyKeyMap))];
-var printableKeypadText = {
-  kp0: "0",
-  kp1: "1",
-  kp2: "2",
-  kp3: "3",
-  kp4: "4",
-  kp5: "5",
-  kp6: "6",
-  kp7: "7",
-  kp8: "8",
-  kp9: "9",
-  kpdecimal: ".",
-  kpdivide: "/",
-  kpmultiply: "*",
-  kpminus: "-",
-  kpplus: "+",
-  kpequal: "=",
-  kpseparator: ","
-};
-function getPrintableKittyKeyText(key) {
-  return printableKeypadText[key.name];
-}
-function fromKittyMods(mod) {
-  return {
-    shift: !!(mod & 1),
-    alt: !!(mod & 2),
-    ctrl: !!(mod & 4),
-    super: !!(mod & 8),
-    hyper: !!(mod & 16),
-    meta: !!(mod & 32),
-    capsLock: !!(mod & 64),
-    numLock: !!(mod & 128)
-  };
-}
-var functionalKeyMap = {
-  A: "up",
-  B: "down",
-  C: "right",
-  D: "left",
-  H: "home",
-  F: "end",
-  E: "clear",
-  P: "f1",
-  Q: "f2",
-  S: "f4"
-};
-var tildeKeyMap = {
-  "1": "home",
-  "2": "insert",
-  "3": "delete",
-  "4": "end",
-  "5": "pageup",
-  "6": "pagedown",
-  "7": "home",
-  "8": "end",
-  "11": "f1",
-  "12": "f2",
-  "13": "f3",
-  "14": "f4",
-  "15": "f5",
-  "17": "f6",
-  "18": "f7",
-  "19": "f8",
-  "20": "f9",
-  "21": "f10",
-  "23": "f11",
-  "24": "f12",
-  "29": "menu",
-  "57427": "clear"
-};
-function parseKittySpecialKey(sequence) {
-  const specialKeyRe = /^\x1b\[(\d+);(\d+):(\d+)([A-Z~])$/;
-  const match = specialKeyRe.exec(sequence);
-  if (!match)
-    return null;
-  const keyNumOrOne = match[1];
-  const modifierStr = match[2];
-  const eventTypeStr = match[3];
-  const terminator = match[4];
-  let keyName;
-  if (terminator === "~") {
-    keyName = tildeKeyMap[keyNumOrOne];
-  } else {
-    if (keyNumOrOne !== "1")
-      return null;
-    keyName = functionalKeyMap[terminator];
-  }
-  if (!keyName)
-    return null;
-  const key = {
-    name: keyName,
-    ctrl: false,
-    meta: false,
-    shift: false,
-    option: false,
-    number: false,
-    sequence,
-    raw: sequence,
-    eventType: "press",
-    source: "kitty",
-    super: false,
-    hyper: false,
-    capsLock: false,
-    numLock: false
-  };
-  if (modifierStr) {
-    const modifierMask = parseInt(modifierStr, 10);
-    if (!isNaN(modifierMask) && modifierMask > 1) {
-      const mods = fromKittyMods(modifierMask - 1);
-      key.shift = mods.shift;
-      key.ctrl = mods.ctrl;
-      key.meta = mods.alt || mods.meta;
-      key.option = mods.alt;
-      key.super = mods.super;
-      key.hyper = mods.hyper;
-      key.capsLock = mods.capsLock;
-      key.numLock = mods.numLock;
-    }
-  }
-  if (eventTypeStr === "1" || !eventTypeStr) {
-    key.eventType = "press";
-  } else if (eventTypeStr === "2") {
-    key.eventType = "press";
-    key.repeated = true;
-  } else if (eventTypeStr === "3") {
-    key.eventType = "release";
-  }
-  return key;
-}
-function parseKittyKeyboard(sequence) {
-  const specialResult = parseKittySpecialKey(sequence);
-  if (specialResult)
-    return specialResult;
-  const kittyRe = /^\x1b\[([^\x1b]+)u$/;
-  const match = kittyRe.exec(sequence);
-  if (!match)
-    return null;
-  const params = match[1];
-  const fields = params.split(";");
-  if (fields.length < 1)
-    return null;
-  const key = {
-    name: "",
-    ctrl: false,
-    meta: false,
-    shift: false,
-    option: false,
-    number: false,
-    sequence,
-    raw: sequence,
-    eventType: "press",
-    source: "kitty",
-    super: false,
-    hyper: false,
-    capsLock: false,
-    numLock: false
-  };
-  let text = "";
-  const field1 = fields[0]?.split(":") || [];
-  const codepointStr = field1[0];
-  if (!codepointStr)
-    return null;
-  const codepoint = parseInt(codepointStr, 10);
-  if (isNaN(codepoint))
-    return null;
-  let shiftedCodepoint;
-  let baseCodepoint;
-  if (field1[1]) {
-    const shifted = parseInt(field1[1], 10);
-    if (!isNaN(shifted) && shifted > 0 && shifted <= 1114111) {
-      shiftedCodepoint = shifted;
-    }
-  }
-  if (field1[2]) {
-    const base = parseInt(field1[2], 10);
-    if (!isNaN(base) && base > 0 && base <= 1114111) {
-      baseCodepoint = base;
-    }
-  }
-  const knownKey = kittyKeyMap[codepoint];
-  if (knownKey) {
-    key.name = knownKey;
-    key.code = `[${codepoint}u`;
-  } else if (codepoint === 0) {
-    key.name = "";
-  } else {
-    if (codepoint > 0 && codepoint <= 1114111) {
-      const char = String.fromCodePoint(codepoint);
-      key.name = char === " " ? "space" : char;
-      if (baseCodepoint) {
-        key.baseCode = baseCodepoint;
-      }
-    } else {
-      return null;
-    }
-  }
-  if (fields[1]) {
-    const field2 = fields[1].split(":");
-    const modifierStr = field2[0];
-    const eventTypeStr = field2[1];
-    if (modifierStr) {
-      const modifierMask = parseInt(modifierStr, 10);
-      if (!isNaN(modifierMask) && modifierMask > 1) {
-        const mods = fromKittyMods(modifierMask - 1);
-        key.shift = mods.shift;
-        key.ctrl = mods.ctrl;
-        key.meta = mods.alt || mods.meta;
-        key.option = mods.alt;
-        key.super = mods.super;
-        key.hyper = mods.hyper;
-        key.capsLock = mods.capsLock;
-        key.numLock = mods.numLock;
-      }
-    }
-    if (eventTypeStr === "1" || !eventTypeStr) {
-      key.eventType = "press";
-    } else if (eventTypeStr === "2") {
-      key.eventType = "press";
-      key.repeated = true;
-    } else if (eventTypeStr === "3") {
-      key.eventType = "release";
-    } else {
-      key.eventType = "press";
-    }
-  }
-  if (fields[2]) {
-    const codepoints = fields[2].split(":");
-    for (const cpStr of codepoints) {
-      const cp = parseInt(cpStr, 10);
-      if (!isNaN(cp) && cp > 0 && cp <= 1114111) {
-        text += String.fromCodePoint(cp);
-      }
-    }
-  }
-  if (text === "") {
-    text = getPrintableKittyKeyText(key) ?? "";
-  }
-  if (text === "") {
-    const isPrintable = key.name.length > 0 && !kittyKeyMap[codepoint];
-    if (isPrintable) {
-      if (codepoint === 32) {
-        text = " ";
-      } else if (key.shift && shiftedCodepoint) {
-        text = String.fromCodePoint(shiftedCodepoint);
-      } else if (key.shift && key.name.length === 1) {
-        text = key.name.toLocaleUpperCase();
-      } else {
-        text = key.name;
-      }
-    }
-  }
-  if (text) {
-    if (codepoint === 0) {
-      key.name = text;
-    }
-    key.sequence = text;
-  }
-  if (codepoint === 0 && text === "") {
-    return null;
-  }
-  return key;
-}
-
-// src/lib/parse.keypress.ts
-var metaKeyCodeRe = /^(?:\x1b)([a-zA-Z0-9])$/;
-var fnKeyRe = /^(?:\x1b+)(O|N|\[|\[\[)(?:(\d+)(?:;(\d+))?([~^$])|(?:1;)?(\d+)?([a-zA-Z]))/;
-var keyName = {
-  OP: "f1",
-  OQ: "f2",
-  OR: "f3",
-  OS: "f4",
-  "[11~": "f1",
-  "[12~": "f2",
-  "[13~": "f3",
-  "[14~": "f4",
-  "[[A": "f1",
-  "[[B": "f2",
-  "[[C": "f3",
-  "[[D": "f4",
-  "[[E": "f5",
-  "[15~": "f5",
-  "[17~": "f6",
-  "[18~": "f7",
-  "[19~": "f8",
-  "[20~": "f9",
-  "[21~": "f10",
-  "[23~": "f11",
-  "[24~": "f12",
-  "[29~": "menu",
-  "[57427~": "clear",
-  "[A": "up",
-  "[B": "down",
-  "[C": "right",
-  "[D": "left",
-  "[E": "clear",
-  "[F": "end",
-  "[H": "home",
-  "[P": "f1",
-  "[Q": "f2",
-  "[S": "f4",
-  OA: "up",
-  OB: "down",
-  OC: "right",
-  OD: "left",
-  OE: "clear",
-  OF: "end",
-  OH: "home",
-  OM: "return",
-  Oj: "*",
-  Ok: "+",
-  Ol: ",",
-  Om: "-",
-  On: ".",
-  Oo: "/",
-  Op: "0",
-  Oq: "1",
-  Or: "2",
-  Os: "3",
-  Ot: "4",
-  Ou: "5",
-  Ov: "6",
-  Ow: "7",
-  Ox: "8",
-  Oy: "9",
-  OX: "=",
-  "[1~": "home",
-  "[2~": "insert",
-  "[3~": "delete",
-  "[4~": "end",
-  "[5~": "pageup",
-  "[6~": "pagedown",
-  "[[5~": "pageup",
-  "[[6~": "pagedown",
-  "[7~": "home",
-  "[8~": "end",
-  "[a": "up",
-  "[b": "down",
-  "[c": "right",
-  "[d": "left",
-  "[e": "clear",
-  f: "right",
-  b: "left",
-  p: "up",
-  n: "down",
-  "[2$": "insert",
-  "[3$": "delete",
-  "[5$": "pageup",
-  "[6$": "pagedown",
-  "[7$": "home",
-  "[8$": "end",
-  Oa: "up",
-  Ob: "down",
-  Oc: "right",
-  Od: "left",
-  Oe: "clear",
-  "[2^": "insert",
-  "[3^": "delete",
-  "[5^": "pageup",
-  "[6^": "pagedown",
-  "[7^": "home",
-  "[8^": "end",
-  "[Z": "tab"
-};
-var nonAlphanumericKeys = [...Object.values(keyName), "backspace"];
-var terminalNamedSingleStrokeKeys = [
-  ...new Set(["return", "linefeed", "tab", "escape", "space", ...nonAlphanumericKeys, ...kittyNamedSingleStrokeKeys])
-];
-var isShiftKey = (code) => {
-  return ["[a", "[b", "[c", "[d", "[e", "[2$", "[3$", "[5$", "[6$", "[7$", "[8$", "[Z"].includes(code);
-};
-var isCtrlKey = (code) => {
-  return ["Oa", "Ob", "Oc", "Od", "Oe", "[2^", "[3^", "[5^", "[6^", "[7^", "[8^"].includes(code);
-};
-var getCtrlKeyName = (charCode) => {
-  if (charCode === 0) {
-    return "space";
-  }
-  if (charCode >= 1 && charCode <= 26) {
-    return String.fromCharCode(charCode + 97 - 1);
-  }
-  if (charCode >= 28 && charCode <= 31) {
-    return String.fromCharCode(charCode + 64);
-  }
-  return;
-};
-var ss3NumpadPrintable = {
-  Op: "0",
-  Oq: "1",
-  Or: "2",
-  Os: "3",
-  Ot: "4",
-  Ou: "5",
-  Ov: "6",
-  Ow: "7",
-  Ox: "8",
-  Oy: "9",
-  Oj: "*",
-  Ok: "+",
-  Ol: ",",
-  Om: "-",
-  On: ".",
-  Oo: "/",
-  OX: "="
-};
-var modifyOtherKeysRe = /^\x1b\[27;(\d+);(\d+)~$/;
-var parseKeypress = (s = "", options = {}) => {
-  let parts;
-  if (Buffer2.isBuffer(s)) {
-    if (s[0] > 127 && s[1] === undefined) {
-      s = "\x1B" + String.fromCharCode(s[0] - 128);
-    } else {
-      s = String(s);
-    }
-  } else if (s !== undefined && typeof s !== "string") {
-    s = String(s);
-  } else if (!s) {
-    s = "";
-  }
-  if (/^\x1b\[<\d+;\d+;\d+[Mm]$/.test(s)) {
-    return null;
-  }
-  if (/^\[<\d+;\d+;\d+[Mm]$/.test(s)) {
-    return null;
-  }
-  if (/^\x1b\[<[\d;]*$/.test(s)) {
-    return null;
-  }
-  if (/^\[<[\d;]*$/.test(s)) {
-    return null;
-  }
-  if (s.startsWith("\x1B[M") && s.length >= 6) {
-    return null;
-  }
-  if (/^\x1b\[\d+;\d+;\d+t$/.test(s)) {
-    return null;
-  }
-  if (/^\x1b\[\d+;\d+R$/.test(s)) {
-    return null;
-  }
-  if (/^\x1b\[\?[\d;]+c$/.test(s)) {
-    return null;
-  }
-  if (/^\x1b\[\?[\d;]+\$y$/.test(s)) {
-    return null;
-  }
-  if (s === "\x1B[I" || s === "\x1B[O") {
-    return null;
-  }
-  if (/^\x1b\][\d;].*(\x1b\\|\x07)$/.test(s)) {
-    return null;
-  }
-  if (s === "\x1B[200~" || s === "\x1B[201~") {
-    return null;
-  }
-  const key = {
-    name: "",
-    ctrl: false,
-    meta: false,
-    shift: false,
-    option: false,
-    number: false,
-    sequence: s,
-    raw: s,
-    eventType: "press",
-    source: "raw"
-  };
-  key.sequence = key.sequence || s || key.name;
-  const ctrlKeyName = s.length === 1 ? getCtrlKeyName(s.charCodeAt(0)) : undefined;
-  const metaCtrlKeyName = s.length === 2 && s[0] === "\x1B" ? getCtrlKeyName(s.charCodeAt(1)) : undefined;
-  if (options.useKittyKeyboard) {
-    const kittyResult = parseKittyKeyboard(s);
-    if (kittyResult) {
-      return kittyResult;
-    }
-  }
-  const modifyOtherKeysMatch = modifyOtherKeysRe.exec(s);
-  if (modifyOtherKeysMatch) {
-    const modifier = parseInt(modifyOtherKeysMatch[1], 10) - 1;
-    const charCode = parseInt(modifyOtherKeysMatch[2], 10);
-    key.ctrl = !!(modifier & 4);
-    key.meta = !!(modifier & 2);
-    key.shift = !!(modifier & 1);
-    key.option = !!(modifier & 2);
-    key.super = !!(modifier & 8);
-    key.hyper = !!(modifier & 16);
-    if (charCode === 13) {
-      key.name = "return";
-    } else if (charCode === 27) {
-      key.name = "escape";
-    } else if (charCode === 9) {
-      key.name = "tab";
-    } else if (charCode === 32) {
-      key.name = "space";
-    } else if (charCode === 127 || charCode === 8) {
-      key.name = "backspace";
-    } else {
-      const char = String.fromCharCode(charCode);
-      key.name = char;
-      key.sequence = char;
-      if (charCode >= 48 && charCode <= 57) {
-        key.number = true;
-      }
-    }
-    return key;
-  }
-  if (s === "\r" || s === "\x1B\r") {
-    key.name = "return";
-    key.meta = s.length === 2;
-  } else if (s === `
-` || s === `\x1B
-`) {
-    key.name = "linefeed";
-    key.meta = s.length === 2;
-  } else if (s === "\t") {
-    key.name = "tab";
-  } else if (s === "\b" || s === "\x1B\b" || s === "\x7F" || s === "\x1B\x7F") {
-    key.name = "backspace";
-    key.meta = s.charAt(0) === "\x1B";
-  } else if (s === "\x1B" || s === "\x1B\x1B") {
-    key.name = "escape";
-    key.meta = s.length === 2;
-  } else if (s === " " || s === "\x1B ") {
-    key.name = "space";
-    key.meta = s.length === 2;
-  } else if (ctrlKeyName) {
-    key.name = ctrlKeyName;
-    key.ctrl = true;
-  } else if (s.length === 1 && s >= "0" && s <= "9") {
-    key.name = s;
-    key.number = true;
-  } else if (s.length === 1 && s >= "a" && s <= "z") {
-    key.name = s;
-  } else if (s.length === 1 && s >= "A" && s <= "Z") {
-    key.name = s.toLowerCase();
-    key.shift = true;
-  } else if (s.length === 1 || s.length === 2 && s.codePointAt(0) > 65535) {
-    key.name = s;
-  } else if (parts = metaKeyCodeRe.exec(s)) {
-    key.meta = true;
-    const char = parts[1];
-    const isUpperCase = /^[A-Z]$/.test(char);
-    if (char === "F") {
-      key.name = "right";
-    } else if (char === "B") {
-      key.name = "left";
-    } else if (isUpperCase) {
-      key.shift = true;
-      key.name = char;
-    } else {
-      key.name = char;
-    }
-  } else if (metaCtrlKeyName) {
-    key.meta = true;
-    key.ctrl = true;
-    key.name = metaCtrlKeyName;
-  } else if (parts = fnKeyRe.exec(s)) {
-    const segs = [...s];
-    if (segs[0] === "\x1B" && segs[1] === "\x1B") {
-      key.option = true;
-      key.meta = true;
-    }
-    const code = [parts[1], parts[2], parts[4], parts[6]].filter(Boolean).join("");
-    const modifier = parseInt(parts[3] || parts[5] || "1", 10) - 1;
-    key.ctrl = key.ctrl || !!(modifier & 4);
-    key.meta = key.meta || !!(modifier & 2);
-    key.shift = key.shift || !!(modifier & 1);
-    key.option = key.option || !!(modifier & 2);
-    key.super = !!(modifier & 8);
-    key.hyper = !!(modifier & 16);
-    key.code = code;
-    const keyNameResult = keyName[code];
-    if (keyNameResult) {
-      key.name = keyNameResult;
-      key.shift = isShiftKey(code) || key.shift;
-      key.ctrl = isCtrlKey(code) || key.ctrl;
-      const ss3Char = ss3NumpadPrintable[code];
-      if (ss3Char !== undefined) {
-        key.sequence = ss3Char;
-        if (key.name >= "0" && key.name <= "9") {
-          key.number = true;
-        }
-      }
-    } else {
-      key.name = "";
-      key.code = undefined;
-    }
-  } else if (s === "\x1B[3~") {
-    key.name = "delete";
-    key.meta = false;
-    key.code = "[3~";
-  }
-  return key;
-};
-
-// src/lib/scroll-acceleration.ts
-class LinearScrollAccel {
-  tick(_now) {
-    return 1;
-  }
-  reset() {}
-}
-
-class MacOSScrollAccel {
-  opts;
-  lastTickTime = 0;
-  velocityHistory = [];
-  historySize = 3;
-  streakTimeout = 150;
-  minTickInterval = 6;
-  constructor(opts = {}) {
-    this.opts = opts;
-  }
-  tick(now = Date.now()) {
-    const A = this.opts.A ?? 0.8;
-    const tau = this.opts.tau ?? 3;
-    const maxMultiplier = this.opts.maxMultiplier ?? 6;
-    const dt = this.lastTickTime ? now - this.lastTickTime : Infinity;
-    if (dt === Infinity || dt > this.streakTimeout) {
-      this.lastTickTime = now;
-      this.velocityHistory = [];
-      return 1;
-    }
-    if (dt < this.minTickInterval) {
-      return 1;
-    }
-    this.lastTickTime = now;
-    this.velocityHistory.push(dt);
-    if (this.velocityHistory.length > this.historySize) {
-      this.velocityHistory.shift();
-    }
-    const avgInterval = this.velocityHistory.reduce((a, b) => a + b, 0) / this.velocityHistory.length;
-    const referenceInterval = 100;
-    const velocity = referenceInterval / avgInterval;
-    const x = velocity / tau;
-    const multiplier = 1 + A * (Math.exp(x) - 1);
-    return Math.min(multiplier, maxMultiplier);
-  }
-  reset() {
-    this.lastTickTime = 0;
-    this.velocityHistory = [];
-  }
-}
-
-// src/lib/yoga.options.ts
-function parseAlign(value) {
-  if (value == null) {
-    return Align.Auto;
-  }
-  switch (value.toLowerCase()) {
-    case "auto":
-      return Align.Auto;
-    case "flex-start":
-      return Align.FlexStart;
-    case "center":
-      return Align.Center;
-    case "flex-end":
-      return Align.FlexEnd;
-    case "stretch":
-      return Align.Stretch;
-    case "baseline":
-      return Align.Baseline;
-    case "space-between":
-      return Align.SpaceBetween;
-    case "space-around":
-      return Align.SpaceAround;
-    case "space-evenly":
-      return Align.SpaceEvenly;
-    default:
-      return Align.Auto;
-  }
-}
-function parseAlignItems(value) {
-  if (value == null) {
-    return Align.Stretch;
-  }
-  switch (value.toLowerCase()) {
-    case "auto":
-      return Align.Auto;
-    case "flex-start":
-      return Align.FlexStart;
-    case "center":
-      return Align.Center;
-    case "flex-end":
-      return Align.FlexEnd;
-    case "stretch":
-      return Align.Stretch;
-    case "baseline":
-      return Align.Baseline;
-    case "space-between":
-      return Align.SpaceBetween;
-    case "space-around":
-      return Align.SpaceAround;
-    case "space-evenly":
-      return Align.SpaceEvenly;
-    default:
-      return Align.Stretch;
-  }
-}
-function parseBoxSizing(value) {
-  if (value == null) {
-    return BoxSizing.BorderBox;
-  }
-  switch (value.toLowerCase()) {
-    case "border-box":
-      return BoxSizing.BorderBox;
-    case "content-box":
-      return BoxSizing.ContentBox;
-    default:
-      return BoxSizing.BorderBox;
-  }
-}
-function parseDimension(value) {
-  if (value == null) {
-    return Dimension.Width;
-  }
-  switch (value.toLowerCase()) {
-    case "width":
-      return Dimension.Width;
-    case "height":
-      return Dimension.Height;
-    default:
-      return Dimension.Width;
-  }
-}
-function parseDirection(value) {
-  if (value == null) {
-    return Direction.LTR;
-  }
-  switch (value.toLowerCase()) {
-    case "inherit":
-      return Direction.Inherit;
-    case "ltr":
-      return Direction.LTR;
-    case "rtl":
-      return Direction.RTL;
-    default:
-      return Direction.LTR;
-  }
-}
-function parseDisplay(value) {
-  if (value == null) {
-    return 0 /* Flex */;
-  }
-  switch (value.toLowerCase()) {
-    case "flex":
-      return 0 /* Flex */;
-    case "none":
-      return 1 /* None */;
-    case "contents":
-      return 2 /* Contents */;
-    default:
-      return 0 /* Flex */;
-  }
-}
-function parseEdge(value) {
-  if (value == null) {
-    return Edge.All;
-  }
-  switch (value.toLowerCase()) {
-    case "left":
-      return Edge.Left;
-    case "top":
-      return Edge.Top;
-    case "right":
-      return Edge.Right;
-    case "bottom":
-      return Edge.Bottom;
-    case "start":
-      return Edge.Start;
-    case "end":
-      return Edge.End;
-    case "horizontal":
-      return Edge.Horizontal;
-    case "vertical":
-      return Edge.Vertical;
-    case "all":
-      return Edge.All;
-    default:
-      return Edge.All;
-  }
-}
-function parseFlexDirection(value) {
-  if (value == null) {
-    return FlexDirection.Column;
-  }
-  switch (value.toLowerCase()) {
-    case "column":
-      return FlexDirection.Column;
-    case "column-reverse":
-      return FlexDirection.ColumnReverse;
-    case "row":
-      return FlexDirection.Row;
-    case "row-reverse":
-      return FlexDirection.RowReverse;
-    default:
-      return FlexDirection.Column;
-  }
-}
-function parseGutter(value) {
-  if (value == null) {
-    return Gutter.All;
-  }
-  switch (value.toLowerCase()) {
-    case "column":
-      return Gutter.Column;
-    case "row":
-      return Gutter.Row;
-    case "all":
-      return Gutter.All;
-    default:
-      return Gutter.All;
-  }
-}
-function parseJustify(value) {
-  if (value == null) {
-    return Justify.FlexStart;
-  }
-  switch (value.toLowerCase()) {
-    case "flex-start":
-      return Justify.FlexStart;
-    case "center":
-      return Justify.Center;
-    case "flex-end":
-      return Justify.FlexEnd;
-    case "space-between":
-      return Justify.SpaceBetween;
-    case "space-around":
-      return Justify.SpaceAround;
-    case "space-evenly":
-      return Justify.SpaceEvenly;
-    default:
-      return Justify.FlexStart;
-  }
-}
-function parseLogLevel(value) {
-  if (value == null) {
-    return 2 /* Info */;
-  }
-  switch (value.toLowerCase()) {
-    case "error":
-      return 0 /* Error */;
-    case "warn":
-      return 1 /* Warn */;
-    case "info":
-      return 2 /* Info */;
-    case "debug":
-      return 3 /* Debug */;
-    case "verbose":
-      return 4 /* Verbose */;
-    case "fatal":
-      return 5 /* Fatal */;
-    default:
-      return 2 /* Info */;
-  }
-}
-function parseMeasureMode(value) {
-  if (value == null) {
-    return MeasureMode.Undefined;
-  }
-  switch (value.toLowerCase()) {
-    case "undefined":
-      return MeasureMode.Undefined;
-    case "exactly":
-      return MeasureMode.Exactly;
-    case "at-most":
-      return MeasureMode.AtMost;
-    default:
-      return MeasureMode.Undefined;
-  }
-}
-function parseOverflow(value) {
-  if (value == null) {
-    return Overflow.Visible;
-  }
-  switch (value.toLowerCase()) {
-    case "visible":
-      return Overflow.Visible;
-    case "hidden":
-      return Overflow.Hidden;
-    case "scroll":
-      return Overflow.Scroll;
-    default:
-      return Overflow.Visible;
-  }
-}
-function parsePositionType(value) {
-  if (value == null) {
-    return PositionType.Relative;
-  }
-  switch (value.toLowerCase()) {
-    case "static":
-      return PositionType.Static;
-    case "relative":
-      return PositionType.Relative;
-    case "absolute":
-      return PositionType.Absolute;
-    default:
-      return PositionType.Static;
-  }
-}
-function parseUnit(value) {
-  if (value == null) {
-    return Unit.Point;
-  }
-  switch (value.toLowerCase()) {
-    case "undefined":
-      return Unit.Undefined;
-    case "point":
-      return Unit.Point;
-    case "percent":
-      return Unit.Percent;
-    case "auto":
-      return Unit.Auto;
-    default:
-      return Unit.Point;
-  }
-}
-function parseWrap(value) {
-  if (value == null) {
-    return Wrap.NoWrap;
-  }
-  switch (value.toLowerCase()) {
-    case "no-wrap":
-      return Wrap.NoWrap;
-    case "wrap":
-      return Wrap.Wrap;
-    case "wrap-reverse":
-      return Wrap.WrapReverse;
-    default:
-      return Wrap.NoWrap;
-  }
-}
-
-// src/lib/parse.mouse.ts
-class MouseParser {
-  mouseButtonsPressed = new Set;
-  static SCROLL_DIRECTIONS = {
-    0: "up",
-    1: "down",
-    2: "left",
-    3: "right"
-  };
-  reset() {
-    this.mouseButtonsPressed.clear();
-  }
-  decodeInput(data) {
-    const buf = Buffer.isBuffer(data) ? data : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
-    return buf.toString("latin1");
-  }
-  parseMouseEvent(data) {
-    const str = this.decodeInput(data);
-    const parsed = this.parseMouseSequenceAt(str, 0);
-    return parsed?.event ?? null;
-  }
-  parseAllMouseEvents(data) {
-    const str = this.decodeInput(data);
-    const events = [];
-    let offset = 0;
-    while (offset < str.length) {
-      const parsed = this.parseMouseSequenceAt(str, offset);
-      if (!parsed) {
-        break;
-      }
-      events.push(parsed.event);
-      offset += parsed.consumed;
-    }
-    return events;
-  }
-  parseMouseSequenceAt(str, offset) {
-    if (!str.startsWith("\x1B[", offset))
-      return null;
-    const introducer = str[offset + 2];
-    if (introducer === "<") {
-      return this.parseSgrSequence(str, offset);
-    }
-    if (introducer === "M") {
-      return this.parseBasicSequence(str, offset);
-    }
-    return null;
-  }
-  parseSgrSequence(str, offset) {
-    let index = offset + 3;
-    const values = [0, 0, 0];
-    let part = 0;
-    let hasDigit = false;
-    while (index < str.length) {
-      const char = str[index];
-      const charCode = str.charCodeAt(index);
-      if (charCode >= 48 && charCode <= 57) {
-        hasDigit = true;
-        values[part] = values[part] * 10 + (charCode - 48);
-        index++;
-        continue;
-      }
-      switch (char) {
-        case ";": {
-          if (!hasDigit || part >= 2)
-            return null;
-          part++;
-          hasDigit = false;
-          index++;
-          break;
-        }
-        case "M":
-        case "m": {
-          if (!hasDigit || part !== 2)
-            return null;
-          return {
-            event: this.decodeSgrEvent(values[0], values[1], values[2], char),
-            consumed: index - offset + 1
-          };
-        }
-        default:
-          return null;
-      }
-    }
-    return null;
-  }
-  parseBasicSequence(str, offset) {
-    if (offset + 6 > str.length)
-      return null;
-    const buttonByte = str.charCodeAt(offset + 3) - 32;
-    const x = str.charCodeAt(offset + 4) - 33;
-    const y = str.charCodeAt(offset + 5) - 33;
-    return {
-      event: this.decodeBasicEvent(buttonByte, x, y),
-      consumed: 6
-    };
-  }
-  decodeSgrEvent(rawButtonCode, wireX, wireY, pressRelease) {
-    const button = rawButtonCode & 3;
-    const isScroll = (rawButtonCode & 64) !== 0;
-    const scrollDirection = !isScroll ? undefined : MouseParser.SCROLL_DIRECTIONS[button];
-    const isMotion = (rawButtonCode & 32) !== 0;
-    const modifiers = {
-      shift: (rawButtonCode & 4) !== 0,
-      alt: (rawButtonCode & 8) !== 0,
-      ctrl: (rawButtonCode & 16) !== 0
-    };
-    let type;
-    let scrollInfo;
-    if (isMotion) {
-      const isDragging = this.mouseButtonsPressed.size > 0;
-      if (button === 3) {
-        type = "move";
-      } else if (isDragging) {
-        type = "drag";
-      } else {
-        type = "move";
-      }
-    } else if (isScroll && pressRelease === "M") {
-      type = "scroll";
-      scrollInfo = {
-        direction: scrollDirection,
-        delta: 1
-      };
-    } else {
-      type = pressRelease === "M" ? "down" : "up";
-      if (type === "down" && button !== 3) {
-        this.mouseButtonsPressed.add(button);
-      } else if (type === "up") {
-        this.mouseButtonsPressed.delete(button);
-      }
-    }
-    return {
-      type,
-      button: button === 3 ? 0 : button,
-      x: wireX - 1,
-      y: wireY - 1,
-      modifiers,
-      scroll: scrollInfo
-    };
-  }
-  decodeBasicEvent(buttonByte, x, y) {
-    const button = buttonByte & 3;
-    const isScroll = (buttonByte & 64) !== 0;
-    const isMotion = (buttonByte & 32) !== 0;
-    const scrollDirection = !isScroll ? undefined : MouseParser.SCROLL_DIRECTIONS[button];
-    const modifiers = {
-      shift: (buttonByte & 4) !== 0,
-      alt: (buttonByte & 8) !== 0,
-      ctrl: (buttonByte & 16) !== 0
-    };
-    let type;
-    let actualButton;
-    let scrollInfo;
-    if (isMotion) {
-      type = "move";
-      actualButton = button === 3 ? -1 : button;
-    } else if (isScroll) {
-      type = "scroll";
-      actualButton = 0;
-      scrollInfo = {
-        direction: scrollDirection,
-        delta: 1
-      };
-    } else {
-      type = button === 3 ? "up" : "down";
-      actualButton = button === 3 ? 0 : button;
-    }
-    return {
-      type,
-      button: actualButton,
-      x,
-      y,
-      modifiers,
-      scroll: scrollInfo
-    };
-  }
-}
-
-// src/lib/selection.ts
-class SelectionAnchor {
-  renderable;
-  relativeX;
-  relativeY;
-  constructor(renderable, absoluteX, absoluteY) {
-    this.renderable = renderable;
-    this.relativeX = absoluteX - Math.trunc(this.renderable.x);
-    this.relativeY = absoluteY - Math.trunc(this.renderable.y);
-  }
-  get x() {
-    return Math.trunc(this.renderable.x) + this.relativeX;
-  }
-  get y() {
-    return Math.trunc(this.renderable.y) + this.relativeY;
-  }
-}
-
-class Selection {
-  _anchor;
-  _focus;
-  _selectedRenderables = [];
-  _touchedRenderables = [];
-  _isActive = true;
-  _isDragging = true;
-  _isStart = false;
-  behavior;
-  constructor(anchorRenderable, anchor, focus, behavior = "cell") {
-    this._anchor = new SelectionAnchor(anchorRenderable, anchor.x, anchor.y);
-    this._focus = { ...focus };
-    this.behavior = behavior;
-  }
-  get isStart() {
-    return this._isStart;
-  }
-  set isStart(value) {
-    this._isStart = value;
-  }
-  get anchor() {
-    return { x: this._anchor.x, y: this._anchor.y };
-  }
-  get focus() {
-    return { ...this._focus };
-  }
-  set focus(value) {
-    this._focus = { ...value };
-  }
-  get isActive() {
-    return this._isActive;
-  }
-  set isActive(value) {
-    this._isActive = value;
-  }
-  get isDragging() {
-    return this._isDragging;
-  }
-  set isDragging(value) {
-    this._isDragging = value;
-  }
-  get bounds() {
-    const minX = Math.min(this._anchor.x, this._focus.x);
-    const maxX = Math.max(this._anchor.x, this._focus.x);
-    const minY = Math.min(this._anchor.y, this._focus.y);
-    const maxY = Math.max(this._anchor.y, this._focus.y);
-    const width = maxX - minX + 1;
-    const height = maxY - minY + 1;
-    return {
-      x: minX,
-      y: minY,
-      width,
-      height
-    };
-  }
-  updateSelectedRenderables(selectedRenderables) {
-    this._selectedRenderables = selectedRenderables;
-  }
-  get selectedRenderables() {
-    return this._selectedRenderables;
-  }
-  updateTouchedRenderables(touchedRenderables) {
-    this._touchedRenderables = touchedRenderables;
-  }
-  get touchedRenderables() {
-    return this._touchedRenderables;
-  }
-  getSelectedText() {
-    const selectedTextsByLine = new Map;
-    const selectedRenderables = this._selectedRenderables.sort((a, b) => {
-      const aY = a.y;
-      const bY = b.y;
-      if (aY !== bY) {
-        return aY - bY;
-      }
-      return a.x - b.x;
-    }).filter((renderable) => !renderable.isDestroyed);
-    for (const renderable of selectedRenderables) {
-      const text = renderable.getSelectedText();
-      if (!text)
-        continue;
-      const lines = text.split(`
-`);
-      for (let index = 0;index < lines.length; index += 1) {
-        const y = renderable.y + index;
-        const line = selectedTextsByLine.get(y) ?? [];
-        line.push({ x: renderable.x, text: lines[index] });
-        selectedTextsByLine.set(y, line);
-      }
-    }
-    return [...selectedTextsByLine.entries()].sort(([leftY], [rightY]) => leftY - rightY).map(([, line]) => line.sort((left, right) => left.x - right.x).map((segment) => segment.text).join("")).join(`
-`);
-  }
-}
-function convertGlobalToLocalSelection(globalSelection, localX, localY) {
-  if (!globalSelection?.isActive) {
-    return null;
-  }
-  return {
-    anchorX: globalSelection.anchor.x - localX,
-    anchorY: globalSelection.anchor.y - localY,
-    focusX: globalSelection.focus.x - localX,
-    focusY: globalSelection.focus.y - localY,
-    isActive: true,
-    behavior: globalSelection.behavior
-  };
-}
-
-class ASCIIFontSelectionHelper {
-  getText;
-  getFont;
-  localSelection = null;
-  constructor(getText, getFont) {
-    this.getText = getText;
-    this.getFont = getFont;
-  }
-  hasSelection() {
-    return this.localSelection !== null;
-  }
-  getSelection() {
-    return this.localSelection;
-  }
-  shouldStartSelection(localX, localY, width, height) {
-    if (localX < 0 || localX >= width || localY < 0 || localY >= height) {
-      return false;
-    }
-    const text = this.getText();
-    const font = this.getFont();
-    const charIndex = coordinateToCharacterIndex(localX, text, font);
-    return charIndex >= 0 && charIndex <= text.length;
-  }
-  onLocalSelectionChanged(localSelection, width, height) {
-    const previousSelection = this.localSelection;
-    if (!localSelection?.isActive) {
-      this.localSelection = null;
-      return previousSelection !== null;
-    }
-    const text = this.getText();
-    const font = this.getFont();
-    const positions = getCharacterPositions(text, font);
-    const minY = Math.min(localSelection.anchorY, localSelection.focusY);
-    const maxY = Math.max(localSelection.anchorY, localSelection.focusY);
-    if (maxY < 0 || minY > height - 1) {
-      this.localSelection = null;
-      return previousSelection !== null;
-    }
-    const indexAt = (x, y) => {
-      if (y < 0)
-        return 0;
-      if (y > height - 1)
-        return text.length;
-      if (x < 0)
-        return 0;
-      if (x >= width)
-        return text.length;
-      for (let index = 1;index < positions.length; index += 1) {
-        if (x < positions[index])
-          return index - 1;
-      }
-      return text.length;
-    };
-    const anchorIndex = indexAt(localSelection.anchorX, localSelection.anchorY);
-    const focusIndex = indexAt(localSelection.focusX, localSelection.focusY);
-    const start = Math.min(anchorIndex, focusIndex);
-    const end = Math.min(Math.max(anchorIndex, focusIndex) + 1, text.length);
-    const samePoint = localSelection.anchorX === localSelection.focusX && localSelection.anchorY === localSelection.focusY;
-    if (samePoint || start >= end) {
-      this.localSelection = null;
-    } else {
-      this.localSelection = { start, end };
-    }
-    return previousSelection?.start !== this.localSelection?.start || previousSelection?.end !== this.localSelection?.end;
-  }
-}
-
-// src/lib/stdin-parser.ts
-import { Buffer as Buffer3 } from "buffer";
-var DEFAULT_TIMEOUT_MS = 20;
-var DEFAULT_MAX_PENDING_BYTES = 64 * 1024;
-var INITIAL_PENDING_CAPACITY = 256;
-var ESC = 27;
-var BEL = 7;
-var BRACKETED_PASTE_START = Buffer3.from("\x1B[200~");
-var BRACKETED_PASTE_END = Buffer3.from("\x1B[201~");
-var EMPTY_BYTES = new Uint8Array(0);
-var KEY_DECODER = new TextDecoder;
-var DEFAULT_PROTOCOL_CONTEXT = {
-  kittyKeyboardEnabled: false,
-  privateCapabilityRepliesActive: false,
-  pixelResolutionQueryActive: false,
-  explicitWidthCprActive: false,
-  startupCursorCprActive: false,
-  replySentinelActive: false
-};
-var RXVT_DOLLAR_CSI_RE = /^\x1b\[\d+\$$/;
-var SYSTEM_CLOCK = new SystemClock;
-
-class ByteQueue {
-  buf;
-  start = 0;
-  end = 0;
-  constructor(capacity = INITIAL_PENDING_CAPACITY) {
-    this.buf = new Uint8Array(capacity);
-  }
-  get length() {
-    return this.end - this.start;
-  }
-  get capacity() {
-    return this.buf.length;
-  }
-  view() {
-    return this.buf.subarray(this.start, this.end);
-  }
-  take() {
-    const chunk = this.view();
-    this.start = 0;
-    this.end = 0;
-    return chunk;
-  }
-  append(chunk) {
-    if (chunk.length === 0) {
-      return;
-    }
-    this.ensureCapacity(this.length + chunk.length);
-    this.buf.set(chunk, this.end);
-    this.end += chunk.length;
-  }
-  consume(count) {
-    if (count <= 0) {
-      return;
-    }
-    if (count >= this.length) {
-      this.start = 0;
-      this.end = 0;
-      return;
-    }
-    this.start += count;
-    if (this.start >= this.buf.length / 2) {
-      this.buf.copyWithin(0, this.start, this.end);
-      this.end -= this.start;
-      this.start = 0;
-    }
-  }
-  clear() {
-    this.start = 0;
-    this.end = 0;
-  }
-  reset(capacity = INITIAL_PENDING_CAPACITY) {
-    this.buf = new Uint8Array(capacity);
-    this.start = 0;
-    this.end = 0;
-  }
-  ensureCapacity(requiredLength) {
-    const currentLength = this.length;
-    if (requiredLength <= this.buf.length) {
-      const availableAtEnd = this.buf.length - this.end;
-      if (availableAtEnd >= requiredLength - currentLength) {
-        return;
-      }
-      this.buf.copyWithin(0, this.start, this.end);
-      this.end = currentLength;
-      this.start = 0;
-      if (requiredLength <= this.buf.length) {
-        return;
-      }
-    }
-    let nextCapacity = this.buf.length;
-    while (nextCapacity < requiredLength) {
-      nextCapacity *= 2;
-    }
-    const next = new Uint8Array(nextCapacity);
-    next.set(this.view(), 0);
-    this.buf = next;
-    this.start = 0;
-    this.end = currentLength;
-  }
-}
-function normalizePositiveOption(value, fallback) {
-  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-    return fallback;
-  }
-  return Math.floor(value);
-}
-function utf8SequenceLength(first) {
-  if (first < 128)
-    return 1;
-  if (first >= 194 && first <= 223)
-    return 2;
-  if (first >= 224 && first <= 239)
-    return 3;
-  if (first >= 240 && first <= 244)
-    return 4;
-  return 0;
-}
-function bytesEqual(left, right) {
-  if (left.length !== right.length) {
-    return false;
-  }
-  for (let index = 0;index < left.length; index += 1) {
-    if (left[index] !== right[index]) {
-      return false;
-    }
-  }
-  return true;
-}
-function isMouseSgrSequence(sequence) {
-  if (sequence.length < 7) {
-    return false;
-  }
-  if (sequence[0] !== ESC || sequence[1] !== 91 || sequence[2] !== 60) {
-    return false;
-  }
-  const final = sequence[sequence.length - 1];
-  if (final !== 77 && final !== 109) {
-    return false;
-  }
-  let part = 0;
-  let hasDigit = false;
-  for (let index = 3;index < sequence.length - 1; index += 1) {
-    const byte = sequence[index];
-    if (byte >= 48 && byte <= 57) {
-      hasDigit = true;
-      continue;
-    }
-    if (byte === 59 && hasDigit && part < 2) {
-      part += 1;
-      hasDigit = false;
-      continue;
-    }
-    return false;
-  }
-  return part === 2 && hasDigit;
-}
-function isAsciiDigit(byte) {
-  return byte >= 48 && byte <= 57;
-}
-function parsePositiveDecimalPrefix(sequence, start, endExclusive) {
-  if (start >= endExclusive)
-    return null;
-  let value = 0;
-  let sawDigit = false;
-  for (let index = start;index < endExclusive; index += 1) {
-    const byte = sequence[index];
-    if (!isAsciiDigit(byte))
-      return null;
-    sawDigit = true;
-    value = value * 10 + (byte - 48);
-  }
-  return sawDigit ? value : null;
-}
-function parseKittyFirstFieldCodepoint(sequence, start, endExclusive) {
-  if (start >= endExclusive)
-    return null;
-  let firstColon = -1;
-  for (let index = start;index < endExclusive; index += 1) {
-    if (sequence[index] === 58) {
-      firstColon = index;
-      break;
-    }
-  }
-  if (firstColon === -1)
-    return null;
-  const codepoint = parsePositiveDecimalPrefix(sequence, start, firstColon);
-  if (codepoint === null)
-    return null;
-  for (let index = firstColon + 1;index < endExclusive; index += 1) {
-    const byte = sequence[index];
-    if (byte !== 58 && !isAsciiDigit(byte))
-      return null;
-  }
-  return codepoint;
-}
-function canStillBeKittyU(state) {
-  return state.semicolons >= 1;
-}
-function canStillBeKittySpecial(state) {
-  return state.semicolons === 1 && state.segments > 1;
-}
-function canStillBeExplicitWidthCpr(state) {
-  return state.firstParamValue === 1 && state.semicolons === 1;
-}
-function canStillBeStartupCursorCpr(state) {
-  return state.semicolons === 1;
-}
-function canStillBeStartupCursorCprPrefix(state) {
-  return state.segments === 1 && state.semicolons <= 1;
-}
-function canStillBePixelResolution(state) {
-  return state.firstParamValue === 4 && state.semicolons === 2;
-}
-function canStillBePixelResolutionPrefix(bytes) {
-  const fixedPrefix = [ESC, 91, 52, 59];
-  const fixedLength = Math.min(bytes.length, fixedPrefix.length);
-  for (let index2 = 0;index2 < fixedLength; index2 += 1) {
-    if (bytes[index2] !== fixedPrefix[index2])
-      return false;
-  }
-  if (bytes.length <= fixedPrefix.length)
-    return bytes.length > 0;
-  let index = fixedPrefix.length;
-  const heightStart = index;
-  while (index < bytes.length && isAsciiDigit(bytes[index]))
-    index += 1;
-  if (index === bytes.length)
-    return index > heightStart;
-  if (index === heightStart || bytes[index] !== 59)
-    return false;
-  index += 1;
-  const widthStart = index;
-  while (index < bytes.length && isAsciiDigit(bytes[index]))
-    index += 1;
-  if (index === bytes.length)
-    return true;
-  return index > widthStart && bytes[index] === 116;
-}
-function canDeferParametricCsi(state, context) {
-  return context.kittyKeyboardEnabled && (canStillBeKittyU(state) || canStillBeKittySpecial(state)) || context.explicitWidthCprActive && canStillBeExplicitWidthCpr(state) || context.startupCursorCprActive && canStillBeStartupCursorCpr(state) || context.pixelResolutionQueryActive && canStillBePixelResolution(state);
-}
-function canCompleteDeferredParametricCsi(state, byte, context) {
-  if (context.kittyKeyboardEnabled) {
-    if (state.hasDigit && byte === 117)
-      return true;
-    if (state.hasDigit && state.semicolons === 1 && state.segments > 1 && (byte === 126 || byte >= 65 && byte <= 90)) {
-      return true;
-    }
-  }
-  if (context.explicitWidthCprActive && state.hasDigit && state.firstParamValue === 1 && state.semicolons === 1 && byte === 82) {
-    return true;
-  }
-  if (context.startupCursorCprActive && state.hasDigit && state.semicolons === 1 && byte === 82) {
-    return true;
-  }
-  if (context.pixelResolutionQueryActive && state.hasDigit && state.firstParamValue === 4 && state.semicolons === 2 && byte === 116) {
-    return true;
-  }
-  return false;
-}
-function classifyParametricCsiProtocol(state, finalByte) {
-  if (finalByte === 82 && state.semicolons === 1 && state.segments === 1 && state.hasDigit) {
-    return "cpr";
-  }
-  return "csi";
-}
-function canDeferPrivateReplyCsi(context) {
-  return context.privateCapabilityRepliesActive;
-}
-function canCompleteDeferredPrivateReplyCsi(state, byte, context) {
-  if (!context.privateCapabilityRepliesActive)
-    return false;
-  if (state.sawDollar)
-    return state.hasDigit && byte === 121;
-  if (byte === 99)
-    return state.hasDigit || state.semicolons > 0;
-  if (byte === 110)
-    return state.hasDigit;
-  return state.hasDigit && byte === 117;
-}
-function concatBytes(left, right) {
-  if (left.length === 0) {
-    return right;
-  }
-  if (right.length === 0) {
-    return left;
-  }
-  const combined = new Uint8Array(left.length + right.length);
-  combined.set(left, 0);
-  combined.set(right, left.length);
-  return combined;
-}
-function withEscPrefix(bytes) {
-  const prefixed = new Uint8Array(bytes.length + 1);
-  prefixed[0] = ESC;
-  prefixed.set(bytes, 1);
-  return prefixed;
-}
-function indexOfBytes(haystack, needle) {
-  if (needle.length === 0) {
-    return 0;
-  }
-  const limit = haystack.length - needle.length;
-  for (let offset = 0;offset <= limit; offset += 1) {
-    let matched = true;
-    for (let index = 0;index < needle.length; index += 1) {
-      if (haystack[offset + index] !== needle[index]) {
-        matched = false;
-        break;
-      }
-    }
-    if (matched) {
-      return offset;
-    }
-  }
-  return -1;
-}
-function decodeLatin1(bytes) {
-  return Buffer3.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString("latin1");
-}
-function decodeUtf8(bytes) {
-  return KEY_DECODER.decode(bytes);
-}
-function createPasteCollector() {
-  return {
-    tail: EMPTY_BYTES,
-    parts: [],
-    totalLength: 0
-  };
-}
-function joinPasteBytes(parts, totalLength) {
-  if (totalLength === 0) {
-    return EMPTY_BYTES;
-  }
-  if (parts.length === 1) {
-    return parts[0];
-  }
-  const bytes = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const part of parts) {
-    bytes.set(part, offset);
-    offset += part.length;
-  }
-  return bytes;
-}
-
-class StdinParser {
-  pending = new ByteQueue(INITIAL_PENDING_CAPACITY);
-  events = [];
-  timeoutMs;
-  maxPendingBytes;
-  armTimeouts;
-  onTimeoutFlush;
-  useKittyKeyboard;
-  mouseParser = new MouseParser;
-  clock;
-  protocolContext;
-  timeoutId = null;
-  destroyed = false;
-  pendingSinceMs = null;
-  pendingTimeoutPaused = false;
-  suspendedPixelResolutionPrefixLength = 0;
-  forceFlush = false;
-  justFlushedEsc = false;
-  state = { tag: "ground" };
-  cursor = 0;
-  unitStart = 0;
-  paste = null;
-  constructor(options = {}) {
-    this.timeoutMs = normalizePositiveOption(options.timeoutMs, DEFAULT_TIMEOUT_MS);
-    this.maxPendingBytes = normalizePositiveOption(options.maxPendingBytes, DEFAULT_MAX_PENDING_BYTES);
-    this.armTimeouts = options.armTimeouts ?? true;
-    this.onTimeoutFlush = options.onTimeoutFlush ?? null;
-    this.useKittyKeyboard = options.useKittyKeyboard ?? true;
-    this.clock = options.clock ?? SYSTEM_CLOCK;
-    this.protocolContext = {
-      ...DEFAULT_PROTOCOL_CONTEXT,
-      kittyKeyboardEnabled: options.protocolContext?.kittyKeyboardEnabled ?? false,
-      privateCapabilityRepliesActive: options.protocolContext?.privateCapabilityRepliesActive ?? false,
-      pixelResolutionQueryActive: options.protocolContext?.pixelResolutionQueryActive ?? false,
-      explicitWidthCprActive: options.protocolContext?.explicitWidthCprActive ?? false,
-      startupCursorCprActive: options.protocolContext?.startupCursorCprActive ?? false
-    };
-  }
-  get bufferCapacity() {
-    return this.pending.capacity;
-  }
-  updateProtocolContext(patch) {
-    this.ensureAlive();
-    this.protocolContext = { ...this.protocolContext, ...patch };
-    if (!this.protocolContext.pixelResolutionQueryActive && this.suspendedPixelResolutionPrefixLength > 0) {
-      const prefixLength = this.suspendedPixelResolutionPrefixLength;
-      this.state = { tag: "ground" };
-      this.consumePrefix(prefixLength);
-      this.scanPending();
-    }
-    this.reconcileDeferredStateWithProtocolContext();
-    this.reconcileTimeoutState();
-  }
-  getAbortableStartupCursorCprState() {
-    if (this.pending.length === 0) {
-      return null;
-    }
-    switch (this.state.tag) {
-      case "csi": {
-        const bytes = this.pending.view();
-        const firstParamStart = this.unitStart + 2;
-        if (this.cursor < firstParamStart) {
-          return null;
-        }
-        let firstParamValue = null;
-        for (let index = firstParamStart;index < this.cursor; index += 1) {
-          const byte = bytes[index];
-          if (!isAsciiDigit(byte)) {
-            return null;
-          }
-          firstParamValue = (firstParamValue ?? 0) * 10 + (byte - 48);
-        }
-        return {
-          tag: "csi_parametric_ignored",
-          semicolons: 0,
-          segments: 1,
-          hasDigit: this.cursor > firstParamStart,
-          firstParamValue
-        };
-      }
-      case "csi_parametric":
-      case "csi_parametric_deferred":
-        if (!canStillBeStartupCursorCprPrefix(this.state) || this.protocolContext.explicitWidthCprActive && canStillBeExplicitWidthCpr(this.state)) {
-          return null;
-        }
-        return {
-          tag: "csi_parametric_ignored",
-          semicolons: this.state.semicolons,
-          segments: this.state.segments,
-          hasDigit: this.state.hasDigit,
-          firstParamValue: this.state.firstParamValue
-        };
-    }
-    return null;
-  }
-  abortPendingStartupCursorCpr() {
-    this.ensureAlive();
-    const nextState = this.getAbortableStartupCursorCprState();
-    if (!nextState) {
-      return;
-    }
-    this.state = nextState;
-    if (this.pendingSinceMs === null) {
-      this.markPending();
-    }
-    this.forceFlush = false;
-    this.reconcileTimeoutState();
-  }
-  push(data) {
-    this.ensureAlive();
-    if (data.length === 0) {
-      this.emitKeyOrResponse("unknown", "");
-      return;
-    }
-    let remainder = data;
-    while (remainder.length > 0) {
-      if (this.paste) {
-        remainder = this.consumePasteBytes(remainder);
-        continue;
-      }
-      const immediatePasteStartIndex = this.state.tag === "ground" && this.pending.length === 0 ? indexOfBytes(remainder, BRACKETED_PASTE_START) : -1;
-      const appendEnd = immediatePasteStartIndex === -1 ? remainder.length : immediatePasteStartIndex + BRACKETED_PASTE_START.length;
-      this.pending.append(remainder.subarray(0, appendEnd));
-      remainder = remainder.subarray(appendEnd);
-      if (this.suspendedPixelResolutionPrefixLength > 0 && this.protocolContext.pixelResolutionQueryActive && !canStillBePixelResolutionPrefix(this.pending.view())) {
-        const prefixLength = this.suspendedPixelResolutionPrefixLength;
-        this.state = { tag: "ground" };
-        this.consumePrefix(prefixLength);
-      }
-      this.scanPending();
-      if (this.paste && this.pending.length > 0) {
-        remainder = this.consumePasteBytes(this.takePendingBytes());
-        continue;
-      }
-      if (!this.paste && this.pending.length > this.maxPendingBytes) {
-        this.flushPendingOverflow();
-        this.scanPending();
-        if (this.paste && this.pending.length > 0) {
-          remainder = this.consumePasteBytes(this.takePendingBytes());
-        }
-      }
-    }
-    this.reconcileTimeoutState();
-  }
-  read() {
-    this.ensureAlive();
-    if (this.events.length === 0 && this.forceFlush) {
-      this.scanPending();
-      this.reconcileTimeoutState();
-    }
-    return this.events.shift() ?? null;
-  }
-  drain(onEvent) {
-    this.ensureAlive();
-    while (true) {
-      if (this.destroyed) {
-        return;
-      }
-      const event = this.read();
-      if (!event) {
-        return;
-      }
-      onEvent(event);
-    }
-  }
-  flushTimeout(nowMsValue = this.clock.now()) {
-    this.ensureAlive();
-    if (this.pendingSinceMs !== null && (nowMsValue < this.pendingSinceMs || nowMsValue - this.pendingSinceMs < this.timeoutMs)) {
-      return;
-    }
-    this.tryForceFlush();
-  }
-  tryForceFlush() {
-    if (this.paste || this.pendingSinceMs === null || this.pending.length === 0) {
-      return;
-    }
-    this.forceFlush = true;
-  }
-  reset() {
-    if (this.destroyed) {
-      return;
-    }
-    this.clearTimeout();
-    this.resetState();
-  }
-  hasPendingPixelResolutionResponse() {
-    if (!this.protocolContext.pixelResolutionQueryActive || this.pending.length === 0)
-      return false;
-    return canStillBePixelResolutionPrefix(this.pending.view());
-  }
-  pausePendingTimeout() {
-    this.ensureAlive();
-    this.pendingTimeoutPaused = true;
-    this.suspendedPixelResolutionPrefixLength = this.pending.length;
-    this.clearTimeout();
-  }
-  resumePendingTimeout() {
-    this.ensureAlive();
-    if (this.pending.length === 0)
-      this.pendingTimeoutPaused = false;
-    this.reconcileTimeoutState();
-  }
-  resetMouseState() {
-    this.ensureAlive();
-    this.mouseParser.reset();
-  }
-  destroy() {
-    if (this.destroyed) {
-      return;
-    }
-    this.clearTimeout();
-    this.destroyed = true;
-    this.resetState();
-  }
-  ensureAlive() {
-    if (this.destroyed) {
-      throw new Error("StdinParser has been destroyed");
-    }
-  }
-  scanPending() {
-    while (!this.paste) {
-      const bytes = this.pending.view();
-      if (this.state.tag === "ground" && this.cursor >= bytes.length) {
-        this.pending.clear();
-        this.cursor = 0;
-        this.unitStart = 0;
-        this.pendingSinceMs = null;
-        this.forceFlush = false;
-        return;
-      }
-      const byte = this.cursor < bytes.length ? bytes[this.cursor] : -1;
-      switch (this.state.tag) {
-        case "ground": {
-          this.unitStart = this.cursor;
-          if (this.justFlushedEsc) {
-            if (byte === 91) {
-              this.justFlushedEsc = false;
-              this.cursor += 1;
-              this.state = { tag: "esc_recovery" };
-              continue;
-            }
-            this.justFlushedEsc = false;
-          }
-          if (byte === ESC) {
-            this.cursor += 1;
-            this.state = { tag: "esc" };
-            continue;
-          }
-          if (byte < 128) {
-            this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.cursor, this.cursor + 1)));
-            this.consumePrefix(this.cursor + 1);
-            continue;
-          }
-          const expected = utf8SequenceLength(byte);
-          if (expected === 0) {
-            if (!this.forceFlush && this.cursor + 1 === bytes.length) {
-              this.markPending();
-              return;
-            }
-            this.emitLegacyHighByte(byte);
-            this.consumePrefix(this.cursor + 1);
-            continue;
-          }
-          this.cursor += 1;
-          this.state = { tag: "utf8", expected, seen: 1 };
-          continue;
-        }
-        case "utf8": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitLegacyHighByte(bytes[this.unitStart]);
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.unitStart + 1);
-            continue;
-          }
-          if ((byte & 192) !== 128) {
-            this.emitLegacyHighByte(bytes[this.unitStart]);
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.unitStart + 1);
-            continue;
-          }
-          const nextSeen = this.state.seen + 1;
-          this.cursor += 1;
-          if (nextSeen < this.state.expected) {
-            this.state = { tag: "utf8", expected: this.state.expected, seen: nextSeen };
-            continue;
-          }
-          this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "esc": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            const flushedLoneEsc = this.cursor === this.unitStart + 1 && bytes[this.unitStart] === ESC;
-            this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-            this.justFlushedEsc = flushedLoneEsc;
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          switch (byte) {
-            case 91:
-              this.cursor += 1;
-              this.state = { tag: "csi" };
-              continue;
-            case 79:
-              this.cursor += 1;
-              this.state = { tag: "ss3" };
-              continue;
-            case 93:
-              this.cursor += 1;
-              this.state = { tag: "osc", sawEsc: false };
-              continue;
-            case 80:
-              this.cursor += 1;
-              this.state = { tag: "dcs", sawEsc: false };
-              continue;
-            case 95:
-              this.cursor += 1;
-              this.state = { tag: "apc", sawEsc: false };
-              continue;
-            case ESC:
-              this.cursor += 1;
-              continue;
-            default:
-              this.cursor += 1;
-              this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-              this.state = { tag: "ground" };
-              this.consumePrefix(this.cursor);
-              continue;
-          }
-        }
-        case "ss3": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          this.cursor += 1;
-          this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "esc_recovery": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === 60) {
-            this.cursor += 1;
-            this.state = { tag: "esc_less_mouse" };
-            continue;
-          }
-          if (byte === 77) {
-            this.cursor += 1;
-            this.state = { tag: "esc_less_x10_mouse" };
-            continue;
-          }
-          this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.unitStart + 1)));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.unitStart + 1);
-          continue;
-        }
-        case "csi": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === 77 && this.cursor === this.unitStart + 2) {
-            const end = this.cursor + 4;
-            if (bytes.length < end) {
-              if (!this.forceFlush) {
-                this.markPending();
-                return;
-              }
-              this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, bytes.length));
-              this.state = { tag: "ground" };
-              this.consumePrefix(bytes.length);
-              continue;
-            }
-            this.emitMouse(bytes.subarray(this.unitStart, end), "x10");
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          if (byte === 36) {
-            const candidateEnd = this.cursor + 1;
-            const candidate = decodeUtf8(bytes.subarray(this.unitStart, candidateEnd));
-            if (RXVT_DOLLAR_CSI_RE.test(candidate)) {
-              this.emitKeyOrResponse("csi", candidate);
-              this.state = { tag: "ground" };
-              this.consumePrefix(candidateEnd);
-              continue;
-            }
-            if (!this.forceFlush && candidateEnd >= bytes.length) {
-              this.markPending();
-              return;
-            }
-          }
-          if (byte === 60 && this.cursor === this.unitStart + 2) {
-            this.cursor += 1;
-            this.state = { tag: "csi_sgr_mouse", part: 0, hasDigit: false };
-            continue;
-          }
-          if (byte === 91 && this.cursor === this.unitStart + 2) {
-            this.cursor += 1;
-            continue;
-          }
-          if (byte === 63 && this.cursor === this.unitStart + 2) {
-            this.cursor += 1;
-            this.state = { tag: "csi_private_reply", semicolons: 0, hasDigit: false, sawDollar: false };
-            continue;
-          }
-          if (byte === 59) {
-            const firstParamStart = this.unitStart + 2;
-            const firstParamEnd = this.cursor;
-            let firstParamValue = parsePositiveDecimalPrefix(bytes, firstParamStart, firstParamEnd);
-            if (firstParamValue === null && this.protocolContext.kittyKeyboardEnabled) {
-              firstParamValue = parseKittyFirstFieldCodepoint(bytes, firstParamStart, firstParamEnd);
-            }
-            if (firstParamValue !== null) {
-              this.cursor += 1;
-              this.state = {
-                tag: "csi_parametric",
-                semicolons: 1,
-                segments: 1,
-                hasDigit: false,
-                firstParamValue
-              };
-              continue;
-            }
-          }
-          if (byte >= 64 && byte <= 126) {
-            const end = this.cursor + 1;
-            const rawBytes = bytes.subarray(this.unitStart, end);
-            if (bytesEqual(rawBytes, BRACKETED_PASTE_START)) {
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              this.paste = createPasteCollector();
-              continue;
-            }
-            if (isMouseSgrSequence(rawBytes)) {
-              this.emitMouse(rawBytes, "sgr");
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              continue;
-            }
-            this.emitKeyOrResponse("csi", decodeUtf8(rawBytes));
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.cursor += 1;
-          continue;
-        }
-        case "csi_sgr_mouse": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.state = { tag: "csi_sgr_mouse_deferred", part: this.state.part, hasDigit: this.state.hasDigit };
-            this.pendingSinceMs = null;
-            this.forceFlush = false;
-            return;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte)) {
-            this.cursor += 1;
-            this.state = { tag: "csi_sgr_mouse", part: this.state.part, hasDigit: true };
-            continue;
-          }
-          if (byte === 59 && this.state.hasDigit && this.state.part < 2) {
-            this.cursor += 1;
-            this.state = { tag: "csi_sgr_mouse", part: this.state.part + 1, hasDigit: false };
-            continue;
-          }
-          if (byte >= 64 && byte <= 126) {
-            const end = this.cursor + 1;
-            const rawBytes = bytes.subarray(this.unitStart, end);
-            if (isMouseSgrSequence(rawBytes)) {
-              this.emitMouse(rawBytes, "sgr");
-            } else {
-              this.emitKeyOrResponse("csi", decodeUtf8(rawBytes));
-            }
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.state = { tag: "csi" };
-          continue;
-        }
-        case "csi_sgr_mouse_deferred": {
-          if (this.cursor >= bytes.length) {
-            this.pendingSinceMs = null;
-            this.forceFlush = false;
-            return;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte) || byte === 59 || byte === 77 || byte === 109) {
-            this.state = { tag: "csi_sgr_mouse", part: this.state.part, hasDigit: this.state.hasDigit };
-            continue;
-          }
-          this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "csi_parametric": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            if (canDeferParametricCsi(this.state, this.protocolContext)) {
-              this.state = {
-                tag: "csi_parametric_deferred",
-                semicolons: this.state.semicolons,
-                segments: this.state.segments,
-                hasDigit: this.state.hasDigit,
-                firstParamValue: this.state.firstParamValue
-              };
-              this.pendingSinceMs = null;
-              this.forceFlush = false;
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte)) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments,
-              hasDigit: true,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte === 58 && this.state.hasDigit && this.state.segments < 3) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments + 1,
-              hasDigit: false,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte === 59 && this.state.semicolons < 2) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons + 1,
-              segments: 1,
-              hasDigit: false,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte >= 64 && byte <= 126) {
-            const end = this.cursor + 1;
-            const protocol = classifyParametricCsiProtocol(this.state, byte);
-            this.emitKeyOrResponse(protocol, decodeUtf8(bytes.subarray(this.unitStart, end)));
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.state = { tag: "csi" };
-          continue;
-        }
-        case "csi_parametric_deferred": {
-          if (this.cursor >= bytes.length) {
-            this.pendingSinceMs = null;
-            this.forceFlush = false;
-            return;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte) || byte === 58 || byte === 59) {
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments,
-              hasDigit: this.state.hasDigit,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (canCompleteDeferredParametricCsi(this.state, byte, this.protocolContext)) {
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments,
-              hasDigit: this.state.hasDigit,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "csi_parametric_ignored": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte)) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric_ignored",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments,
-              hasDigit: true,
-              firstParamValue: this.state.semicolons === 0 ? (this.state.firstParamValue ?? 0) * 10 + (byte - 48) : this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte === 59 && this.state.semicolons === 0 && this.state.hasDigit) {
-            if (this.protocolContext.explicitWidthCprActive && this.state.firstParamValue === 1) {
-              this.state = { tag: "csi" };
-              continue;
-            }
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric_ignored",
-              semicolons: 1,
-              segments: 1,
-              hasDigit: false,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte === 82 && this.state.semicolons === 1 && this.state.hasDigit) {
-            const end = this.cursor + 1;
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          if (this.state.semicolons === 0) {
-            this.state = { tag: "csi" };
-            continue;
-          }
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "csi_private_reply": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            if (canDeferPrivateReplyCsi(this.protocolContext)) {
-              this.state = {
-                tag: "csi_private_reply_deferred",
-                semicolons: this.state.semicolons,
-                hasDigit: this.state.hasDigit,
-                sawDollar: this.state.sawDollar
-              };
-              this.pendingSinceMs = null;
-              this.forceFlush = false;
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte)) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons,
-              hasDigit: true,
-              sawDollar: this.state.sawDollar
-            };
-            continue;
-          }
-          if (byte === 59) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons + 1,
-              hasDigit: false,
-              sawDollar: false
-            };
-            continue;
-          }
-          if (byte === 36 && this.state.hasDigit && !this.state.sawDollar) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons,
-              hasDigit: true,
-              sawDollar: true
-            };
-            continue;
-          }
-          if (byte >= 64 && byte <= 126) {
-            const end = this.cursor + 1;
-            this.emitOpaqueResponse("csi", bytes.subarray(this.unitStart, end));
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.state = { tag: "csi" };
-          continue;
-        }
-        case "csi_private_reply_deferred": {
-          if (this.cursor >= bytes.length) {
-            this.pendingSinceMs = null;
-            this.forceFlush = false;
-            return;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte) || byte === 59 || byte === 36) {
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons,
-              hasDigit: this.state.hasDigit,
-              sawDollar: this.state.sawDollar
-            };
-            continue;
-          }
-          if (canCompleteDeferredPrivateReplyCsi(this.state, byte, this.protocolContext)) {
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons,
-              hasDigit: this.state.hasDigit,
-              sawDollar: this.state.sawDollar
-            };
-            continue;
-          }
-          this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "osc": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (this.state.sawEsc) {
-            if (byte === 92) {
-              const end = this.cursor + 1;
-              this.emitOpaqueResponse("osc", bytes.subarray(this.unitStart, end));
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              continue;
-            }
-            this.state = { tag: "osc", sawEsc: false };
-            continue;
-          }
-          if (byte === BEL) {
-            const end = this.cursor + 1;
-            this.emitOpaqueResponse("osc", bytes.subarray(this.unitStart, end));
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          if (byte === ESC) {
-            this.cursor += 1;
-            this.state = { tag: "osc", sawEsc: true };
-            continue;
-          }
-          this.cursor += 1;
-          continue;
-        }
-        case "dcs": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (this.state.sawEsc) {
-            if (byte === 92) {
-              const end = this.cursor + 1;
-              this.emitOpaqueResponse("dcs", bytes.subarray(this.unitStart, end));
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              continue;
-            }
-            this.state = { tag: "dcs", sawEsc: false };
-            continue;
-          }
-          if (byte === ESC) {
-            this.cursor += 1;
-            this.state = { tag: "dcs", sawEsc: true };
-            continue;
-          }
-          this.cursor += 1;
-          continue;
-        }
-        case "apc": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (this.state.sawEsc) {
-            if (byte === 92) {
-              const end = this.cursor + 1;
-              this.emitOpaqueResponse("apc", bytes.subarray(this.unitStart, end));
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              continue;
-            }
-            this.state = { tag: "apc", sawEsc: false };
-            continue;
-          }
-          if (byte === ESC) {
-            this.cursor += 1;
-            this.state = { tag: "apc", sawEsc: true };
-            continue;
-          }
-          this.cursor += 1;
-          continue;
-        }
-        case "esc_less_mouse": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte >= 48 && byte <= 57 || byte === 59) {
-            this.cursor += 1;
-            continue;
-          }
-          if (byte === 77 || byte === 109) {
-            const end = this.cursor + 1;
-            const rawBytes = bytes.subarray(this.unitStart, end);
-            const prefixed = withEscPrefix(rawBytes);
-            if (isMouseSgrSequence(prefixed)) {
-              this.emitMouse(prefixed, "sgr");
-            } else {
-              this.emitOpaqueResponse("unknown", rawBytes);
-            }
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "esc_less_x10_mouse": {
-          const end = this.unitStart + 5;
-          if (bytes.length < end) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, bytes.length));
-            this.state = { tag: "ground" };
-            this.consumePrefix(bytes.length);
-            continue;
-          }
-          const rawBytes = bytes.subarray(this.unitStart, end);
-          this.emitMouse(withEscPrefix(rawBytes), "x10");
-          this.state = { tag: "ground" };
-          this.consumePrefix(end);
-          continue;
-        }
-      }
-    }
-  }
-  emitKeyOrResponse(protocol, raw) {
-    const parsed = parseKeypress(raw, { useKittyKeyboard: this.useKittyKeyboard });
-    if (parsed) {
-      this.events.push({
-        type: "key",
-        raw: parsed.raw,
-        key: parsed
-      });
-      return;
-    }
-    this.events.push({
-      type: "response",
-      protocol,
-      sequence: raw
-    });
-  }
-  emitMouse(rawBytes, encoding) {
-    const event = this.mouseParser.parseMouseEvent(rawBytes);
-    if (!event) {
-      this.emitOpaqueResponse("unknown", rawBytes);
-      return;
-    }
-    this.events.push({
-      type: "mouse",
-      raw: decodeLatin1(rawBytes),
-      encoding,
-      event
-    });
-  }
-  emitLegacyHighByte(byte) {
-    const parsed = parseKeypress(Buffer3.from([byte]), { useKittyKeyboard: this.useKittyKeyboard });
-    if (parsed) {
-      this.events.push({
-        type: "key",
-        raw: parsed.raw,
-        key: parsed
-      });
-      return;
-    }
-    this.events.push({
-      type: "response",
-      protocol: "unknown",
-      sequence: String.fromCharCode(byte)
-    });
-  }
-  emitOpaqueResponse(protocol, rawBytes) {
-    this.events.push({
-      type: "response",
-      protocol,
-      sequence: decodeLatin1(rawBytes)
-    });
-  }
-  consumePrefix(endExclusive) {
-    this.pending.consume(endExclusive);
-    this.pendingTimeoutPaused = false;
-    this.suspendedPixelResolutionPrefixLength = 0;
-    this.cursor = 0;
-    this.unitStart = 0;
-    this.pendingSinceMs = null;
-    this.forceFlush = false;
-  }
-  takePendingBytes() {
-    const buffered = this.pending.take();
-    this.cursor = 0;
-    this.unitStart = 0;
-    this.pendingSinceMs = null;
-    this.forceFlush = false;
-    return buffered;
-  }
-  flushPendingOverflow() {
-    if (this.pending.length === 0) {
-      return;
-    }
-    this.emitOpaqueResponse("unknown", this.pending.view());
-    this.pending.clear();
-    this.cursor = 0;
-    this.unitStart = 0;
-    this.pendingSinceMs = null;
-    this.pendingTimeoutPaused = false;
-    this.suspendedPixelResolutionPrefixLength = 0;
-    this.forceFlush = false;
-    this.state = { tag: "ground" };
-  }
-  markPending() {
-    this.pendingSinceMs = this.clock.now();
-  }
-  consumePasteBytes(chunk) {
-    const paste = this.paste;
-    const combined = concatBytes(paste.tail, chunk);
-    const endIndex = indexOfBytes(combined, BRACKETED_PASTE_END);
-    if (endIndex !== -1) {
-      this.pushPasteBytes(combined.subarray(0, endIndex));
-      this.events.push({
-        type: "paste",
-        bytes: joinPasteBytes(paste.parts, paste.totalLength)
-      });
-      this.paste = null;
-      return combined.subarray(endIndex + BRACKETED_PASTE_END.length);
-    }
-    const keep = Math.min(BRACKETED_PASTE_END.length - 1, combined.length);
-    const stableLength = combined.length - keep;
-    if (stableLength > 0) {
-      this.pushPasteBytes(combined.subarray(0, stableLength));
-    }
-    paste.tail = Uint8Array.from(combined.subarray(stableLength));
-    return EMPTY_BYTES;
-  }
-  pushPasteBytes(bytes) {
-    if (bytes.length === 0) {
-      return;
-    }
-    this.paste.parts.push(Uint8Array.from(bytes));
-    this.paste.totalLength += bytes.length;
-  }
-  reconcileDeferredStateWithProtocolContext() {
-    switch (this.state.tag) {
-      case "csi_parametric_deferred":
-        if (!canDeferParametricCsi(this.state, this.protocolContext)) {
-          this.emitOpaqueResponse("unknown", this.pending.view().subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-        }
-        return;
-      case "csi_private_reply_deferred":
-        if (!canDeferPrivateReplyCsi(this.protocolContext)) {
-          this.emitOpaqueResponse("unknown", this.pending.view().subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-        }
-        return;
-    }
-  }
-  reconcileTimeoutState() {
-    if (!this.armTimeouts) {
-      return;
-    }
-    if (this.pendingTimeoutPaused) {
-      this.clearTimeout();
-      return;
-    }
-    if (this.paste || this.pendingSinceMs === null || this.pending.length === 0) {
-      this.clearTimeout();
-      return;
-    }
-    this.clearTimeout();
-    this.timeoutId = this.clock.setTimeout(() => {
-      this.timeoutId = null;
-      if (this.destroyed) {
-        return;
-      }
-      try {
-        this.tryForceFlush();
-        this.onTimeoutFlush?.();
-      } catch (error) {
-        console.error("stdin parser timeout flush failed", error);
-      }
-    }, this.timeoutMs);
-  }
-  clearTimeout() {
-    if (!this.timeoutId) {
-      return;
-    }
-    this.clock.clearTimeout(this.timeoutId);
-    this.timeoutId = null;
-  }
-  resetState() {
-    this.pending.reset(INITIAL_PENDING_CAPACITY);
-    this.events.length = 0;
-    this.pendingSinceMs = null;
-    this.pendingTimeoutPaused = false;
-    this.suspendedPixelResolutionPrefixLength = 0;
-    this.forceFlush = false;
-    this.justFlushedEsc = false;
-    this.state = { tag: "ground" };
-    this.cursor = 0;
-    this.unitStart = 0;
-    this.paste = null;
-    this.mouseParser.reset();
-  }
-}
-
-// src/lib/tree-sitter/client.ts
-import { EventEmitter as EventEmitter2 } from "events";
-
-// src/lib/debounce.ts
-var TIMERS_MAP = new Map;
-
-class DebounceController {
-  scopeId;
-  constructor(scopeId) {
-    this.scopeId = scopeId;
-    if (!TIMERS_MAP.has(this.scopeId)) {
-      TIMERS_MAP.set(this.scopeId, new Map);
-    }
-  }
-  debounce(id, ms, fn) {
-    const scopeMap = TIMERS_MAP.get(this.scopeId);
-    return new Promise((resolve3, reject) => {
-      if (scopeMap.has(id)) {
-        clearTimeout(scopeMap.get(id));
-      }
-      const timerId = setTimeout(() => {
-        try {
-          resolve3(fn());
-        } catch (error) {
-          reject(error);
-        }
-        scopeMap.delete(id);
-      }, ms);
-      scopeMap.set(id, timerId);
-    });
-  }
-  clearDebounce(id) {
-    const scopeMap = TIMERS_MAP.get(this.scopeId);
-    if (scopeMap && scopeMap.has(id)) {
-      clearTimeout(scopeMap.get(id));
-      scopeMap.delete(id);
-    }
-  }
-  clear() {
-    const scopeMap = TIMERS_MAP.get(this.scopeId);
-    if (scopeMap) {
-      scopeMap.forEach((timerId) => clearTimeout(timerId));
-      scopeMap.clear();
-    }
-  }
-}
-function createDebounce(scopeId) {
-  return new DebounceController(scopeId);
-}
-function clearDebounceScope(scopeId) {
-  const scopeMap = TIMERS_MAP.get(scopeId);
-  if (scopeMap) {
-    scopeMap.forEach((timerId) => clearTimeout(timerId));
-    scopeMap.clear();
-  }
-}
-
-// src/lib/queue.ts
-class ProcessQueue {
-  processor;
-  queue = [];
-  processing = false;
-  autoProcess = true;
-  constructor(processor, autoProcess = true) {
-    this.processor = processor;
-    this.autoProcess = autoProcess;
-  }
-  enqueue(item) {
-    this.queue.push(item);
-    if (!this.processing && this.autoProcess) {
-      this.processQueue();
-    }
-  }
-  processQueue() {
-    if (this.queue.length === 0) {
-      return;
-    }
-    this.processing = true;
-    queueMicrotask(async () => {
-      if (this.queue.length === 0) {
-        this.processing = false;
-        return;
-      }
-      const item = this.queue.shift();
-      try {
-        await this.processor(item);
-      } catch (error) {
-        console.error("Error processing queue item:", error);
-      }
-      if (this.queue.length > 0) {
-        this.processQueue();
-      } else {
-        this.processing = false;
-      }
-    });
-  }
-  clear() {
-    this.queue = [];
-  }
-  isProcessing() {
-    return this.processing;
-  }
-  size() {
-    return this.queue.length;
-  }
-}
-
-// src/lib/tree-sitter/default-parsers.ts
-var defaultParserDescriptors = [
-  {
-    filetype: "javascript",
-    aliases: ["javascriptreact"],
-    queries: { highlights: ["assets/javascript/highlights.scm"] },
-    wasm: "assets/javascript/tree-sitter-javascript.wasm"
-  },
-  {
-    filetype: "typescript",
-    queries: { highlights: ["assets/typescript/highlights.scm"] },
-    wasm: "assets/typescript/tree-sitter-typescript.wasm"
-  },
-  {
-    filetype: "typescriptreact",
-    queries: { highlights: ["assets/typescriptreact/highlights.scm"] },
-    wasm: "assets/typescriptreact/tree-sitter-tsx.wasm"
-  },
-  {
-    filetype: "markdown",
-    queries: {
-      highlights: ["assets/markdown/highlights.scm"],
-      injections: ["assets/markdown/injections.scm"]
-    },
-    wasm: "assets/markdown/tree-sitter-markdown.wasm",
-    injectionMapping: {
-      nodeTypes: { inline: "markdown_inline", pipe_table_cell: "markdown_inline" },
-      infoStringMap: {
-        javascript: "javascript",
-        js: "javascript",
-        jsx: "javascriptreact",
-        javascriptreact: "javascriptreact",
-        typescript: "typescript",
-        ts: "typescript",
-        tsx: "typescriptreact",
-        typescriptreact: "typescriptreact",
-        markdown: "markdown",
-        md: "markdown"
-      }
-    }
-  },
-  {
-    filetype: "markdown_inline",
-    queries: { highlights: ["assets/markdown_inline/highlights.scm"] },
-    wasm: "assets/markdown_inline/tree-sitter-markdown_inline.wasm"
-  },
-  {
-    filetype: "zig",
-    queries: { highlights: ["assets/zig/highlights.scm"] },
-    wasm: "assets/zig/tree-sitter-zig.wasm"
-  }
-];
-var defaultParserAssetPaths = [
-  ...new Set(defaultParserDescriptors.flatMap((parser) => [
-    ...parser.queries.highlights,
-    parser.wasm,
-    ...parser.queries.injections ?? []
-  ]))
-];
-var cachedParsers;
-function getParsers() {
-  cachedParsers ??= Promise.all(defaultParserDescriptors.map(resolveDefaultParser));
-  return cachedParsers;
-}
-async function resolveDefaultParser(parser) {
-  const queries = {
-    highlights: await Promise.all(parser.queries.highlights.map(resolveParserAsset))
-  };
-  if (parser.queries.injections) {
-    queries.injections = await Promise.all(parser.queries.injections.map(resolveParserAsset));
-  }
-  return {
-    filetype: parser.filetype,
-    ...parser.aliases ? { aliases: [...parser.aliases] } : {},
-    queries,
-    wasm: await resolveParserAsset(parser.wasm),
-    ...parser.injectionMapping ? { injectionMapping: parser.injectionMapping } : {}
-  };
-}
-function resolveParserAsset(relativePath) {
-  return resolveDefaultParserAsset(relativePath, new URL(`./${relativePath}`, import.meta.url));
-}
-
-// src/lib/tree-sitter/client.ts
-import { resolve as resolve3, isAbsolute as isAbsolute3, parse } from "path";
-import { existsSync as existsSync4 } from "fs";
-registerEnvVar({
-  name: "OTUI_TREE_SITTER_WORKER_PATH",
-  description: "Path to the TreeSitter worker entry script",
-  type: "string",
-  default: ""
-});
-var DEFAULT_PARSER_OVERRIDES = [];
-function addDefaultParsers(parsers) {
-  for (const parser of parsers) {
-    DEFAULT_PARSER_OVERRIDES = [
-      ...DEFAULT_PARSER_OVERRIDES.filter((existingParser) => existingParser.filetype !== parser.filetype),
-      parser
-    ];
-  }
-}
-var isUrl = (path) => path.startsWith("http://") || path.startsWith("https://");
-
-class TreeSitterClient extends EventEmitter2 {
-  initialized = false;
-  worker;
-  buffers = new Map;
-  initializePromise;
-  initializeResolvers;
-  messageCallbacks = new Map;
-  messageIdCounter = 0;
-  editQueues = new Map;
-  debouncer;
-  options;
-  destroyCallbacks = new Set;
-  lifecycleGeneration = 0;
-  rejectInitialization;
-  destroyPromise;
-  workerTerminationFailed = false;
-  constructor(options, internalOptions = {}) {
-    super();
-    this.options = options;
-    this.debouncer = createDebounce("tree-sitter-client");
-    if (internalOptions.autoStartWorker ?? true) {
-      this.startWorker();
-    }
-  }
-  onDestroy(callback) {
-    this.destroyCallbacks.add(callback);
-    return () => {
-      this.destroyCallbacks.delete(callback);
-    };
-  }
-  emitError(error, bufferId) {
-    if (this.listenerCount("error") > 0) {
-      this.emit("error", error, bufferId);
-    }
-  }
-  emitWarning(warning, bufferId) {
-    if (this.listenerCount("warning") > 0) {
-      this.emit("warning", warning, bufferId);
-    }
-  }
-  startWorker() {
-    if (this.worker) {
-      return;
-    }
-    const workerPath = this.resolveWorkerPath();
-    const worker = new Worker(workerPath);
-    this.worker = worker;
-    worker.onmessage = (event) => {
-      if (this.worker !== worker) {
-        return;
-      }
-      this.handleWorkerMessage(event);
-    };
-    worker.onerror = (error) => {
-      if (this.worker !== worker) {
-        return;
-      }
-      console.error("TreeSitter worker error:", error.message);
-      const workerError = new Error(`Worker error: ${error.message}`, { cause: error.error });
-      this.handleWorkerFailure(worker, workerError);
-      this.emitError(`Worker error: ${error.message}`);
-    };
-  }
-  sendWorkerMessage(message) {
-    if (!this.worker) {
-      throw new Error("TreeSitter worker is not available");
-    }
-    this.worker.postMessage(message);
-  }
-  rejectPendingRequests(error) {
-    const requests = Array.from(this.messageCallbacks.values());
-    this.messageCallbacks.clear();
-    for (const request of requests) {
-      request.reject(error);
-    }
-  }
-  rejectActiveInitialization(error) {
-    if (this.initializeResolvers) {
-      clearTimeout(this.initializeResolvers.timeoutId);
-      this.initializeResolvers.reject(error);
-      this.initializeResolvers = undefined;
-    }
-    this.rejectInitialization?.(error);
-    this.rejectInitialization = undefined;
-  }
-  handleWorkerFailure(worker, error) {
-    if (this.worker !== worker) {
-      return;
-    }
-    worker.onmessage = null;
-    worker.onerror = null;
-    this.worker = undefined;
-    this.lifecycleGeneration++;
-    this.initialized = false;
-    this.initializePromise = undefined;
-    this.rejectActiveInitialization(error);
-    this.rejectPendingRequests(error);
-    this.editQueues.clear();
-    this.buffers.clear();
-    this.debouncer.clear();
-    try {
-      Promise.resolve(worker.terminate()).catch(() => {});
-    } catch {}
-  }
-  resolveWorkerPath() {
-    if (this.options.workerPath) {
-      return this.options.workerPath;
-    }
-    if (env.OTUI_TREE_SITTER_WORKER_PATH) {
-      return env.OTUI_TREE_SITTER_WORKER_PATH;
-    }
-    if (typeof OTUI_TREE_SITTER_WORKER_PATH !== "undefined") {
-      return OTUI_TREE_SITTER_WORKER_PATH;
-    }
-    let workerPath = resolveDefaultTreeSitterWorkerPath(new URL("./parser.worker.js", import.meta.url));
-    if (!process.env.OTUI_ASSET_ROOT && !existsSync4(workerPath)) {
-      workerPath = new URL("./parser.worker.ts", import.meta.url).href;
-    }
-    return workerPath;
-  }
-  async stopWorker() {
-    const worker = this.worker;
-    if (!worker) {
-      return;
-    }
-    const onmessage = worker.onmessage;
-    const onerror = worker.onerror;
-    worker.onmessage = null;
-    worker.onerror = null;
-    this.worker = undefined;
-    try {
-      const termination = worker.terminate();
-      if (termination && typeof termination.then === "function") {
-        await termination;
-      }
-    } catch (error) {
-      if (!this.worker) {
-        worker.onmessage = onmessage;
-        worker.onerror = onerror;
-        this.worker = worker;
-      }
-      throw error;
-    }
-  }
-  async handleReset() {
-    this.buffers.clear();
-    await this.stopWorker();
-    this.startWorker();
-    this.initialized = false;
-    this.initializePromise = undefined;
-    this.initializeResolvers = undefined;
-    return this.initialize();
-  }
-  async initialize() {
-    if (this.destroyPromise) {
-      throw new Error("Cannot initialize while client is being destroyed");
-    }
-    if (this.workerTerminationFailed) {
-      throw new Error("Cannot initialize after worker termination failed; retry destroy()");
-    }
-    if (this.initializePromise) {
-      return this.initializePromise;
-    }
-    if (!this.worker) {
-      this.startWorker();
-    }
-    const worker = this.worker;
-    const generation = this.lifecycleGeneration;
-    let rejectCancellation;
-    const cancellation = new Promise((_, reject) => {
-      rejectCancellation = reject;
-    });
-    const initialization = Promise.race([this.initializeClient(generation, worker), cancellation]);
-    this.rejectInitialization = rejectCancellation;
-    this.initializePromise = initialization;
-    initialization.then(() => {
-      if (this.initializePromise === initialization) {
-        this.rejectInitialization = undefined;
-      }
-    }, () => {
-      if (this.initializePromise === initialization) {
-        this.rejectInitialization = undefined;
-      }
-    });
-    return this.initializePromise;
-  }
-  assertCurrentInitialization(generation, worker) {
-    if (this.lifecycleGeneration !== generation || this.worker !== worker || this.destroyPromise) {
-      throw new Error("TreeSitter initialization was invalidated");
-    }
-  }
-  async initializeClient(generation, worker) {
-    const treeSitterWasmPath = await resolveTreeSitterWasm();
-    this.assertCurrentInitialization(generation, worker);
-    await new Promise((resolve4, reject) => {
-      const timeoutMs = this.options.initTimeout ?? 1e4;
-      const timeoutId = setTimeout(() => {
-        const error = new Error("Worker initialization timed out");
-        console.error("TreeSitter client:", error.message);
-        this.initializeResolvers = undefined;
-        reject(error);
-      }, timeoutMs);
-      this.initializeResolvers = { resolve: resolve4, reject, timeoutId };
-      this.sendWorkerMessage({
-        type: "INIT",
-        dataPath: this.options.dataPath,
-        treeSitterWasmPath
-      });
-    });
-    this.assertCurrentInitialization(generation, worker);
-    await this.registerDefaultParsers(generation, worker);
-    this.assertCurrentInitialization(generation, worker);
-    this.initialized = true;
-  }
-  async registerDefaultParsers(generation = this.lifecycleGeneration, worker = this.worker) {
-    const defaultParsers = await getParsers();
-    this.assertCurrentInitialization(generation, worker);
-    const overriddenFiletypes = new Set(DEFAULT_PARSER_OVERRIDES.map((parser) => parser.filetype));
-    for (const parser of [
-      ...defaultParsers.filter((parser2) => !overriddenFiletypes.has(parser2.filetype)),
-      ...DEFAULT_PARSER_OVERRIDES
-    ]) {
-      worker.postMessage({ type: "ADD_FILETYPE_PARSER", filetypeParser: this.resolveFiletypeParser(parser) });
-    }
-  }
-  resolvePath(path) {
-    if (isUrl(path)) {
-      return path;
-    }
-    if (isBunfsPath(path)) {
-      return normalizeBunfsPath(parse(path).base);
-    }
-    if (!isAbsolute3(path)) {
-      return resolve3(path);
-    }
-    return path;
-  }
-  addFiletypeParser(filetypeParser) {
-    this.sendWorkerMessage({ type: "ADD_FILETYPE_PARSER", filetypeParser: this.resolveFiletypeParser(filetypeParser) });
-  }
-  resolveFiletypeParser(filetypeParser) {
-    return {
-      ...filetypeParser,
-      aliases: filetypeParser.aliases ? [...new Set(filetypeParser.aliases.filter((alias) => alias !== filetypeParser.filetype))] : undefined,
-      wasm: this.resolvePath(filetypeParser.wasm),
-      queries: {
-        highlights: filetypeParser.queries.highlights.map((path) => this.resolvePath(path)),
-        injections: filetypeParser.queries.injections?.map((path) => this.resolvePath(path))
-      }
-    };
-  }
-  async getPerformance() {
-    const messageId = `performance_${this.messageIdCounter++}`;
-    return new Promise((resolve4, reject) => {
-      this.messageCallbacks.set(messageId, { resolve: resolve4, reject });
-      try {
-        this.sendWorkerMessage({ type: "GET_PERFORMANCE", messageId });
-      } catch (error) {
-        this.messageCallbacks.delete(messageId);
-        reject(error instanceof Error ? error : new Error(String(error)));
-      }
-    });
-  }
-  async highlightOnce(content, filetype) {
-    if (!this.initialized) {
-      try {
-        await this.initialize();
-      } catch (error) {
-        return { error: "Could not highlight because of initialization error" };
-      }
-    }
-    const messageId = `oneshot_${this.messageIdCounter++}`;
-    return new Promise((resolve4, reject) => {
-      this.messageCallbacks.set(messageId, { resolve: resolve4, reject });
-      try {
-        this.sendWorkerMessage({
-          type: "ONESHOT_HIGHLIGHT",
-          content,
-          filetype,
-          messageId
-        });
-      } catch (error) {
-        this.messageCallbacks.delete(messageId);
-        reject(error instanceof Error ? error : new Error(String(error)));
-      }
-    });
-  }
-  handleWorkerMessage(event) {
-    const message = event.data;
-    switch (message.type) {
-      case "HIGHLIGHT_RESPONSE": {
-        const buffer = this.buffers.get(message.bufferId);
-        if (!buffer || !buffer.hasParser) {
-          return;
-        }
-        if (buffer.version !== message.version) {
-          this.resetBuffer(message.bufferId, buffer.version, buffer.content);
-          return;
-        }
-        this.emit("highlights:response", message.bufferId, message.version, message.highlights);
-        return;
-      }
-      case "INIT_RESPONSE": {
-        if (!this.initializeResolvers) {
-          return;
-        }
-        clearTimeout(this.initializeResolvers.timeoutId);
-        if (message.error) {
-          console.error("TreeSitter client initialization failed:", message.error);
-          this.initializeResolvers.reject(new Error(message.error));
-        } else {
-          this.initializeResolvers.resolve();
-        }
-        this.initializeResolvers = undefined;
-        return;
-      }
-      case "PARSER_INIT_RESPONSE": {
-        const callback = this.messageCallbacks.get(message.messageId);
-        if (callback) {
-          this.messageCallbacks.delete(message.messageId);
-          callback.resolve({ hasParser: message.hasParser, warning: message.warning, error: message.error });
-        }
-        return;
-      }
-      case "PRELOAD_PARSER_RESPONSE": {
-        const callback = this.messageCallbacks.get(message.messageId);
-        if (callback) {
-          this.messageCallbacks.delete(message.messageId);
-          callback.resolve({ hasParser: message.hasParser });
-        }
-        return;
-      }
-      case "BUFFER_DISPOSED": {
-        const callback = this.messageCallbacks.get(`dispose_${message.bufferId}`);
-        if (callback) {
-          this.messageCallbacks.delete(`dispose_${message.bufferId}`);
-          callback.resolve(true);
-        }
-        this.emit("buffer:disposed", message.bufferId);
-        return;
-      }
-      case "PERFORMANCE_RESPONSE": {
-        const callback = this.messageCallbacks.get(message.messageId);
-        if (callback) {
-          this.messageCallbacks.delete(message.messageId);
-          callback.resolve(message.performance);
-        }
-        return;
-      }
-      case "ONESHOT_HIGHLIGHT_RESPONSE": {
-        const callback = this.messageCallbacks.get(message.messageId);
-        if (callback) {
-          this.messageCallbacks.delete(message.messageId);
-          callback.resolve({ highlights: message.highlights, warning: message.warning, error: message.error });
-        }
-        return;
-      }
-      case "UPDATE_DATA_PATH_RESPONSE": {
-        const callback = this.messageCallbacks.get(message.messageId);
-        if (callback) {
-          this.messageCallbacks.delete(message.messageId);
-          callback.resolve({ error: message.error });
-        }
-        return;
-      }
-      case "CLEAR_CACHE_RESPONSE": {
-        const callback = this.messageCallbacks.get(message.messageId);
-        if (callback) {
-          this.messageCallbacks.delete(message.messageId);
-          callback.resolve({ error: message.error });
-        }
-        return;
-      }
-      case "WARNING": {
-        this.emitWarning(message.warning, message.bufferId);
-        return;
-      }
-      case "ERROR": {
-        if (message.messageId) {
-          const callback = this.messageCallbacks.get(message.messageId);
-          if (callback) {
-            this.messageCallbacks.delete(message.messageId);
-            callback.reject(new Error(message.error));
-          }
-        }
-        this.emitError(message.error, message.bufferId);
-        return;
-      }
-      case "WORKER_LOG": {
-        this.emit("worker:log", message.logType, message.data.join(" "));
-        return;
-      }
-    }
-  }
-  async preloadParser(filetype) {
-    const messageId = `has_parser_${this.messageIdCounter++}`;
-    const response = await new Promise((resolve4, reject) => {
-      this.messageCallbacks.set(messageId, { resolve: resolve4, reject });
-      try {
-        this.sendWorkerMessage({
-          type: "PRELOAD_PARSER",
-          filetype,
-          messageId
-        });
-      } catch (error) {
-        this.messageCallbacks.delete(messageId);
-        reject(error instanceof Error ? error : new Error(String(error)));
-      }
-    });
-    return response.hasParser;
-  }
-  async createBuffer(id, content, filetype, version = 1, autoInitialize = true) {
-    if (!this.initialized) {
-      if (!autoInitialize) {
-        this.emitError("Could not create buffer because client is not initialized");
-        return false;
-      }
-      try {
-        await this.initialize();
-      } catch (error) {
-        this.emitError("Could not create buffer because of initialization error");
-        return false;
-      }
-    }
-    if (this.buffers.has(id)) {
-      throw new Error(`Buffer with id ${id} already exists`);
-    }
-    this.buffers.set(id, { id, content, filetype, version, hasParser: false });
-    const messageId = `init_${this.messageIdCounter++}`;
-    const response = await new Promise((resolve4, reject) => {
-      this.messageCallbacks.set(messageId, { resolve: resolve4, reject });
-      try {
-        this.sendWorkerMessage({
-          type: "INITIALIZE_PARSER",
-          bufferId: id,
-          version,
-          content,
-          filetype,
-          messageId
-        });
-      } catch (error) {
-        this.messageCallbacks.delete(messageId);
-        reject(error instanceof Error ? error : new Error(String(error)));
-      }
-    });
-    if (!response.hasParser) {
-      this.emit("buffer:initialized", id, false);
-      if (filetype !== "plaintext") {
-        this.emitWarning(response.warning || response.error || "Buffer has no parser", id);
-      }
-      return false;
-    }
-    const bufferState = { id, content, filetype, version, hasParser: true };
-    this.buffers.set(id, bufferState);
-    this.emit("buffer:initialized", id, true);
-    return true;
-  }
-  async updateBuffer(id, edits, newContent, version) {
-    if (!this.initialized) {
-      return;
-    }
-    const buffer = this.buffers.get(id);
-    if (!buffer || !buffer.hasParser) {
-      return;
-    }
-    this.buffers.set(id, { ...buffer, content: newContent, version });
-    if (!this.editQueues.has(id)) {
-      this.editQueues.set(id, new ProcessQueue((item) => this.processEdit(id, item.edits, item.newContent, item.version, item.isReset)));
-    }
-    const bufferQueue = this.editQueues.get(id);
-    bufferQueue.enqueue({ edits, newContent, version });
-  }
-  async processEdit(bufferId, edits, newContent, version, isReset = false) {
-    this.sendWorkerMessage({
-      type: isReset ? "RESET_BUFFER" : "HANDLE_EDITS",
-      bufferId,
-      version,
-      content: newContent,
-      edits
-    });
-  }
-  async removeBuffer(bufferId) {
-    if (!this.initialized) {
-      return;
-    }
-    this.buffers.delete(bufferId);
-    if (this.editQueues.has(bufferId)) {
-      this.editQueues.get(bufferId)?.clear();
-      this.editQueues.delete(bufferId);
-    }
-    if (this.worker) {
-      await new Promise((resolve4, reject) => {
-        const messageId = `dispose_${bufferId}`;
-        this.messageCallbacks.set(messageId, { resolve: resolve4, reject });
-        try {
-          this.sendWorkerMessage({
-            type: "DISPOSE_BUFFER",
-            bufferId
-          });
-        } catch (error) {
-          console.error("Error disposing buffer", error);
-          this.messageCallbacks.delete(messageId);
-          resolve4(false);
-        }
-        setTimeout(() => {
-          if (this.messageCallbacks.has(messageId)) {
-            this.messageCallbacks.delete(messageId);
-            console.warn({ bufferId }, "Timed out waiting for buffer to be disposed");
-            resolve4(false);
-          }
-        }, 3000);
-      });
-    }
-    this.debouncer.clearDebounce(`reset-${bufferId}`);
-  }
-  destroy() {
-    if (this.destroyPromise) {
-      return this.destroyPromise;
-    }
-    let resolveDestroy;
-    let rejectDestroy;
-    const destroyPromise = new Promise((resolve4, reject) => {
-      resolveDestroy = resolve4;
-      rejectDestroy = reject;
-    });
-    this.destroyPromise = destroyPromise;
-    const destroyError = new Error("Client destroyed during initialization");
-    this.lifecycleGeneration++;
-    this.initialized = false;
-    this.initializePromise = undefined;
-    this.rejectActiveInitialization(destroyError);
-    this.rejectPendingRequests(new Error("TreeSitter client destroyed"));
-    for (const callback of this.destroyCallbacks) {
-      try {
-        callback();
-      } catch (error) {
-        console.error("TreeSitter client destroy callback failed:", error);
-      }
-    }
-    this.destroyCallbacks.clear();
-    clearDebounceScope("tree-sitter-client");
-    this.debouncer.clear();
-    this.editQueues.clear();
-    this.buffers.clear();
-    this.stopWorker().then(() => {
-      this.workerTerminationFailed = false;
-      if (this.destroyPromise === destroyPromise) {
-        this.destroyPromise = undefined;
-      }
-      resolveDestroy();
-    }, (error) => {
-      this.workerTerminationFailed = true;
-      if (this.destroyPromise === destroyPromise) {
-        this.destroyPromise = undefined;
-      }
-      rejectDestroy(error);
-    });
-    return destroyPromise;
-  }
-  async resetBuffer(bufferId, version, content) {
-    if (!this.initialized) {
-      return;
-    }
-    const buffer = this.buffers.get(bufferId);
-    if (!buffer || !buffer.hasParser) {
-      this.emitError("Cannot reset buffer with no parser", bufferId);
-      return;
-    }
-    this.buffers.set(bufferId, { ...buffer, content, version });
-    this.debouncer.debounce(`reset-${bufferId}`, 10, () => this.processEdit(bufferId, [], content, version, true));
-  }
-  getBuffer(bufferId) {
-    return this.buffers.get(bufferId);
-  }
-  getAllBuffers() {
-    return Array.from(this.buffers.values());
-  }
-  isInitialized() {
-    return this.initialized;
-  }
-  async setDataPath(dataPath) {
-    if (this.options.dataPath === dataPath) {
-      return;
-    }
-    this.options.dataPath = dataPath;
-    if (this.initialized && this.worker) {
-      const messageId = `update_datapath_${this.messageIdCounter++}`;
-      return new Promise((resolve4, reject) => {
-        this.messageCallbacks.set(messageId, {
-          resolve: (response) => {
-            if (response.error) {
-              reject(new Error(response.error));
-            } else {
-              resolve4();
-            }
-          },
-          reject
-        });
-        try {
-          this.sendWorkerMessage({
-            type: "UPDATE_DATA_PATH",
-            dataPath,
-            messageId
-          });
-        } catch (error) {
-          this.messageCallbacks.delete(messageId);
-          reject(error instanceof Error ? error : new Error(String(error)));
-        }
-      });
-    }
-  }
-  async clearCache() {
-    if (!this.initialized || !this.worker) {
-      throw new Error("Cannot clear cache: client is not initialized");
-    }
-    const messageId = `clear_cache_${this.messageIdCounter++}`;
-    return new Promise((resolve4, reject) => {
-      this.messageCallbacks.set(messageId, {
-        resolve: (response) => {
-          if (response.error) {
-            reject(new Error(response.error));
-          } else {
-            resolve4();
-          }
-        },
-        reject
-      });
-      try {
-        this.sendWorkerMessage({
-          type: "CLEAR_CACHE",
-          messageId
-        });
-      } catch (error) {
-        this.messageCallbacks.delete(messageId);
-        reject(error instanceof Error ? error : new Error(String(error)));
-      }
-    });
-  }
-}
-
-// src/lib/tree-sitter-styled-text.ts
-registerEnvVar({ name: "OTUI_TS_STYLE_WARN", default: false, description: "Enable warnings for missing syntax styles" });
-function getSpecificity(group) {
-  return group.split(".").length;
-}
-function shouldSuppressInInjection(group, meta) {
-  if (meta?.isInjection) {
-    return false;
-  }
-  return group === "markup.raw.block";
-}
-function treeSitterToTextChunks(content, highlights, syntaxStyle, options) {
-  const chunks = [];
-  const ranges = options?.ranges;
-  const defaultStyle = syntaxStyle.getStyle("default");
-  const concealEnabled = options?.enabled ?? true;
-  const baseStyle = options?.baseHighlight ? syntaxStyle.getStyle(options.baseHighlight) : undefined;
-  const injectionContainerRanges = [];
-  const boundaries = [];
-  for (let i = 0;i < highlights.length; i++) {
-    const [start, end, , meta] = highlights[i];
-    if (start === end)
-      continue;
-    if (meta?.containsInjection) {
-      injectionContainerRanges.push({ start, end });
-    }
-    boundaries.push({ offset: start, type: "start", highlightIndex: i });
-    boundaries.push({ offset: end, type: "end", highlightIndex: i });
-  }
-  boundaries.sort((a, b) => {
-    if (a.offset !== b.offset)
-      return a.offset - b.offset;
-    if (a.type === "end" && b.type === "start")
-      return -1;
-    if (a.type === "start" && b.type === "end")
-      return 1;
-    return 0;
-  });
-  const activeHighlights = new Set;
-  let currentOffset = 0;
-  for (let i = 0;i < boundaries.length; i++) {
-    const boundary = boundaries[i];
-    if (currentOffset < boundary.offset && activeHighlights.size > 0) {
-      const segmentText = content.slice(currentOffset, boundary.offset);
-      const activeGroups = [];
-      for (const idx of activeHighlights) {
-        const [, , group, meta] = highlights[idx];
-        activeGroups.push({ group, meta, index: idx });
-      }
-      const concealHighlight = concealEnabled ? activeGroups.find((h) => h.meta?.conceal !== undefined || h.group === "conceal" || h.group.startsWith("conceal.")) : undefined;
-      if (concealHighlight) {
-        let replacementText = "";
-        if (concealHighlight.meta?.conceal !== undefined) {
-          replacementText = concealHighlight.meta.conceal;
-        } else if (concealHighlight.group === "conceal.with.space") {
-          replacementText = " ";
-        }
-        if (replacementText) {
-          chunks.push({
-            __isChunk: true,
-            text: replacementText,
-            fg: defaultStyle?.fg,
-            bg: defaultStyle?.bg,
-            attributes: defaultStyle ? createTextAttributes({
-              bold: defaultStyle.bold,
-              italic: defaultStyle.italic,
-              underline: defaultStyle.underline,
-              dim: defaultStyle.dim
-            }) : 0
-          });
-          ranges?.push({ start: currentOffset, end: boundary.offset });
-        }
-      } else {
-        const insideInjectionContainer = injectionContainerRanges.some((range) => currentOffset >= range.start && currentOffset < range.end);
-        const validGroups = activeGroups.filter((h) => {
-          if (insideInjectionContainer && shouldSuppressInInjection(h.group, h.meta)) {
-            return false;
-          }
-          return true;
-        });
-        const sortedGroups = validGroups.sort((a, b) => {
-          const aSpec = getSpecificity(a.group);
-          const bSpec = getSpecificity(b.group);
-          if (aSpec !== bSpec)
-            return aSpec - bSpec;
-          return a.index - b.index;
-        });
-        const mergedStyle = baseStyle ? { ...baseStyle } : {};
-        for (const { group } of sortedGroups) {
-          let styleForGroup = syntaxStyle.getStyle(group);
-          if (!styleForGroup && group.includes(".")) {
-            const baseName = group.split(".")[0];
-            styleForGroup = syntaxStyle.getStyle(baseName);
-          }
-          if (styleForGroup) {
-            if (styleForGroup.fg !== undefined)
-              mergedStyle.fg = styleForGroup.fg;
-            if (styleForGroup.bg !== undefined)
-              mergedStyle.bg = styleForGroup.bg;
-            if (styleForGroup.bold !== undefined)
-              mergedStyle.bold = styleForGroup.bold;
-            if (styleForGroup.italic !== undefined)
-              mergedStyle.italic = styleForGroup.italic;
-            if (styleForGroup.underline !== undefined)
-              mergedStyle.underline = styleForGroup.underline;
-            if (styleForGroup.dim !== undefined)
-              mergedStyle.dim = styleForGroup.dim;
-          } else {
-            if (group.includes(".")) {
-              const baseName = group.split(".")[0];
-              if (env.OTUI_TS_STYLE_WARN) {
-                console.warn(`Syntax style not found for group "${group}" or base scope "${baseName}", using default style`);
-              }
-            } else {
-              if (env.OTUI_TS_STYLE_WARN) {
-                console.warn(`Syntax style not found for group "${group}", using default style`);
-              }
-            }
-          }
-        }
-        const finalStyle = Object.keys(mergedStyle).length > 0 ? mergedStyle : defaultStyle;
-        chunks.push({
-          __isChunk: true,
-          text: segmentText,
-          fg: finalStyle?.fg,
-          bg: finalStyle?.bg,
-          attributes: finalStyle ? createTextAttributes({
-            bold: finalStyle.bold,
-            italic: finalStyle.italic,
-            underline: finalStyle.underline,
-            dim: finalStyle.dim
-          }) : 0
-        });
-        ranges?.push({ start: currentOffset, end: boundary.offset });
-      }
-    } else if (currentOffset < boundary.offset) {
-      const text = content.slice(currentOffset, boundary.offset);
-      const style = baseStyle ?? defaultStyle;
-      chunks.push({
-        __isChunk: true,
-        text,
-        fg: style?.fg,
-        bg: style?.bg,
-        attributes: style ? createTextAttributes({
-          bold: style.bold,
-          italic: style.italic,
-          underline: style.underline,
-          dim: style.dim
-        }) : 0
-      });
-      ranges?.push({ start: currentOffset, end: boundary.offset });
-    }
-    if (boundary.type === "start") {
-      activeHighlights.add(boundary.highlightIndex);
-    } else {
-      activeHighlights.delete(boundary.highlightIndex);
-      if (concealEnabled) {
-        const [, , group, meta] = highlights[boundary.highlightIndex];
-        if (meta?.concealLines !== undefined) {
-          if (boundary.offset < content.length && content[boundary.offset] === `
-`) {
-            currentOffset = boundary.offset + 1;
-            continue;
-          }
-        }
-        if (meta?.conceal !== undefined) {
-          if (meta.conceal === " ") {
-            if (boundary.offset < content.length && content[boundary.offset] === " ") {
-              currentOffset = boundary.offset + 1;
-              continue;
-            }
-          } else if (meta.conceal === "" && group === "conceal" && !meta.isInjection) {
-            if (boundary.offset < content.length && content[boundary.offset] === " ") {
-              currentOffset = boundary.offset + 1;
-              continue;
-            }
-          }
-        }
-      }
-    }
-    currentOffset = boundary.offset;
-  }
-  if (currentOffset < content.length) {
-    const text = content.slice(currentOffset);
-    const style = baseStyle ?? defaultStyle;
-    chunks.push({
-      __isChunk: true,
-      text,
-      fg: style?.fg,
-      bg: style?.bg,
-      attributes: style ? createTextAttributes({
-        bold: style.bold,
-        italic: style.italic,
-        underline: style.underline,
-        dim: style.dim
-      }) : 0
-    });
-    ranges?.push({ start: currentOffset, end: content.length });
-  }
-  return chunks;
-}
-async function treeSitterToStyledText(content, filetype, syntaxStyle, client, options) {
-  const result = await client.highlightOnce(content, filetype);
-  if (result.highlights && result.highlights.length > 0 || options?.baseHighlight) {
-    const chunks = treeSitterToTextChunks(content, result.highlights ?? [], syntaxStyle, {
-      enabled: options?.conceal?.enabled ?? true,
-      baseHighlight: options?.baseHighlight
-    });
-    return new StyledText(chunks);
-  } else {
-    const defaultStyle = syntaxStyle.mergeStyles("default");
-    const chunks = [
-      {
-        __isChunk: true,
-        text: content,
-        fg: defaultStyle.fg,
-        bg: defaultStyle.bg,
-        attributes: defaultStyle.attributes
-      }
-    ];
-    return new StyledText(chunks);
-  }
-}
-
-// src/lib/data-paths.ts
-import os from "os";
-import path from "path";
-import { EventEmitter as EventEmitter3 } from "events";
-
-// src/lib/validate-dir-name.ts
-function isValidDirectoryName(name) {
-  if (!name || typeof name !== "string") {
-    return false;
-  }
-  if (name.trim().length === 0) {
-    return false;
-  }
-  const reservedNames = [
-    "CON",
-    "PRN",
-    "AUX",
-    "NUL",
-    "COM1",
-    "COM2",
-    "COM3",
-    "COM4",
-    "COM5",
-    "COM6",
-    "COM7",
-    "COM8",
-    "COM9",
-    "LPT1",
-    "LPT2",
-    "LPT3",
-    "LPT4",
-    "LPT5",
-    "LPT6",
-    "LPT7",
-    "LPT8",
-    "LPT9"
-  ];
-  if (reservedNames.includes(name.toUpperCase())) {
-    return false;
-  }
-  const invalidChars = /[<>:"|?*/\\\x00-\x1f]/;
-  if (invalidChars.test(name)) {
-    return false;
-  }
-  if (name.endsWith(".") || name.endsWith(" ")) {
-    return false;
-  }
-  if (name === "." || name === "..") {
-    return false;
-  }
-  return true;
-}
-
-// src/lib/data-paths.ts
-registerEnvVar({
-  name: "XDG_CONFIG_HOME",
-  description: "Base directory for user-specific configuration files",
-  type: "string",
-  default: ""
-});
-registerEnvVar({
-  name: "XDG_DATA_HOME",
-  description: "Base directory for user-specific data files",
-  type: "string",
-  default: ""
-});
-
-class DataPathsManager extends EventEmitter3 {
-  _appName;
-  _globalConfigPath;
-  _globalConfigFile;
-  _localConfigFile;
-  _globalDataPath;
-  constructor() {
-    super();
-    this._appName = "opentui";
-  }
-  get appName() {
-    return this._appName;
-  }
-  set appName(value) {
-    if (!isValidDirectoryName(value)) {
-      throw new Error(`Invalid app name "${value}": must be a valid directory name`);
-    }
-    if (this._appName !== value) {
-      this._appName = value;
-      this._globalConfigPath = undefined;
-      this._globalConfigFile = undefined;
-      this._localConfigFile = undefined;
-      this._globalDataPath = undefined;
-      this.emit("paths:changed", this.toObject());
-    }
-  }
-  get globalConfigPath() {
-    if (this._globalConfigPath === undefined) {
-      const homeDir = os.homedir();
-      const xdgConfigHome = env.XDG_CONFIG_HOME;
-      const baseConfigDir = xdgConfigHome || path.join(homeDir, ".config");
-      this._globalConfigPath = path.join(baseConfigDir, this._appName);
-    }
-    return this._globalConfigPath;
-  }
-  get globalConfigFile() {
-    if (this._globalConfigFile === undefined) {
-      this._globalConfigFile = path.join(this.globalConfigPath, "init.ts");
-    }
-    return this._globalConfigFile;
-  }
-  get localConfigFile() {
-    if (this._localConfigFile === undefined) {
-      this._localConfigFile = path.join(process.cwd(), `.${this._appName}.ts`);
-    }
-    return this._localConfigFile;
-  }
-  get globalDataPath() {
-    if (this._globalDataPath === undefined) {
-      const homeDir = os.homedir();
-      const xdgDataHome = env.XDG_DATA_HOME;
-      const baseDataDir = xdgDataHome || path.join(homeDir, ".local/share");
-      this._globalDataPath = path.join(baseDataDir, this._appName);
-    }
-    return this._globalDataPath;
-  }
-  toObject() {
-    return {
-      globalConfigPath: this.globalConfigPath,
-      globalConfigFile: this.globalConfigFile,
-      localConfigFile: this.localConfigFile,
-      globalDataPath: this.globalDataPath
-    };
-  }
-}
-function getDataPaths() {
-  return singleton("data-paths-opentui", () => new DataPathsManager);
-}
-
-// src/lib/tree-sitter/resolve-ft.ts
-import path2 from "path";
-var extensionToFiletype = new Map([
-  ["astro", "astro"],
-  ["bash", "bash"],
-  ["c", "c"],
-  ["cc", "cpp"],
-  ["cjs", "javascript"],
-  ["clj", "clojure"],
-  ["cljs", "clojure"],
-  ["cljc", "clojure"],
-  ["cpp", "cpp"],
-  ["cxx", "cpp"],
-  ["cs", "csharp"],
-  ["cts", "typescript"],
-  ["ctsx", "typescriptreact"],
-  ["dart", "dart"],
-  ["diff", "diff"],
-  ["edn", "clojure"],
-  ["go", "go"],
-  ["gemspec", "ruby"],
-  ["groovy", "groovy"],
-  ["h", "c"],
-  ["handlebars", "handlebars"],
-  ["hbs", "handlebars"],
-  ["hpp", "cpp"],
-  ["hxx", "cpp"],
-  ["h++", "cpp"],
-  ["hh", "cpp"],
-  ["hrl", "erlang"],
-  ["hs", "haskell"],
-  ["htm", "html"],
-  ["html", "html"],
-  ["ini", "ini"],
-  ["js", "javascript"],
-  ["jsx", "javascriptreact"],
-  ["jl", "julia"],
-  ["json", "json"],
-  ["ksh", "bash"],
-  ["kt", "kotlin"],
-  ["kts", "kotlin"],
-  ["latex", "latex"],
-  ["less", "less"],
-  ["lua", "lua"],
-  ["markdown", "markdown"],
-  ["md", "markdown"],
-  ["mdown", "markdown"],
-  ["mkd", "markdown"],
-  ["mjs", "javascript"],
-  ["ml", "ocaml"],
-  ["mli", "ocaml"],
-  ["mts", "typescript"],
-  ["mtsx", "typescriptreact"],
-  ["patch", "diff"],
-  ["php", "php"],
-  ["pl", "perl"],
-  ["pm", "perl"],
-  ["ps1", "powershell"],
-  ["psm1", "powershell"],
-  ["py", "python"],
-  ["pyi", "python"],
-  ["r", "r"],
-  ["rb", "ruby"],
-  ["rake", "ruby"],
-  ["rs", "rust"],
-  ["ru", "ruby"],
-  ["sass", "sass"],
-  ["sc", "scala"],
-  ["scala", "scala"],
-  ["scss", "scss"],
-  ["sh", "bash"],
-  ["sql", "sql"],
-  ["svelte", "svelte"],
-  ["swift", "swift"],
-  ["ts", "typescript"],
-  ["tsx", "typescriptreact"],
-  ["tex", "latex"],
-  ["toml", "toml"],
-  ["vue", "vue"],
-  ["vim", "vim"],
-  ["xml", "xml"],
-  ["xsl", "xsl"],
-  ["yaml", "yaml"],
-  ["yml", "yaml"],
-  ["zig", "zig"],
-  ["zon", "zig"],
-  ["zsh", "bash"],
-  ["c++", "cpp"],
-  ["erl", "erlang"],
-  ["exs", "elixir"],
-  ["ex", "elixir"],
-  ["elm", "elm"],
-  ["fsharp", "fsharp"],
-  ["fs", "fsharp"],
-  ["fsx", "fsharp"],
-  ["fsscript", "fsharp"],
-  ["fsi", "fsharp"],
-  ["java", "java"],
-  ["css", "css"]
-]);
-var basenameToFiletype = new Map([
-  [".bash_aliases", "bash"],
-  [".bash_logout", "bash"],
-  [".bash_profile", "bash"],
-  [".bashrc", "bash"],
-  [".kshrc", "bash"],
-  [".profile", "bash"],
-  [".vimrc", "vim"],
-  [".zlogin", "bash"],
-  [".zlogout", "bash"],
-  [".zprofile", "bash"],
-  [".zshenv", "bash"],
-  [".zshrc", "bash"],
-  ["appfile", "ruby"],
-  ["berksfile", "ruby"],
-  ["brewfile", "ruby"],
-  ["cheffile", "ruby"],
-  ["containerfile", "dockerfile"],
-  ["dockerfile", "dockerfile"],
-  ["fastfile", "ruby"],
-  ["gemfile", "ruby"],
-  ["gnumakefile", "make"],
-  ["gvimrc", "vim"],
-  ["guardfile", "ruby"],
-  ["makefile", "make"],
-  ["podfile", "ruby"],
-  ["rakefile", "ruby"],
-  ["thorfile", "ruby"],
-  ["vagrantfile", "ruby"]
-]);
-function normalizeFiletypeToken(value) {
-  const normalizedValue = value.trim().replace(/^\./, "").toLowerCase();
-  return normalizedValue || undefined;
-}
-function getBasename(value) {
-  const normalizedValue = value.trim().replaceAll("\\", "/");
-  if (!normalizedValue)
-    return;
-  const basename2 = path2.posix.basename(normalizedValue).toLowerCase();
-  return basename2 || undefined;
-}
-function extToFiletype(extension) {
-  const normalizedExtension = normalizeFiletypeToken(extension);
-  if (!normalizedExtension)
-    return;
-  return extensionToFiletype.get(normalizedExtension);
-}
-function pathToFiletype(path3) {
-  if (typeof path3 !== "string")
-    return;
-  const basename2 = getBasename(path3);
-  if (!basename2)
-    return;
-  const basenameFiletype = basenameToFiletype.get(basename2);
-  if (basenameFiletype) {
-    return basenameFiletype;
-  }
-  const lastDot = basename2.lastIndexOf(".");
-  if (lastDot === -1 || lastDot === basename2.length - 1) {
-    return;
-  }
-  const extension = basename2.substring(lastDot + 1);
-  return extToFiletype(extension);
-}
-function infoStringToFiletype(infoString) {
-  if (typeof infoString !== "string")
-    return;
-  const token = infoString.trim().split(/\s+/, 1)[0];
-  const directBasenameMatch = basenameToFiletype.get(token.toLowerCase());
-  if (directBasenameMatch)
-    return directBasenameMatch;
-  const normalizedToken = normalizeFiletypeToken(token);
-  if (!normalizedToken)
-    return;
-  return basenameToFiletype.get(normalizedToken) ?? pathToFiletype(normalizedToken) ?? extToFiletype(normalizedToken) ?? normalizedToken;
-}
-
-// src/lib/tree-sitter/index.ts
-var TREE_SITTER_CLIENT_KEY = "tree-sitter-client";
-var TREE_SITTER_CLIENT_LISTENER_STATE_KEY = "tree-sitter-client-listener-state";
-function getTreeSitterClientListenerState() {
-  return singleton(TREE_SITTER_CLIENT_LISTENER_STATE_KEY, () => ({}));
-}
-function getTreeSitterClient() {
-  const existingClient = getSingleton(TREE_SITTER_CLIENT_KEY);
-  if (existingClient) {
-    return existingClient;
-  }
-  const dataPathsManager = getDataPaths();
-  const defaultOptions = {
-    dataPath: dataPathsManager.globalDataPath
-  };
-  return singleton(TREE_SITTER_CLIENT_KEY, () => {
-    const client2 = new TreeSitterClient(defaultOptions);
-    const listenerState = getTreeSitterClientListenerState();
-    const handlePathsChanged = (paths) => {
-      client2.setDataPath(paths.globalDataPath).catch((error) => {
-        console.warn("Failed to update tree-sitter data path:", error);
-      });
-    };
-    const removeListener = () => {
-      dataPathsManager.off("paths:changed", handlePathsChanged);
-      if (listenerState.removeListener === removeListener) {
-        listenerState.removeListener = undefined;
-      }
-      if (getSingleton(TREE_SITTER_CLIENT_KEY) === client2) {
-        destroySingleton(TREE_SITTER_CLIENT_KEY);
-      }
-    };
-    listenerState.removeListener = removeListener;
-    client2.onDestroy(removeListener);
-    dataPathsManager.on("paths:changed", handlePathsChanged);
-    return client2;
-  });
-}
-async function destroyTreeSitterClient() {
-  const client2 = getSingleton(TREE_SITTER_CLIENT_KEY);
-  if (!client2) {
-    const listenerState = getSingleton(TREE_SITTER_CLIENT_LISTENER_STATE_KEY);
-    listenerState?.removeListener?.();
-    if (listenerState) {
-      listenerState.removeListener = undefined;
-    }
-    return;
-  }
-  destroySingleton(TREE_SITTER_CLIENT_KEY);
-  await client2.destroy();
-}
-
-// src/lib/extmarks-history.ts
-class ExtmarksHistory {
-  undoStack = [];
-  redoStack = [];
-  saveSnapshot(extmarks, nextId) {
-    const snapshot = {
-      extmarks: new Map(Array.from(extmarks.entries()).map(([id, extmark]) => [id, { ...extmark }])),
-      nextId
-    };
-    this.undoStack.push(snapshot);
-    this.redoStack = [];
-  }
-  undo() {
-    if (this.undoStack.length === 0)
-      return null;
-    return this.undoStack.pop();
-  }
-  redo() {
-    if (this.redoStack.length === 0)
-      return null;
-    return this.redoStack.pop();
-  }
-  pushRedo(snapshot) {
-    this.redoStack.push(snapshot);
-  }
-  pushUndo(snapshot) {
-    this.undoStack.push(snapshot);
-  }
-  clear() {
-    this.undoStack = [];
-    this.redoStack = [];
-  }
-  canUndo() {
-    return this.undoStack.length > 0;
-  }
-  canRedo() {
-    return this.redoStack.length > 0;
-  }
-}
-
-// src/lib/extmarks.ts
-class ExtmarksController {
-  editBuffer;
-  editorView;
-  extmarks = new Map;
-  extmarksByTypeId = new Map;
-  metadata = new Map;
-  nextId = 1;
-  destroyed = false;
-  history = new ExtmarksHistory;
-  typeNameToId = new Map;
-  typeIdToName = new Map;
-  nextTypeId = 1;
-  originalMoveCursorLeft;
-  originalMoveCursorRight;
-  originalSetCursorByOffset;
-  originalMoveUpVisual;
-  originalMoveDownVisual;
-  originalDeleteCharBackward;
-  originalDeleteChar;
-  originalInsertText;
-  originalInsertChar;
-  originalDeleteRange;
-  originalSetText;
-  originalReplaceText;
-  originalClear;
-  originalNewLine;
-  originalDeleteLine;
-  originalEditorViewDeleteSelectedText;
-  originalEditorViewReplaceSelectedText;
-  originalUndo;
-  originalRedo;
-  contentChangeListener = () => {
-    if (!this.destroyed)
-      this.updateHighlights();
-  };
-  constructor(editBuffer, editorView) {
-    this.editBuffer = editBuffer;
-    this.editorView = editorView;
-    this.originalMoveCursorLeft = editBuffer.moveCursorLeft.bind(editBuffer);
-    this.originalMoveCursorRight = editBuffer.moveCursorRight.bind(editBuffer);
-    this.originalSetCursorByOffset = editBuffer.setCursorByOffset.bind(editBuffer);
-    this.originalMoveUpVisual = editorView.moveUpVisual.bind(editorView);
-    this.originalMoveDownVisual = editorView.moveDownVisual.bind(editorView);
-    this.originalDeleteCharBackward = editBuffer.deleteCharBackward.bind(editBuffer);
-    this.originalDeleteChar = editBuffer.deleteChar.bind(editBuffer);
-    this.originalInsertText = editBuffer.insertText.bind(editBuffer);
-    this.originalInsertChar = editBuffer.insertChar.bind(editBuffer);
-    this.originalDeleteRange = editBuffer.deleteRange.bind(editBuffer);
-    this.originalSetText = editBuffer.setText.bind(editBuffer);
-    this.originalReplaceText = editBuffer.replaceText.bind(editBuffer);
-    this.originalClear = editBuffer.clear.bind(editBuffer);
-    this.originalNewLine = editBuffer.newLine.bind(editBuffer);
-    this.originalDeleteLine = editBuffer.deleteLine.bind(editBuffer);
-    this.originalEditorViewDeleteSelectedText = editorView.deleteSelectedText.bind(editorView);
-    this.originalEditorViewReplaceSelectedText = editorView._replaceSelectedText.bind(editorView);
-    this.originalUndo = editBuffer.undo.bind(editBuffer);
-    this.originalRedo = editBuffer.redo.bind(editBuffer);
-    this.wrapCursorMovement();
-    this.wrapDeletion();
-    this.wrapInsertion();
-    this.wrapEditorViewDeleteSelectedText();
-    this.wrapUndoRedo();
-    this.setupContentChangeListener();
-  }
-  wrapCursorMovement() {
-    this.editBuffer.moveCursorLeft = () => {
-      if (this.destroyed) {
-        this.originalMoveCursorLeft();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
-        this.originalMoveCursorLeft();
-        return;
-      }
-      const targetOffset = currentOffset - 1;
-      if (targetOffset < 0) {
-        this.originalMoveCursorLeft();
-        return;
-      }
-      const virtualExtmark = this.findVirtualExtmarkContaining(targetOffset);
-      if (virtualExtmark && currentOffset >= virtualExtmark.end) {
-        this.editBuffer.setCursorByOffset(Math.max(0, virtualExtmark.start - 1));
-        return;
-      }
-      this.originalMoveCursorLeft();
-    };
-    this.editBuffer.moveCursorRight = () => {
-      if (this.destroyed) {
-        this.originalMoveCursorRight();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
-        this.originalMoveCursorRight();
-        return;
-      }
-      const targetOffset = currentOffset + 1;
-      if (this.editBuffer.offsetToPosition(targetOffset) === null) {
-        this.originalMoveCursorRight();
-        return;
-      }
-      const virtualExtmark = this.findVirtualExtmarkContaining(targetOffset);
-      if (virtualExtmark && currentOffset <= virtualExtmark.start) {
-        this.editBuffer.setCursorByOffset(virtualExtmark.end);
-        return;
-      }
-      this.originalMoveCursorRight();
-    };
-    this.editorView.moveUpVisual = () => {
-      if (this.destroyed) {
-        this.originalMoveUpVisual();
-        return;
-      }
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
-        this.originalMoveUpVisual();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      this.originalMoveUpVisual();
-      const newOffset = this.editBuffer.getCursorPosition().offset;
-      const virtualExtmark = this.findVirtualExtmarkContaining(newOffset);
-      if (virtualExtmark) {
-        const distanceToStart = newOffset - virtualExtmark.start;
-        const distanceToEnd = virtualExtmark.end - newOffset;
-        if (distanceToStart < distanceToEnd) {
-          this.editorView.setCursorByOffset(Math.max(0, virtualExtmark.start - 1));
-        } else {
-          this.editorView.setCursorByOffset(virtualExtmark.end);
-        }
-      }
-    };
-    this.editorView.moveDownVisual = () => {
-      if (this.destroyed) {
-        this.originalMoveDownVisual();
-        return;
-      }
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
-        this.originalMoveDownVisual();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      this.originalMoveDownVisual();
-      const newOffset = this.editBuffer.getCursorPosition().offset;
-      const virtualExtmark = this.findVirtualExtmarkContaining(newOffset);
-      if (virtualExtmark) {
-        const distanceToStart = newOffset - virtualExtmark.start;
-        const distanceToEnd = virtualExtmark.end - newOffset;
-        if (distanceToStart < distanceToEnd) {
-          const adjustedOffset = virtualExtmark.start - 1;
-          const targetOffset = adjustedOffset <= currentOffset ? virtualExtmark.end : adjustedOffset;
-          this.editorView.setCursorByOffset(targetOffset);
-        } else {
-          this.editorView.setCursorByOffset(virtualExtmark.end);
-        }
-      }
-    };
-    this.editBuffer.setCursorByOffset = (offset) => {
-      if (this.destroyed) {
-        this.originalSetCursorByOffset(offset);
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
-        this.originalSetCursorByOffset(offset);
-        return;
-      }
-      const movingForward = offset > currentOffset;
-      if (movingForward) {
-        const virtualExtmark = this.findVirtualExtmarkContaining(offset);
-        if (virtualExtmark && currentOffset <= virtualExtmark.start) {
-          this.originalSetCursorByOffset(virtualExtmark.end);
-          return;
-        }
-      } else {
-        for (const extmark of this.extmarks.values()) {
-          if (extmark.virtual && currentOffset >= extmark.end && offset < extmark.end && offset >= extmark.start) {
-            this.originalSetCursorByOffset(Math.max(0, extmark.start - 1));
-            return;
-          }
-        }
-      }
-      this.originalSetCursorByOffset(offset);
-    };
-  }
-  wrapDeletion() {
-    this.editBuffer.deleteCharBackward = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalDeleteCharBackward();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hadSelection = this.editorView.hasSelection();
-      if (currentOffset === 0 || hadSelection) {
-        this.originalDeleteCharBackward();
-        this.saveSnapshot();
-        return;
-      }
-      const targetOffset = currentOffset - 1;
-      const virtualExtmark = this.findVirtualExtmarkContaining(targetOffset);
-      if (virtualExtmark && currentOffset === virtualExtmark.end) {
-        const startCursor = this.offsetToPosition(virtualExtmark.start);
-        const endCursor = this.offsetToPosition(virtualExtmark.end);
-        const deleteOffset2 = virtualExtmark.start;
-        const change2 = this.measureChange(() => this.originalDeleteRange(startCursor.row, startCursor.col, endCursor.row, endCursor.col));
-        this.saveSnapshot();
-        this.deleteExtmarkById(virtualExtmark.id);
-        this.shiftExtmarks(deleteOffset2, change2);
-        return;
-      }
-      const deleteOffset = this.editBuffer._getPrevCharBoundary().offset;
-      const change = this.measureChange(() => this.originalDeleteCharBackward());
-      this.saveSnapshot();
-      this.shiftExtmarks(deleteOffset, change);
-    });
-    this.editBuffer.deleteChar = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalDeleteChar();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hadSelection = this.editorView.hasSelection();
-      if (hadSelection) {
-        this.originalDeleteChar();
-        this.saveSnapshot();
-        return;
-      }
-      const targetOffset = currentOffset;
-      const virtualExtmark = this.findVirtualExtmarkContaining(targetOffset);
-      if (virtualExtmark && currentOffset === virtualExtmark.start) {
-        const startCursor = this.offsetToPosition(virtualExtmark.start);
-        const endCursor = this.offsetToPosition(virtualExtmark.end);
-        const deleteOffset = virtualExtmark.start;
-        const change2 = this.measureChange(() => this.originalDeleteRange(startCursor.row, startCursor.col, endCursor.row, endCursor.col));
-        this.saveSnapshot();
-        this.deleteExtmarkById(virtualExtmark.id);
-        this.shiftExtmarks(deleteOffset, change2);
-        return;
-      }
-      const change = this.measureChange(() => this.originalDeleteChar());
-      this.saveSnapshot();
-      this.shiftExtmarks(currentOffset, change);
-    });
-    this.editBuffer.deleteRange = (startLine, startCol, endLine, endCol) => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalDeleteRange(startLine, startCol, endLine, endCol);
-        return;
-      }
-      const startOffset = Math.min(this.positionToOffset(startLine, startCol), this.positionToOffset(endLine, endCol));
-      const change = this.measureChange(() => this.originalDeleteRange(startLine, startCol, endLine, endCol));
-      this.saveSnapshot();
-      this.shiftExtmarks(startOffset, change);
-    });
-    this.editBuffer.deleteLine = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalDeleteLine();
-        return;
-      }
-      const row = this.editBuffer.getCursorPosition().row;
-      const lineStart = this.editBuffer.getLineStartOffset(row);
-      const [start, end] = row + 1 < this.editBuffer.getLineCount() ? [lineStart, this.editBuffer.getLineStartOffset(row + 1)] : [Math.max(0, lineStart - 1), this.editBuffer.getEOL().offset];
-      this.originalDeleteLine();
-      this.saveSnapshot();
-      this.adjustExtmarksAfterDeletion(start, end - start);
-    });
-  }
-  wrapInsertion() {
-    this.editBuffer.insertText = (text) => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalInsertText(text);
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const change = this.measureChange(() => this.originalInsertText(text));
-      this.saveSnapshot();
-      this.shiftExtmarks(currentOffset, change);
-    });
-    this.editBuffer.insertChar = (char) => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalInsertChar(char);
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const change = this.measureChange(() => this.originalInsertChar(char));
-      this.saveSnapshot();
-      this.shiftExtmarks(currentOffset, change);
-    });
-    this.editBuffer.setText = (text) => {
-      if (this.destroyed) {
-        this.originalSetText(text);
-        return;
-      }
-      this.editBuffer.runMutation(() => {
-        this.originalSetText(text);
-        this.clear();
-      });
-    };
-    this.editBuffer.replaceText = (text) => {
-      if (this.destroyed) {
-        this.originalReplaceText(text);
-        return;
-      }
-      this.editBuffer.runMutation(() => {
-        this.originalReplaceText(text);
-        this.saveSnapshot();
-        this.clear();
-      });
-    };
-    this.editBuffer.clear = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalClear();
-        return;
-      }
-      this.originalClear();
-      this.saveSnapshot();
-      this.clear();
-    });
-    this.editBuffer.newLine = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalNewLine();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      this.originalNewLine();
-      this.saveSnapshot();
-      this.adjustExtmarksAfterInsertion(currentOffset, 1);
-    });
-  }
-  wrapEditorViewDeleteSelectedText() {
-    this.editorView._replaceSelectedText = (text) => this.editBuffer.runMutation(() => {
-      if (this.destroyed)
-        return this.originalEditorViewReplaceSelectedText(text);
-      const selection = this.editorView.getSelection();
-      const deleteOffset = selection ? Math.min(selection.start, selection.end) : 0;
-      const cursorOffset = this.editBuffer.getCursorPosition().offset;
-      let result;
-      const change = this.measureChange(() => result = this.originalEditorViewReplaceSelectedText(text));
-      const insertOffset = result.deleted ? deleteOffset : cursorOffset;
-      const insertLength = result.inserted ? this.editBuffer.getCursorPosition().offset - insertOffset : 0;
-      if (result.deleted) {
-        this.saveSnapshot();
-        this.shiftExtmarks(deleteOffset, change - insertLength, false);
-      }
-      if (result.inserted)
-        this.saveSnapshot();
-      this.shiftExtmarks(insertOffset, insertLength, false);
-      if (change !== 0 || insertLength !== 0)
-        this.updateHighlights();
-      return result;
-    });
-    this.editorView.deleteSelectedText = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalEditorViewDeleteSelectedText();
-        return;
-      }
-      const selection = this.editorView.getSelection();
-      if (!selection) {
-        this.originalEditorViewDeleteSelectedText();
-        this.saveSnapshot();
-        return;
-      }
-      const deleteOffset = Math.min(selection.start, selection.end);
-      const change = this.measureChange(() => this.originalEditorViewDeleteSelectedText());
-      this.saveSnapshot();
-      this.shiftExtmarks(deleteOffset, change);
-    });
-  }
-  setupContentChangeListener() {
-    this.editBuffer.on("content-changed", this.contentChangeListener);
-  }
-  deleteExtmarkById(id) {
-    const extmark = this.extmarks.get(id);
-    if (extmark) {
-      this.extmarks.delete(id);
-      this.extmarksByTypeId.get(extmark.typeId)?.delete(id);
-      this.metadata.delete(id);
-    }
-  }
-  findVirtualExtmarkContaining(offset) {
-    for (const extmark of this.extmarks.values()) {
-      if (extmark.virtual && offset >= extmark.start && offset < extmark.end) {
-        return extmark;
-      }
-    }
-    return null;
-  }
-  adjustExtmarksAfterInsertion(insertOffset, length, updateHighlights = true) {
-    for (const extmark of this.extmarks.values()) {
-      if (extmark.start >= insertOffset) {
-        extmark.start += length;
-        extmark.end += length;
-      } else if (extmark.end > insertOffset) {
-        extmark.end += length;
-      }
-    }
-    if (updateHighlights)
-      this.updateHighlights();
-  }
-  adjustExtmarksAfterDeletion(deleteOffset, length, updateHighlights = true) {
-    const toDelete = [];
-    for (const extmark of this.extmarks.values()) {
-      if (extmark.end <= deleteOffset) {
-        continue;
-      }
-      if (extmark.start >= deleteOffset + length) {
-        extmark.start -= length;
-        extmark.end -= length;
-      } else if (extmark.start >= deleteOffset && extmark.end <= deleteOffset + length) {
-        toDelete.push(extmark.id);
-      } else if (extmark.start < deleteOffset && extmark.end > deleteOffset + length) {
-        extmark.end -= length;
-      } else if (extmark.start < deleteOffset && extmark.end > deleteOffset) {
-        extmark.end -= Math.min(extmark.end, deleteOffset + length) - deleteOffset;
-      } else if (extmark.start < deleteOffset + length && extmark.end > deleteOffset + length) {
-        const overlap = deleteOffset + length - extmark.start;
-        extmark.start = deleteOffset;
-        extmark.end -= length;
-      }
-    }
-    for (const id of toDelete) {
-      this.deleteExtmarkById(id);
-    }
-    if (updateHighlights)
-      this.updateHighlights();
-  }
-  offsetToPosition(offset) {
-    const result = this.editBuffer.offsetToPosition(offset);
-    if (!result) {
-      return { row: 0, col: 0 };
-    }
-    return result;
-  }
-  positionToOffset(row, col) {
-    return this.editBuffer.positionToOffset(row, col);
-  }
-  measureChange(edit) {
-    const before = this.editBuffer._getEOF().offset;
-    edit();
-    return this.editBuffer._getEOF().offset - before;
-  }
-  shiftExtmarks(offset, change, updateHighlights = true) {
-    if (change > 0)
-      this.adjustExtmarksAfterInsertion(offset, change, updateHighlights);
-    else if (change < 0)
-      this.adjustExtmarksAfterDeletion(offset, -change, updateHighlights);
-  }
-  updateHighlights() {
-    this.editBuffer.clearAllHighlights();
-    for (const extmark of this.extmarks.values()) {
-      if (extmark.styleId !== undefined) {
-        this.editBuffer.addHighlightByCharRange({
-          start: this.offsetExcludingNewlines(extmark.start),
-          end: this.offsetExcludingNewlines(extmark.end),
-          styleId: extmark.styleId,
-          priority: extmark.priority ?? 0,
-          hlRef: extmark.id & 65535
-        });
-      }
-    }
-  }
-  offsetExcludingNewlines(offset) {
-    return offset - (this.editBuffer.offsetToPosition(offset)?.row ?? 0);
-  }
-  create(options) {
-    if (this.destroyed) {
-      throw new Error("ExtmarksController is destroyed");
-    }
-    const id = this.nextId++;
-    const typeId = options.typeId ?? 0;
-    const extmark = {
-      id,
-      start: options.start,
-      end: options.end,
-      virtual: options.virtual ?? false,
-      styleId: options.styleId,
-      priority: options.priority,
-      data: options.data,
-      typeId
-    };
-    this.extmarks.set(id, extmark);
-    if (!this.extmarksByTypeId.has(typeId)) {
-      this.extmarksByTypeId.set(typeId, new Set);
-    }
-    this.extmarksByTypeId.get(typeId).add(id);
-    if (options.metadata !== undefined) {
-      this.metadata.set(id, options.metadata);
-    }
-    try {
-      this.updateHighlights();
-    } catch (error) {
-      this.deleteExtmarkById(id);
-      this.updateHighlights();
-      throw error;
-    }
-    return id;
-  }
-  delete(id) {
-    if (this.destroyed) {
-      throw new Error("ExtmarksController is destroyed");
-    }
-    const extmark = this.extmarks.get(id);
-    if (!extmark)
-      return false;
-    this.deleteExtmarkById(id);
-    this.updateHighlights();
-    return true;
-  }
-  get(id) {
-    if (this.destroyed)
-      return null;
-    return this.extmarks.get(id) ?? null;
-  }
-  getAll() {
-    if (this.destroyed)
-      return [];
-    return Array.from(this.extmarks.values());
-  }
-  getVirtual() {
-    if (this.destroyed)
-      return [];
-    return Array.from(this.extmarks.values()).filter((e) => e.virtual);
-  }
-  getAtOffset(offset) {
-    if (this.destroyed)
-      return [];
-    return Array.from(this.extmarks.values()).filter((e) => offset >= e.start && offset < e.end);
-  }
-  getAllForTypeId(typeId) {
-    if (this.destroyed)
-      return [];
-    const ids = this.extmarksByTypeId.get(typeId);
-    if (!ids)
-      return [];
-    return Array.from(ids).map((id) => this.extmarks.get(id)).filter((e) => e !== undefined);
-  }
-  clear() {
-    if (this.destroyed)
-      return;
-    this.extmarks.clear();
-    this.extmarksByTypeId.clear();
-    this.metadata.clear();
-    this.updateHighlights();
-  }
-  saveSnapshot() {
-    this.history.saveSnapshot(this.snapshotExtmarks(), this.nextId);
-  }
-  snapshotExtmarks() {
-    return new Map(Array.from(this.extmarks, ([id, extmark]) => [id, { ...extmark, metadata: this.metadata.get(id) }]));
-  }
-  restoreSnapshot(snapshot) {
-    this.extmarks.clear();
-    this.extmarksByTypeId.clear();
-    this.metadata.clear();
-    for (const [id, saved] of snapshot.extmarks) {
-      const { metadata, ...extmark } = saved;
-      this.extmarks.set(id, extmark);
-      if (!this.extmarksByTypeId.has(extmark.typeId)) {
-        this.extmarksByTypeId.set(extmark.typeId, new Set);
-      }
-      this.extmarksByTypeId.get(extmark.typeId).add(id);
-      if (metadata !== undefined)
-        this.metadata.set(id, metadata);
-    }
-    this.nextId = snapshot.nextId;
-    this.updateHighlights();
-  }
-  wrapUndoRedo() {
-    this.editBuffer.undo = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed || !this.history.canUndo()) {
-        return this.originalUndo();
-      }
-      const result = this.originalUndo();
-      const currentSnapshot = {
-        extmarks: this.snapshotExtmarks(),
-        nextId: this.nextId
-      };
-      this.history.pushRedo(currentSnapshot);
-      const snapshot = this.history.undo();
-      this.restoreSnapshot(snapshot);
-      return result;
-    });
-    this.editBuffer.redo = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed || !this.history.canRedo()) {
-        return this.originalRedo();
-      }
-      const result = this.originalRedo();
-      const currentSnapshot = {
-        extmarks: this.snapshotExtmarks(),
-        nextId: this.nextId
-      };
-      this.history.pushUndo(currentSnapshot);
-      const snapshot = this.history.redo();
-      this.restoreSnapshot(snapshot);
-      return result;
-    });
-  }
-  registerType(typeName) {
-    if (this.destroyed) {
-      throw new Error("ExtmarksController is destroyed");
-    }
-    const existing = this.typeNameToId.get(typeName);
-    if (existing !== undefined) {
-      return existing;
-    }
-    const typeId = this.nextTypeId++;
-    this.typeNameToId.set(typeName, typeId);
-    this.typeIdToName.set(typeId, typeName);
-    return typeId;
-  }
-  getTypeId(typeName) {
-    if (this.destroyed)
-      return null;
-    return this.typeNameToId.get(typeName) ?? null;
-  }
-  getTypeName(typeId) {
-    if (this.destroyed)
-      return null;
-    return this.typeIdToName.get(typeId) ?? null;
-  }
-  getMetadataFor(extmarkId) {
-    if (this.destroyed)
-      return;
-    return this.metadata.get(extmarkId);
-  }
-  destroy() {
-    if (this.destroyed)
-      return;
-    this.editBuffer.off("content-changed", this.contentChangeListener);
-    this.editBuffer.moveCursorLeft = this.originalMoveCursorLeft;
-    this.editBuffer.moveCursorRight = this.originalMoveCursorRight;
-    this.editBuffer.setCursorByOffset = this.originalSetCursorByOffset;
-    this.editorView.moveUpVisual = this.originalMoveUpVisual;
-    this.editorView.moveDownVisual = this.originalMoveDownVisual;
-    this.editBuffer.deleteCharBackward = this.originalDeleteCharBackward;
-    this.editBuffer.deleteChar = this.originalDeleteChar;
-    this.editBuffer.insertText = this.originalInsertText;
-    this.editBuffer.insertChar = this.originalInsertChar;
-    this.editBuffer.deleteRange = this.originalDeleteRange;
-    this.editBuffer.setText = this.originalSetText;
-    this.editBuffer.replaceText = this.originalReplaceText;
-    this.editBuffer.clear = this.originalClear;
-    this.editBuffer.newLine = this.originalNewLine;
-    this.editBuffer.deleteLine = this.originalDeleteLine;
-    this.editorView.deleteSelectedText = this.originalEditorViewDeleteSelectedText;
-    this.editorView._replaceSelectedText = this.originalEditorViewReplaceSelectedText;
-    this.editBuffer.undo = this.originalUndo;
-    this.editBuffer.redo = this.originalRedo;
-    this.extmarks.clear();
-    this.extmarksByTypeId.clear();
-    this.metadata.clear();
-    this.typeNameToId.clear();
-    this.typeIdToName.clear();
-    this.history.clear();
-    this.destroyed = true;
-  }
-}
-function createExtmarksController(editBuffer, editorView) {
-  return new ExtmarksController(editBuffer, editorView);
-}
-
-// src/lib/terminal-palette.ts
-var SYSTEM_CLOCK2 = new SystemClock;
-registerEnvVar({
-  name: "OTUI_PALETTE_IDLE_TIMEOUT_MS",
-  description: "Milliseconds of silence after palette queries before using fallback colors.",
-  type: "number",
-  default: 300
-});
-var OSC4_RESPONSE = /\x1b]4;(\d+);(?:(?:rgb:)([0-9a-fA-F]+)\/([0-9a-fA-F]+)\/([0-9a-fA-F]+)|#([0-9a-fA-F]{6}))(?:\x07|\x1b\\)/g;
-var OSC_SPECIAL_RESPONSE = /\x1b](\d+);(?:(?:rgb:)([0-9a-fA-F]+)\/([0-9a-fA-F]+)\/([0-9a-fA-F]+)|#([0-9a-fA-F]{6}))(?:\x07|\x1b\\)/g;
-function scaleComponent(comp) {
-  const val = parseInt(comp, 16);
-  const maxIn = (1 << 4 * comp.length) - 1;
-  return Math.round(val / maxIn * 255).toString(16).padStart(2, "0");
-}
-function toHex(r, g, b, hex6) {
-  if (hex6)
-    return `#${hex6.toLowerCase()}`;
-  if (r && g && b)
-    return `#${scaleComponent(r)}${scaleComponent(g)}${scaleComponent(b)}`;
-  return "#000000";
-}
-function wrapForTmux(osc) {
-  const escaped = osc.replace(/\x1b/g, "\x1B\x1B");
-  return `\x1BPtmux;${escaped}\x1B\\`;
-}
-
-class TerminalPalette {
-  stdin;
-  stdout;
-  writeFn;
-  activeQuerySessions = [];
-  inLegacyTmux;
-  inTmux;
-  oscSource;
-  clock;
-  constructor(options) {
-    const { stdin, stdout, writeFn, isLegacyTmux, isTmux, oscSource, clock } = options;
-    this.stdin = stdin;
-    this.stdout = stdout;
-    this.writeFn = writeFn || ((data) => stdout.write(data));
-    this.inLegacyTmux = isLegacyTmux ?? false;
-    this.inTmux = isTmux ?? this.inLegacyTmux;
-    this.oscSource = oscSource;
-    this.clock = clock ?? SYSTEM_CLOCK2;
-  }
-  writeOsc(osc, wrapForLegacyTmux = false) {
-    const data = wrapForLegacyTmux && this.inLegacyTmux ? wrapForTmux(osc) : osc;
-    return this.writeFn(data);
-  }
-  cleanup() {
-    for (const cleanupSession of [...this.activeQuerySessions]) {
-      cleanupSession();
-    }
-    this.activeQuerySessions = [];
-  }
-  subscribeInput(handler) {
-    if (this.oscSource) {
-      return this.oscSource.subscribeOsc((sequence) => {
-        handler(sequence);
-      });
-    }
-    this.stdin.on("data", handler);
-    return () => {
-      this.stdin.removeListener("data", handler);
-    };
-  }
-  createQuerySession() {
-    const timers = new Set;
-    const subscriptions = new Set;
-    let closed = false;
-    const cleanup = () => {
-      if (closed)
-        return;
-      closed = true;
-      for (const timer of timers) {
-        this.clock.clearTimeout(timer);
-      }
-      timers.clear();
-      for (const unsubscribe of subscriptions) {
-        unsubscribe();
-      }
-      subscriptions.clear();
-      const idx = this.activeQuerySessions.indexOf(cleanup);
-      if (idx !== -1)
-        this.activeQuerySessions.splice(idx, 1);
-    };
-    this.activeQuerySessions.push(cleanup);
-    return {
-      setTimer: (fn, ms) => {
-        const timer = this.clock.setTimeout(fn, ms);
-        timers.add(timer);
-        return timer;
-      },
-      resetTimer: (existing, fn, ms) => {
-        if (existing) {
-          this.clock.clearTimeout(existing);
-          timers.delete(existing);
-        }
-        const timer = this.clock.setTimeout(fn, ms);
-        timers.add(timer);
-        return timer;
-      },
-      subscribeInput: (handler) => {
-        const unsubscribe = this.subscribeInput(handler);
-        subscriptions.add(unsubscribe);
-        return () => {
-          if (!subscriptions.has(unsubscribe))
-            return;
-          subscriptions.delete(unsubscribe);
-          unsubscribe();
-        };
-      },
-      cleanup
-    };
-  }
-  async detectOSCSupport(timeoutMs = 300) {
-    const out = this.stdout;
-    if (!out.isTTY || !this.stdin.isTTY)
-      return false;
-    return new Promise((resolve4) => {
-      const session = this.createQuerySession();
-      let buffer = "";
-      let settled = false;
-      const finish = (supported) => {
-        if (settled)
-          return;
-        settled = true;
-        session.cleanup();
-        resolve4(supported);
-      };
-      const onData = (chunk) => {
-        buffer += chunk.toString();
-        OSC4_RESPONSE.lastIndex = 0;
-        if (OSC4_RESPONSE.test(buffer)) {
-          finish(true);
-        }
-      };
-      session.setTimer(() => {
-        finish(false);
-      }, timeoutMs);
-      session.subscribeInput(onData);
-      this.writeOsc("\x1B]4;0;?\x07", true);
-    });
-  }
-  async queryPalette(indices, timeoutMs = 1200, idleTimeoutMs = env.OTUI_PALETTE_IDLE_TIMEOUT_MS) {
-    const out = this.stdout;
-    const results = new Map;
-    indices.forEach((i) => results.set(i, null));
-    if (!out.isTTY || !this.stdin.isTTY) {
-      return results;
-    }
-    return new Promise((resolve4) => {
-      const session = this.createQuerySession();
-      let buffer = "";
-      let idleTimer = null;
-      let settled = false;
-      const finish = () => {
-        if (settled)
-          return;
-        settled = true;
-        session.cleanup();
-        resolve4(results);
-      };
-      const onData = (chunk) => {
-        buffer += chunk.toString();
-        let m;
-        OSC4_RESPONSE.lastIndex = 0;
-        while (m = OSC4_RESPONSE.exec(buffer)) {
-          const idx = parseInt(m[1], 10);
-          if (results.has(idx))
-            results.set(idx, toHex(m[2], m[3], m[4], m[5]));
-        }
-        if (buffer.length > 8192)
-          buffer = buffer.slice(-4096);
-        const done = [...results.values()].filter((v) => v !== null).length;
-        if (done === results.size) {
-          finish();
-          return;
-        }
-        idleTimer = session.resetTimer(idleTimer, finish, idleTimeoutMs);
-      };
-      session.setTimer(finish, timeoutMs);
-      session.subscribeInput(onData);
-      this.writeOsc(indices.map((i) => `\x1B]4;${i};?\x07`).join(""), true);
-      idleTimer = session.resetTimer(idleTimer, finish, idleTimeoutMs);
-    });
-  }
-  async querySpecialColors(timeoutMs = 1200, idleTimeoutMs = env.OTUI_PALETTE_IDLE_TIMEOUT_MS) {
-    const out = this.stdout;
-    const results = {
-      10: null,
-      11: null,
-      12: null,
-      13: null,
-      14: null,
-      15: null,
-      16: null,
-      17: null,
-      19: null
-    };
-    const queries = this.inTmux ? [10, 11, 12] : [10, 11, 12, 13, 14, 15, 16, 17, 19];
-    if (!out.isTTY || !this.stdin.isTTY) {
-      return results;
-    }
-    return new Promise((resolve4) => {
-      const session = this.createQuerySession();
-      let buffer = "";
-      let idleTimer = null;
-      let settled = false;
-      const finish = () => {
-        if (settled)
-          return;
-        settled = true;
-        session.cleanup();
-        resolve4(results);
-      };
-      const onData = (chunk) => {
-        buffer += chunk.toString();
-        let updated = false;
-        let m;
-        OSC_SPECIAL_RESPONSE.lastIndex = 0;
-        while (m = OSC_SPECIAL_RESPONSE.exec(buffer)) {
-          const idx = parseInt(m[1], 10);
-          if (idx in results) {
-            results[idx] = toHex(m[2], m[3], m[4], m[5]);
-            updated = true;
-          }
-        }
-        if (buffer.length > 8192)
-          buffer = buffer.slice(-4096);
-        if (queries.every((idx) => results[idx] !== null)) {
-          finish();
-          return;
-        }
-        if (!updated)
-          return;
-        idleTimer = session.resetTimer(idleTimer, finish, idleTimeoutMs);
-      };
-      session.setTimer(finish, timeoutMs);
-      session.subscribeInput(onData);
-      this.writeOsc(queries.map((idx) => `\x1B]${idx};?\x07`).join(""));
-      idleTimer = session.resetTimer(idleTimer, finish, idleTimeoutMs);
-    });
-  }
-  async detect(options) {
-    const { timeout = 5000, size = 16 } = options || {};
-    const supported = await this.detectOSCSupport();
-    if (!supported) {
-      return {
-        palette: Array(size).fill(null),
-        defaultForeground: null,
-        defaultBackground: null,
-        cursorColor: null,
-        mouseForeground: null,
-        mouseBackground: null,
-        tekForeground: null,
-        tekBackground: null,
-        highlightBackground: null,
-        highlightForeground: null
-      };
-    }
-    const indicesToQuery = [...Array(size).keys()];
-    const idleTimeout = env.OTUI_PALETTE_IDLE_TIMEOUT_MS;
-    const [paletteResults, specialColors] = await Promise.all([
-      this.queryPalette(indicesToQuery, timeout, idleTimeout),
-      this.querySpecialColors(timeout, idleTimeout)
-    ]);
-    return {
-      palette: [...Array(size).keys()].map((i) => paletteResults.get(i) ?? null),
-      defaultForeground: specialColors[10],
-      defaultBackground: specialColors[11],
-      cursorColor: specialColors[12],
-      mouseForeground: specialColors[13],
-      mouseBackground: specialColors[14],
-      tekForeground: specialColors[15],
-      tekBackground: specialColors[16],
-      highlightBackground: specialColors[17],
-      highlightForeground: specialColors[19]
-    };
-  }
-}
-function createTerminalPalette(options) {
-  return new TerminalPalette(options);
-}
-var DEFAULT_FOREGROUND_FALLBACK = RGBA.fromInts(...DEFAULT_FOREGROUND_RGB);
-var DEFAULT_BACKGROUND_FALLBACK = RGBA.fromInts(...DEFAULT_BACKGROUND_RGB);
-var fallbackAnsi256Palette = null;
-function getFallbackAnsi256Palette() {
-  if (!fallbackAnsi256Palette) {
-    fallbackAnsi256Palette = Array.from({ length: 256 }, (_, index) => {
-      const [r, g, b] = ansi256IndexToRgb(index);
-      return RGBA.fromInts(r, g, b);
-    });
-  }
-  return fallbackAnsi256Palette;
-}
-function normalizeTerminalPalette(colors) {
-  const fallbackPalette = getFallbackAnsi256Palette();
-  return {
-    palette: Array.from({ length: 256 }, (_, index) => {
-      const detected = colors?.palette[index];
-      return detected ? RGBA.fromHex(detected) : RGBA.clone(fallbackPalette[index]);
-    }),
-    defaultForeground: colors?.defaultForeground ? RGBA.fromHex(colors.defaultForeground) : RGBA.clone(DEFAULT_FOREGROUND_FALLBACK),
-    defaultBackground: colors?.defaultBackground ? RGBA.fromHex(colors.defaultBackground) : RGBA.clone(DEFAULT_BACKGROUND_FALLBACK)
-  };
-}
-function buildTerminalPaletteSignature(colors) {
-  const normalized = normalizeTerminalPalette(colors);
-  const paletteSignature = normalized.palette.map((color) => color.toInts().join(",")).join(";");
-  return [
-    paletteSignature,
-    normalized.defaultForeground.toInts().join(","),
-    normalized.defaultBackground.toInts().join(",")
-  ].join("|");
-}
-
-// src/lib/paste.ts
-var PASTE_TEXT_DECODER = new TextDecoder;
-var ANSI_SEQUENCES = /(?:\x1b\[|\x9b)[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]?|(?:\x1b[P\]X^_]|[\x90\x98\x9d-\x9f])[^\x07\x1b\x9c]*(?:\x07|\x1b\\|\x9c)?|\x1b[\x20-\x2f]*[\x30-\x7e]?/g;
-function decodePasteBytes(bytes) {
-  return PASTE_TEXT_DECODER.decode(bytes);
-}
-function stripAnsiSequences(text) {
-  return text.replace(ANSI_SEQUENCES, "");
-}
-
-// src/lib/host-clipboard.internal.ts
-var DEFAULT_CLIPBOARD_TIMEOUT_MS = 1000;
-var DEFAULT_CLIPBOARD_MAX_BYTES = 8 * 1024 * 1024;
-var DEFAULT_CLIPBOARD_MAX_IMAGE_PIXELS = 64 * 1024 * 1024;
-var DEFAULT_CLIPBOARD_MAX_CONVERSION_BYTES = 512 * 1024 * 1024;
-var DEFAULT_CLIPBOARD_MAX_CONCURRENT_OPERATIONS = 16;
-var DEFAULT_CLIPBOARD_MAX_PROVIDER_TRANSFERS = 16;
-var MAX_U32 = 4294967295;
-var MIME_ESSENCE_PATTERN = /^[a-z0-9!#$%&'*+.^_`|~-]+\/[a-z0-9!#$%&'*+.^_`|~-]+$/i;
-var HOST_CLIPBOARD_MIME_PREFERENCE_COUNT_MAX = 64;
-var HOST_CLIPBOARD_MIME_ESSENCE_BYTES_MAX = 255;
-var validateU32 = (name, value) => {
-  if (!Number.isInteger(value) || value < 0 || value > MAX_U32) {
-    throw new RangeError(`${name} must be an integer from 0 through ${MAX_U32}`);
-  }
-  return value;
-};
-var validatePositiveU32 = (name, value) => {
-  const validated = validateU32(name, value);
-  if (validated === 0)
-    throw new RangeError(`${name} must be greater than zero`);
-  return validated;
-};
-var normalizeOptions = (options) => {
-  const waylandSeat = options.waylandSeat;
-  if (waylandSeat !== undefined && (typeof waylandSeat !== "string" || waylandSeat.length === 0 || waylandSeat.includes("\x00"))) {
-    throw new TypeError("waylandSeat must be a non-empty string without NUL characters");
-  }
-  return {
-    timeoutMs: validateU32("timeoutMs", options.timeoutMs ?? DEFAULT_CLIPBOARD_TIMEOUT_MS),
-    maxReadBytes: validateU32("maxReadBytes", options.maxReadBytes ?? DEFAULT_CLIPBOARD_MAX_BYTES),
-    maxWriteBytes: validateU32("maxWriteBytes", options.maxWriteBytes ?? DEFAULT_CLIPBOARD_MAX_BYTES),
-    maxImagePixels: validateU32("maxImagePixels", options.maxImagePixels ?? DEFAULT_CLIPBOARD_MAX_IMAGE_PIXELS),
-    maxConversionBytes: validateU32("maxConversionBytes", options.maxConversionBytes ?? DEFAULT_CLIPBOARD_MAX_CONVERSION_BYTES),
-    maxConcurrentOperations: validatePositiveU32("maxConcurrentOperations", options.maxConcurrentOperations ?? DEFAULT_CLIPBOARD_MAX_CONCURRENT_OPERATIONS),
-    maxProviderTransfers: validatePositiveU32("maxProviderTransfers", options.maxProviderTransfers ?? DEFAULT_CLIPBOARD_MAX_PROVIDER_TRANSFERS),
-    waylandSeat
-  };
-};
-var normalizePreferredTypes = (preferredTypes) => {
-  if (!Array.isArray(preferredTypes) || preferredTypes.length === 0) {
-    throw new TypeError("preferredTypes must contain at least one MIME essence type");
-  }
-  if (preferredTypes.length > HOST_CLIPBOARD_MIME_PREFERENCE_COUNT_MAX) {
-    throw new RangeError(`preferredTypes must contain at most ${HOST_CLIPBOARD_MIME_PREFERENCE_COUNT_MAX} MIME essence types`);
-  }
-  const normalized = preferredTypes.map((mimeType) => {
-    if (typeof mimeType !== "string") {
-      throw new TypeError("preferredTypes must contain valid MIME essence types without parameters");
-    }
-    if (mimeType.length > HOST_CLIPBOARD_MIME_ESSENCE_BYTES_MAX) {
-      throw new RangeError(`preferredTypes MIME essences must be at most ${HOST_CLIPBOARD_MIME_ESSENCE_BYTES_MAX} ASCII bytes`);
-    }
-    if (!MIME_ESSENCE_PATTERN.test(mimeType)) {
-      throw new TypeError("preferredTypes must contain valid MIME essence types without parameters");
-    }
-    return mimeType.toLowerCase();
-  });
-  return normalized;
-};
-var normalizeSelection = (selection) => {
-  const normalized = selection ?? "clipboard";
-  if (normalized !== "clipboard" && normalized !== "primary") {
-    throw new TypeError("selection must be clipboard or primary");
-  }
-  return normalized;
-};
-var validateClipboardText = (text, maxWriteBytes) => {
-  if (typeof text !== "string" || text.length === 0)
-    throw new TypeError("writeText requires non-empty text");
-  if (text.includes("\x00"))
-    throw new TypeError("writeText does not support NUL characters");
-  const byteLimit = Math.min(maxWriteBytes, MAX_U32);
-  let byteLength = 0;
-  for (const character of text) {
-    const codePoint = character.codePointAt(0);
-    if (codePoint >= 55296 && codePoint <= 57343) {
-      throw new TypeError("writeText does not support unpaired UTF-16 surrogates");
-    }
-    if (codePoint <= 127) {
-      byteLength += 1;
-    } else if (codePoint <= 2047) {
-      byteLength += 2;
-    } else if (codePoint <= 65535) {
-      byteLength += 3;
-    } else {
-      byteLength += 4;
-    }
-    if (byteLength > byteLimit) {
-      throw new RangeError(`writeText exceeds the configured ${maxWriteBytes} byte limit`);
-    }
-  }
-};
-var createActiveOperation = (callerSignal) => {
-  const controller = new AbortController;
-  let settle = () => {};
-  const settled = new Promise((resolve4) => {
-    settle = resolve4;
-  });
-  if (callerSignal) {
-    callerSignal.addEventListener("abort", () => controller.abort(callerSignal.reason), {
-      once: true,
-      signal: controller.signal
-    });
-  }
-  return { controller, settled, settle };
-};
-var runTrackedOperation = (active, callerSignal, operation) => {
-  const state = createActiveOperation(callerSignal);
-  active.add(state);
-  let result;
-  try {
-    result = operation(state.controller.signal);
-  } catch (error) {
-    result = Promise.reject(error);
-  }
-  return result.finally(() => {
-    active.delete(state);
-    state.controller.abort();
-    state.settle();
-  });
-};
-var createHostClipboardWithBackend = (options, createBackend) => {
-  const config = normalizeOptions(options);
-  const backend3 = createBackend(config);
-  const active = new Set;
-  let disposed = false;
-  let disposePromise;
-  const assertUsable = () => {
-    if (disposed)
-      throw new Error("Host clipboard service is disposed");
-  };
-  return {
-    maxWriteBytes: config.maxWriteBytes,
-    read(readOptions) {
-      try {
-        assertUsable();
-        const preferredTypes = normalizePreferredTypes(readOptions.preferredTypes);
-        const selection = normalizeSelection(readOptions.selection);
-        if (readOptions.signal?.aborted)
-          return Promise.resolve({ status: "cancelled" });
-        if (config.timeoutMs === 0)
-          return Promise.resolve({ status: "timed-out" });
-        return runTrackedOperation(active, readOptions.signal, async (signal) => {
-          const result = await backend3.read({
-            preferredTypes,
-            selection,
-            maxBytes: config.maxReadBytes,
-            timeoutMs: config.timeoutMs,
-            signal
-          });
-          if (result.status !== "read")
-            return result;
-          if (result.representation.bytes.byteLength > config.maxReadBytes)
-            return { status: "limit-exceeded" };
-          return { status: "read", representation: result.representation };
-        });
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    },
-    writeText(text, operationOptions = {}) {
-      try {
-        assertUsable();
-        validateClipboardText(text, config.maxWriteBytes);
-        const selection = normalizeSelection(operationOptions.selection);
-        if (operationOptions.signal?.aborted)
-          return Promise.resolve({ status: "cancelled" });
-        if (config.timeoutMs === 0)
-          return Promise.resolve({ status: "timed-out" });
-        return runTrackedOperation(active, operationOptions.signal, (signal) => backend3.writeText(text, { selection, timeoutMs: config.timeoutMs, signal }));
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    },
-    clear(operationOptions = {}) {
-      try {
-        assertUsable();
-        const selection = normalizeSelection(operationOptions.selection);
-        if (operationOptions.signal?.aborted)
-          return Promise.resolve({ status: "cancelled" });
-        if (config.timeoutMs === 0)
-          return Promise.resolve({ status: "timed-out" });
-        return runTrackedOperation(active, operationOptions.signal, (signal) => backend3.clear({ selection, timeoutMs: config.timeoutMs, signal }));
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    },
-    dispose() {
-      if (disposePromise)
-        return disposePromise;
-      disposed = true;
-      for (const operation of active)
-        operation.controller.abort();
-      disposePromise = (async () => {
-        await Promise.all([...active].map((operation) => operation.settled));
-        await backend3.dispose();
-      })();
-      return disposePromise;
-    }
-  };
-};
-
-// src/lib/host-clipboard.native.ts
-var SHUTDOWN_POLL_INTERVAL_MS = 1;
-var OPERATION_POLL_INTERVAL_MS = 1;
-var PROVIDER_POLL_INTERVAL_MS = 8;
-var MAX_WORK_UNITS_PER_DRAIN = 64;
-var selectionValue = (selection) => selection === "clipboard" ? 0 : 1;
-var encodeReadRequest = (preferredTypes) => {
-  const encoder2 = new TextEncoder;
-  const encoded = preferredTypes.map((mimeType) => encoder2.encode(mimeType));
-  const size = encoded.reduce((total, mimeType) => total + 4 + mimeType.byteLength, 4);
-  const request = new Uint8Array(size);
-  const view = new DataView(request.buffer);
-  view.setUint32(0, encoded.length, true);
-  let offset = 4;
-  for (const mimeType of encoded) {
-    view.setUint32(offset, mimeType.byteLength, true);
-    offset += 4;
-    request.set(mimeType, offset);
-    offset += mimeType.byteLength;
-  }
-  return request;
-};
-var startFailure = (status) => ({
-  status: "failed",
-  error: new Error(`Native clipboard operation failed to start (${NativeClipboardStartStatus[status]})`)
-});
-
-class NativeClipboardBackend {
-  maxImagePixels;
-  maxConversionBytes;
-  library;
-  service;
-  pending = new Map;
-  pollTimer;
-  pollTimerForOperation = false;
-  providerActive = false;
-  disposed = false;
-  disposePromise;
-  constructor(maxImagePixels, maxConversionBytes, maxConcurrentOperations, maxProviderTransfers, waylandSeat) {
-    this.maxImagePixels = maxImagePixels;
-    this.maxConversionBytes = maxConversionBytes;
-    this.library = resolveRenderLib();
-    const service = this.library.clipboardServiceCreate(maxConcurrentOperations, maxProviderTransfers, waylandSeat);
-    if (!service)
-      throw new Error("Failed to create native clipboard service");
-    this.service = service;
-  }
-  read(options) {
-    const request = encodeReadRequest(options.preferredTypes);
-    const started = this.library.clipboardReadOperationStart(this.service, request, selectionValue(options.selection), options.maxBytes, this.maxImagePixels, this.maxConversionBytes, options.timeoutMs);
-    return this.track(started, options.signal, "read");
-  }
-  writeText(text, options) {
-    const started = this.library.clipboardWriteOperationStart(this.service, new TextEncoder().encode(text), selectionValue(options.selection), options.timeoutMs);
-    return this.track(started, options.signal, "write");
-  }
-  clear(options) {
-    const started = this.library.clipboardClearOperationStart(this.service, selectionValue(options.selection), options.timeoutMs);
-    return this.track(started, options.signal, "clear");
-  }
-  dispose() {
-    if (this.disposePromise)
-      return this.disposePromise;
-    this.disposed = true;
-    this.disposePromise = this.shutdown();
-    return this.disposePromise;
-  }
-  track(started, signal, kind) {
-    if (this.disposed)
-      return Promise.reject(new Error("Native clipboard backend is disposed"));
-    if (started.status !== NativeClipboardStartStatus.Ok || !started.operation) {
-      return Promise.resolve(startFailure(started.status));
-    }
-    return new Promise((resolve4, reject) => {
-      const operation = { handle: started.operation, kind, signal, resolve: resolve4, reject };
-      this.pending.set(operation.handle, operation);
-      signal.addEventListener("abort", () => this.requestCancel(operation), { once: true });
-      this.ensureScheduled();
-      this.drain();
-    });
-  }
-  requestCancel(operation) {
-    if (!this.pending.has(operation.handle))
-      return;
-    try {
-      this.library.clipboardOperationCancel(operation.handle);
-    } catch (error) {
-      operation.cleanupError ??= error;
-    }
-    this.ensureScheduled();
-  }
-  ensureScheduled() {
-    const hasPendingOperation = this.pending.size > 0;
-    if (!hasPendingOperation && !this.providerActive) {
-      this.clearPollTimer();
-      return;
-    }
-    if (this.pollTimer !== undefined) {
-      if (hasPendingOperation && !this.pollTimerForOperation)
-        this.clearPollTimer();
-      else {
-        if (hasPendingOperation)
-          this.pollTimer.ref();
-        else
-          this.pollTimer.unref();
-        return;
-      }
-    }
-    this.pollTimerForOperation = hasPendingOperation;
-    this.pollTimer = setTimeout(() => {
-      this.pollTimer = undefined;
-      this.pollTimerForOperation = false;
-      this.drain();
-    }, hasPendingOperation ? OPERATION_POLL_INTERVAL_MS : PROVIDER_POLL_INTERVAL_MS);
-    if (!hasPendingOperation)
-      this.pollTimer.unref();
-  }
-  clearPollTimer() {
-    if (this.pollTimer === undefined)
-      return;
-    clearTimeout(this.pollTimer);
-    this.pollTimer = undefined;
-    this.pollTimerForOperation = false;
-  }
-  drain() {
-    this.providerActive = false;
-    try {
-      this.providerActive = this.library.clipboardServiceDrain(this.service) === 1;
-    } catch (error) {
-      for (const operation of this.pending.values()) {
-        operation.cleanupError ??= error;
-        try {
-          this.library.clipboardOperationCancel(operation.handle);
-        } catch {}
-      }
-    }
-    let workUnits = 0;
-    while (workUnits < MAX_WORK_UNITS_PER_DRAIN && this.pending.size > 0) {
-      const operation = this.pending.values().next().value;
-      if (!operation)
-        break;
-      workUnits += 1;
-      try {
-        if (operation.cleanupError !== undefined) {
-          try {
-            this.library.clipboardOperationCancel(operation.handle);
-          } catch {}
-          const status2 = this.library.clipboardOperationPoll(operation.handle);
-          if (status2 === NativeClipboardOperationStatus.Pending) {
-            this.rotate(operation);
-            continue;
-          }
-          this.providerActive = true;
-          const destroyed2 = this.library.clipboardOperationDestroy(operation.handle);
-          if (destroyed2 === NativeClipboardDestroyStatus.NotReady) {
-            this.rotate(operation);
-            continue;
-          }
-          this.pending.delete(operation.handle);
-          operation.reject(operation.cleanupError);
-          continue;
-        }
-        if (operation.signal.aborted)
-          this.library.clipboardOperationCancel(operation.handle);
-        const status = this.library.clipboardOperationPoll(operation.handle);
-        if (status === NativeClipboardOperationStatus.Pending) {
-          this.rotate(operation);
-          continue;
-        }
-        this.providerActive = true;
-        const result = this.readResult(operation.handle, operation.kind, status);
-        const destroyed = this.library.clipboardOperationDestroy(operation.handle);
-        if (destroyed === NativeClipboardDestroyStatus.NotReady) {
-          this.rotate(operation);
-          continue;
-        }
-        this.pending.delete(operation.handle);
-        operation.resolve(destroyed === NativeClipboardDestroyStatus.Destroyed ? result : { status: "failed", error: new Error("Native clipboard operation became invalid before destruction") });
-      } catch (error) {
-        operation.cleanupError ??= error;
-        try {
-          this.library.clipboardOperationCancel(operation.handle);
-        } catch {}
-        this.rotate(operation);
-      }
-    }
-    this.ensureScheduled();
-  }
-  rotate(operation) {
-    this.pending.delete(operation.handle);
-    this.pending.set(operation.handle, operation);
-  }
-  readResult(handle, kind, status) {
-    switch (status) {
-      case NativeClipboardOperationStatus.Read:
-        return kind === "read" ? this.readRepresentation(handle) : this.invalidResult(kind, status);
-      case NativeClipboardOperationStatus.Empty:
-        return kind === "read" ? { status: "empty" } : this.invalidResult(kind, status);
-      case NativeClipboardOperationStatus.Written:
-        return kind === "write" ? { status: "written" } : this.invalidResult(kind, status);
-      case NativeClipboardOperationStatus.Cleared:
-        return kind === "clear" ? { status: "cleared" } : this.invalidResult(kind, status);
-      case NativeClipboardOperationStatus.Unsupported:
-        return { status: "unsupported" };
-      case NativeClipboardOperationStatus.Cancelled:
-        return { status: "cancelled" };
-      case NativeClipboardOperationStatus.TimedOut:
-        return { status: "timed-out" };
-      case NativeClipboardOperationStatus.LimitExceeded:
-        return kind === "read" ? { status: "limit-exceeded" } : this.invalidResult(kind, status);
-      case NativeClipboardOperationStatus.Failed:
-        return { status: "failed", error: this.readError(handle) };
-      default:
-        return { status: "failed", error: new Error("Native clipboard operation returned an invalid status") };
-    }
-  }
-  invalidResult(kind, status) {
-    return {
-      status: "failed",
-      error: new Error(`Native clipboard ${kind} returned inapplicable status ${NativeClipboardOperationStatus[status]}`)
-    };
-  }
-  readRepresentation(handle) {
-    const mimeLength = this.library.clipboardOperationResultMimeLength(handle);
-    const dataLength = this.library.clipboardOperationResultDataLength(handle);
-    if (mimeLength.status !== NativeClipboardCopyStatus.Ok || dataLength.status !== NativeClipboardCopyStatus.Ok) {
-      return { status: "failed", error: new Error("Failed to read native clipboard result lengths") };
-    }
-    const mime = new Uint8Array(mimeLength.length);
-    const bytes = new Uint8Array(dataLength.length);
-    if (this.library.clipboardOperationResultMimeCopy(handle, mime) !== NativeClipboardCopyStatus.Ok || this.library.clipboardOperationResultDataCopy(handle, bytes) !== NativeClipboardCopyStatus.Ok) {
-      return { status: "failed", error: new Error("Failed to copy native clipboard result") };
-    }
-    return { status: "read", representation: { mimeType: new TextDecoder().decode(mime), bytes } };
-  }
-  readError(handle) {
-    const code = this.library.clipboardOperationResultErrorCode(handle);
-    const length = this.library.clipboardOperationResultDiagnosticLength(handle);
-    if (code.status !== NativeClipboardCopyStatus.Ok || length.status !== NativeClipboardCopyStatus.Ok) {
-      return new Error("Native clipboard operation failed without a readable diagnostic");
-    }
-    const diagnostic = new Uint8Array(length.length);
-    if (this.library.clipboardOperationResultDiagnosticCopy(handle, diagnostic) !== NativeClipboardCopyStatus.Ok) {
-      return new Error("Native clipboard operation failed without a readable diagnostic");
-    }
-    return Object.assign(new Error(new TextDecoder().decode(diagnostic)), { code: code.errorCode });
-  }
-  async shutdown() {
-    this.clearPollTimer();
-    let status = this.library.clipboardServiceBeginShutdown(this.service);
-    while (status === NativeClipboardShutdownStatus.Pending) {
-      await new Promise((resolve4) => setTimeout(resolve4, SHUTDOWN_POLL_INTERVAL_MS));
-      status = this.library.clipboardServicePollShutdown(this.service);
-    }
-    if (status !== NativeClipboardShutdownStatus.Ready)
-      throw new Error("Native clipboard service became invalid");
-    if (this.library.clipboardServiceDestroy(this.service) !== NativeClipboardDestroyStatus.Destroyed) {
-      throw new Error("Failed to destroy native clipboard service");
-    }
-  }
-}
-var createNativeHostClipboardBackend = (options) => new NativeClipboardBackend(options.maxImagePixels, options.maxConversionBytes, options.maxConcurrentOperations, options.maxProviderTransfers, options.waylandSeat);
-
-// src/lib/clipboard.ts
-var NOT_ATTEMPTED_TERMINAL = {
-  status: "not-attempted",
-  capability: "unknown"
-};
-var validateSelection = (selection) => {
-  const normalized = selection ?? "clipboard";
-  if (normalized !== "clipboard" && normalized !== "primary") {
-    throw new TypeError("selection must be clipboard or primary");
-  }
-  return normalized;
-};
-var createHostClipboard = (options = {}) => createHostClipboardWithBackend(options, createNativeHostClipboardBackend);
-var validateDestination = (destination) => {
-  if (destination !== "terminal-only" && destination !== "host-only" && destination !== "best-available" && destination !== "all-available") {
-    throw new TypeError("destination is not a supported clipboard policy");
-  }
-};
-var createClipboard = ({ host, terminal }) => {
-  const active = new Set;
-  let disposed = false;
-  let disposePromise;
-  const assertUsable = () => {
-    if (disposed)
-      throw new Error("Clipboard service is disposed");
-  };
-  const canUseRemoteHost = (options) => !terminal.remote || options.allowRemoteHost === true;
-  const composeMutation = async (options, signal, hostOperation, terminalOperation) => {
-    if (options.destination === "terminal-only") {
-      return { host: { status: "not-attempted" }, terminal: terminalOperation() };
-    }
-    if (options.destination === "host-only") {
-      const hostResult = canUseRemoteHost(options) ? await hostOperation() : { status: "not-attempted" };
-      return { host: hostResult, terminal: NOT_ATTEMPTED_TERMINAL };
-    }
-    if (options.destination === "best-available") {
-      if (terminal.remote) {
-        return { host: { status: "not-attempted" }, terminal: terminalOperation() };
-      }
-      const hostResult = await hostOperation();
-      const terminalResult2 = !signal.aborted && (hostResult.status === "unsupported" || hostResult.status === "failed") ? terminalOperation() : NOT_ATTEMPTED_TERMINAL;
-      return { host: hostResult, terminal: terminalResult2 };
-    }
-    const hostPromise = canUseRemoteHost(options) ? hostOperation() : Promise.resolve({ status: "not-attempted" });
-    const terminalResult = terminalOperation();
-    return { host: await hostPromise, terminal: terminalResult };
-  };
-  return {
-    read(options) {
-      try {
-        assertUsable();
-        return host.read(options);
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    },
-    writeText(text, options) {
-      try {
-        assertUsable();
-        validateDestination(options.destination);
-        validateClipboardText(text, host.maxWriteBytes);
-        const selection = validateSelection(options.selection);
-        if (options.signal?.aborted) {
-          return Promise.resolve({ host: { status: "not-attempted" }, terminal: NOT_ATTEMPTED_TERMINAL });
-        }
-        return runTrackedOperation(active, options.signal, (signal) => {
-          const operationOptions = { selection, signal };
-          return composeMutation(options, signal, () => host.writeText(text, operationOptions), () => terminal.writeText(text, selection));
-        });
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    },
-    clear(options) {
-      try {
-        assertUsable();
-        validateDestination(options.destination);
-        const selection = validateSelection(options.selection);
-        if (options.signal?.aborted) {
-          return Promise.resolve({ host: { status: "not-attempted" }, terminal: NOT_ATTEMPTED_TERMINAL });
-        }
-        return runTrackedOperation(active, options.signal, (signal) => {
-          const operationOptions = { selection, signal };
-          return composeMutation(options, signal, () => host.clear(operationOptions), () => terminal.clear(selection));
-        });
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    },
-    dispose() {
-      if (disposePromise)
-        return disposePromise;
-      disposed = true;
-      for (const operation of active)
-        operation.controller.abort();
-      disposePromise = (async () => {
-        await Promise.all([...active].map((operation) => operation.settled));
-        await host.dispose();
-      })();
-      return disposePromise;
-    }
-  };
-};
-var ClipboardTarget;
-((ClipboardTarget2) => {
-  ClipboardTarget2[ClipboardTarget2["Clipboard"] = 0] = "Clipboard";
-  ClipboardTarget2[ClipboardTarget2["Primary"] = 1] = "Primary";
-  ClipboardTarget2[ClipboardTarget2["Select"] = 2] = "Select";
-  ClipboardTarget2[ClipboardTarget2["Secondary"] = 3] = "Secondary";
-})(ClipboardTarget ||= {});
-var createRendererClipboardAdapter = (renderer) => {
-  const targetFor = (selection) => selection === "primary" ? 1 /* Primary */ : 0 /* Clipboard */;
-  const capability = () => renderer.capabilities?.osc52_support ?? "unknown";
-  return {
-    get remote() {
-      return renderer.capabilities?.remote ?? true;
-    },
-    writeText(text, selection) {
-      const currentCapability = capability();
-      if (currentCapability === "unsupported")
-        return { status: "not-attempted", capability: currentCapability };
-      return {
-        status: renderer.copyToClipboardOSC52(text, targetFor(selection)) ? "attempted" : "local-failure",
-        capability: currentCapability
-      };
-    },
-    clear(selection) {
-      const currentCapability = capability();
-      if (currentCapability === "unsupported")
-        return { status: "not-attempted", capability: currentCapability };
-      return {
-        status: renderer.clearClipboardOSC52(targetFor(selection)) ? "attempted" : "local-failure",
-        capability: currentCapability
-      };
-    }
-  };
-};
-
-// src/lib/detect-links.ts
-var URL_SCOPES = ["markup.link.url", "string.special.url"];
-var HTTP_URL_PREFIX = /https?:\/\//i;
-var BARE_URL = /https?:\/\/[^\s<>"`]+/gi;
-function normalizeMarkdownLinkTarget(destination) {
-  return destination.replace(/\\([!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~])/g, "$1");
-}
-function detectLinks(chunks, context) {
-  const content = context.content;
-  const highlights = context.highlights;
-  const hasBareUrl = HTTP_URL_PREFIX.test(content);
-  if (!hasBareUrl && !highlights.some(([, , group]) => URL_SCOPES.includes(group)))
-    return chunks;
-  const ranges = [];
-  const rawRanges = [];
-  const labels = new Map;
-  const concealedDelimiters = new Map;
-  for (let i = 0;i < highlights.length; i++) {
-    const [start, end, group, meta] = highlights[i];
-    if (group === "conceal" && meta?.conceal === "" && /^[*_~]+$/.test(content.slice(start, end))) {
-      concealedDelimiters.set(end, start);
-    }
-    if (group === "markup.raw" || group.startsWith("markup.raw.")) {
-      rawRanges.push({ start, end });
-    }
-    if (group === "markup.link.label") {
-      const existing = labels.get(end);
-      if (!existing || start < existing.start)
-        labels.set(end, { start, end });
-    }
-    if (!URL_SCOPES.includes(group))
-      continue;
-    const url = content.slice(start, end);
-    if (!url)
-      continue;
-    ranges.push({ start, end, url });
-  }
-  const highlightedCount = ranges.length;
-  for (let index = 0;index < highlightedCount; index++) {
-    const range = ranges[index];
-    let labelEnd = range.start;
-    if (content[labelEnd - 1] === "<")
-      labelEnd--;
-    while (labelEnd > 0 && /\s/.test(content[labelEnd - 1]))
-      labelEnd--;
-    if (content[labelEnd - 1] !== "(" || content[labelEnd - 2] !== "]")
-      continue;
-    const label = labels.get(labelEnd - 2);
-    if (!label)
-      continue;
-    range.url = normalizeMarkdownLinkTarget(range.url);
-    ranges.push({ ...label, url: range.url, label: true });
-  }
-  if (hasBareUrl) {
-    rawRanges.sort((a, b) => a.start - b.start || b.end - a.end);
-    ranges.sort((a, b) => a.start - b.start || b.end - a.end);
-    let rawIndex = 0;
-    let highlightedIndex = 0;
-    for (const match of content.matchAll(BARE_URL)) {
-      const start = match.index;
-      let url = match[0];
-      let openParens = 0;
-      let closeParens = 0;
-      for (const character of url) {
-        if (character === "(")
-          openParens++;
-        if (character === ")")
-          closeParens++;
-      }
-      while (url.length > 0) {
-        const delimiterStart = concealedDelimiters.get(start + url.length);
-        if (delimiterStart !== undefined && delimiterStart >= start) {
-          url = url.slice(0, delimiterStart - start);
-          continue;
-        }
-        const last = url[url.length - 1];
-        if (last === ")" && closeParens > openParens) {
-          closeParens--;
-        } else if (!".,!?;:]}'".includes(last)) {
-          break;
-        }
-        url = url.slice(0, -1);
-      }
-      const end = start + url.length;
-      if (!url)
-        continue;
-      while (rawIndex < rawRanges.length && rawRanges[rawIndex].end <= start)
-        rawIndex++;
-      if (rawIndex < rawRanges.length && rawRanges[rawIndex].start < end)
-        continue;
-      while (highlightedIndex < ranges.length && ranges[highlightedIndex].end <= start)
-        highlightedIndex++;
-      if (highlightedIndex < ranges.length && ranges[highlightedIndex].start < end)
-        continue;
-      ranges.push({ start, end, url, bare: true });
-    }
-  }
-  if (ranges.length === 0)
-    return chunks;
-  ranges.sort((a, b) => a.start - b.start || b.end - a.end || Number(b.label ?? false) - Number(a.label ?? false));
-  const bareStyle = context.syntaxStyle?.mergeStyles("markup.link.label");
-  const linkedChunks = [];
-  let contentPos = 0;
-  let rangeIndex = 0;
-  for (let index = 0;index < chunks.length; index++) {
-    const chunk = chunks[index];
-    if (!chunk.text || chunk.link) {
-      linkedChunks.push(chunk);
-      continue;
-    }
-    const providedRange = context.sourceRanges?.[index];
-    const start = providedRange?.start ?? content.indexOf(chunk.text, contentPos);
-    if (start < 0) {
-      linkedChunks.push(chunk);
-      continue;
-    }
-    const end = providedRange?.end ?? start + chunk.text.length;
-    contentPos = end;
-    while (rangeIndex < ranges.length && ranges[rangeIndex].end <= start)
-      rangeIndex++;
-    if (content.slice(start, end) !== chunk.text) {
-      const range = ranges[rangeIndex];
-      if (range?.label && range.start < end)
-        chunk.link = { url: range.url };
-      linkedChunks.push(chunk);
-      continue;
-    }
-    let position = start;
-    for (;rangeIndex < ranges.length; rangeIndex++) {
-      const range = ranges[rangeIndex];
-      if (range.end <= position)
-        continue;
-      if (range.start >= end)
-        break;
-      const linkStart = Math.max(position, range.start);
-      const linkEnd = Math.min(end, range.end);
-      if (linkStart > position) {
-        linkedChunks.push({ ...chunk, text: chunk.text.slice(position - start, linkStart - start) });
-      }
-      const linked = linkStart === start && linkEnd === end ? chunk : { ...chunk, text: chunk.text.slice(linkStart - start, linkEnd - start) };
-      linked.link = { url: range.url };
-      if (range.bare && bareStyle) {
-        if (bareStyle.fg)
-          linked.fg = bareStyle.fg;
-        if (bareStyle.bg)
-          linked.bg = bareStyle.bg;
-        linked.attributes = (linked.attributes ?? 0) | bareStyle.attributes;
-      }
-      linkedChunks.push(linked);
-      position = linkEnd;
-      if (position === end)
-        break;
-    }
-    if (position === start) {
-      linkedChunks.push(chunk);
-    } else if (position < end) {
-      linkedChunks.push({ ...chunk, text: chunk.text.slice(position - start) });
-    }
-  }
-  return linkedChunks;
-}
-// src/session-buffer.ts
-function acquireSessionBufferLease(lib, context, session, which, frame = null) {
-  return frame ? lib.sceneFrameAcquireBufferLease(context, session, frame, which) : lib.sessionAcquireBufferLease(context, session, which);
-}
-
-// src/lib/buffer-access.ts
-function withBufferAccess(lib, context, lease, callback) {
-  try {
-    return withLazyBufferAccess(lease, (getCells) => callback(getCells()), () => lib.contextValidateBufferLease(context, lease.handle));
-  } finally {
-    lib.contextReleaseBufferLease(context, lease.handle);
-  }
-}
-function withLazyBufferAccess(snapshot, callback, validate2) {
-  let active = true;
-  let cells;
-  const getCells = () => {
-    if (!active)
-      throw new Error("Buffer access scope has ended");
-    if (cells)
-      return cells;
-    const value = typeof snapshot === "function" ? snapshot() : snapshot;
-    let char;
-    let fg2;
-    let bg2;
-    let attributes;
-    const guard = () => {
-      if (!active)
-        throw new Error("Buffer access scope has ended");
-    };
-    cells = {
-      width: value.width,
-      height: value.height,
-      generation: value.generation,
-      get char() {
-        guard();
-        return char ??= new Uint32Array(toArrayBuffer(value.char, 0, value.width * value.height * 4));
-      },
-      get fg() {
-        guard();
-        return fg2 ??= new Uint16Array(toArrayBuffer(value.fg, 0, value.width * value.height * 8));
-      },
-      get bg() {
-        guard();
-        return bg2 ??= new Uint16Array(toArrayBuffer(value.bg, 0, value.width * value.height * 8));
-      },
-      get attributes() {
-        guard();
-        return attributes ??= new Uint32Array(toArrayBuffer(value.attributes, 0, value.width * value.height * 4));
-      }
-    };
-    return cells;
-  };
-  try {
-    const result = callback(getCells);
-    if (result !== null && (typeof result === "object" || typeof result === "function") && "then" in result && typeof result.then === "function") {
-      Promise.resolve(result).catch(() => {});
-      throw new TypeError("Buffer access callbacks must be synchronous");
-    }
-    validate2();
-    return result;
-  } finally {
-    active = false;
-  }
-}
-
-// src/buffer.ts
-function requireInteger(value, name, min, max) {
-  if (!Number.isSafeInteger(value) || value < min || value > max) {
-    throw new RangeError(`${name} must be an integer from ${min} to ${max}`);
-  }
-}
-function packDrawOptions(border2, shouldFill, titleAlignment, bottomTitleAlignment, fillDimsImages = false) {
-  let packed = 0;
-  if (border2 === true) {
-    packed |= 15;
-  } else if (Array.isArray(border2)) {
-    if (border2.includes("top"))
-      packed |= 8;
-    if (border2.includes("right"))
-      packed |= 4;
-    if (border2.includes("bottom"))
-      packed |= 2;
-    if (border2.includes("left"))
-      packed |= 1;
-  }
-  if (shouldFill) {
-    packed |= 1 << 4;
-  }
-  const alignmentMap = {
-    left: 0,
-    center: 1,
-    right: 2
-  };
-  const alignment = alignmentMap[titleAlignment];
-  const bottomAlignment = alignmentMap[bottomTitleAlignment];
-  packed |= alignment << 5;
-  packed |= bottomAlignment << 7;
-  if (fillDimsImages) {
-    packed |= 1 << 9;
-  }
-  return packed;
-}
-var recordedFrameAccess = "Paint hooks record drawing and cannot read the frame. Draw into an owned buffer and compose it instead.";
-
-class ResourceContext {
-  renderLib = resolveRenderLib();
-  context;
-  _disposed = false;
-  constructor(options) {
-    this.context = this.renderLib.createContext(options);
-  }
-  get disposed() {
-    return this._disposed;
-  }
-  get resourceContext() {
-    return this;
-  }
-  assertAlive() {
-    if (this._disposed)
-      throw new Error("Resource Context is destroyed");
-  }
-  destroy() {
-    if (this._disposed)
-      return;
-    this.renderLib.getYogaHost().runMutation(() => {
-      this.renderLib.destroyContext(this.context);
-      this._disposed = true;
-    });
-  }
-}
-var contextUnicode = new WeakMap;
-var contextUnicodeChars = new WeakMap;
-var nextUnicodeChar = 4294967296;
-
-class OptimizedBuffer {
-  static fbIdCounter = 0;
-  id;
-  lib;
-  source;
-  _width;
-  _height;
-  _widthMethod;
-  respectAlpha = false;
-  _destroyed = false;
-  _nativePaintAccess = null;
-  _bufferTarget;
-  guard() {
-    if (this._destroyed)
-      throw new Error(`Buffer ${this.id} is destroyed`);
-    if ("buffer" in this.source)
-      this.source.owner.assertAlive();
-  }
-  get recorder() {
-    return "recorder" in this.source ? this.source.recorder : null;
-  }
-  checkedTarget() {
-    const source = this.source;
-    if ("buffer" in source) {
-      return this._bufferTarget ??= Object.freeze({ context: source.context, target: source.buffer, frame: null });
-    }
-    if ("recorder" in source)
-      throw new Error(recordedFrameAccess);
-    const frame = source.getFrame?.();
-    if (source.which !== "next" || !frame)
-      throw new Error("Session scene drawing requires an active next frame");
-    return { context: source.context, target: source.session, frame };
-  }
-  _getSceneHandle(scene) {
-    this.guard();
-    const source = this.source;
-    if (!("buffer" in source) || source.owner !== scene.resourceContext || this.lib !== scene.resourceContext.renderLib) {
-      throw new Error("Scene binding requires a buffer owned by the same Context");
-    }
-    return source.buffer;
-  }
-  _getSceneDrawTarget(scene) {
-    this.guard();
-    scene.assertAlive();
-    const target = this.checkedTarget();
-    if (target.context !== scene.driver.context || this.lib !== scene.driver.renderLib) {
-      throw new Error("Scene drawing requires a buffer owned by the same Context");
-    }
-    return target;
-  }
-  drawChecked(options) {
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.draw(options);
-    this.lib.contextDrawBuffer(this.checkedTarget(), options);
-  }
-  _drawSceneBody(scene, node, x, y) {
-    this.guard();
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.view("scene", node, x, y);
-    this.lib.contextDrawSceneBody(this._getSceneDrawTarget(scene), node, x, y);
-  }
-  get buffers() {
-    this.guard();
-    if (this._nativePaintAccess !== null)
-      return this._nativePaintAccess();
-    if (this.recorder)
-      throw new Error(recordedFrameAccess);
-    throw new Error("Use withBuffers() for Context-owned framebuffer access");
-  }
-  withBuffers(callback) {
-    this.guard();
-    const lib = this.lib;
-    const source = this.source;
-    if ("recorder" in source)
-      throw new Error(recordedFrameAccess);
-    const lease = "session" in source ? acquireSessionBufferLease(lib, source.context, source.session, source.which, source.getFrame?.()) : lib.contextAcquireBufferLease(source.context, source.buffer);
-    return withBufferAccess(lib, source.context, lease, callback);
-  }
-  _withNativePaint(callback) {
-    const source = this.source;
-    if ("recorder" in source)
-      throw new Error(recordedFrameAccess);
-    const lib = this.lib;
-    let lease;
-    const previous = this._nativePaintAccess;
-    try {
-      withLazyBufferAccess(() => lease ??= ("session" in source) ? acquireSessionBufferLease(lib, source.context, source.session, source.which, source.getFrame?.()) : lib.contextAcquireBufferLease(source.context, source.buffer), (getCells) => {
-        this._nativePaintAccess = getCells;
-        callback();
-      }, () => {
-        if (lease)
-          lib.contextValidateBufferLease(source.context, lease.handle);
-      });
-    } finally {
-      this._nativePaintAccess = previous;
-      if (lease)
-        lib.contextReleaseBufferLease(source.context, lease.handle);
-    }
-  }
-  constructor(lib, source, width, height, options) {
-    this.id = options.id || `fb_${OptimizedBuffer.fbIdCounter++}`;
-    this.lib = lib;
-    this.respectAlpha = options.respectAlpha || false;
-    this._width = width;
-    this._height = height;
-    this._widthMethod = options.widthMethod || "unicode";
-    this.source = source;
-  }
-  static fromRecorder(lib, context, session, recorder) {
-    const { width, height } = lib.sessionGetRendererState(context, session);
-    return new OptimizedBuffer(lib, { context, session, recorder }, width, height, { id: "scene-recording" });
-  }
-  static fromSession(lib, context, session, which, getFrame) {
-    const { width, height } = lib.sessionGetRendererState(context, session);
-    return new OptimizedBuffer(lib, { context, session, which, getFrame }, width, height, { id: `scene-${which}` });
-  }
-  static create(width, height, widthMethod, options) {
-    const owner = options?.owner?.resourceContext;
-    if (!owner)
-      throw new Error("OptimizedBuffer requires an explicit resource owner: pass { owner: renderer.nativeScene }, or a ResourceContext when there is no renderer");
-    owner.assertAlive();
-    const { renderLib: lib, context } = owner;
-    const buffer = lib.createContextBuffer(context, {
-      width,
-      height,
-      widthMethod,
-      respectAlpha: options.respectAlpha
-    });
-    try {
-      return new OptimizedBuffer(lib, { context, buffer, owner }, width, height, { ...options, widthMethod });
-    } catch (error) {
-      try {
-        lib.destroyContextBuffer(context, buffer);
-      } catch {}
-      throw error;
-    }
-  }
-  get widthMethod() {
-    if ("session" in this.source) {
-      this.guard();
-      this._widthMethod = this.lib.sessionGetCapabilities(this.source.context, this.source.session).unicode;
-    }
-    return this._widthMethod;
-  }
-  get width() {
-    this.guard();
-    if ("session" in this.source)
-      return this.lib.sessionGetRendererState(this.source.context, this.source.session).width;
-    return this._width;
-  }
-  get height() {
-    this.guard();
-    if ("session" in this.source)
-      return this.lib.sessionGetRendererState(this.source.context, this.source.session).height;
-    return this._height;
-  }
-  setRespectAlpha(respectAlpha) {
-    this.guard();
-    this.drawChecked({ operation: "respectAlpha", enabled: respectAlpha });
-    this.respectAlpha = respectAlpha;
-  }
-  getRealCharBytes(addLineBreaks = false) {
-    return this.withResolvedChars({ addLineBreaks }, (bytes) => bytes);
-  }
-  withResolvedChars({ addLineBreaks, cellLengths }, callback) {
-    this.guard();
-    const lib = this.lib;
-    const source = this.source;
-    if ("recorder" in source)
-      throw new Error(recordedFrameAccess);
-    const lease = "session" in source ? acquireSessionBufferLease(lib, source.context, source.session, source.which, source.getFrame?.()) : lib.contextAcquireBufferLease(source.context, source.buffer);
-    return withBufferAccess(lib, source.context, lease, (cells) => {
-      const size = lib.contextBufferLeaseGetRealCharSize(source.context, lease.handle, addLineBreaks);
-      const output = new Uint8Array(size);
-      const lengths = cellLengths ? new Uint8Array(cells.width * cells.height) : undefined;
-      const written = lib.contextBufferLeaseWriteResolvedChars(source.context, lease.handle, output, addLineBreaks, lengths);
-      return callback(output.subarray(0, written), cells, lengths);
-    });
-  }
-  getSpanLines() {
-    return this.withResolvedChars({ addLineBreaks: false, cellLengths: true }, (bytes, cells, lengths) => {
-      const { fg: fg2, bg: bg2, attributes, width, height } = cells;
-      const lines = [];
-      const decoder2 = new TextDecoder("utf-8", { ignoreBOM: true });
-      let offset = 0;
-      for (let y = 0;y < height; y++) {
-        const spans = [];
-        let currentSpan = null;
-        for (let x = 0;x < width; x++) {
-          const i = y * width + x;
-          const cellFg = RGBA.fromArray(fg2.subarray(i * 4, i * 4 + 4));
-          const cellBg = RGBA.fromArray(bg2.subarray(i * 4, i * 4 + 4));
-          const cellAttrs = attributes[i] & 255;
-          const end = offset + lengths[i];
-          const cellChar = decoder2.decode(bytes.subarray(offset, end));
-          offset = end;
-          if (currentSpan && currentSpan.fg.equals(cellFg) && currentSpan.bg.equals(cellBg) && currentSpan.attributes === cellAttrs) {
-            currentSpan.text += cellChar;
-            currentSpan.width += 1;
-          } else {
-            if (currentSpan) {
-              spans.push(currentSpan);
-            }
-            currentSpan = {
-              text: cellChar,
-              fg: cellFg,
-              bg: cellBg,
-              attributes: cellAttrs,
-              width: 1
-            };
-          }
-        }
-        if (currentSpan) {
-          spans.push(currentSpan);
-        }
-        lines.push({ spans });
-      }
-      return lines;
-    });
-  }
-  clear(bg2 = RGBA.fromValues(0, 0, 0, 1)) {
-    this.guard();
-    this.drawChecked({ operation: "clear", background: bg2 });
-  }
-  setCell(x, y, char, fg2, bg2, attributes = 0) {
-    this.guard();
-    this.drawChecked({
-      operation: "cell",
-      x,
-      y,
-      char: char.codePointAt(0) ?? 32,
-      foreground: fg2,
-      background: bg2,
-      attributes
-    });
-  }
-  setCellWithAlphaBlending(x, y, char, fg2, bg2, attributes = 0) {
-    this.guard();
-    this.drawChecked({
-      operation: "cellBlend",
-      x,
-      y,
-      char: char.codePointAt(0) ?? 32,
-      foreground: fg2,
-      background: bg2,
-      attributes
-    });
-  }
-  drawText(text, x, y, fg2, bg2, attributes = 0, selection2) {
-    this.guard();
-    if (!selection2) {
-      this.drawChecked({ operation: "text", text, x, y, foreground: fg2, background: bg2, attributes });
-      return;
-    }
-    const { start, end } = selection2;
-    let selectionBg;
-    let selectionFg;
-    if (selection2.bgColor) {
-      selectionBg = selection2.bgColor;
-      selectionFg = selection2.fgColor || fg2;
-    } else {
-      const defaultBg = bg2 || RGBA.fromValues(0, 0, 0, 0);
-      selectionFg = defaultBg.a > 0 ? defaultBg : RGBA.fromValues(0, 0, 0, 1);
-      selectionBg = fg2;
-    }
-    if (start > 0) {
-      const beforeText = text.slice(0, start);
-      this.drawText(beforeText, x, y, fg2, bg2, attributes);
-    }
-    if (end > start) {
-      const selectedText = text.slice(start, end);
-      this.drawText(selectedText, x + start, y, selectionFg, selectionBg, attributes);
-    }
-    if (end < text.length) {
-      const afterText = text.slice(end);
-      this.drawText(afterText, x + end, y, fg2, bg2, attributes);
-    }
-  }
-  fillRect(x, y, width, height, bg2) {
-    this.guard();
-    if (width <= 0 || height <= 0)
-      return;
-    this.drawChecked({ operation: "fill", x, y, width, height, background: bg2 });
-  }
-  colorMatrix(matrix, cellMask, strength = 1, target = 3 /* Both */) {
-    this.guard();
-    if (matrix.length !== 16)
-      throw new RangeError(`colorMatrix matrix must have length 16, got ${matrix.length}`);
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.colorMatrix(matrix, cellMask, strength, target);
-    const destination = this.checkedTarget();
-    this.lib.contextColorMatrixBuffer(destination, matrix, cellMask, strength, target);
-  }
-  colorMatrixUniform(matrix, strength = 1, target = 3 /* Both */) {
-    this.guard();
-    if (matrix.length !== 16)
-      throw new RangeError(`colorMatrixUniform matrix must have length 16, got ${matrix.length}`);
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.colorMatrix(matrix, null, strength, target);
-    const destination = this.checkedTarget();
-    this.lib.contextColorMatrixBuffer(destination, matrix, null, strength, target);
-  }
-  drawFrameBuffer(destX, destY, frameBuffer, sourceX, sourceY, sourceWidth, sourceHeight) {
-    this.guard();
-    frameBuffer.guard();
-    const destination = this.source;
-    const source = frameBuffer.source;
-    if (!("buffer" in source) || source.context !== destination.context || frameBuffer.lib !== this.lib) {
-      throw new Error("Scene composition requires a buffer owned by the same Context");
-    }
-    this.drawChecked({
-      operation: "compose",
-      source: source.buffer,
-      x: destX,
-      y: destY,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight
-    });
-  }
-  destroy() {
-    if (this._destroyed)
-      return;
-    const source = this.source;
-    if ("buffer" in source && !source.owner.disposed) {
-      const release = () => {
-        if (!source.owner.disposed)
-          this.lib.destroyContextBuffer(source.context, source.buffer);
-      };
-      this.lib.releaseAfterPaint(source.context, release);
-    }
-    this._destroyed = true;
-  }
-  drawTextBuffer(textBufferView, x, y) {
-    this.guard();
-    const owner = textBufferView._getOwner();
-    if (owner.renderLib !== this.lib || owner.context !== this.source.context) {
-      throw new Error("Text drawing requires a view owned by the same Context");
-    }
-    const view = textBufferView._getSceneHandle(owner);
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.view("text", view, x, y);
-    this.lib.contextDrawTextBufferView(this.checkedTarget(), view, x, y);
-  }
-  drawEditorView(editorView, x, y) {
-    this.guard();
-    const owner = editorView._getOwner();
-    if (owner.renderLib !== this.lib || owner.context !== this.source.context) {
-      throw new Error("Editor drawing requires a view owned by the same Context");
-    }
-    const view = editorView._getSceneHandle(owner);
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.view("editor", view, x, y);
-    this.lib.contextDrawEditorView(this.checkedTarget(), view, x, y);
-  }
-  drawSuperSampleBuffer(x, y, pixelData, pixelDataLength, format, alignedBytesPerRow) {
-    this.guard();
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.supersample(pixelData, pixelDataLength, x, y, format, alignedBytesPerRow);
-    const target = this.checkedTarget();
-    this.lib.contextDrawSuperSampleBuffer(target, pixelData, pixelDataLength, x, y, format, alignedBytesPerRow);
-  }
-  drawImage(image, x, y, width, height, pixelWidth = 0, pixelHeight = 0, sourceX = 0, sourceY = 0, sourceWidth = image.width, sourceHeight = image.height, protocol = "auto", opacityOverride) {
-    this.guard();
-    requireInteger(x, "x", -2147483648, 2147483647);
-    requireInteger(y, "y", -2147483648, 2147483647);
-    requireInteger(width, "width", 1, 2147483647);
-    requireInteger(height, "height", 1, 2147483647);
-    requireInteger(pixelWidth, "pixelWidth", 0, 2147483647);
-    requireInteger(pixelHeight, "pixelHeight", 0, 2147483647);
-    requireInteger(sourceX, "sourceX", 0, 4294967295);
-    requireInteger(sourceY, "sourceY", 0, 4294967295);
-    requireInteger(sourceWidth, "sourceWidth", 1, 4294967295);
-    requireInteger(sourceHeight, "sourceHeight", 1, 4294967295);
-    if (x + width > 2147483647 || y + height > 2147483647) {
-      throw new RangeError("image destination coordinates and dimensions exceed i32 bounds");
-    }
-    const options = {
-      x,
-      y,
-      width,
-      height,
-      pixelWidth,
-      pixelHeight,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
-      protocol,
-      opacityOverride: opacityOverride ?? null
-    };
-    const handle = image._getContextHandle(this.lib, this.source.context);
-    const recorder = this.recorder;
-    if (recorder) {
-      recorder.image(handle, options);
-      return true;
-    }
-    return this.lib.contextDrawImage(this.checkedTarget(), handle, options);
-  }
-  drawPackedBuffer(data, dataLen, posX, posY, terminalWidthCells, terminalHeightCells) {
-    this.guard();
-    if (dataLen <= 0 || terminalWidthCells <= 0 || terminalHeightCells <= 0)
-      return;
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.packed(data, dataLen, posX, posY, terminalWidthCells, terminalHeightCells);
-    const target = this.checkedTarget();
-    this.lib.contextDrawPackedBuffer(target, data, dataLen, posX, posY, terminalWidthCells, terminalHeightCells);
-  }
-  drawGrayscaleBuffer(posX, posY, intensities, srcWidth, srcHeight, fg2 = null, bg2 = null) {
-    this.guard();
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.grayscale(intensities, posX, posY, srcWidth, srcHeight, fg2, bg2, false);
-    const target = this.checkedTarget();
-    this.lib.contextDrawGrayscaleBuffer(target, intensities, posX, posY, srcWidth, srcHeight, fg2, bg2, false);
-  }
-  drawGrayscaleBufferSupersampled(posX, posY, intensities, srcWidth, srcHeight, fg2 = null, bg2 = null) {
-    this.guard();
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.grayscale(intensities, posX, posY, srcWidth, srcHeight, fg2, bg2, true);
-    const target = this.checkedTarget();
-    this.lib.contextDrawGrayscaleBuffer(target, intensities, posX, posY, srcWidth, srcHeight, fg2, bg2, true);
-  }
-  resize(width, height) {
-    this.guard();
-    const source = this.source;
-    if (!("buffer" in source)) {
-      throw new Error("Resizing a Session scene framebuffer is unsupported");
-    }
-    if (this._width === width && this._height === height)
-      return;
-    this.lib.contextResizeBuffer(source.context, source.buffer, width, height);
-    this._width = width;
-    this._height = height;
-  }
-  drawBox(options) {
-    this.guard();
-    if (options.width <= 0 || options.height <= 0)
-      return;
-    const style = parseBorderStyle(options.borderStyle, "single");
-    const borderChars = options.customBorderChars ?? BorderCharArrays[style];
-    const packedOptions = packDrawOptions(options.border, options.shouldFill ?? false, options.titleAlignment || "left", options.bottomTitleAlignment || "left", options.fillDimsImages ?? false);
-    this.drawChecked({
-      operation: "box",
-      x: options.x,
-      y: options.y,
-      width: options.width,
-      height: options.height,
-      borderChars,
-      packedOptions,
-      foreground: options.borderColor,
-      background: options.backgroundColor,
-      titleColor: options.titleColor ?? options.borderColor,
-      text: options.title,
-      bottomTitle: options.bottomTitle
-    });
-  }
-  pushScissorRect(x, y, width, height) {
-    this.guard();
-    this.stackChecked({ operation: "pushScissor", x, y, width: Math.max(0, width), height: Math.max(0, height) });
-  }
-  popScissorRect() {
-    this.guard();
-    this.stackChecked({ operation: "popScissor" });
-  }
-  clearScissorRects() {
-    this.guard();
-    this.stackChecked({ operation: "clearScissors" });
-  }
-  pushOpacity(opacity) {
-    this.guard();
-    this.stackChecked({ operation: "pushOpacity", opacity });
-  }
-  popOpacity() {
-    this.guard();
-    this.stackChecked({ operation: "popOpacity" });
-  }
-  getCurrentOpacity() {
-    this.guard();
-    return this.stackChecked({ operation: "getOpacity" });
-  }
-  clearOpacity() {
-    this.guard();
-    this.stackChecked({ operation: "clearOpacity" });
-  }
-  stackChecked(options) {
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.stack(options);
-    return this.lib.contextBufferStack(this.checkedTarget(), options);
-  }
-  encodeUnicode(text) {
-    this.guard();
-    const context = this.source.context;
-    const handle = this.lib.createContextUnicode(context, text, this.widthMethod);
-    const owner = { lib: this.lib, handle, tokens: [] };
-    let chars = contextUnicodeChars.get(context);
-    if (!chars)
-      contextUnicodeChars.set(context, chars = new Map);
-    try {
-      const data = this.lib.getContextUnicode(context, handle);
-      if (data.length > Number.MAX_SAFE_INTEGER - nextUnicodeChar)
-        throw new RangeError("Unicode token limit reached");
-      data.forEach((glyph, index) => {
-        if (glyph.char <= 1114111)
-          return;
-        glyph.char = nextUnicodeChar++;
-        owner.tokens.push(glyph.char);
-        chars.set(glyph.char, { owner, index });
-      });
-      const encoded = { data };
-      contextUnicode.set(encoded, owner);
-      return encoded;
-    } catch (error) {
-      for (const token of owner.tokens)
-        chars.delete(token);
-      try {
-        this.lib.destroyContextUnicode(context, handle);
-      } catch {}
-      throw error;
-    }
-  }
-  freeUnicode(encoded) {
-    this.guard();
-    const native = contextUnicode.get(encoded);
-    if (!native || native.lib !== this.lib || native.handle.context !== this.source.context) {
-      throw new Error("Encoded Unicode must be live and owned by the same Context");
-    }
-    const context = this.source.context;
-    const release = () => this.lib.destroyContextUnicode(context, native.handle);
-    this.lib.releaseAfterPaint(context, release);
-    const chars = contextUnicodeChars.get(this.source.context);
-    for (const token of native.tokens)
-      chars.delete(token);
-    contextUnicode.delete(encoded);
-  }
-  drawGrid(options) {
-    this.guard();
-    const recorder = this.recorder;
-    if (recorder)
-      return recorder.grid(options);
-    const target = this.checkedTarget();
-    this.lib.contextDrawGrid(target, options);
-  }
-  drawChar(char, x, y, fg2, bg2, attributes = 0) {
-    this.guard();
-    if (char > 4294967295) {
-      const glyph = contextUnicodeChars.get(this.source.context)?.get(char);
-      if (!glyph || glyph.owner.lib !== this.lib) {
-        throw new Error("Encoded Unicode must be live and owned by the same Context");
-      }
-      const recorder = this.recorder;
-      if (recorder)
-        return recorder.unicode(glyph.owner.handle, glyph.index, x, y, fg2, bg2, attributes);
-      this.lib.contextBufferDrawUnicode(this.checkedTarget(), glyph.owner.handle, glyph.index, x, y, fg2, bg2, attributes);
-      return;
-    }
-    this.drawChecked({ operation: "char", char, x, y, foreground: fg2, background: bg2, attributes });
-  }
-}
-
-// src/Renderable.ts
-import { EventEmitter as EventEmitter4 } from "events";
-
-// src/lib/renderable.validations.ts
-function validateOptions(id, options) {
-  if (typeof options.width === "number") {
-    if (options.width < 0) {
-      throw new TypeError(`Invalid width for Renderable ${id}: ${options.width}`);
-    }
-  }
-  if (typeof options.height === "number") {
-    if (options.height < 0) {
-      throw new TypeError(`Invalid height for Renderable ${id}: ${options.height}`);
-    }
-  }
-}
-function isValidPercentage(value) {
-  if (typeof value === "string" && value.endsWith("%")) {
-    const numPart = value.slice(0, -1);
-    const num = parseFloat(numPart);
-    return !Number.isNaN(num);
-  }
-  return false;
-}
-function isMarginType(value) {
-  if (typeof value === "number" && !Number.isNaN(value)) {
-    return true;
-  }
-  if (value === "auto") {
-    return true;
-  }
-  return isValidPercentage(value);
-}
-function isPaddingType(value) {
-  if (typeof value === "number" && !Number.isNaN(value)) {
-    return true;
-  }
-  return isValidPercentage(value);
-}
-function isPositionType(value) {
-  if (typeof value === "number" && !Number.isNaN(value)) {
-    return true;
-  }
-  if (value === "auto") {
-    return true;
-  }
-  return isValidPercentage(value);
-}
-function isPositionTypeType(value) {
-  return value === "relative" || value === "absolute";
-}
-function isOverflowType(value) {
-  return value === "visible" || value === "hidden" || value === "scroll";
-}
-function isDimensionType(value) {
-  return isPositionType(value);
-}
-function isFlexBasisType(value) {
-  if (value === undefined || value === "auto") {
-    return true;
-  }
-  if (typeof value === "number" && !Number.isNaN(value)) {
-    return true;
-  }
-  return false;
-}
-function isSizeType(value) {
-  if (value === undefined) {
-    return true;
-  }
-  if (typeof value === "number" && !Number.isNaN(value)) {
-    return true;
-  }
-  return isValidPercentage(value);
-}
-
-// src/Renderable.ts
-var BrandedRenderable = Symbol.for("@opentui/core/Renderable");
-var hookNames = [
-  "renderSelf",
-  "onResize",
-  "onLayoutResize",
-  "onUpdate",
-  "renderBefore",
-  "renderAfter",
-  "onLifecyclePass"
-];
-var nativeSceneHookBeforeAfter = nativeConstants.OT_SCENE_HOOK_RENDER_BEFORE | nativeConstants.OT_SCENE_HOOK_RENDER_AFTER;
-function isRowFlexDirection(direction) {
-  return direction === FlexDirection.Row || direction === FlexDirection.RowReverse;
-}
-function clampOpacity(value) {
-  return value === undefined ? 1 : Math.max(0, Math.min(1, value));
-}
-var LayoutEvents;
-((LayoutEvents2) => {
-  LayoutEvents2["LAYOUT_CHANGED"] = "layout-changed";
-  LayoutEvents2["RESIZED"] = "resized";
-})(LayoutEvents ||= {});
-var RenderableEvents;
-((RenderableEvents2) => {
-  RenderableEvents2["FOCUSED"] = "focused";
-  RenderableEvents2["BLURRED"] = "blurred";
-  RenderableEvents2["DESTROYED"] = "destroyed";
-})(RenderableEvents ||= {});
-var positionKeys = ["left", "top", "right", "bottom"];
-function isRenderable(obj) {
-  return !!obj?.[BrandedRenderable];
-}
-
-class BaseRenderable extends EventEmitter4 {
-  [BrandedRenderable] = true;
-  static renderableNumber = 1;
-  _id;
-  num;
-  _dirty = false;
-  parent = null;
-  _visible = true;
-  constructor(options) {
-    super();
-    this.num = BaseRenderable.renderableNumber++;
-    this._id = options.id ?? `renderable-${this.num}`;
-  }
-  get id() {
-    return this._id;
-  }
-  set id(value) {
-    this._id = value;
-  }
-  get isDirty() {
-    return this._dirty;
-  }
-  markClean() {
-    this._dirty = false;
-  }
-  markDirty() {
-    this._dirty = true;
-  }
-  destroy() {}
-  destroyRecursively() {}
-  get visible() {
-    return this._visible;
-  }
-  set visible(value) {
-    this._visible = value;
-  }
-}
-
-class Renderable extends BaseRenderable {
-  static defaultFocusable = false;
-  static renderablesByNumber = new Map;
-  static nativeIntegration = {
-    kind: "custom",
-    body: { native: this.prototype.renderSelf }
-  };
-  static baseHooks = {
-    renderSelf: this.prototype.renderSelf,
-    onResize: this.prototype.onResize,
-    onLayoutResize: this.prototype.onLayoutResize,
-    onUpdate: this.prototype.onUpdate,
-    renderBefore: undefined,
-    renderAfter: undefined,
-    onLifecyclePass: null
-  };
-  nativeIntegration;
-  _isDestroyed = false;
-  _cleanupInProgress = false;
-  _childCleanupInProgress = false;
-  _deferredCleanup;
-  _ctx;
-  _sceneHandle;
-  _yogaFreed = false;
-  _translateX = 0;
-  _translateY = 0;
-  _width;
-  _height;
-  _destroyedLayout;
-  _zIndex;
-  buffered;
-  frameBuffer = null;
-  _focusable = this.constructor.defaultFocusable;
-  _focused = false;
-  keypressHandler = null;
-  pasteHandler = null;
-  _live = false;
-  _animationFps;
-  stopAnimationTick;
-  animationDrawnFrame = -1;
-  _liveCount = 0;
-  _sizeChangeListener = undefined;
-  _hooks = Renderable.baseHooks;
-  _nativeSceneHookGeneration = 0n;
-  _nativeSceneHooksRegistered = false;
-  _nativeSceneResize = false;
-  _paintLayout;
-  _observedLayout;
-  _observedLayoutRevision = -1;
-  _selectable = false;
-  _mouseListener = null;
-  _mouseListeners = {};
-  _pasteListener = undefined;
-  _keyListeners = {};
-  _positionType = "relative";
-  _overflow = "visible";
-  _position = {};
-  _opacity = 1;
-  _flexShrink = 1;
-  _childrenInLayoutOrder = [];
-  parent = null;
-  get onLifecyclePass() {
-    return this._hooks.onLifecyclePass;
-  }
-  set onLifecyclePass(value) {
-    this.setHook("onLifecyclePass", value);
-  }
-  get renderBefore() {
-    return this._hooks.renderBefore;
-  }
-  set renderBefore(value) {
-    this.setHook("renderBefore", value);
-  }
-  get renderAfter() {
-    return this._hooks.renderAfter;
-  }
-  set renderAfter(value) {
-    this.setHook("renderAfter", value);
-  }
-  constructor(ctx, options) {
-    super(options);
-    this._ctx = ctx;
-    this.nativeIntegration = new.target.nativeIntegration;
-    Renderable.renderablesByNumber.set(this.num, this);
-    try {
-      validateOptions(this.id, options);
-      this._width = options.width ?? "auto";
-      this._height = options.height ?? "auto";
-      this._zIndex = options.zIndex ?? 0;
-      this._visible = options.visible !== false;
-      this.buffered = options.buffered ?? false;
-      this._live = options.live ?? false;
-      this._liveCount = this._live && this._visible ? 1 : 0;
-      this._opacity = clampOpacity(options.opacity);
-      ctx.nativeScene.createNode(this, options);
-      const hooks = {};
-      for (const name of hookNames)
-        hooks[name] = this[name];
-      for (const name of ["renderBefore", "renderAfter"]) {
-        if (options[name] !== undefined)
-          hooks[name] = Renderable.normalizeHook(name, options[name]);
-      }
-      this.publishHooks(hooks);
-      this.setDisplay(this._visible ? 0 /* Flex */ : 1 /* None */);
-      this.setupYogaProperties(options);
-      if (this.nativeIntegration.measure)
-        this.setMeasureFunc(this.nativeIntegration.measure.bind(this));
-      if (this._zIndex !== 0 || this._opacity !== 1 || this._focusable) {
-        ctx.nativeScene.setPaint(this, Renderable.prototype.getNativeScenePaint.call(this));
-      }
-      this.applyEventOptions(options);
-      if (this.buffered) {
-        this.createFrameBuffer();
-      }
-      this.animationFps = options.animationFps;
-    } catch (error) {
-      try {
-        this.destroyLayoutBacking();
-      } catch {}
-      Renderable.renderablesByNumber.delete(this.num);
-      throw error;
-    }
-  }
-  abortConstruction(error, cleanup) {
-    try {
-      this.destroyLayoutBacking((run) => {
-        this._isDestroyed = true;
-        this.updateAnimationTick();
-        Renderable.renderablesByNumber.delete(this.num);
-        if (cleanup)
-          run(() => cleanup(run));
-        if (this.frameBuffer) {
-          const frameBuffer = this.frameBuffer;
-          this.frameBuffer = null;
-          run(() => frameBuffer.destroy());
-        }
-      });
-    } catch {}
-    throw error;
-  }
-  rollbackConstruction(error) {
-    try {
-      Renderable.prototype.destroy.call(this);
-    } catch {}
-    throw error;
-  }
-  runCleanup(steps) {
-    let failure;
-    const run = (step) => {
-      try {
-        step();
-      } catch (error) {
-        failure ??= { error };
-      }
-    };
-    try {
-      steps(run);
-    } catch (error) {
-      if (!failure)
-        throw error;
-    }
-    if (failure)
-      throw failure.error;
-  }
-  assignOptions(target, options) {
-    if (options == null || this._isDestroyed || target._isDestroyed)
-      return;
-    this.assertMutable();
-    for (const key of Reflect.ownKeys(options)) {
-      if (!Object.getOwnPropertyDescriptor(options, key)?.enumerable)
-        continue;
-      const value = Reflect.get(options, key);
-      if (this._isDestroyed || target._isDestroyed)
-        return;
-      target[key] = value;
-    }
-  }
-  get focusable() {
-    return this._focusable;
-  }
-  set focusable(value) {
-    value ??= this.constructor.defaultFocusable;
-    if (this._focusable === value)
-      return;
-    this.setNativeScenePaint({ focusable: value });
-    this._focusable = value;
-    this.runCleanup((run) => {
-      if (!value)
-        run(() => this.blur());
-      run(() => this.requestRender());
-    });
-  }
-  get ctx() {
-    return this._ctx;
-  }
-  get visible() {
-    return this._visible;
-  }
-  get primaryAxis() {
-    return isRowFlexDirection(this.getFlexDirection()) ? "row" : "column";
-  }
-  set visible(value) {
-    value ??= true;
-    if (this._visible === value)
-      return;
-    this.runMutation(() => {
-      const wasVisible = this._visible;
-      this.setDisplay(value ? 0 /* Flex */ : 1 /* None */);
-      this._visible = value;
-      if (this._live) {
-        if (!wasVisible && value) {
-          this.propagateLiveCount(1);
-        } else if (wasVisible && !value) {
-          this.propagateLiveCount(-1);
-        }
-      }
-      this.updateAnimationTick();
-      if (this._focused) {
-        this.blur();
-      }
-      this.requestRender();
-    });
-  }
-  get opacity() {
-    return this._opacity;
-  }
-  set opacity(value) {
-    const clamped = clampOpacity(value);
-    if (this._opacity !== clamped) {
-      this.setNativeScenePaint({ opacity: clamped });
-      this._opacity = clamped;
-      this.requestRender();
-    }
-  }
-  hasSelection() {
-    return false;
-  }
-  onSelectionChanged(selection2) {
-    return false;
-  }
-  getSelectedText() {
-    return "";
-  }
-  shouldStartSelection(x, y) {
-    return false;
-  }
-  focus() {
-    if (this._isDestroyed || this._focused || !this._focusable)
-      return;
-    this._ctx.nativeScene.setFocus(this, true);
-    this._focused = true;
-    this.runCleanup((run) => {
-      run(() => this._ctx.focusRenderable(this));
-      run(() => this.requestRender());
-      if (this._isDestroyed || !this._focused || this._ctx.currentFocusedRenderable !== this)
-        return;
-      if (this.keypressHandler)
-        return;
-      this.keypressHandler = (key) => {
-        if (this._isDestroyed || !this._focused || this._ctx.currentFocusedRenderable !== this)
-          return;
-        this._keyListeners["down"]?.(key);
-        if (this._isDestroyed)
-          return;
-        if (!key.defaultPrevented && this.handleKeyPress) {
-          this.handleKeyPress(key);
-        }
-      };
-      this.pasteHandler = (event) => {
-        if (this._isDestroyed || !this._focused || this._ctx.currentFocusedRenderable !== this)
-          return;
-        this._pasteListener?.call(this, event);
-        if (this._isDestroyed)
-          return;
-        if (!event.defaultPrevented && this.handlePaste) {
-          this.handlePaste(event);
-        }
-      };
-      this.ctx._internalKeyInput.onInternal("keypress", this.keypressHandler);
-      this.ctx._internalKeyInput.onInternal("paste", this.pasteHandler);
-      run(() => this.propagateFocusChange(true));
-      run(() => this.emit("focused" /* FOCUSED */));
-    });
-  }
-  propagateFocusChange(_hasFocus) {
-    for (let parent = this.parent;parent; parent = parent.parent)
-      parent.markDirty();
-    this.requestRender();
-  }
-  blur() {
-    if (!this._focused)
-      return;
-    this._focused = false;
-    const keypress = this.keypressHandler;
-    const paste2 = this.pasteHandler;
-    this.keypressHandler = null;
-    this.pasteHandler = null;
-    this.runCleanup((run) => {
-      run(() => this._ctx.nativeScene.setFocus(this, false));
-      if (keypress)
-        run(() => this.ctx._internalKeyInput.offInternal("keypress", keypress));
-      if (paste2)
-        run(() => this.ctx._internalKeyInput.offInternal("paste", paste2));
-      run(() => this.propagateFocusChange(false));
-      if (!this._focused)
-        run(() => this._ctx.blurRenderable(this));
-      if (!this._focused)
-        run(() => this.emit("blurred" /* BLURRED */));
-    });
-  }
-  get focused() {
-    return this._focused;
-  }
-  get hasFocusedDescendant() {
-    const focused = this._ctx.currentFocusedRenderable;
-    if (!focused?._focused || focused._isDestroyed)
-      return false;
-    for (let parent = focused.parent;parent; parent = parent.parent)
-      if (parent === this)
-        return true;
-    return false;
-  }
-  get live() {
-    return this._live;
-  }
-  get liveCount() {
-    return this._liveCount;
-  }
-  set live(value) {
-    value ??= false;
-    if (this._live === value)
-      return;
-    this._live = value;
-    if (this._visible) {
-      const delta = value ? 1 : -1;
-      this.propagateLiveCount(delta);
-    }
-  }
-  propagateLiveCount(delta) {
-    this._liveCount += delta;
-    this.parent?.propagateLiveCount(delta);
-  }
-  onLiveCountChanged(previous) {}
-  get animationFps() {
-    return this._animationFps;
-  }
-  set animationFps(value) {
-    value ??= undefined;
-    if (value !== undefined && !(value > 0 && value < Infinity)) {
-      throw new RangeError(`animationFps must be positive and finite, got ${value}`);
-    }
-    if (this._animationFps === value)
-      return;
-    const toggled = this._animationFps === undefined !== (value === undefined);
-    this._animationFps = value;
-    if (toggled)
-      this.refreshNativeSceneHooks();
-    this.updateAnimationTick();
-  }
-  updateAnimationTick() {
-    this.stopAnimationTick?.();
-    this.stopAnimationTick = undefined;
-    if (this._animationFps === undefined || !this._visible || this._isDestroyed)
-      return;
-    this.stopAnimationTick = this._ctx.onAnimationTick(this._animationFps, (deltaTime, ticks, time) => {
-      if (this.animationDrawnFrame < this._ctx.frameId - 1) {
-        this.stopAnimationTick?.();
-        this.stopAnimationTick = undefined;
-        return;
-      }
-      this.onAnimationTick(deltaTime, ticks, time);
-    });
-  }
-  onAnimationTick(deltaTime, ticks, time) {}
-  findDescendantById(id) {
-    for (const child of this._childrenInLayoutOrder) {
-      if (child.id === id)
-        return child;
-      if (isRenderable(child)) {
-        const found = child.findDescendantById(id);
-        if (found)
-          return found;
-      }
-    }
-    return;
-  }
-  requestRender() {
-    this.markDirty();
-    this._ctx.requestRender();
-  }
-  _needsLifecyclePass() {
-    return this.onLifecyclePass !== null;
-  }
-  get translateX() {
-    return this._translateX;
-  }
-  set translateX(value) {
-    value ??= 0;
-    if (this._translateX === value)
-      return;
-    this.setNativeScenePaint({ translateX: value });
-    this._translateX = value;
-    this.requestRender();
-  }
-  get translateY() {
-    return this._translateY;
-  }
-  set translateY(value) {
-    value ??= 0;
-    if (this._translateY === value)
-      return;
-    this.setNativeScenePaint({ translateY: value });
-    this._translateY = value;
-    this.requestRender();
-  }
-  get screenX() {
-    return this.isFreed() ? this._destroyedLayout?.screenX ?? 0 : this.getNativeSceneLayout().screenX;
-  }
-  get screenY() {
-    return this.isFreed() ? this._destroyedLayout?.screenY ?? 0 : this.getNativeSceneLayout().screenY;
-  }
-  get _screenX() {
-    return this._paintLayout?.screenX ?? this.screenX;
-  }
-  get _screenY() {
-    return this._paintLayout?.screenY ?? this.screenY;
-  }
-  _paintOrigin(buffer) {
-    return buffer === this.frameBuffer ? [0, 0] : [Math.trunc(this._screenX), Math.trunc(this._screenY)];
-  }
-  _drawNativeBody(buffer) {
-    this._ctx.nativeScene.drawBody(this, buffer, ...this._paintOrigin(buffer));
-  }
-  get _paintWidth() {
-    return this._paintLayout?.width ?? this.width;
-  }
-  get _paintHeight() {
-    return this._paintLayout?.height ?? this.height;
-  }
-  get x() {
-    if (!this.isFreed())
-      return this.getNativeSceneLayout().screenX;
-    const left = this._destroyedLayout?.x ?? 0;
-    if (this.parent) {
-      return this.parent.x + left + this._translateX;
-    }
-    return left + this._translateX;
-  }
-  set x(value) {
-    this.left = value;
-  }
-  get top() {
-    return this._position.top;
-  }
-  set top(value) {
-    if (isPositionType(value) || value == null) {
-      this.setPosition({ top: value ?? undefined });
-    }
-  }
-  get right() {
-    return this._position.right;
-  }
-  set right(value) {
-    if (isPositionType(value) || value == null) {
-      this.setPosition({ right: value ?? undefined });
-    }
-  }
-  get bottom() {
-    return this._position.bottom;
-  }
-  set bottom(value) {
-    if (isPositionType(value) || value == null) {
-      this.setPosition({ bottom: value ?? undefined });
-    }
-  }
-  get left() {
-    return this._position.left;
-  }
-  set left(value) {
-    if (isPositionType(value) || value == null) {
-      this.setPosition({ left: value ?? undefined });
-    }
-  }
-  get y() {
-    if (!this.isFreed())
-      return this.getNativeSceneLayout().screenY;
-    const top = this._destroyedLayout?.y ?? 0;
-    if (this.parent) {
-      return this.parent.y + top + this._translateY;
-    }
-    return top + this._translateY;
-  }
-  set y(value) {
-    this.top = value;
-  }
-  get width() {
-    if (!this.isFreed()) {
-      const layout = this.getNativeSceneLayout();
-      return layout.width === 0 ? this.styledDimension("width") : layout.width;
-    }
-    return this._destroyedLayout?.width ?? this.styledDimension("width");
-  }
-  set width(value) {
-    this.setDimension("width", value);
-  }
-  get height() {
-    if (!this.isFreed()) {
-      const layout = this.getNativeSceneLayout();
-      return layout.height === 0 ? this.styledDimension("height") : layout.height;
-    }
-    return this._destroyedLayout?.height ?? this.styledDimension("height");
-  }
-  defaultDimension(_kind) {
-    return "auto";
-  }
-  styledDimension(kind) {
-    const value = kind === "width" ? this._width : this._height;
-    return typeof value === "number" ? value : 0;
-  }
-  getNativeSceneLayout() {
-    const revision = this._ctx.nativeScene.observedLayoutRevision;
-    if (revision !== undefined && this._observedLayoutRevision === revision)
-      return this._observedLayout;
-    return this.observeLayout(this._ctx.nativeScene.getLayout(this));
-  }
-  observeLayout(layout) {
-    const revision = this._ctx.nativeScene.observedLayoutRevision;
-    if (layout && revision !== undefined) {
-      this._observedLayout = layout;
-      this._observedLayoutRevision = revision;
-    }
-    return layout;
-  }
-  set height(value) {
-    this.setDimension("height", value);
-  }
-  setDimension(kind, input) {
-    if (this.isFreed())
-      return;
-    const value = input ?? this.defaultDimension(kind);
-    const key = kind === "width" ? "_width" : "_height";
-    if (!isDimensionType(value) || this[key] === value)
-      return;
-    this.runMutation(() => {
-      const disableShrink = typeof value === "number" && this._flexShrink === 1;
-      const dimension = kind === "width" ? Dimension.Width : Dimension.Height;
-      sceneSetDimension(this._ctx.nativeScene, this, dimension, value, disableShrink);
-      this[key] = value;
-      if (disableShrink)
-        this._flexShrink = 0;
-      this.requestRender();
-    });
-  }
-  get zIndex() {
-    return this._zIndex;
-  }
-  set zIndex(value) {
-    value = value ?? 0;
-    if (this._zIndex !== value) {
-      this.setNativeScenePaint({ zIndex: value });
-      this._zIndex = value;
-      this.requestRender();
-    }
-  }
-  getChildrenSortedByPrimaryAxis() {
-    const axis = this.primaryAxis === "row" ? "screenX" : "screenY";
-    if (this._childrenInLayoutOrder.length < 2)
-      return [...this._childrenInLayoutOrder];
-    const children = this._childrenInLayoutOrder.map((child) => ({ child, coordinate: child[axis] }));
-    children.sort((a, b) => a.coordinate - b.coordinate);
-    return children.map(({ child }) => child);
-  }
-  _bindSceneHandle(handle) {
-    this._sceneHandle = handle;
-    this._yogaFreed = false;
-  }
-  _getSceneHandle(owner) {
-    if (this._ctx.nativeScene !== owner)
-      throw new Error("Yoga node belongs to a different native scene");
-    owner.assertAlive();
-    if (this._yogaFreed || !this._sceneHandle)
-      throw new Error("Native scene Yoga node is freed");
-    return this._sceneHandle;
-  }
-  _releaseSceneHandle() {
-    this._yogaFreed = true;
-    this._sceneHandle = undefined;
-  }
-  isFreed() {
-    return this._yogaFreed || !this._sceneHandle;
-  }
-  assertMutable() {
-    this._ctx.nativeScene.driver.renderLib.getYogaHost().assertMutable();
-    this._getSceneHandle(this._ctx.nativeScene);
-  }
-  runMutation(operation) {
-    if (this.isFreed())
-      return;
-    this.assertMutable();
-    return this._ctx.nativeScene.driver.renderLib.getYogaHost().runMutation(operation);
-  }
-  yogaSetEnum(kind, value) {
-    if (this.isFreed())
-      return;
-    sceneSetEnum(this._ctx.nativeScene, this, kind, value);
-  }
-  yogaGetEnum(kind, fallback) {
-    return this.isFreed() ? fallback : sceneGetEnum(this._ctx.nativeScene, this, kind);
-  }
-  yogaGetFloat(kind) {
-    return this.isFreed() ? NaN : sceneGetFloat(this._ctx.nativeScene, this, kind);
-  }
-  yogaSetFloat(kind, value) {
-    if (this.isFreed())
-      return;
-    sceneSetFloat(this._ctx.nativeScene, this, kind, value);
-  }
-  yogaSetValue(kind, edge, valueInput) {
-    if (this.isFreed())
-      return;
-    sceneSetValue(this._ctx.nativeScene, this, kind, edge, valueInput);
-  }
-  yogaGetValue(kind, edge) {
-    return this.isFreed() ? UNDEFINED_VALUE : sceneGetValue(this._ctx.nativeScene, this, kind, edge);
-  }
-  setDisplay(display) {
-    this.yogaSetEnum(YogaEnumKind.Display, display);
-  }
-  getFlexDirection() {
-    return this.yogaGetEnum(YogaEnumKind.FlexDirection, FlexDirection.Column);
-  }
-  setFlexDirection(flexDirection) {
-    this.yogaSetEnum(YogaEnumKind.FlexDirection, flexDirection);
-  }
-  setFlexWrap(flexWrap) {
-    this.yogaSetEnum(YogaEnumKind.FlexWrap, flexWrap);
-  }
-  setAlignItems(alignItems) {
-    this.yogaSetEnum(YogaEnumKind.AlignItems, alignItems);
-  }
-  setJustifyContent(justifyContent) {
-    this.yogaSetEnum(YogaEnumKind.JustifyContent, justifyContent);
-  }
-  setAlignSelf(alignSelf) {
-    this.yogaSetEnum(YogaEnumKind.AlignSelf, alignSelf);
-  }
-  setPositionType(positionType) {
-    this.yogaSetEnum(YogaEnumKind.PositionType, positionType);
-  }
-  setOverflow(overflow) {
-    this.yogaSetEnum(YogaEnumKind.Overflow, overflow);
-  }
-  setFlexGrow(flexGrow) {
-    this.yogaSetFloat(YogaFloatKind.FlexGrow, flexGrow);
-  }
-  setFlexShrink(flexShrink) {
-    this.yogaSetFloat(YogaFloatKind.FlexShrink, flexShrink);
-  }
-  setFlexBasis(flexBasis) {
-    this.yogaSetValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE, flexBasis);
-  }
-  setWidth(width) {
-    this.yogaSetValue(YogaValueKind.Width, NATIVE_EDGE_NONE, width);
-  }
-  setHeight(height) {
-    this.yogaSetValue(YogaValueKind.Height, NATIVE_EDGE_NONE, height);
-  }
-  setMinWidth(minWidth) {
-    this.yogaSetValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE, minWidth);
-  }
-  setMaxWidth(maxWidth) {
-    this.yogaSetValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE, maxWidth);
-  }
-  setMinHeight(minHeight) {
-    this.yogaSetValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE, minHeight);
-  }
-  setMaxHeight(maxHeight) {
-    this.yogaSetValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE, maxHeight);
-  }
-  setMargin(edge, margin) {
-    this.yogaSetValue(YogaValueKind.Margin, edge, margin);
-  }
-  getMargin(edge) {
-    return this.yogaGetValue(YogaValueKind.Margin, edge);
-  }
-  setPadding(edge, padding) {
-    this.yogaSetValue(YogaValueKind.Padding, edge, padding);
-  }
-  setGap(gutter, gap) {
-    this.yogaSetValue(YogaValueKind.Gap, gutter, gap);
-  }
-  getWidth() {
-    return this.yogaGetValue(YogaValueKind.Width, NATIVE_EDGE_NONE);
-  }
-  getFlexWrap() {
-    return this.yogaGetEnum(YogaEnumKind.FlexWrap, Wrap.NoWrap);
-  }
-  getAlignItems() {
-    return this.yogaGetEnum(YogaEnumKind.AlignItems, Align.Stretch);
-  }
-  getJustifyContent() {
-    return this.yogaGetEnum(YogaEnumKind.JustifyContent, Justify.FlexStart);
-  }
-  getAlignSelf() {
-    return this.yogaGetEnum(YogaEnumKind.AlignSelf, Align.Auto);
-  }
-  getPositionType() {
-    return this.yogaGetEnum(YogaEnumKind.PositionType, PositionType.Relative);
-  }
-  getFlexGrow() {
-    return this.yogaGetFloat(YogaFloatKind.FlexGrow);
-  }
-  getFlexShrink() {
-    return this.yogaGetFloat(YogaFloatKind.FlexShrink);
-  }
-  getFlexBasis() {
-    return this.yogaGetValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE);
-  }
-  getHeight() {
-    return this.yogaGetValue(YogaValueKind.Height, NATIVE_EDGE_NONE);
-  }
-  getMinWidth() {
-    return this.yogaGetValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE);
-  }
-  getMinHeight() {
-    return this.yogaGetValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE);
-  }
-  getMaxWidth() {
-    return this.yogaGetValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE);
-  }
-  getMaxHeight() {
-    return this.yogaGetValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE);
-  }
-  getPadding(edge) {
-    return this.yogaGetValue(YogaValueKind.Padding, edge);
-  }
-  getGap(gutter) {
-    return this.yogaGetValue(YogaValueKind.Gap, gutter);
-  }
-  getComputedLayout() {
-    const { left, top, right, bottom, width, height } = this._ctx.nativeScene.getLayout(this, true);
-    return { left, top, right, bottom, width, height };
-  }
-  setMeasureFunc(measure) {
-    this.assertMutable();
-    this._ctx.nativeScene.setMeasureFunc(this, measure);
-  }
-  hasMeasureFunc() {
-    return this._ctx.nativeScene.hasMeasureFunc(this);
-  }
-  setupYogaProperties(options) {
-    const node = this;
-    if (isFlexBasisType(options.flexBasis)) {
-      node.setFlexBasis(options.flexBasis);
-    }
-    if (isSizeType(options.minWidth)) {
-      node.setMinWidth(options.minWidth);
-    }
-    if (isSizeType(options.minHeight)) {
-      node.setMinHeight(options.minHeight);
-    }
-    if (options.flexGrow !== undefined) {
-      node.setFlexGrow(options.flexGrow);
-    } else {
-      node.setFlexGrow(0);
-    }
-    if (options.flexShrink !== undefined) {
-      this._flexShrink = options.flexShrink;
-      node.setFlexShrink(options.flexShrink);
-    } else {
-      const hasExplicitWidth = typeof options.width === "number";
-      const hasExplicitHeight = typeof options.height === "number";
-      this._flexShrink = hasExplicitWidth || hasExplicitHeight ? 0 : 1;
-      node.setFlexShrink(this._flexShrink);
-    }
-    node.setFlexDirection(parseFlexDirection(options.flexDirection));
-    node.setFlexWrap(parseWrap(options.flexWrap));
-    node.setAlignItems(parseAlignItems(options.alignItems));
-    node.setJustifyContent(parseJustify(options.justifyContent));
-    node.setAlignSelf(parseAlign(options.alignSelf));
-    if (isDimensionType(options.width)) {
-      this._width = options.width;
-      node.setWidth(options.width);
-    }
-    if (isDimensionType(options.height)) {
-      this._height = options.height;
-      node.setHeight(options.height);
-    }
-    this._positionType = options.position === "absolute" ? "absolute" : "relative";
-    if (this._positionType !== "relative") {
-      node.setPositionType(parsePositionType(this._positionType));
-    }
-    this._overflow = options.overflow === "hidden" ? "hidden" : options.overflow === "scroll" ? "scroll" : "visible";
-    if (this._overflow !== "visible") {
-      node.setOverflow(parseOverflow(this._overflow));
-    }
-    const hasPositionProps = options.top !== undefined || options.right !== undefined || options.bottom !== undefined || options.left !== undefined;
-    if (hasPositionProps) {
-      this._position = {
-        top: options.top,
-        right: options.right,
-        bottom: options.bottom,
-        left: options.left
-      };
-      this.updateYogaPosition(this._position);
-      this.requestRender();
-    }
-    if (isSizeType(options.maxWidth)) {
-      node.setMaxWidth(options.maxWidth);
-    }
-    if (isSizeType(options.maxHeight)) {
-      node.setMaxHeight(options.maxHeight);
-    }
-    this.setupMarginAndPadding(options);
-  }
-  setupMarginAndPadding(options) {
-    const node = this;
-    if (isMarginType(options.margin)) {
-      node.setMargin(Edge.All, options.margin);
-    }
-    if (isMarginType(options.marginX)) {
-      node.setMargin(Edge.Horizontal, options.marginX);
-    }
-    if (isMarginType(options.marginY)) {
-      node.setMargin(Edge.Vertical, options.marginY);
-    }
-    if (isMarginType(options.marginTop)) {
-      node.setMargin(Edge.Top, options.marginTop);
-    }
-    if (isMarginType(options.marginRight)) {
-      node.setMargin(Edge.Right, options.marginRight);
-    }
-    if (isMarginType(options.marginBottom)) {
-      node.setMargin(Edge.Bottom, options.marginBottom);
-    }
-    if (isMarginType(options.marginLeft)) {
-      node.setMargin(Edge.Left, options.marginLeft);
-    }
-    if (isPaddingType(options.padding)) {
-      node.setPadding(Edge.All, options.padding);
-    }
-    if (isPaddingType(options.paddingX)) {
-      node.setPadding(Edge.Horizontal, options.paddingX);
-    }
-    if (isPaddingType(options.paddingY)) {
-      node.setPadding(Edge.Vertical, options.paddingY);
-    }
-    if (isPaddingType(options.paddingTop)) {
-      node.setPadding(Edge.Top, options.paddingTop);
-    }
-    if (isPaddingType(options.paddingRight)) {
-      node.setPadding(Edge.Right, options.paddingRight);
-    }
-    if (isPaddingType(options.paddingBottom)) {
-      node.setPadding(Edge.Bottom, options.paddingBottom);
-    }
-    if (isPaddingType(options.paddingLeft)) {
-      node.setPadding(Edge.Left, options.paddingLeft);
-    }
-  }
-  set position(positionType) {
-    positionType ??= "relative";
-    if (!isPositionTypeType(positionType) || this._positionType === positionType)
-      return;
-    this.runMutation(() => {
-      this.setPositionType(parsePositionType(positionType));
-      this._positionType = positionType;
-      this.requestRender();
-    });
-  }
-  get overflow() {
-    return this._overflow;
-  }
-  set overflow(overflow) {
-    overflow ??= "visible";
-    if (!isOverflowType(overflow) || this._overflow === overflow)
-      return;
-    this.runMutation(() => {
-      this.setOverflow(parseOverflow(overflow));
-      this._overflow = overflow;
-      this.requestRender();
-    });
-  }
-  setPosition(position) {
-    this.runMutation(() => {
-      this.updateYogaPosition(position);
-      this._position = { ...this._position, ...position };
-      this.requestRender();
-    });
-  }
-  updateYogaPosition(position) {
-    const units = new Uint32Array(positionKeys.length);
-    const values = new Float32Array(positionKeys.length);
-    let mask = 0;
-    for (let edge = 0;edge < positionKeys.length; edge++) {
-      const key = positionKeys[edge];
-      const input = position[key] ?? undefined;
-      if (!(key in position) || input !== undefined && !isPositionType(input))
-        continue;
-      const value = parseYogaValue(input);
-      mask |= 1 << edge;
-      units[edge] = value.unit;
-      values[edge] = value.value;
-    }
-    this._ctx.nativeScene.setPositions(this, mask, units, values);
-  }
-  set flexGrow(grow) {
-    if (grow == null) {
-      this.setFlexGrow(0);
-    } else {
-      this.setFlexGrow(grow);
-    }
-    this.requestRender();
-  }
-  set flexShrink(shrink) {
-    const value = shrink == null ? 1 : shrink;
-    this.runMutation(() => {
-      this.setFlexShrink(value);
-      this._flexShrink = value;
-      this.requestRender();
-    });
-  }
-  set flexDirection(direction) {
-    this.setFlexDirection(parseFlexDirection(direction));
-    this.requestRender();
-  }
-  set flexWrap(wrap) {
-    this.setFlexWrap(parseWrap(wrap));
-    this.requestRender();
-  }
-  set alignItems(alignItems) {
-    this.setAlignItems(parseAlignItems(alignItems));
-    this.requestRender();
-  }
-  set justifyContent(justifyContent) {
-    this.setJustifyContent(parseJustify(justifyContent));
-    this.requestRender();
-  }
-  set alignSelf(alignSelf) {
-    this.setAlignSelf(parseAlign(alignSelf));
-    this.requestRender();
-  }
-  set flexBasis(basis) {
-    this.setStyleValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE, basis, isFlexBasisType);
-  }
-  set minWidth(minWidth) {
-    this.setStyleValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE, minWidth, isSizeType);
-  }
-  set maxWidth(maxWidth) {
-    this.setStyleValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE, maxWidth, isSizeType);
-  }
-  set minHeight(minHeight) {
-    this.setStyleValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE, minHeight, isSizeType);
-  }
-  set maxHeight(maxHeight) {
-    this.setStyleValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE, maxHeight, isSizeType);
-  }
-  set margin(margin) {
-    this.setStyleValue(YogaValueKind.Margin, Edge.All, margin, isMarginType);
-  }
-  set marginX(marginX) {
-    this.setStyleValue(YogaValueKind.Margin, Edge.Horizontal, marginX, isMarginType);
-  }
-  set marginY(marginY) {
-    this.setStyleValue(YogaValueKind.Margin, Edge.Vertical, marginY, isMarginType);
-  }
-  set marginTop(margin) {
-    this.setStyleValue(YogaValueKind.Margin, Edge.Top, margin, isMarginType);
-  }
-  get marginTop() {
-    return this.getMargin(Edge.Top).value;
-  }
-  set marginRight(margin) {
-    this.setStyleValue(YogaValueKind.Margin, Edge.Right, margin, isMarginType);
-  }
-  set marginBottom(margin) {
-    this.setStyleValue(YogaValueKind.Margin, Edge.Bottom, margin, isMarginType);
-  }
-  set marginLeft(margin) {
-    this.setStyleValue(YogaValueKind.Margin, Edge.Left, margin, isMarginType);
-  }
-  set padding(padding) {
-    this.setStyleValue(YogaValueKind.Padding, Edge.All, padding, isPaddingType);
-  }
-  set paddingX(paddingX) {
-    this.setStyleValue(YogaValueKind.Padding, Edge.Horizontal, paddingX, isPaddingType);
-  }
-  set paddingY(paddingY) {
-    this.setStyleValue(YogaValueKind.Padding, Edge.Vertical, paddingY, isPaddingType);
-  }
-  set paddingTop(padding) {
-    this.setStyleValue(YogaValueKind.Padding, Edge.Top, padding, isPaddingType);
-  }
-  set paddingRight(padding) {
-    this.setStyleValue(YogaValueKind.Padding, Edge.Right, padding, isPaddingType);
-  }
-  set paddingBottom(padding) {
-    this.setStyleValue(YogaValueKind.Padding, Edge.Bottom, padding, isPaddingType);
-  }
-  set paddingLeft(padding) {
-    this.setStyleValue(YogaValueKind.Padding, Edge.Left, padding, isPaddingType);
-  }
-  setStyleValue(kind, edge, value, isValid) {
-    if (value != null && !isValid(value))
-      return;
-    this.yogaSetValue(kind, edge, value ?? undefined);
-    this.requestRender();
-  }
-  setMeasureProvider(provider) {
-    if (this.isFreed())
-      return;
-    const node = this;
-    node.runMutation(() => {
-      node.setMeasureFunc(provider);
-      this.requestRender();
-    });
-  }
-  invalidateIntrinsicSize() {
-    if (this.isFreed())
-      return;
-    const node = this;
-    node.assertMutable();
-    if (node.hasMeasureFunc())
-      this._ctx.nativeScene.markDirty(this);
-  }
-  getLayout() {
-    if (this.isFreed())
-      throw new Error("Renderable is destroyed");
-    return this.getComputedLayout();
-  }
-  onLayoutResize(width, height) {
-    if (this._visible) {
-      this.handleFrameBufferResize(width, height);
-      this._hooks.onResize.call(this, width, height);
-      this.requestRender();
-    }
-  }
-  handleFrameBufferResize(width, height) {
-    if (!this.buffered)
-      return;
-    if (width <= 0 || height <= 0) {
-      return;
-    }
-    if (this.frameBuffer) {
-      this.frameBuffer.resize(width, height);
-    } else {
-      this.createFrameBuffer();
-    }
-  }
-  createFrameBuffer() {
-    const w = this.width;
-    const h = this.height;
-    if (w <= 0 || h <= 0) {
-      return;
-    }
-    this.frameBuffer = OptimizedBuffer.create(w, h, this._ctx.widthMethod, {
-      respectAlpha: true,
-      id: `framebuffer-${this.id}`,
-      owner: this._ctx.nativeScene
-    });
-  }
-  onResize(width, height) {
-    this.onSizeChange?.();
-    this.emit("resize");
-  }
-  placeChild(child, anchor) {
-    return this.runMutation(() => {
-      if (this._ctx.nativeScene !== child._ctx.nativeScene) {
-        throw new Error("Cannot move renderables between native scenes");
-      }
-      let previous = child.parent;
-      if (previous && previous !== this && previous.remove !== Renderable.prototype.remove) {
-        previous.remove(child);
-        previous = child.parent;
-      }
-      if (this._isDestroyed || child.isDestroyed || anchor?.isDestroyed)
-        return -1;
-      const target = this;
-      const childNode = child;
-      const previousIndex = previous?._childrenInLayoutOrder.indexOf(child) ?? -1;
-      const anchorIndex = anchor ? target._childrenInLayoutOrder.indexOf(anchor) : target._childrenInLayoutOrder.length;
-      if (anchorIndex === -1)
-        return -1;
-      const index = anchorIndex - (previous === target && previousIndex !== -1 && previousIndex < anchorIndex ? 1 : 0);
-      let counts;
-      let lifecycle;
-      if (previous !== target) {
-        if (child._liveCount > 0) {
-          counts = new Map;
-          for (const [start, delta] of [
-            [previous, -child._liveCount],
-            [target, child._liveCount]
-          ]) {
-            for (let parent = start;parent; parent = parent.parent) {
-              const count = counts.get(parent) ?? { before: parent._liveCount, after: parent._liveCount };
-              count.after += delta;
-              counts.set(parent, count);
-            }
-          }
-        }
-        if (previous) {
-          const passes = previous._ctx.getLifecyclePasses();
-          lifecycle = new Map([[passes, false]]);
-        }
-        if (typeof child.onLifecyclePass === "function") {
-          const passes = target._ctx.getLifecyclePasses();
-          lifecycle ??= new Map;
-          lifecycle.set(passes, true);
-        }
-      }
-      this._ctx.nativeScene.moveNode(childNode, this, index);
-      if (previous && previousIndex !== -1)
-        previous._childrenInLayoutOrder.splice(previousIndex, 1);
-      target._childrenInLayoutOrder.splice(index, 0, child);
-      child.parent = target;
-      if (counts)
-        for (const [parent, count] of counts)
-          parent._liveCount = count.after;
-      if (lifecycle)
-        for (const [passes, active] of lifecycle) {
-          if (active)
-            passes.add(child);
-          else
-            passes.delete(child);
-        }
-      this.runCleanup((run) => {
-        if (previous !== target && (child._focused || child.hasFocusedDescendant))
-          for (const start of [previous, target])
-            for (let parent = start;parent; parent = parent.parent)
-              parent.markDirty();
-        if (counts)
-          for (const [parent, count] of counts)
-            run(() => parent.onLiveCountChanged(count.before));
-        if (previous && previous !== target)
-          run(() => child.onRemove());
-        if (previous && previous !== target)
-          run(() => previous.requestRender());
-        run(() => target.requestRender());
-      });
-      return index;
-    });
-  }
-  add(obj, index) {
-    if (!obj) {
-      return -1;
-    }
-    if (isVNode(obj))
-      this.assertMutable();
-    const renderable = maybeMakeRenderable(this._ctx, obj);
-    if (!renderable) {
-      return -1;
-    }
-    if (this._isDestroyed) {
-      if (true) {
-        console.warn(`Renderable with id ${this.id} was already destroyed, skipping add`);
-      }
-      return -1;
-    }
-    if (renderable.isDestroyed) {
-      if (true) {
-        console.warn(`Renderable with id ${renderable.id} was already destroyed, skipping add`);
-      }
-      return -1;
-    }
-    const anchorRenderable = index !== undefined ? this._childrenInLayoutOrder[index] : undefined;
-    if (anchorRenderable) {
-      return this.insertBefore(renderable, anchorRenderable);
-    }
-    return this.placeChild(renderable);
-  }
-  insertBefore(obj, anchor) {
-    if (!anchor) {
-      return this.add(obj);
-    }
-    if (!obj) {
-      return -1;
-    }
-    if (isVNode(obj))
-      this.assertMutable();
-    const renderable = maybeMakeRenderable(this._ctx, obj);
-    if (!renderable) {
-      return -1;
-    }
-    if (this._isDestroyed) {
-      if (true) {
-        console.warn(`Renderable with id ${this.id} was already destroyed, skipping insertBefore`);
-      }
-      return -1;
-    }
-    if (renderable.isDestroyed) {
-      if (true) {
-        console.warn(`Renderable with id ${renderable.id} was already destroyed, skipping insertBefore`);
-      }
-      return -1;
-    }
-    if (!isRenderable(anchor)) {
-      throw new Error("Anchor must be a Renderable");
-    }
-    if (anchor.isDestroyed) {
-      if (true) {
-        console.warn(`Anchor with id ${anchor.id} was already destroyed, skipping insertBefore`);
-      }
-      return -1;
-    }
-    if (this._childrenInLayoutOrder.indexOf(anchor) === -1) {
-      if (true) {
-        console.warn(`Anchor with id ${anchor.id} does not exist within the parent ${this.id}, skipping insertBefore`);
-      }
-      return -1;
-    }
-    if (renderable === anchor) {
-      if (true) {
-        console.warn(`Anchor is the same as the node ${renderable.id} being inserted, skipping insertBefore`);
-      }
-      return -1;
-    }
-    return this.placeChild(renderable, anchor);
-  }
-  getRenderable(id) {
-    return this._childrenInLayoutOrder.find((child) => child.id === id);
-  }
-  remove(child) {
-    if (!(child instanceof BaseRenderable)) {
-      throw new Error("remove expects a renderable child object");
-    }
-    const index = this._childrenInLayoutOrder.indexOf(child);
-    if (index === -1) {
-      if (true) {
-        console.warn(`Renderable with id ${child.id} is not a child of ${this.id}, skipping remove`);
-      }
-      return;
-    }
-    const renderable = this._childrenInLayoutOrder[index];
-    this.runMutation(() => {
-      this._ctx.nativeScene.moveNode(renderable, null, 0);
-      this.removeLayoutChildAt(index);
-      this.runCleanup((run) => {
-        if (renderable._focused || renderable.hasFocusedDescendant) {
-          run(() => renderable.propagateFocusChange(false));
-        }
-        if (renderable._liveCount > 0)
-          run(() => this.propagateLiveCount(-renderable._liveCount));
-        run(() => this.requestRender());
-        run(() => renderable.onRemove());
-        renderable.parent = null;
-        run(() => this._ctx.unregisterLifecyclePass(renderable));
-      });
-    });
-  }
-  onRemove() {}
-  getChildren() {
-    return [...this._childrenInLayoutOrder];
-  }
-  getChildrenCount() {
-    return this._childrenInLayoutOrder.length;
-  }
-  onUpdate(deltaTime) {}
-  renderSelf(buffer, deltaTime) {}
-  getNativeScenePaint() {
-    return {
-      zIndex: this._zIndex,
-      opacity: this._opacity,
-      translateX: this._translateX,
-      translateY: this._translateY,
-      border: NativeBorder.None,
-      shouldFill: false,
-      backgroundColor: RGBA.fromValues(0, 0, 0, 0),
-      borderColor: RGBA.fromValues(1, 1, 1, 1),
-      focusable: this._focusable,
-      focusedBorderColor: RGBA.fromValues(0, 170 / 255, 1, 1),
-      borderStyle: "single"
-    };
-  }
-  setNativeScenePaint(paint = this.getNativeScenePaint()) {
-    if (this.isFreed())
-      return;
-    this._ctx.nativeScene.setPaint(this, paint);
-  }
-  static {
-    Object.defineProperty(this.prototype, "selectable", {
-      configurable: true,
-      get() {
-        return this._selectable;
-      },
-      set(value) {
-        if (this.isFreed())
-          return;
-        this.assertMutable();
-        this._selectable = value;
-      }
-    });
-  }
-  static normalizeHook(name, value) {
-    if (value == null && name !== "renderSelf" && name !== "onResize" && name !== "onLayoutResize") {
-      return name === "onUpdate" ? Renderable.baseHooks.onUpdate : name === "onLifecyclePass" ? null : undefined;
-    }
-    if (typeof value !== "function")
-      throw new TypeError(`Invalid ${name} hook`);
-    return value;
-  }
-  setHook(name, value) {
-    value = Renderable.normalizeHook(name, value);
-    if (value === this._hooks[name])
-      return;
-    const hooks = { ...this._hooks, [name]: value };
-    if (name !== "onLifecyclePass")
-      return this.publishHooks(hooks);
-    this._hooks = hooks;
-    this.syncLifecyclePass();
-  }
-  syncLifecyclePass() {
-    if (!this.onLifecyclePass)
-      this._ctx.unregisterLifecyclePass(this);
-    else if (this.parent)
-      this._ctx.registerLifecyclePass(this);
-    else
-      this._ctx.nativeScene.lifecyclePasses.refresh(this);
-  }
-  refreshHooks() {
-    if (this._isDestroyed)
-      return;
-    this.assertMutable();
-    const hooks = {};
-    for (const name of hookNames)
-      hooks[name] = Renderable.normalizeHook(name, this[name]);
-    this.publishHooks(hooks);
-    for (const name of ["renderBefore", "renderAfter", "onLifecyclePass"]) {
-      if (!Object.hasOwn(this, name))
-        continue;
-      delete this[name];
-      if (this[name] !== hooks[name])
-        Reflect.set(this, name, hooks[name]);
-    }
-    this.syncLifecyclePass();
-    this._refreshNativeSceneSurface();
-    this.requestRender();
-  }
-  usesNativeDrawing(renderSelf) {
-    const body = this.nativeIntegration.body;
-    return typeof body === "object" && "native" in body && (!this.buffered || body.buffered === true) && renderSelf === body.native;
-  }
-  needsHostResize(onResize) {
-    const resize = this.nativeIntegration.lifecycle?.resize;
-    return onResize !== Renderable.baseHooks.onResize && onResize !== resize?.native;
-  }
-  hostUpdateFlags(onUpdate) {
-    if (this._animationFps !== undefined)
-      return NativeSceneHook.Update;
-    const update = this.nativeIntegration.lifecycle?.update;
-    if (update && onUpdate === update.idle) {
-      return update.active(this) ? NativeSceneHook.Update : NativeSceneHook.IdleUpdate;
-    }
-    return onUpdate === Renderable.baseHooks.onUpdate ? 0 : NativeSceneHook.Update;
-  }
-  refreshNativeSceneHooks() {
-    this.publishHooks(this._hooks);
-  }
-  _refreshNativeSceneSurface() {}
-  publishHooks(hooks, pending = {}) {
-    if (!this.isFreed()) {
-      const integration = this.nativeIntegration;
-      const resize = this.buffered || hooks.onLayoutResize !== Renderable.baseHooks.onLayoutResize || this.needsHostResize(hooks.onResize);
-      const sizeChange = "sizeChange" in pending ? pending.sizeChange : this._sizeChangeListener;
-      const lineInfo = pending.lineInfo ?? (!!integration.lineInfo && this.listenerCount("line-info-change") > 0);
-      const flags = (hooks.renderBefore ? NativeSceneHook.RenderBefore : 0) | (hooks.renderAfter ? NativeSceneHook.RenderAfter : 0) | (this.usesNativeDrawing(hooks.renderSelf) ? 0 : NativeSceneHook.RenderSelf) | this.hostUpdateFlags(hooks.onUpdate) | (integration.lifecycle?.scroll?.active(this) ? NativeSceneHook.Scroll : 0) | (resize || sizeChange || (pending.resize ?? this.listenerCount("resize")) > 0 ? NativeSceneHook.Resize : 0) | ((pending.layout ?? this.listenerCount("layout-changed" /* LAYOUT_CHANGED */)) > 0 ? NativeSceneHook.LayoutChanged : 0);
-      const generation = this._nativeSceneHookGeneration + 1n;
-      if (flags !== 0 || lineInfo || this._nativeSceneHooksRegistered) {
-        let nativeFlags = flags;
-        if (integration.beforeAfter === false)
-          nativeFlags &= ~nativeSceneHookBeforeAfter;
-        if (!resize && integration.lifecycle?.resize) {
-          nativeFlags = nativeFlags & ~NativeSceneHook.Resize | (lineInfo && integration.lineInfo ? NativeSceneHook.Resize : 0);
-        }
-        if (nativeFlags & NativeSceneHook.RenderSelf)
-          nativeFlags |= NativeSceneHook.RenderAfter;
-        const scene = this._ctx.nativeScene;
-        scene.setHooks(this, nativeFlags, generation, this.styledDimension("width"), this.styledDimension("height"));
-        this._nativeSceneHooksRegistered = true;
-      }
-      this._nativeSceneResize = resize;
-      this._nativeSceneHookGeneration = generation;
-    }
-    this._hooks = hooks;
-  }
-  _runNativeSceneHook(request, deltaTime) {
-    if (this._isDestroyed || request.hookGeneration !== this._nativeSceneHookGeneration)
-      return;
-    this.observeLayout(request.publicLayout);
-    this._paintLayout = request.paintLayout;
-    try {
-      switch (request.kind) {
-        case NativeSceneFrame.Update:
-          if (this._animationFps !== undefined) {
-            this.animationDrawnFrame = this._ctx.frameId;
-            if (!this.stopAnimationTick)
-              this.updateAnimationTick();
-          }
-          this._hooks.onUpdate.call(this, deltaTime);
-          break;
-        case NativeSceneFrame.Resize:
-          if (this._nativeSceneResize) {
-            this._hooks.onLayoutResize.call(this, request.width, request.height);
-          } else {
-            const resize = this.nativeIntegration.lifecycle?.resize;
-            if (!resize) {
-              this.onSizeChange?.call(this);
-              if (!this._isDestroyed)
-                this.emit("resize");
-            }
-            if (!this._isDestroyed && this.nativeIntegration.lineInfo)
-              this.emit("line-info-change");
-          }
-          break;
-        case NativeSceneFrame.LayoutChanged:
-          this.emit("layout-changed" /* LAYOUT_CHANGED */);
-          break;
-        case NativeSceneFrame.Scroll:
-          this.nativeIntegration.lifecycle?.scroll?.notify(this);
-          break;
-      }
-    } finally {
-      this._paintLayout = undefined;
-    }
-  }
-  _recordNativeScenePaint(slot, index, deltaTime, frame, recorder, publicLayout) {
-    if (this._isDestroyed)
-      return;
-    this.observeLayout(publicLayout);
-    this._paintLayout = slot.paintLayout;
-    const buffer = this.nativeIntegration.paintBuffer !== "destination" && this.nativeIntegration.bufferComposition !== "native" && this.buffered && this.frameBuffer ? this.frameBuffer : frame;
-    try {
-      if (slot.hooks & NativeSceneHook.RenderBefore) {
-        recorder.slot(index, NativeScenePaintPhase.Before, slot.opacity);
-        this._hooks.renderBefore?.call(this, buffer, deltaTime);
-        if (this._isDestroyed)
-          return;
-      }
-      if (slot.hooks & NativeSceneHook.RenderSelf) {
-        recorder.slot(index, NativeScenePaintPhase.Self, slot.opacity);
-        if (this.nativeIntegration.beforeAfter === false)
-          this.markClean();
-        this._invokeNativePaint(buffer, deltaTime);
-        if (this._isDestroyed)
-          return;
-      }
-      if (slot.hooks & NativeSceneHook.RenderAfter) {
-        recorder.slot(index, NativeScenePaintPhase.After, slot.opacity);
-        if (this.nativeIntegration.beforeAfter !== false) {
-          this._hooks.renderAfter?.call(this, buffer, deltaTime);
-          this.markClean();
-        }
-        if (!this._isDestroyed && this.nativeIntegration.bufferComposition !== "native" && this.buffered && this.frameBuffer)
-          frame.drawFrameBuffer(Math.trunc(this._screenX), Math.trunc(this._screenY), this.frameBuffer);
-      }
-    } finally {
-      this._paintLayout = undefined;
-    }
-  }
-  _invokeNativePaint(buffer, deltaTime) {
-    this._hooks.renderSelf.call(this, buffer, deltaTime);
-  }
-  get isDestroyed() {
-    return this._isDestroyed;
-  }
-  destroy() {
-    if (this._isDestroyed || this._cleanupInProgress || this._childCleanupInProgress) {
-      return;
-    }
-    this.assertMutable();
-    this.destroyLayoutBacking((run) => {
-      run(() => this.destroyOwnedResources());
-      const heldFocus = this._focused || this.hasFocusedDescendant;
-      this._isDestroyed = true;
-      this.updateAnimationTick();
-      run(() => this.emit("destroyed" /* DESTROYED */));
-      if (heldFocus)
-        run(() => this.propagateFocusChange(false));
-      if (this.parent) {
-        const parent = this.parent;
-        run(() => parent.remove(this));
-        if (this.parent === parent) {
-          run(() => this.detachFromParent());
-        }
-      }
-      if (this.frameBuffer) {
-        const frameBuffer = this.frameBuffer;
-        this.frameBuffer = null;
-        run(() => frameBuffer.destroy());
-      }
-      for (const child of [...this._childrenInLayoutOrder]) {
-        run(() => this.remove(child));
-      }
-      this._childrenInLayoutOrder = [];
-      Renderable.renderablesByNumber.delete(this.num);
-      run(() => this.blur());
-      run(() => this.removeAllListeners());
-      run(() => this.destroySelf());
-    });
-  }
-  destroyRecursively() {
-    if (this._isDestroyed || this._cleanupInProgress || this._childCleanupInProgress)
-      return;
-    this.assertMutable();
-    const children = [...this._childrenInLayoutOrder];
-    let index = 0;
-    this._childCleanupInProgress = true;
-    const cleanupOwners = this._ctx.nativeScene.cleanupOwners;
-    const ownsCompletion = !cleanupOwners.has(this);
-    cleanupOwners.add(this);
-    const resume = () => this.runCleanup((run) => {
-      while (index < children.length) {
-        const child = children[index++];
-        run(() => child.destroyRecursively());
-        if (child._cleanupInProgress || child._childCleanupInProgress) {
-          (child._deferredCleanup ??= []).push(resume);
-          return;
-        }
-      }
-      this._childCleanupInProgress = false;
-      run(() => this.destroy());
-      if (ownsCompletion)
-        this.completeCleanup(run);
-    });
-    resume();
-  }
-  _deferUntilCleanupComplete(resume) {
-    const pending = [this];
-    while (pending.length > 0) {
-      const node = pending.pop();
-      if (node._cleanupInProgress || node._childCleanupInProgress) {
-        (node._deferredCleanup ??= []).push(resume);
-        return true;
-      }
-      for (const child of node._childrenInLayoutOrder)
-        pending.push(child);
-    }
-    for (const node of this._ctx.nativeScene.cleanupOwners) {
-      (node._deferredCleanup ??= []).push(resume);
-      return true;
-    }
-    return false;
-  }
-  destroyOwnedResources() {}
-  destroySelf() {}
-  destroyLayoutBacking(cleanup) {
-    const scene = this._ctx.nativeScene;
-    const hasHandle = !!this._sceneHandle && !this._yogaFreed;
-    this._cleanupInProgress = true;
-    const cleanupOwners = scene.cleanupOwners;
-    const ownsCompletion = !cleanupOwners.has(this);
-    cleanupOwners.add(this);
-    this.runCleanup((run) => {
-      if (hasHandle && this.selectable) {
-        run(() => {
-          const layout = scene.getLayout(this);
-          this._destroyedLayout = {
-            x: layout.left,
-            y: layout.top,
-            screenX: layout.screenX,
-            screenY: layout.screenY,
-            width: layout.width === 0 ? this.styledDimension("width") : layout.width,
-            height: layout.height === 0 ? this.styledDimension("height") : layout.height
-          };
-        });
-      }
-      if (cleanup)
-        run(() => cleanup(run));
-      this._isDestroyed = true;
-      if (hasHandle)
-        run(() => scene.destroyNode(this));
-      this._cleanupInProgress = false;
-      if (ownsCompletion)
-        this.completeCleanup(run);
-    });
-  }
-  completeCleanup(run) {
-    this._ctx.nativeScene.cleanupOwners.delete(this);
-    const deferred = this._deferredCleanup;
-    this._deferredCleanup = undefined;
-    if (deferred)
-      for (const resume of deferred)
-        run(resume);
-  }
-  removeLayoutChildAt(index) {
-    const children = this._childrenInLayoutOrder;
-    if (index === children.length - 1)
-      children.pop();
-    else
-      children.splice(index, 1);
-  }
-  detachFromParent() {
-    const parent = this.parent;
-    if (!parent)
-      return;
-    const layoutIndex = parent._childrenInLayoutOrder.indexOf(this);
-    if (layoutIndex !== -1) {
-      this._ctx.nativeScene.moveNode(this, null, 0);
-      parent.removeLayoutChildAt(layoutIndex);
-      if (this._liveCount > 0) {
-        parent.propagateLiveCount(-this._liveCount);
-      }
-    }
-    parent._ctx.unregisterLifecyclePass(this);
-    this.parent = null;
-  }
-  processMouseEvent(event) {
-    event.currentTarget = this;
-    this._mouseListener?.call(this, event);
-    if (this._isDestroyed)
-      return;
-    this._mouseListeners[event.type]?.call(this, event);
-    if (this._isDestroyed)
-      return;
-    this.onMouseEvent(event);
-    if (this.parent && !event.propagationStopped) {
-      this.parent.processMouseEvent(event);
-    }
-  }
-  assertSupportedEvent(event) {
-    if ((event === "resized" /* RESIZED */ || event === "layout-changed" /* LAYOUT_CHANGED */) && !(this instanceof RootRenderable)) {
-      throw new Error(`Native scene does not support ${event} hooks`);
-    }
-  }
-  on(event, listener) {
-    return this.changeSceneListeners("add", event, listener);
-  }
-  addListener(event, listener) {
-    return this.changeSceneListeners("add", event, listener);
-  }
-  prependListener(event, listener) {
-    return this.changeSceneListeners("prepend", event, listener);
-  }
-  off(event, listener) {
-    return this.changeSceneListeners("remove", event, listener);
-  }
-  removeListener(event, listener) {
-    return this.changeSceneListeners("remove", event, listener);
-  }
-  removeAllListeners(event) {
-    if (arguments.length > 0 && event === undefined)
-      return super.removeAllListeners(event);
-    return this.changeSceneListeners("clear", event);
-  }
-  changeSceneListeners(operation, event, listener) {
-    if (operation === "add" || operation === "prepend")
-      this.assertSupportedEvent(event);
-    const change = () => {
-      switch (operation) {
-        case "add":
-          return super.addListener(event, listener);
-        case "prepend":
-          return super.prependListener(event, listener);
-        case "remove":
-          return super.removeListener(event, listener);
-        case "clear":
-          return event === undefined ? super.removeAllListeners() : super.removeAllListeners(event);
-      }
-    };
-    if (this._isDestroyed || event === "line-info-change" && !this.nativeIntegration.lineInfo || (operation !== "clear" || event !== undefined) && event !== "resize" && event !== "line-info-change" && event !== "layout-changed" /* LAYOUT_CHANGED */ || operation !== "clear" && typeof listener !== "function") {
-      return change();
-    }
-    let resize = this.listenerCount("resize");
-    const initialLineInfo = this.nativeIntegration.lineInfo ? this.listenerCount("line-info-change") : 0;
-    let lineInfo = initialLineInfo;
-    let layout = this.listenerCount("layout-changed" /* LAYOUT_CHANGED */);
-    if (operation === "clear") {
-      if (event === undefined || event === "resize")
-        resize = 0;
-      if (event === undefined || event === "line-info-change")
-        lineInfo = 0;
-      if (event === undefined || event === "layout-changed" /* LAYOUT_CHANGED */)
-        layout = 0;
-      const changed = resize !== this.listenerCount("resize") || lineInfo !== initialLineInfo || layout !== this.listenerCount("layout-changed" /* LAYOUT_CHANGED */);
-      if (!changed)
-        return change();
-    } else {
-      if (operation === "remove" && !this.rawListeners(event).some((entry) => entry === listener || entry.listener === listener)) {
-        return change();
-      }
-      const delta = operation === "remove" ? -1 : 1;
-      if (event === "resize")
-        resize += delta;
-      else if (event === "line-info-change")
-        lineInfo += delta;
-      else
-        layout += delta;
-    }
-    this.publishHooks(this._hooks, { resize, layout, lineInfo: lineInfo > 0 });
-    this.runCleanup((run) => {
-      run(change);
-      run(() => {
-        if (!this._isDestroyed)
-          this.publishHooks(this._hooks);
-      });
-    });
-    return this;
-  }
-  onMouseEvent(event) {}
-  set onMouse(handler) {
-    if (handler)
-      this._mouseListener = handler;
-    else
-      this._mouseListener = null;
-  }
-  set onMouseDown(handler) {
-    if (handler)
-      this._mouseListeners["down"] = handler;
-    else
-      delete this._mouseListeners["down"];
-  }
-  set onMouseUp(handler) {
-    if (handler)
-      this._mouseListeners["up"] = handler;
-    else
-      delete this._mouseListeners["up"];
-  }
-  set onMouseMove(handler) {
-    if (handler)
-      this._mouseListeners["move"] = handler;
-    else
-      delete this._mouseListeners["move"];
-  }
-  set onMouseDrag(handler) {
-    if (handler)
-      this._mouseListeners["drag"] = handler;
-    else
-      delete this._mouseListeners["drag"];
-  }
-  set onMouseDragEnd(handler) {
-    if (handler)
-      this._mouseListeners["drag-end"] = handler;
-    else
-      delete this._mouseListeners["drag-end"];
-  }
-  set onMouseDrop(handler) {
-    if (handler)
-      this._mouseListeners["drop"] = handler;
-    else
-      delete this._mouseListeners["drop"];
-  }
-  set onMouseOver(handler) {
-    if (handler)
-      this._mouseListeners["over"] = handler;
-    else
-      delete this._mouseListeners["over"];
-  }
-  set onMouseOut(handler) {
-    if (handler)
-      this._mouseListeners["out"] = handler;
-    else
-      delete this._mouseListeners["out"];
-  }
-  set onMouseScroll(handler) {
-    if (handler)
-      this._mouseListeners["scroll"] = handler;
-    else
-      delete this._mouseListeners["scroll"];
-  }
-  set onPaste(handler) {
-    this._pasteListener = handler;
-  }
-  get onPaste() {
-    return this._pasteListener;
-  }
-  set onKeyDown(handler) {
-    if (handler)
-      this._keyListeners["down"] = handler;
-    else
-      delete this._keyListeners["down"];
-  }
-  get onKeyDown() {
-    return this._keyListeners["down"];
-  }
-  set onSizeChange(handler) {
-    if (handler !== this._sizeChangeListener) {
-      if (handler != null && typeof handler !== "function")
-        throw new TypeError("Invalid size change hook");
-      this.publishHooks(this._hooks, { sizeChange: handler });
-    }
-    this._sizeChangeListener = handler;
-  }
-  get onSizeChange() {
-    return this._sizeChangeListener;
-  }
-  applyEventOptions(options) {
-    this.onMouse = options.onMouse;
-    this.onMouseDown = options.onMouseDown;
-    this.onMouseUp = options.onMouseUp;
-    this.onMouseMove = options.onMouseMove;
-    this.onMouseDrag = options.onMouseDrag;
-    this.onMouseDragEnd = options.onMouseDragEnd;
-    this.onMouseDrop = options.onMouseDrop;
-    this.onMouseOver = options.onMouseOver;
-    this.onMouseOut = options.onMouseOut;
-    this.onMouseScroll = options.onMouseScroll;
-    this.onPaste = options.onPaste;
-    this.onKeyDown = options.onKeyDown;
-    this.onSizeChange = options.onSizeChange;
-  }
-}
-
-class RootRenderable extends Renderable {
-  static nativeIntegration = {
-    ...Renderable.nativeIntegration,
-    kind: "root"
-  };
-  _currentRenderable;
-  constructor(ctx) {
-    super(ctx, {
-      id: "__root__",
-      zIndex: 0,
-      visible: true,
-      width: ctx.width,
-      height: ctx.height,
-      enableLayout: true
-    });
-    try {
-      this.setNativeScenePaint();
-    } catch (error) {
-      this.abortConstruction(error);
-    }
-  }
-  get currentRenderable() {
-    return this._currentRenderable;
-  }
-  _setCurrentRenderable(renderable) {
-    this._currentRenderable = renderable;
-  }
-  takeCurrentRenderable() {
-    const renderable = this._currentRenderable;
-    this._currentRenderable = undefined;
-    return renderable;
-  }
-  propagateLiveCount(delta) {
-    const oldCount = this._liveCount;
-    this._liveCount += delta;
-    this.onLiveCountChanged(oldCount);
-  }
-  onLiveCountChanged(previous) {
-    if (previous === 0 && this._liveCount > 0) {
-      this._ctx.requestLive();
-    } else if (previous > 0 && this._liveCount === 0) {
-      this._ctx.dropLive();
-    }
-  }
-  resize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.emit("resized" /* RESIZED */, { width, height });
-  }
-}
-
-// src/renderables/composition/vnode.ts
-import util from "util";
-var BrandedVNode = Symbol.for("@opentui/core/VNode");
-function isRenderableConstructor(value) {
-  return typeof value === "function" && value.prototype && Renderable.prototype.isPrototypeOf(value.prototype);
-}
-function flattenChildren(children) {
-  const result = [];
-  for (const child of children) {
-    if (Array.isArray(child)) {
-      result.push(...flattenChildren(child));
-    } else if (child !== null && child !== undefined && child !== false) {
-      result.push(child);
-    }
-  }
-  return result;
-}
-function h(type, props, ...children) {
-  if (typeof type !== "function") {
-    throw new TypeError("h() received an invalid vnode type");
-  }
-  const vnode = {
-    [BrandedVNode]: true,
-    type,
-    props,
-    children: flattenChildren(children),
-    __pendingCalls: []
-  };
-  if (isRenderableConstructor(type)) {
-    return new Proxy(vnode, {
-      get(target, prop, receiver) {
-        if (prop in target) {
-          return Reflect.get(target, prop, receiver);
-        }
-        if (typeof prop === "string") {
-          const prototype = type.prototype;
-          const hasMethod = prototype && (typeof prototype[prop] === "function" || Object.getOwnPropertyDescriptor(prototype, prop) || Object.getOwnPropertyDescriptor(Object.getPrototypeOf(prototype), prop));
-          if (hasMethod) {
-            return (...args) => {
-              target.__pendingCalls = target.__pendingCalls || [];
-              target.__pendingCalls.push({ method: prop, args });
-              return target;
-            };
-          }
-        }
-        return Reflect.get(target, prop, receiver);
-      },
-      set(target, prop, value, receiver) {
-        if (typeof prop === "string" && isRenderableConstructor(type)) {
-          const prototype = type.prototype;
-          const descriptor = Object.getOwnPropertyDescriptor(prototype, prop) || Object.getOwnPropertyDescriptor(Object.getPrototypeOf(prototype), prop);
-          if (descriptor && descriptor.set) {
-            target.__pendingCalls = target.__pendingCalls || [];
-            target.__pendingCalls.push({ method: prop, args: [value], isProperty: true });
-            return true;
-          }
-        }
-        return Reflect.set(target, prop, value, receiver);
-      }
-    });
-  }
-  return vnode;
-}
-function isVNode(node) {
-  return node && node[BrandedVNode];
-}
-function maybeMakeRenderable(ctx, node) {
-  if (isRenderable(node))
-    return node;
-  if (isVNode(node))
-    return instantiate(ctx, node);
-  if (true) {
-    console.warn("maybeMakeRenderable received an invalid node", util.inspect(node, { depth: 2 }));
-  }
-  return null;
-}
-function wrapWithDelegates(instance, delegateMap) {
-  if (!delegateMap || Object.keys(delegateMap).length === 0)
-    return instance;
-  const getDescendant = (id) => {
-    return instance.findDescendantById(id);
-  };
-  const proxy = new Proxy(instance, {
-    get(target, prop, receiver) {
-      if (typeof prop === "string" && delegateMap[prop]) {
-        const host = getDescendant(delegateMap[prop]);
-        if (host) {
-          const value = host[prop];
-          if (typeof value === "function") {
-            return value.bind(host);
-          }
-          return value;
-        }
-      }
-      return Reflect.get(target, prop, receiver);
-    },
-    set(target, prop, value, receiver) {
-      if (typeof prop === "string" && delegateMap[prop]) {
-        const host = getDescendant(delegateMap[prop]);
-        if (host) {
-          return Reflect.set(host, prop, value);
-        }
-      }
-      return Reflect.set(target, prop, value, receiver);
-    }
-  });
-  return proxy;
-}
-function instantiate(ctx, node) {
-  if (isRenderable(node))
-    return node;
-  if (!node || typeof node !== "object") {
-    throw new TypeError("mount() received an invalid vnode");
-  }
-  const vnode = node;
-  const { type, props } = vnode;
-  const children = flattenChildren(vnode.children || []);
-  const delegateMap = vnode.__delegateMap;
-  if (isRenderableConstructor(type)) {
-    const instance = new type(ctx, props || {});
-    for (const child of children) {
-      if (isRenderable(child)) {
-        instance.add(child);
-      } else {
-        const mounted = instantiate(ctx, child);
-        instance.add(mounted);
-      }
-    }
-    const delegatedInstance = wrapWithDelegates(instance, delegateMap);
-    const pendingCalls = vnode.__pendingCalls;
-    if (pendingCalls) {
-      for (const call of pendingCalls) {
-        if (call.isProperty) {
-          delegatedInstance[call.method] = call.args[0];
-        } else {
-          delegatedInstance[call.method].apply(delegatedInstance, call.args);
-        }
-      }
-    }
-    return delegatedInstance;
-  }
-  const resolved = type(props || {}, children);
-  const inst = instantiate(ctx, resolved);
-  return wrapWithDelegates(inst, delegateMap);
-}
-function delegate(mapping, vnode) {
-  if (isRenderable(vnode)) {
-    return wrapWithDelegates(vnode, mapping);
-  }
-  if (!vnode || typeof vnode !== "object")
-    return vnode;
-  vnode.__delegateMap = { ...vnode.__delegateMap || {}, ...mapping };
-  return vnode;
-}
-
-export { nativeLayouts, nativeConstants, toArrayBuffer, singleton, envRegistry, registerEnvVar, clearEnvCache, generateEnvMarkdown, generateEnvColored, env, stringWidth2 as stringWidth, resolveBundledFilePath, TextAttributes, ATTRIBUTE_BASE_BITS, ATTRIBUTE_BASE_MASK, getBaseAttributes, DebugOverlayCorner, TargetChannel, DEFAULT_FOREGROUND_RGB, DEFAULT_BACKGROUND_RGB, normalizeIndexedColorIndex, ansi256IndexToRgb, RGBA, normalizeColorValue, hexToRgb, rgbToHex, hsvToRgb, parseColor, createTextAttributes, attributesWithLink, getLinkId, visualizeRenderableTree, isStyledText, StyledText, stringToStyledText, black, red, green, yellow, blue, magenta, cyan, white, brightBlack, brightRed, brightGreen, brightYellow, brightBlue, brightMagenta, brightCyan, brightWhite, bgBlack, bgRed, bgGreen, bgYellow, bgBlue, bgMagenta, bgCyan, bgWhite, bold, italic, underline, strikethrough, dim, reverse, blink, fg, bg, link, t, YogaEnumKind, YogaFloatKind, YogaValueKind, sceneSetEnum, sceneSetFloat, sceneSetValue, SpanInfoStruct, NativeAudioStreamFormat, NativeAudioStreamState, NativeAudioStreamStateNames, NativeAudioStreamCloseReason, NativeAudioStreamState2 as NativeAudioStreamState1, NativeAudioStreamCloseReason2 as NativeAudioStreamCloseReason1, NativeAudioStreamFormat2 as NativeAudioStreamFormat1, MAX_LINK_URL_BYTES, NativeTextViewCommand, NativeEditCommand, NativeEditPositionQuery, NativeEditorStyleMask, NativeEditHighlightOperation, NativeEditorCommand, NativeEditorSelectionOperation, NativeEditorPositionQuery, NativeEditEvent, NativeStyleGroup, NativeStyleFlags, NATIVE_EDGE_NONE, NativeBorder, NativeSceneHook, NativeSceneFrame, NativeScenePaintPhase, emptySceneScrollState, NATIVE_BUFFER_TEXT_BYTES_MAX, NativeSessionState, NativeSessionRenderStatus, NATIVE_SESSION_CONTROL_PACKET_BYTES, NativeSessionTerminalPhase, NativeSessionPumpStatus, NativeStatus, NativeError, NativeClipboardOperationStatus, NativeClipboardStartStatus, NativeClipboardCancelStatus, NativeClipboardCopyStatus, NativeClipboardDestroyStatus, NativeClipboardShutdownStatus, SceneStaging, NativePaintRecorder, LogLevel, FFIRenderLib, setRenderLibPath, resolveRenderLib, Align, BoxSizing, Dimension, Direction, Display, Edge, Errata, ExperimentalFeature, FlexDirection, Gutter, Justify, LogLevel2 as LogLevel1, MeasureMode, NodeType, Overflow, PositionType, Unit, Wrap, ALIGN_AUTO, ALIGN_FLEX_START, ALIGN_CENTER, ALIGN_FLEX_END, ALIGN_STRETCH, ALIGN_BASELINE, ALIGN_SPACE_BETWEEN, ALIGN_SPACE_AROUND, ALIGN_SPACE_EVENLY, BOX_SIZING_BORDER_BOX, BOX_SIZING_CONTENT_BOX, DIMENSION_WIDTH, DIMENSION_HEIGHT, DIRECTION_INHERIT, DIRECTION_LTR, DIRECTION_RTL, DISPLAY_FLEX, DISPLAY_NONE, DISPLAY_CONTENTS, EDGE_LEFT, EDGE_TOP, EDGE_RIGHT, EDGE_BOTTOM, EDGE_START, EDGE_END, EDGE_HORIZONTAL, EDGE_VERTICAL, EDGE_ALL, ERRATA_NONE, ERRATA_STRETCH_FLEX_BASIS, ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING, ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE, ERRATA_ALL, ERRATA_CLASSIC, EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS, FLEX_DIRECTION_COLUMN, FLEX_DIRECTION_COLUMN_REVERSE, FLEX_DIRECTION_ROW, FLEX_DIRECTION_ROW_REVERSE, GUTTER_COLUMN, GUTTER_ROW, GUTTER_ALL, JUSTIFY_FLEX_START, JUSTIFY_CENTER, JUSTIFY_FLEX_END, JUSTIFY_SPACE_BETWEEN, JUSTIFY_SPACE_AROUND, JUSTIFY_SPACE_EVENLY, LOG_LEVEL_ERROR, LOG_LEVEL_WARN, LOG_LEVEL_INFO, LOG_LEVEL_DEBUG, LOG_LEVEL_VERBOSE, LOG_LEVEL_FATAL, MEASURE_MODE_UNDEFINED, MEASURE_MODE_EXACTLY, MEASURE_MODE_AT_MOST, NODE_TYPE_DEFAULT, NODE_TYPE_TEXT, OVERFLOW_VISIBLE, OVERFLOW_HIDDEN, OVERFLOW_SCROLL, POSITION_TYPE_STATIC, POSITION_TYPE_RELATIVE, POSITION_TYPE_ABSOLUTE, UNIT_UNDEFINED, UNIT_POINT, UNIT_PERCENT, UNIT_AUTO, WRAP_NO_WRAP, WRAP_WRAP, WRAP_WRAP_REVERSE, YogaStatus, YogaError, Config, Node, exports_yoga, yoga_default, isValidBorderStyle, parseBorderStyle, BorderChars, getBorderFromSides, getBorderSides, borderCharsToArray, BorderCharArrays, KeyEvent, PasteEvent, KeyHandler, InternalKeyHandler, fonts, measureText, getCharacterPositions, coordinateToCharacterIndex, renderFontToFrameBuffer, convertThemeToStyles, SyntaxStyle, hastToStyledText, SystemClock, kittyKeyMap, printableKeypadText, nonAlphanumericKeys, terminalNamedSingleStrokeKeys, parseKeypress, LinearScrollAccel, MacOSScrollAccel, parseAlign, parseAlignItems, parseBoxSizing, parseDimension, parseDirection, parseDisplay, parseEdge, parseFlexDirection, parseGutter, parseJustify, parseLogLevel, parseMeasureMode, parseOverflow, parsePositionType, parseUnit, parseWrap, MouseParser, Selection, convertGlobalToLocalSelection, ASCIIFontSelectionHelper, StdinParser, addDefaultParsers, TreeSitterClient, treeSitterToTextChunks, treeSitterToStyledText, DataPathsManager, getDataPaths, extensionToFiletype, basenameToFiletype, extToFiletype, pathToFiletype, infoStringToFiletype, getTreeSitterClient, destroyTreeSitterClient, ExtmarksController, createExtmarksController, TerminalPalette, createTerminalPalette, normalizeTerminalPalette, buildTerminalPaletteSignature, decodePasteBytes, stripAnsiSequences, createHostClipboard, createClipboard, ClipboardTarget, createRendererClipboardAdapter, normalizeMarkdownLinkTarget, detectLinks, acquireSessionBufferLease, ResourceContext, OptimizedBuffer, h, isVNode, maybeMakeRenderable, wrapWithDelegates, instantiate, delegate, isValidPercentage, LayoutEvents, RenderableEvents, isRenderable, BaseRenderable, Renderable, RootRenderable };
-
-//# debugId=F887EE9CC8BCFBCC64756E2164756E21
-//# sourceMappingURL=chunk-bun-fsx01y4t.js.map
+//# debugId=304DF9EA536A5F6D64756E2164756E21
+//# sourceMappingURL=chunk-bun-jbvxnz0s.js.map

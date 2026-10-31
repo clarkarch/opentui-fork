@@ -131,7 +131,7 @@ async function loadConfig(configPath) {
   let resolvedConfigPath = configPath;
   if (ext === "") {
     const files = await readdir(path2.dirname(configPath));
-    const file = files.find((file2) => file2.startsWith(path2.basename(configPath)) && (file2.endsWith(".json") || file2.endsWith(".ts") || file2.endsWith(".js")));
+    const file = files.find((file) => file.startsWith(path2.basename(configPath)) && (file.endsWith(".json") || file.endsWith(".ts") || file.endsWith(".js")));
     if (!file) {
       throw new Error(`No config file found for ${configPath}`);
     }
@@ -441,5 +441,5 @@ export {
   main as updateAssets
 };
 
-//# debugId=D63E3DB0995C104C64756E2164756E21
+//# debugId=22E1DE90AE569C3B64756E2164756E21
 //# sourceMappingURL=update-assets.js.map
