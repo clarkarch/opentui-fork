@@ -100,7 +100,7 @@ asserts both.
 
 Versions are `0.8.0-fork.N`: the upstream version the fork is based on, plus
 the fork's own release counter. They are prereleases of the upstream version,
-so a consumer has to ask for them explicitly (`^0.8.0-fork.1`), which is what
+so a consumer has to ask for them explicitly (`^0.8.0-fork.4`), which is what
 `package.json` pins.
 
 To publish:
