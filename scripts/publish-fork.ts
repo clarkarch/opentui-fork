@@ -20,9 +20,10 @@
  * A local run can point --native-dir at packages/native/lib for the targets
  * that were built on this machine.
  *
- * Authentication: npm's own credentials (an .npmrc with a token, or
- * NPM_TOKEN/NODE_AUTH_TOKEN in the environment). The token needs publish
- * rights on the @clarkarch scope.
+ * Authentication: npm's own credentials — an .npmrc with a token, or
+ * NPM_TOKEN/NODE_AUTH_TOKEN in the environment (the token needs publish rights
+ * on the @clarkarch scope), or npm's trusted publishing: with the workflow's
+ * OIDC token, the npm CLI exchanges it for a short-lived publish token.
  */
 import { spawnSync } from "node:child_process"
 import { existsSync, readFileSync } from "node:fs"
@@ -36,7 +37,7 @@ import {
   stageNativePackage,
 } from "../packages/core/scripts/native-package"
 import { variants, zigOutputName } from "../packages/core/scripts/variants"
-import { publishPackage, readPackageJson, waitUntilServed } from "./npm-publish"
+import { publishPackage, publishedState, readPackageJson, waitUntilServed } from "./npm-publish"
 
 interface CoreManifest {
   readonly name: string
@@ -137,6 +138,24 @@ function stageNativePackages(options: Options): string[] {
   return staged
 }
 
+/**
+ * Whether the run has any way to authenticate with npm.
+ *
+ * A token (in the environment or in ~/.npmrc) is one way. npm's TRUSTED
+ * PUBLISHING is the other: the runner exposes the OIDC endpoint through these
+ * variables when the workflow asks for `id-token: write`, and the npm CLI
+ * exchanges it for a short-lived publish token.
+ */
+function hasNpmCredentials(): boolean {
+  if (process.env.NPM_TOKEN || process.env.NODE_AUTH_TOKEN) {
+    return true
+  }
+  if (existsSync(join(process.env.HOME ?? "", ".npmrc"))) {
+    return true
+  }
+  return Boolean(process.env.ACTIONS_ID_TOKEN_REQUEST_URL && process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN)
+}
+
 async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2))
 
@@ -162,11 +181,33 @@ async function main(): Promise<void> {
     return
   }
 
-  if (!process.env.NPM_TOKEN && !process.env.NODE_AUTH_TOKEN && !existsSync(join(process.env.HOME ?? "", ".npmrc"))) {
-    throw new Error("No npm credentials found: set NPM_TOKEN or add an .npmrc with a publish token")
+  // What is still missing from npm. A version that is already there with
+  // identical contents is skipped, and a rerun of a finished release needs no
+  // credentials at all.
+  const pending: string[] = []
+  for (const directory of directories) {
+    const manifest = readPackageJson(directory)
+    const state = await publishedState(directory)
+    if (state === "different") {
+      throw new Error(`${manifest.name}@${manifest.version} is already on npm with different contents`)
+    }
+    if (state === "missing") {
+      pending.push(directory)
+    }
   }
 
-  for (const directory of directories) await publishPackage(directory, options.tag)
+  if (pending.length === 0) {
+    console.log("\nEvery package is already on npm with identical contents; nothing to publish.")
+    return
+  }
+
+  if (!hasNpmCredentials()) {
+    throw new Error(
+      "No npm credentials found: set NPM_TOKEN, add an .npmrc with a publish token, or run with an OIDC token (id-token: write)",
+    )
+  }
+
+  for (const directory of pending) await publishPackage(directory, options.tag)
   await waitUntilServed(directories)
 }
 

@@ -7,9 +7,15 @@ name: publish-npm
 # native-artifacts.yml) and downloaded into the layout the publish script
 # expects: <native-dir>/<zig-target>/<library>.
 #
-# The npm token comes from the repository secret NPM_TOKEN and needs publish
-# rights on the @clarkarch scope. The workflow publishes the version in
-# packages/core/package.json; bump it before running.
+# Authentication: npm's TRUSTED PUBLISHING (OIDC) when the packages have a
+# trusted publisher configured on npmjs.com — the workflow asks for
+# `id-token: write` and the npm CLI exchanges the GitHub token for a
+# short-lived one. The `NPM_TOKEN` repository secret is the fallback: when it
+# is set, it is written to ~/.npmrc and used instead. The token needs publish
+# rights on the @clarkarch scope.
+#
+# The workflow publishes the version in packages/core/package.json; bump it
+# before running.
 
 on:
   workflow_dispatch:
@@ -26,6 +32,9 @@ on:
 
 permissions:
   contents: read
+  # npm's trusted publishing: the npm CLI exchanges this OIDC token for a
+  # short-lived publish token.
+  id-token: write
 
 jobs:
   build:
@@ -144,10 +153,18 @@ jobs:
       - name: Install the workspace
         run: bun install --frozen-lockfile
 
+      - name: Use an npm CLI that speaks trusted publishing
+        # npm 11.5.1 added OIDC trusted publishing; older CLIs ignore the
+        # workflow's id-token and fall back to a token that may not exist.
+        run: npm install -g npm@latest
+
       - name: Publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          printf '//registry.npmjs.org/:_authToken=%s\n' "$NPM_TOKEN" > ~/.npmrc
+          # With no token, the npm CLI uses the workflow's OIDC token (trusted
+          # publishing). With one, the token wins.
+          if [ -n "$NPM_TOKEN" ]; then
+            printf '//registry.npmjs.org/:_authToken=%s\n' "$NPM_TOKEN" > ~/.npmrc
+          fi
           bun scripts/publish-fork.ts --native-dir native
