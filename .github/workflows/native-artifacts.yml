@@ -93,11 +93,22 @@ jobs:
           fi
           # The fork keeps debug symbols in its committed artifacts; the release
           # copies are stripped so downloads stay small.
+          #
+          # llvm-strip, not strip: the host's strip only understands the host
+          # architecture, so the aarch64 libraries kept every symbol (29 MB
+          # instead of 5 MB) — and the failure was swallowed, so nobody saw
+          # it. llvm-strip is multi-target, and a failed strip now fails the
+          # build instead of shipping a fat library.
           if [ "${{ runner.os }}" = "Linux" ]; then
-            strip --strip-unneeded "$lib" || echo "strip failed, keeping symbols"
+            if ! command -v llvm-strip >/dev/null; then
+              sudo apt-get update -qq
+              sudo apt-get install -y -qq llvm
+            fi
+            llvm-strip --strip-unneeded "$lib"
           else
-            strip -x "$lib" || echo "strip failed, keeping symbols"
+            strip -x "$lib"
           fi
+          ls -l "$lib"
 
       - uses: actions/upload-artifact@v4
         with:

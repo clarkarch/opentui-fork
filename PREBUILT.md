@@ -9,9 +9,10 @@ toolchain can use the fork as-is:
 - `packages/native/lib/{x86_64-linux,aarch64-linux}/libopentui.so` — the patched native
   library (`zig build -Doptimize=ReleaseFast`, zig 0.16.0).
 
-They are the files downstream projects (tfm's `file:../opentui-fork/packages/core/dist`
-dependency plus its `scripts/sync-opentui-lib.sh`) load. **Rebuild and commit both
-after any change under `packages/core/src` or `packages/native/src`:**
+They are the build outputs this branch carries. Downstream projects do NOT
+point at them: they install the published npm packages (see below), whose
+platform packages carry the stripped library for every target. **Rebuild and
+commit both after any change under `packages/core/src` or `packages/native/src`:**
 
 ```sh
 cd packages/native
@@ -110,6 +111,15 @@ To publish:
 3. Push, then run the `publish-npm` workflow. It builds the native library for
    every target, downloads them, and publishes the platform packages first and
    the core second, so an install never sees the core without its library.
+
+The publish step skips a version npm already has: npm cannot republish a
+version, and the native libraries are rebuilt on every run, so a rerun always
+sees different bytes for a published version. Skipping is what makes a
+PARTIAL release resumable — the packages that landed stay, the rest are
+published. The libraries are stripped with `llvm-strip`, which understands
+every target architecture; the host's `strip` only understands the host's, so
+the aarch64 libraries used to ship with all their symbols (29 MB instead of
+5 MB).
 
 The workflow authenticates with npm's **trusted publishing** (OIDC): the
 packages need a trusted publisher configured on npmjs.com (the repository and

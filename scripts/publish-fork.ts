@@ -38,7 +38,7 @@ import {
   zigTargetDirectory,
 } from "../packages/core/scripts/native-package"
 import { variants } from "../packages/core/scripts/variants"
-import { publishPackage, publishedState, readPackageJson, waitUntilServed } from "./npm-publish"
+import { publishPackage, publishedState, readPackageJson, waitUntilServed, type PublishedState } from "./npm-publish"
 
 interface CoreManifest {
   readonly name: string
@@ -140,6 +140,46 @@ function stageNativePackages(options: Options): string[] {
 }
 
 /**
+ * A staged package and what npm already has for it.
+ */
+export interface PublishCandidate {
+  /** The package id, e.g. `@clarkarch/opentui-fork-linux-x64@0.8.0-fork.3`. */
+  readonly id: string
+  /** The staged directory that holds the package. */
+  readonly directory: string
+  /** What npm already has for this version. */
+  readonly state: PublishedState
+}
+
+/**
+ * The packages that still have to be published.
+ *
+ * A version that is already on npm cannot be published again — npm refuses
+ * it — and the native libraries are REBUILT on every run, so a rerun of a
+ * published version always differs byte-wise. Failing on that difference would
+ * make a rerun impossible, and a rerun is exactly what a PARTIAL release
+ * needs: the packages that landed stay, the rest get published.
+ *
+ * So an already-published version is skipped, and the difference is reported
+ * rather than swallowed: the way to publish new contents is a new version.
+ */
+export function planPublish(candidates: readonly PublishCandidate[]): {
+  readonly publish: readonly string[]
+  readonly skipped: readonly PublishCandidate[]
+} {
+  const publish: string[] = []
+  const skipped: PublishCandidate[] = []
+  for (const candidate of candidates) {
+    if (candidate.state === "missing") {
+      publish.push(candidate.directory)
+      continue
+    }
+    skipped.push(candidate)
+  }
+  return { publish, skipped }
+}
+
+/**
  * Whether the run has any way to authenticate with npm.
  *
  * A token (in the environment or in ~/.npmrc) is one way. npm's TRUSTED
@@ -182,23 +222,33 @@ async function main(): Promise<void> {
     return
   }
 
-  // What is still missing from npm. A version that is already there with
-  // identical contents is skipped, and a rerun of a finished release needs no
-  // credentials at all.
-  const pending: string[] = []
+  // What is still missing from npm. A version that is already there cannot be
+  // published again (npm refuses it), and the native libraries are rebuilt on
+  // every run, so a rerun always sees different bytes for an already
+  // published version. Skipping those is what makes a partial release
+  // resumable.
+  const candidates: PublishCandidate[] = []
   for (const directory of directories) {
     const manifest = readPackageJson(directory)
-    const state = await publishedState(directory)
-    if (state === "different") {
-      throw new Error(`${manifest.name}@${manifest.version} is already on npm with different contents`)
-    }
-    if (state === "missing") {
-      pending.push(directory)
-    }
+    candidates.push({
+      id: `${manifest.name}@${manifest.version}`,
+      directory,
+      state: await publishedState(directory),
+    })
   }
 
-  if (pending.length === 0) {
-    console.log("\nEvery package is already on npm with identical contents; nothing to publish.")
+  const plan = planPublish(candidates)
+  for (const candidate of plan.skipped) {
+    console.log(
+      `${candidate.id} is already on npm (${candidate.state} contents); skipping` +
+        (candidate.state === "different"
+          ? " — npm cannot republish a version, so bump the version to publish new contents"
+          : ""),
+    )
+  }
+
+  if (plan.publish.length === 0) {
+    console.log("\nEvery package is already on npm; nothing to publish.")
     return
   }
 
@@ -208,11 +258,16 @@ async function main(): Promise<void> {
     )
   }
 
-  for (const directory of pending) await publishPackage(directory, options.tag)
-  await waitUntilServed(directories)
+  for (const directory of plan.publish) await publishPackage(directory, options.tag)
+  await waitUntilServed(plan.publish)
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : error)
-  process.exit(1)
-})
+// The guard keeps the module importable: a test imports the planning helpers
+// without publishing anything.
+const entry = process.argv[1]
+if (entry && resolve(entry) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error)
+    process.exit(1)
+  })
+}
