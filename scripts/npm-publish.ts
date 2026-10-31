@@ -107,10 +107,25 @@ function packageUrl(name: string): string {
   return `${registry}/${name.replace("/", "%2f")}`
 }
 
+/**
+ * The integrity of the tarball `npm pack` would upload.
+ *
+ * npm 12 keys the `--json` report by the package name, npm 11 reports an
+ * array — the release script has to work with both, or it fails on whichever
+ * npm the runner ships.
+ */
+export function parsePackIntegrity(stdout: string): string | undefined {
+  const parsed = JSON.parse(stdout) as Array<{ integrity?: string }> | Record<string, { integrity?: string }>
+  if (Array.isArray(parsed)) {
+    return parsed[0]?.integrity
+  }
+  return Object.values(parsed)[0]?.integrity
+}
+
 export function localIntegrity(directory: string): string {
   const result = spawnSync("npm", ["pack", "--dry-run", "--json"], { cwd: directory, encoding: "utf8" })
   if (result.status !== 0) throw new Error(`npm pack failed in ${directory}:\n${result.stderr}`)
-  const integrity = (JSON.parse(result.stdout) as Array<{ integrity?: string }>)[0]?.integrity
+  const integrity = parsePackIntegrity(result.stdout)
   if (!integrity) throw new Error(`npm pack reported no integrity for ${directory}`)
   return integrity
 }
