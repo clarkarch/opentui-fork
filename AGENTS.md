@@ -73,6 +73,17 @@ This branch is a fork that carries patches upstream does not have. It is publish
   the dist — the runtime plugin is transpiled, not bundled, so `./published-package.js` has to exist as a file.
 - The runtime plugin registers the published name (`@clarkarch/opentui-fork` and `/testing`) next to `@opentui/core`,
   so a plugin that imports the fork by either name reaches the HOST's core instance instead of loading a second copy.
+- Upstream's curated `ghostty-zig-0.17.patch` was written for a build that DISABLES the Kitty graphics protocol
+  (`-Dvt-features=-kitty-graphics,-glyph-protocol`). Zig analyzes function bodies lazily, so that build never analyzed
+  the kitty-graphics code path and its Zig 0.17 breakages survived the patch — the fork ENABLES the protocol, so it hit
+  them. The fork therefore carries its OWN patch layer, applied AFTER upstream's:
+  `packages/native/src/vendor/zig-deps/ghostty-kitty-graphics-zig-0.17.patch`. The concrete breakage was Zig 0.17 giving
+  `std.ArrayList` a `pointer_stability` field, which breaks the struct literals that adopt an owned slice; the curated
+  patch fixed two of the three in `graphics_image.zig` and missed one. Only API migrations are taken from Ghostty's own
+  0.17 tree — its unrelated feature changes stay out.
+- A vendored patch written for a FEATURE-DISABLED build only covers the code that build actually analyzed. When the fork
+  turns a protocol ON that upstream turns OFF, the newly-live code needs its own audit against the upstream Zig version,
+  not just the vendored patch.
 
 ## Portable FFI
 

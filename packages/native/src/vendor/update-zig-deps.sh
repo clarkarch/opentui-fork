@@ -28,12 +28,17 @@ fi
 
 # The archive and every input that produced it: this script's pins and the
 # OpenTUI changes. A mismatch means one changed without the other.
+#
+# Build caches are excluded: a local `zig build` leaves `.zig-cache` and
+# `zig-out` next to the sources, and the archive drops them, so they are
+# not inputs either. Hashing them would make the manifest depend on the
+# machine that generated it.
 manifest() (
   cd "$VENDOR_DIR"
   for path in zig-deps.tar.gz update-zig-deps.sh; do
     printf '%s  %s\n' "$(sha256_file "$path")" "$path"
   done
-  find zig-deps -type f | LC_ALL=C sort | while read -r path; do
+  find zig-deps -type f '!' -path '*/.zig-cache/*' '!' -path '*/zig-out/*' | LC_ALL=C sort | while read -r path; do
     printf '%s  %s\n' "$(sha256_file "$path")" "$path"
   done
 )
@@ -102,6 +107,12 @@ cp "$VENDOR_DIR/zig-deps/ghostty-build.zig" "$DEPS_DIR/ghostty/build.zig"
 cp "$VENDOR_DIR/zig-deps/ghostty-build.zig.zon" "$DEPS_DIR/ghostty/build.zig.zon"
 git -C "$DEPS_DIR/ghostty" apply "$VENDOR_DIR/zig-deps/ghostty-shared-deps.patch"
 git -C "$DEPS_DIR/ghostty" apply "$VENDOR_DIR/zig-deps/ghostty-zig-0.17.patch"
+# The fork's own Zig 0.17 fixes for the Kitty graphics protocol. OpenTUI's
+# curated patch was written for a build that disables the protocol, so the
+# kitty-graphics code path was never analyzed and its Zig 0.17 breakages
+# were never fixed; the fork enables the protocol. Applied last, on top of
+# the curated patch.
+git -C "$DEPS_DIR/ghostty" apply "$VENDOR_DIR/zig-deps/ghostty-kitty-graphics-zig-0.17.patch"
 
 # The fork's own `wuffs` package: a dependency-free stand-in for Ghostty's
 # `pkg/wuffs`, which Ghostty's VT build needs when the Kitty graphics
@@ -109,7 +120,7 @@ git -C "$DEPS_DIR/ghostty" apply "$VENDOR_DIR/zig-deps/ghostty-zig-0.17.patch"
 # protocol stays enabled; see zig-deps/wuffs/src/main.zig.
 cp -R "$VENDOR_DIR/zig-deps/wuffs" "$DEPS_DIR/wuffs"
 # A local `zig build` leaves its cache next to the sources; it is not an input.
-rm -rf "$DEPS_DIR/wuffs/.zig-cache" "$DEPS_DIR/wuffs/zig-out"
+find "$DEPS_DIR" -type d \( -name '.zig-cache' -o -name 'zig-out' \) -prune -exec rm -rf {} +
 
 for name in uucode-ghostty uucode-opentui; do
   extract "$TMP_DIR/$name.tar.gz" "$SOURCE_DIR/$name"
