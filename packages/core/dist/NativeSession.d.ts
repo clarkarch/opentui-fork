@@ -13,7 +13,9 @@ export interface NativeSessionDriverOptions {
     output?: NativeSessionOptions;
     /** Copy-buffer size for custom Writable destinations. Native stdout needs no buffer. */
     outputBufferSize?: number;
-    /** Cancel if graceful close has not completed within this finite interval. */
+    /** Graceful close drops the queued output, restores and rejects as late once this long passes without written
+     * bytes and no write in progress, or ten times this long in all; a write in progress finishes first. Another
+     * interval without written bytes then cancels it unrestored. */
     closeTimeoutMs?: number;
     scheduler?: NativeSessionScheduler;
 }
@@ -42,13 +44,21 @@ export declare class NativeSession {
     private readonly closeWait;
     private idleWait;
     private presentationWait;
+    /** @internal Image uploads that later frames still send, read when the last waited frame presented. */
+    imageUploadsPending: number;
     private transition;
     private scheduled;
     private output;
+    /** The stdout writer's copy in flight: when it started, and how many polls found it busy. */
+    private stdoutPost;
+    /** fd 1 output goes through the native writer thread until it reports unsupported. */
+    private stdoutWriter;
     private blocked;
     private sinkErrorSeen;
     private detached;
     private closeDeadlineNs;
+    private closeCapNs;
+    private closeLate;
     private closeRequested;
     private closeInterruption;
     private stopped;
@@ -67,6 +77,8 @@ export declare class NativeSession {
     get disposed(): boolean;
     get contextDisposed(): boolean;
     get error(): Error | null;
+    /** The Session takes native work: it has not failed and is not closing or exiting. */
+    get open(): boolean;
     usesOutput(sink: Writable): boolean;
     /** The optional attachment cleanup is installed only after checked native acceptance. */
     attachRenderer(options: NativeSessionRendererOptions, beforeDispose?: () => void): void;
@@ -108,7 +120,7 @@ export declare class NativeSession {
     close(): Promise<void>;
     /** @internal Bound required snapshot flushing by the same graceful-close deadline. */
     armCloseTimeout(): void;
-    /** Identifies this driver's close interruption, not transport or restoration success. */
+    /** Identifies this driver's close interruption or late close; a late close on `closed` wrote the restore. */
     isCloseInterruption(error: unknown): boolean;
     /**
      * Cancels immediately without claiming restoration. Release external Context
@@ -120,6 +132,9 @@ export declare class NativeSession {
      * Only real stdout supports direct synchronous delivery. In-flight writes cannot
      * be replayed, and arbitrary borrowed sinks cannot finish asynchronously at exit. */
     restoreOnExit(): boolean;
+    /** One exit copy through the writer. False: no writer, or it never picked the copy up and
+     * gave it back; the synchronous drain takes over. */
+    private exitThroughWriter;
     private checkOpen;
     private changeTerminal;
     private onError;
@@ -129,6 +144,11 @@ export declare class NativeSession {
     private schedule;
     private turn;
     private writeOutput;
+    /** Collects the writer's finished copy and, when `start`, hands over the next. */
+    private postStdout;
+    /** The next poll of a copy in flight: the next turn (0n) for its first 64 polls within 0.5 ms, then an eighth of
+     * its age, from 1 to 50 ms. */
+    private pollDeadline;
     private writeSink;
     private completePresentation;
     private detach;

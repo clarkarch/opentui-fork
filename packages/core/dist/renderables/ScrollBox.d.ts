@@ -35,7 +35,7 @@ export declare class ScrollBoxRenderable extends BoxRenderable {
     readonly horizontalScrollBar: ScrollBoxBar;
     readonly verticalScrollBar: ScrollBoxBar;
     protected static readonly defaultFocusable = true;
-    private selectionListener?;
+    private readonly selectionListener;
     private autoScrollMouseX;
     private autoScrollMouseY;
     private readonly autoScrollThresholdVertical;

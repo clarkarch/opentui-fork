@@ -1,7 +1,7 @@
 import type { NativeSession } from "./NativeSession.js";
 import type { Renderable, RenderableOptions } from "./Renderable.js";
 import type { ImageFit } from "./renderables/Image.js";
-import type { NativeImage } from "./image.js";
+import type { ExtractOptions, NativeImage } from "./image.js";
 import { OptimizedBuffer } from "./buffer.js";
 import type { ImageRenderProtocol } from "./types.js";
 import { type CliRenderer } from "./renderer.js";
@@ -9,7 +9,7 @@ import type { StyledText } from "./lib/styled-text.js";
 import type { RGBA } from "./lib/RGBA.js";
 import type { LocalSelectionBounds } from "./lib/selection.js";
 import { type Value, type MeasureFunction } from "./yoga.js";
-import { NativeSessionRenderStatus, type NativeSceneFrameOptions, type NativeSceneFrameRequest, type NativeSceneLayout, type NativeScenePaint, type NativeScenePaintUpdate, type NativeSceneBoxDetails, type NativeSceneTextOptions, type NativeSceneSliderOptions, type NativeSceneArrowOptions, type NativeSceneScrollOptions, type NativeSceneScrollState, type NativeSceneEditorOptions, type ContextEditorViewHandle, type ContextTextBufferViewHandle, type SceneNodeHandle } from "./zig.js";
+import { NativeSessionRenderStatus, type NativeSceneFrameOptions, type NativeSceneFrameRequest, type NativeSceneLayout, type NativeScenePaint, type NativeScenePaintUpdate, type NativeSceneBoxDetails, type NativeSceneTextOptions, type NativeSceneSliderOptions, type NativeSceneArrowOptions, type NativeSceneScrollOptions, type NativeSceneScrollState, type NativeSceneEditorOptions, type ContextEditorViewHandle, type ContextTextBufferViewHandle, type SceneNodeHandle, type NativeContextHandle, type RenderLib } from "./zig.js";
 type PaintOptions = () => Pick<NativeSceneFrameOptions, "background" | "useMouse" | "excludedHitNum" | "preserveUnwritten">;
 declare class NativeLifecyclePasses extends Set<Renderable> {
     private order;
@@ -122,6 +122,14 @@ export declare class NativeScene {
     /** @internal Standard arrow paint commits before its wrapper projection. */
     setArrow(renderable: Renderable, options: NativeSceneArrowOptions): void;
     setImage(renderable: Renderable, image: NativeImage | null, fit: ImageFit, protocol: ImageRenderProtocol, buffer: OptimizedBuffer | null, placementOpacity?: number | null): void;
+    setVideo(renderable: Renderable, fit: ImageFit, buffer: OptimizedBuffer | null): void;
+    setCrop(renderable: Renderable, crop: ExtractOptions | undefined): void;
+    /** @internal Video control and state calls address the node after staged writes. */
+    videoNode(renderable: Renderable): {
+        lib: RenderLib;
+        context: NativeContextHandle;
+        node: SceneNodeHandle;
+    };
     /** @internal A scroll write moves the box's children, so it bumps the layout revision like a frame step. */
     setScroll(renderable: Renderable, options: NativeSceneScrollOptions): void;
     setScrollArrow(renderable: Renderable, axis: number, end: number, options: Omit<NativeSceneArrowOptions, "direction">): void;

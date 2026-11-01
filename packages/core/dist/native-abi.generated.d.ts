@@ -511,6 +511,58 @@ export declare const nativeSymbols: {
         readonly args: readonly ["ptr", "buffer", "ptr", "u32", "u32", "ptr", "f32"];
         readonly returns: "i32";
     };
+    readonly ot_scene_set_crop: {
+        readonly args: readonly ["ptr", "buffer", "u32", "u32", "u32", "u32"];
+        readonly returns: "i32";
+    };
+    readonly ot_scene_set_video: {
+        readonly args: readonly ["ptr", "buffer", "u32", "ptr"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_open: {
+        readonly args: readonly ["ptr", "buffer", "ptr", "u32", "u32", "buffer"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_play: {
+        readonly args: readonly ["ptr", "buffer"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_pause: {
+        readonly args: readonly ["ptr", "buffer"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_seek: {
+        readonly args: readonly ["ptr", "buffer", "i64"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_set_loop: {
+        readonly args: readonly ["ptr", "buffer", "u32"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_set_muted: {
+        readonly args: readonly ["ptr", "buffer", "u32"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_set_volume: {
+        readonly args: readonly ["ptr", "buffer", "f32"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_set_av_sync_offset: {
+        readonly args: readonly ["ptr", "buffer", "i64"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_set_max_fps: {
+        readonly args: readonly ["ptr", "buffer", "u32"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_get_state: {
+        readonly args: readonly ["ptr", "buffer", "buffer"];
+        readonly returns: "i32";
+    };
+    readonly ot_video_get_error: {
+        readonly args: readonly ["ptr", "buffer", "ptr", "u32", "buffer"];
+        readonly returns: "i32";
+    };
     readonly ot_buffer_draw_image: {
         readonly args: readonly ["ptr", "buffer", "ptr", "buffer", "buffer", "buffer"];
         readonly returns: "i32";
@@ -883,11 +935,19 @@ export declare const nativeSymbols: {
         readonly args: readonly ["ptr", "buffer", "u32", "buffer"];
         readonly returns: "i32";
     };
+    readonly ot_session_post_stdout: {
+        readonly args: readonly ["ptr", "buffer", "u32", "u32", "buffer", "buffer"];
+        readonly returns: "i32";
+    };
     readonly ot_session_complete_output: {
         readonly args: readonly ["ptr", "buffer", "buffer", "u32"];
         readonly returns: "i32";
     };
     readonly ot_session_close: {
+        readonly args: readonly ["ptr", "buffer"];
+        readonly returns: "i32";
+    };
+    readonly ot_session_drop_output: {
         readonly args: readonly ["ptr", "buffer"];
         readonly returns: "i32";
     };
@@ -2854,7 +2914,7 @@ export declare const nativeLayouts: {
         };
     };
     readonly ot_session_renderer_state: {
-        readonly size: 32;
+        readonly size: 40;
         readonly alignment: 8;
         readonly fields: {
             readonly struct_size: {
@@ -2893,8 +2953,20 @@ export declare const nativeLayouts: {
                 readonly alignment: 4;
                 readonly type: "u32";
             };
-            readonly reserved: {
+            readonly image_uploads_pending: {
                 readonly offset: 28;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly dropped_frames: {
+                readonly offset: 32;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly dropped_frame_bytes: {
+                readonly offset: 36;
                 readonly size: 4;
                 readonly alignment: 4;
                 readonly type: "u32";
@@ -3849,6 +3921,84 @@ export declare const nativeLayouts: {
             };
         };
     };
+    readonly ot_video_info: {
+        readonly size: 32;
+        readonly alignment: 8;
+        readonly fields: {
+            readonly duration_us: {
+                readonly offset: 0;
+                readonly size: 8;
+                readonly alignment: 8;
+                readonly type: "i64";
+            };
+            readonly width: {
+                readonly offset: 8;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly height: {
+                readonly offset: 12;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly fps_num: {
+                readonly offset: 16;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly fps_den: {
+                readonly offset: 20;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly has_audio: {
+                readonly offset: 24;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly reserved: {
+                readonly offset: 28;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+        };
+    };
+    readonly ot_video_state: {
+        readonly size: 24;
+        readonly alignment: 8;
+        readonly fields: {
+            readonly current_time_us: {
+                readonly offset: 0;
+                readonly size: 8;
+                readonly alignment: 8;
+                readonly type: "i64";
+            };
+            readonly frame_pts_us: {
+                readonly offset: 8;
+                readonly size: 8;
+                readonly alignment: 8;
+                readonly type: "i64";
+            };
+            readonly flags: {
+                readonly offset: 16;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly quality_tier: {
+                readonly offset: 20;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+        };
+    };
     readonly ot_image_draw_options: {
         readonly size: 64;
         readonly alignment: 4;
@@ -4228,7 +4378,7 @@ export declare const nativeLayouts: {
         };
     };
     readonly ot_buffer_draw_text_record: {
-        readonly size: 44;
+        readonly size: 48;
         readonly alignment: 4;
         readonly fields: {
             readonly header: {
@@ -4266,6 +4416,12 @@ export declare const nativeLayouts: {
                 readonly size: 8;
                 readonly alignment: 2;
                 readonly type: "[4]u16";
+            };
+            readonly max_width: {
+                readonly offset: 44;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
             };
         };
     };
@@ -5635,6 +5791,7 @@ export declare const nativeConstants: {
     readonly OT_IMAGE_OUTPUT_TOO_SMALL: -45;
     readonly OT_IMAGE_UNSUPPORTED_FEATURE: -46;
     readonly OT_IMAGE_BUSY: -47;
+    readonly OT_VIDEO_FAILED: -60;
     readonly OT_SCENE_ROOT: 0;
     readonly OT_SCENE_BOX: 1;
     readonly OT_SCENE_TEXT: 2;
@@ -5644,6 +5801,7 @@ export declare const nativeConstants: {
     readonly OT_SCENE_CUSTOM: 6;
     readonly OT_SCENE_TEXT_VIEW: 7;
     readonly OT_SCENE_IMAGE: 8;
+    readonly OT_SCENE_VIDEO: 9;
     readonly OT_SCENE_WRAP_NONE: 0;
     readonly OT_SCENE_WRAP_CHAR: 1;
     readonly OT_SCENE_WRAP_WORD: 2;
@@ -6020,6 +6178,13 @@ export declare const nativeConstants: {
     readonly OT_IMAGE_BLEND_SOURCE_OVER: 0;
     readonly OT_IMAGE_BLEND_SOURCE: 1;
     readonly OT_IMAGE_BLEND_DESTINATION_OVER: 2;
+    readonly OT_VIDEO_OPEN_NO_AUDIO: 1;
+    readonly OT_VIDEO_PLAYING: 1;
+    readonly OT_VIDEO_ENDED: 2;
+    readonly OT_VIDEO_BUFFERING: 4;
+    readonly OT_VIDEO_AUDIO: 8;
+    readonly OT_VIDEO_HAS_FRAME: 16;
+    readonly OT_VIDEO_ERROR: 32;
     readonly OT_TEXT_VIEW_WRAP_WIDTH: 0;
     readonly OT_TEXT_VIEW_WRAP_MODE: 1;
     readonly OT_TEXT_VIEW_FIRST_LINE_OFFSET: 2;
@@ -6043,6 +6208,7 @@ export declare const nativeConstants: {
     readonly OT_BUFFER_DRAW_HAS_BACKGROUND: 1;
     readonly OT_BUFFER_DRAW_HAS_SOURCE_WIDTH: 2;
     readonly OT_BUFFER_DRAW_HAS_SOURCE_HEIGHT: 4;
+    readonly OT_BUFFER_DRAW_FIT_ELLIPSIS: 16;
     readonly OT_BUFFER_STACK_DEPTH_MAX: 256;
     readonly OT_BUFFER_STACK_GET_OPACITY: 0;
     readonly OT_BUFFER_STACK_PUSH_SCISSOR: 1;
@@ -6121,6 +6287,8 @@ export declare const nativeConstants: {
     readonly OT_PUMP_OUTPUT_PENDING: 2;
     readonly OT_PUMP_WAIT_UNTIL: 3;
     readonly OT_PUMP_CLOSED: 4;
+    readonly OT_STDOUT_IDLE: 0;
+    readonly OT_STDOUT_IN_FLIGHT: 1;
     readonly OT_INPUT_KEY: 1;
     readonly OT_INPUT_MOUSE: 2;
     readonly OT_INPUT_PASTE: 3;

@@ -83,8 +83,6 @@ export declare class SelectRenderable extends Renderable {
     };
     constructor(ctx: RenderContext, options: SelectRenderableOptions);
     protected renderSelf(buffer: OptimizedBuffer, deltaTime: number): void;
-    private refreshFrameBuffer;
-    private renderScrollIndicatorToFrameBuffer;
     get options(): SelectOption[];
     set options(options: SelectOption[]);
     getSelectedOption(): SelectOption | null;

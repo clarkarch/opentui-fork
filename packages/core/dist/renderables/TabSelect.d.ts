@@ -60,9 +60,6 @@ export declare class TabSelectRenderable extends Renderable {
     private calculateDynamicHeight;
     protected defaultDimension(kind: "width" | "height"): number | "auto" | `${number}%`;
     protected renderSelf(buffer: OptimizedBuffer, deltaTime: number): void;
-    private refreshFrameBuffer;
-    private truncateText;
-    private renderScrollArrowsToFrameBuffer;
     setOptions(options: TabSelectOption[]): void;
     getSelectedOption(): TabSelectOption | null;
     getSelectedIndex(): number;

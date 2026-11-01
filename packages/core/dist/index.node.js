@@ -6,7 +6,6 @@ import {
   generateEnvMarkdown2,
   generateEnvColored2,
   env2,
-  stringWidth,
   resolveBundledFilePath2,
   TextAttributes2,
   ATTRIBUTE_BASE_BITS2,
@@ -120,7 +119,7 @@ import {
   Gutter2,
   MeasureMode2,
   exports_yoga
-} from "./chunk-node-68spbb5k.js";
+} from "./chunk-node-3xmy5yva.js";
 import {
   isValidBorderStyle2,
   parseBorderStyle2,
@@ -228,6 +227,8 @@ import {
   NativeImage2,
   NativeImagePool2,
   resolveImageRenderProtocol2,
+  checkCrop2,
+  sameCrop2,
   ImageRenderable2,
   isTextNodeRenderable2,
   TextNodeRenderable2,
@@ -252,7 +253,7 @@ import {
   CliRenderEvents2,
   RendererControlState2,
   CliRenderer2
-} from "./chunk-node-y9jsacqf.js";
+} from "./chunk-node-1ab0hd0x.js";
 // src/syntax-style.ts
 function cloneStyle(style) {
   return {
@@ -4741,7 +4742,10 @@ class AudioRecorder extends EventEmitter {
       await this.writeFully(createWavHeader(this.sampleRate, this.channels, Number(this.dataBytesWritten)), 0, "finalize");
       if (this.terminationRequest != null)
         return;
-      await this.fileHandle.sync();
+      await this.fileHandle.sync().catch((cause) => {
+        if (cause.code !== "ERR_ACCESS_DENIED")
+          throw cause;
+      });
       if (this.terminationRequest != null)
         return;
       await this.fileHandle.close();
@@ -6086,6 +6090,7 @@ class VRenderable extends Renderable2 {
 // src/renderables/LineNumberRenderable.ts
 var DEFAULT_GUTTER_FG = "#888888";
 var DEFAULT_GUTTER_BG = "transparent";
+var transparent = RGBA2.fromValues(0, 0, 0, 0);
 function cloneLineSign(sign) {
   return {
     ...sign,
@@ -6108,8 +6113,8 @@ class GutterRenderable extends Renderable2 {
   _maxBeforeWidth = 0;
   _maxAfterWidth = 0;
   _lastKnownLineCount = 0;
-  _paintedSources;
-  _paintedSourceOffset = 0;
+  _signWidths = new Map;
+  _signWidthMethod;
   constructor(ctx, target, options) {
     super(ctx, {
       id: options.id,
@@ -6134,7 +6139,10 @@ class GutterRenderable extends Renderable2 {
       this.setupMeasureFunc();
       this.onLifecyclePass = () => {
         const currentLineCount = this.target.virtualLineCount;
-        if (currentLineCount !== this._lastKnownLineCount) {
+        const signsStale = this._ctx.widthMethod !== this._signWidthMethod;
+        if (signsStale)
+          this.calculateSignWidths();
+        if (currentLineCount !== this._lastKnownLineCount || signsStale) {
           this._lastKnownLineCount = currentLineCount;
           this.invalidateIntrinsicSize();
           this.requestRender();
@@ -6185,16 +6193,30 @@ class GutterRenderable extends Renderable2 {
   calculateSignWidths() {
     this._maxBeforeWidth = 0;
     this._maxAfterWidth = this._layout.minAfterWidth;
+    this._signWidths.clear();
+    this._signWidthMethod = this._ctx.widthMethod;
     for (const sign of this._lineSigns.values()) {
-      if (sign.before) {
-        const width = stringWidth(sign.before);
-        this._maxBeforeWidth = Math.max(this._maxBeforeWidth, width);
-      }
-      if (sign.after) {
-        const width = stringWidth(sign.after);
-        this._maxAfterWidth = Math.max(this._maxAfterWidth, width);
-      }
+      if (sign.before)
+        this._maxBeforeWidth = Math.max(this._maxBeforeWidth, this.signWidth(sign.before));
+      if (sign.after)
+        this._maxAfterWidth = Math.max(this._maxAfterWidth, this.signWidth(sign.after));
     }
+  }
+  signWidth(sign) {
+    if (/^[\x20-\x7e]*$/.test(sign))
+      return sign.length;
+    let width = this._signWidths.get(sign);
+    if (width !== undefined)
+      return width;
+    const { context, renderLib } = this._ctx.nativeScene.driver;
+    const unicode = renderLib.createContextUnicode(context, sign, this._signWidthMethod);
+    try {
+      width = renderLib.getContextUnicode(context, unicode).reduce((sum, glyph) => sum + glyph.width, 0);
+    } finally {
+      renderLib.destroyContextUnicode(context, unicode);
+    }
+    this._signWidths.set(sign, width);
+    return width;
   }
   calculateWidth() {
     const totalLines = Math.max(this.target.lineCount, this.target.virtualLineCount);
@@ -6250,81 +6272,48 @@ class GutterRenderable extends Renderable2 {
   getLineSigns() {
     return this._lineSigns;
   }
-  createFrameBuffer() {}
-  handleFrameBufferResize() {}
   renderSelf(buffer) {
-    const x = Math.trunc(this._screenX);
-    const y = Math.trunc(this._screenY);
+    const [x, y] = this._paintOrigin(buffer);
     const start = Math.max(0, -y);
     const end = Math.min(this.height, buffer.height - y);
     if (end <= start || x >= buffer.width || x + this.width <= 0)
       return;
-    if (!this.frameBuffer) {
-      this.frameBuffer = OptimizedBuffer2.create(this.width, end - start, this._ctx.widthMethod, {
-        respectAlpha: true,
-        id: `framebuffer-${this.id}`,
-        owner: this._ctx.nativeScene
-      });
-    } else if (this.frameBuffer.width !== this.width || this.frameBuffer.height !== end - start) {
-      this.frameBuffer.resize(this.width, end - start);
-      this._paintedSources = undefined;
-    }
-    this.refreshFrameBuffer(this.frameBuffer, Math.trunc(this.target.scrollY) + start);
-    this.markClean();
-    buffer.drawFrameBuffer(x, y + start, this.frameBuffer);
-  }
-  refreshFrameBuffer(buffer, startLine) {
+    const startLine = Math.trunc(this.target.scrollY) + start;
     const sourceStart = Math.max(0, startLine - 1);
     const sourceOffset = startLine - sourceStart;
-    const sources = getLineSources(this.target, sourceStart, buffer.height + sourceOffset);
-    const paintedSources = this._paintedSources;
-    if (!this.isDirty && sourceOffset === this._paintedSourceOffset && paintedSources && sources.length === paintedSources.length && sources.every((source, i) => source === paintedSources[i])) {
-      return;
-    }
-    buffer.clear(this._bg);
+    const sources = getLineSources(this.target, sourceStart, end - start + sourceOffset);
     let lastSource = sourceOffset > 0 ? sources[0] : -1;
-    for (let i = 0;i < buffer.height; i++) {
-      const visualLineIndex = sourceOffset + i;
-      if (visualLineIndex >= sources.length)
-        break;
-      const logicalLine = sources[visualLineIndex];
-      const lineBg = this._lineColorsGutter.get(logicalLine) ?? this._bg;
-      if (lineBg !== this._bg) {
-        buffer.fillRect(0, i, this.width, 1, lineBg);
-      }
-      if (logicalLine === lastSource) {} else {
-        let currentX = 0;
+    for (let i = sourceOffset;i < end - start + sourceOffset; i++) {
+      const row = y + start + i - sourceOffset;
+      const logicalLine = sources[i];
+      const lineBg = this._lineColorsGutter.get(logicalLine);
+      if (!lineBg || lineBg.a < 1)
+        buffer.fillRect(x, row, this.width, 1, this._bg);
+      if (lineBg)
+        buffer.fillRect(x, row, this.width, 1, lineBg);
+      if (logicalLine !== undefined && logicalLine !== lastSource) {
         const sign = this._lineSigns.get(logicalLine);
         if (sign?.before) {
-          const beforeWidth = stringWidth(sign.before);
-          const padding = this._maxBeforeWidth - beforeWidth;
-          currentX += padding;
+          const beforeX = x + this._maxBeforeWidth - this.signWidth(sign.before);
           const beforeColor = sign.beforeColor ? parseColor2(sign.beforeColor) : this._fg;
-          buffer.drawText(sign.before, currentX, i, beforeColor, lineBg);
-          currentX += beforeWidth;
-        } else if (this._maxBeforeWidth > 0) {
-          currentX += this._maxBeforeWidth;
+          buffer.drawText(sign.before, beforeX, row, beforeColor, transparent);
         }
         if (!this._hideLineNumbers.has(logicalLine)) {
           const customLineNum = this._lineNumbers.get(logicalLine);
-          const lineNum = customLineNum !== undefined ? customLineNum : logicalLine + 1 + this._lineNumberOffset;
-          const lineNumStr = lineNum.toString();
-          const lineNumWidth = lineNumStr.length;
-          const lineNumX = this.width - this._maxAfterWidth - this._layout.paddingRight - lineNumWidth;
+          const lineNumStr = (customLineNum ?? logicalLine + 1 + this._lineNumberOffset).toString();
+          const lineNumX = this.width - this._maxAfterWidth - this._layout.paddingRight - lineNumStr.length;
           if (lineNumX >= this._maxBeforeWidth + this._layout.paddingLeft) {
-            buffer.drawText(lineNumStr, lineNumX, i, this._fg, lineBg);
+            buffer.drawText(lineNumStr, x + lineNumX, row, this._fg, transparent);
           }
         }
         if (sign?.after) {
-          const afterX = this.width - this._layout.paddingRight - this._maxAfterWidth;
+          const afterX = x + this.width - this._layout.paddingRight - this._maxAfterWidth;
           const afterColor = sign.afterColor ? parseColor2(sign.afterColor) : this._fg;
-          buffer.drawText(sign.after, afterX, i, afterColor, lineBg);
+          buffer.drawText(sign.after, afterX, row, afterColor, transparent);
         }
       }
       lastSource = logicalLine;
     }
-    this._paintedSources = sources.slice();
-    this._paintedSourceOffset = sourceOffset;
   }
 }
 function getLineSources(target, startLine, lineCount) {
@@ -9074,6 +9063,472 @@ class InputRenderable extends TextareaRenderable {
   }
   set initialValue(value) {}
 }
+// src/renderables/Video.ts
+function validateVolume(value) {
+  if (!Number.isFinite(value) || value < 0 || value > 340282346638528860000000000000000000000)
+    throw new RangeError("volume must be a finite, non-negative 32-bit float");
+}
+function validateAvSyncOffset(value) {
+  if (!Number.isFinite(value) || Math.abs(value) > 60000)
+    throw new RangeError("avSyncOffsetMs must be from -60000 to 60000");
+}
+function validateMaxFps(value) {
+  if (!Number.isInteger(value) || value < 1 || value > 120)
+    throw new RangeError("maxFps must be an integer from 1 to 120");
+}
+function toMicroseconds(seconds, label) {
+  const value = Math.round(seconds * 1e6);
+  if (!Number.isFinite(seconds) || !Number.isSafeInteger(value))
+    throw new RangeError(`${label} must be finite`);
+  return BigInt(value);
+}
+
+class VideoRenderable extends Renderable2 {
+  static nativeIntegration = {
+    kind: "video",
+    body: { native: this.prototype.renderSelf, buffered: true },
+    bufferComposition: "native"
+  };
+  _source;
+  _fit;
+  _crop;
+  _loop;
+  _audio;
+  _muted;
+  _volume;
+  _avSyncOffsetMs;
+  _maxFps;
+  _autoplay;
+  _metadata = null;
+  _playRequested = false;
+  stopTick;
+  _opens = 0;
+  onReady;
+  onError;
+  onEnd;
+  onPlay;
+  onPause;
+  onSeek;
+  onTimeUpdate;
+  constructor(ctx, options) {
+    super(ctx, options);
+    try {
+      this._fit = options.fit ?? "fit";
+      this._loop = options.loop ?? false;
+      this._audio = options.audio ?? true;
+      this._muted = options.muted ?? false;
+      this._volume = options.volume ?? 1;
+      validateVolume(this._volume);
+      this._avSyncOffsetMs = options.avSyncOffsetMs ?? 0;
+      validateAvSyncOffset(this._avSyncOffsetMs);
+      this._maxFps = options.maxFps ?? 30;
+      validateMaxFps(this._maxFps);
+      this._autoplay = options.autoplay ?? false;
+      this.onReady = options.onReady;
+      this.onError = options.onError;
+      this.onEnd = options.onEnd;
+      this.onPlay = options.onPlay;
+      this.onPause = options.onPause;
+      this.onSeek = options.onSeek;
+      this.onTimeUpdate = options.onTimeUpdate;
+      this.setNativeSceneVideo();
+      if (options.source !== undefined)
+        this.source = options.source;
+      this.crop = options.crop;
+    } catch (error) {
+      this.abortConstruction(error, () => this.destroySelf());
+    }
+  }
+  get source() {
+    return this._source;
+  }
+  set source(value) {
+    value ??= undefined;
+    if (value === this._source && !this.failed() || this.isDestroyed)
+      return;
+    this.open(value, this.playing);
+  }
+  open(value, resume) {
+    this._opens++;
+    this._source = value;
+    this._metadata = null;
+    this._playRequested = resume;
+    const native = this.native();
+    try {
+      const info = native.lib.videoOpen(native.context, native.node, value ?? "", this._audio);
+      if (!value)
+        return;
+      this._playRequested = resume || this._autoplay;
+      this._metadata = {
+        width: info.width,
+        height: info.height,
+        fps: info.fpsDen > 0 ? info.fpsNum / info.fpsDen : 0,
+        duration: Number(info.durationUs) / 1e6,
+        hasAudio: info.hasAudio
+      };
+      native.lib.videoSetLoop(native.context, native.node, this._loop);
+      native.lib.videoSetMuted(native.context, native.node, this._muted);
+      native.lib.videoSetVolume(native.context, native.node, this._volume);
+      native.lib.videoSetAvSyncOffset(native.context, native.node, toMicroseconds(this._avSyncOffsetMs / 1000, "avSyncOffsetMs"));
+      native.lib.videoSetMaxFps(native.context, native.node, this._maxFps);
+      const metadata = { ...this._metadata };
+      this.afterOpen(() => {
+        this.onReady?.(metadata);
+        this.startRequested();
+        try {
+          if (this._crop)
+            checkCrop2(this._crop, metadata.width, metadata.height);
+        } catch (error) {
+          this.reportError(error, "");
+        }
+      });
+    } catch (error) {
+      this._metadata = null;
+      this._playRequested = false;
+      const detail = this.errorDetail("");
+      this.afterOpen(() => this.reportError(error, detail));
+    } finally {
+      this.syncPlayback();
+      this.requestRender();
+    }
+  }
+  get fit() {
+    return this._fit;
+  }
+  set fit(value) {
+    const next = value ?? "fit";
+    if (this._fit === next || this.isDestroyed)
+      return;
+    this.setNativeSceneVideo(next);
+    this._fit = next;
+    this.requestRender();
+  }
+  get crop() {
+    return this._crop && { ...this._crop };
+  }
+  set crop(value) {
+    if (sameCrop2(this._crop, value ?? undefined) || this.isDestroyed)
+      return;
+    const next = this.acceptCrop(value ?? undefined);
+    if (next === null)
+      return;
+    this._ctx.nativeScene.setCrop(this, next);
+    this._crop = next;
+    this.requestRender();
+  }
+  get loop() {
+    return this._loop;
+  }
+  set loop(value) {
+    const next = value ?? false;
+    if (this._loop === next || this.isDestroyed)
+      return;
+    if (this.applyOption((native) => native.lib.videoSetLoop(native.context, native.node, next)))
+      this._loop = next;
+  }
+  get audio() {
+    return this._audio;
+  }
+  set audio(value) {
+    const next = value ?? true;
+    if (this._audio === next || this.isDestroyed)
+      return;
+    this._audio = next;
+    if (this._metadata)
+      this.open(this._source, this.playing);
+  }
+  get muted() {
+    return this._muted;
+  }
+  set muted(value) {
+    const next = value ?? false;
+    if (this._muted === next || this.isDestroyed)
+      return;
+    if (this.applyOption((native) => native.lib.videoSetMuted(native.context, native.node, next)))
+      this._muted = next;
+  }
+  get volume() {
+    return this._volume;
+  }
+  set volume(value) {
+    const next = value ?? 1;
+    validateVolume(next);
+    if (this._volume === next || this.isDestroyed)
+      return;
+    if (this.applyOption((native) => native.lib.videoSetVolume(native.context, native.node, next)))
+      this._volume = next;
+  }
+  get avSyncOffsetMs() {
+    return this._avSyncOffsetMs;
+  }
+  set avSyncOffsetMs(value) {
+    const next = value ?? 0;
+    validateAvSyncOffset(next);
+    if (this._avSyncOffsetMs === next || this.isDestroyed)
+      return;
+    const offset = toMicroseconds(next / 1000, "avSyncOffsetMs");
+    if (this.applyOption((native) => native.lib.videoSetAvSyncOffset(native.context, native.node, offset)))
+      this._avSyncOffsetMs = next;
+  }
+  get maxFps() {
+    return this._maxFps;
+  }
+  set maxFps(value) {
+    const next = value ?? 30;
+    validateMaxFps(next);
+    if (this._maxFps === next || this.isDestroyed)
+      return;
+    if (!this.applyOption((native) => native.lib.videoSetMaxFps(native.context, native.node, next)))
+      return;
+    this._maxFps = next;
+    this.syncPlayback();
+  }
+  get autoplay() {
+    return this._autoplay;
+  }
+  set autoplay(value) {
+    const next = value ?? false;
+    if (this._autoplay === next || this.isDestroyed)
+      return;
+    this._autoplay = next;
+    if (!next || !this._metadata)
+      return;
+    const requested = this.control((native) => {
+      const state = native.lib.videoGetState(native.context, native.node);
+      if (state.playing || state.ended || state.currentTimeUs !== 0n)
+        return false;
+      this._playRequested = true;
+    });
+    if (requested)
+      this.afterOpen(() => this.startRequested());
+  }
+  get ready() {
+    return this._metadata !== null;
+  }
+  get videoMetadata() {
+    return this._metadata ? { ...this._metadata } : null;
+  }
+  get playing() {
+    if (this.isDestroyed)
+      return false;
+    return this._playRequested || this._metadata !== null && this.readState().playing;
+  }
+  get paused() {
+    return !this.playing;
+  }
+  get ended() {
+    return this._metadata !== null && !this.isDestroyed && this.readState().ended;
+  }
+  get duration() {
+    return this._metadata?.duration ?? 0;
+  }
+  get durationMs() {
+    return this.duration * 1000;
+  }
+  get currentTime() {
+    if (!this._metadata || this.isDestroyed)
+      return 0;
+    return Number(this.readState().currentTimeUs) / 1e6;
+  }
+  set currentTime(value) {
+    if (value == null)
+      return;
+    this.seek(value);
+  }
+  get qualityTier() {
+    if (!this._metadata || this.isDestroyed)
+      return 0;
+    return this.readState().qualityTier;
+  }
+  get currentTimeMs() {
+    return this.currentTime * 1000;
+  }
+  play() {
+    if (this.isDestroyed || this._playRequested)
+      return;
+    if (!this._metadata) {
+      if (this._source !== undefined)
+        this.open(this._source, true);
+      else
+        this._playRequested = true;
+      return;
+    }
+    const started = this.control((native) => {
+      if (native.lib.videoGetState(native.context, native.node).playing)
+        return false;
+      native.lib.videoCall(native.context, native.node, "ot_video_play");
+    });
+    if (started)
+      this.onPlay?.();
+  }
+  resume() {
+    this.play();
+  }
+  pause() {
+    if (this.isDestroyed)
+      return;
+    const requested = this._playRequested;
+    this._playRequested = false;
+    if (!this._metadata)
+      return;
+    const paused = this.control((native) => {
+      if (requested)
+        return;
+      if (!native.lib.videoGetState(native.context, native.node).playing)
+        return false;
+      native.lib.videoCall(native.context, native.node, "ot_video_pause");
+    });
+    if (!paused)
+      return;
+    const time = this.currentTime;
+    this.onPause?.();
+    this.onTimeUpdate?.(time);
+  }
+  toggle() {
+    if (this.playing)
+      this.pause();
+    else
+      this.play();
+  }
+  seek(time) {
+    const target = toMicroseconds(time, "Video time");
+    if (!this._metadata || this.isDestroyed)
+      return;
+    if (!this.control((native) => native.lib.videoSeek(native.context, native.node, target)))
+      return;
+    const position = this.currentTime;
+    this.onSeek?.(position);
+    this.onTimeUpdate?.(position);
+  }
+  seekBy(delta) {
+    if (!Number.isFinite(delta))
+      throw new RangeError("Video seek delta must be finite");
+    this.seek(this.currentTime + delta);
+  }
+  seekToMs(milliseconds) {
+    if (!Number.isFinite(milliseconds))
+      throw new RangeError("Video time must be finite");
+    this.seek(milliseconds / 1000);
+  }
+  createFrameBuffer() {
+    const previous = this.frameBuffer;
+    super.createFrameBuffer();
+    if (this._fit === undefined || this.frameBuffer === previous)
+      return;
+    this.setNativeSceneVideo();
+  }
+  renderSelf(_buffer) {}
+  poll() {
+    if (!this._metadata || this.isDestroyed)
+      return;
+    let state;
+    try {
+      state = this.readState();
+    } catch (error) {
+      this.reportError(error);
+      this.syncPlayback(false);
+      return;
+    }
+    if (state.failed) {
+      this.reportError(new Error(this.errorDetail("Video playback failed")));
+      this.syncPlayback();
+      return;
+    }
+    this.onTimeUpdate?.(Number(state.currentTimeUs) / 1e6);
+    if (state.ended) {
+      this.syncPlayback();
+      this.onEnd?.();
+    }
+  }
+  native() {
+    return this._ctx.nativeScene.videoNode(this);
+  }
+  readState() {
+    const native = this.native();
+    return native.lib.videoGetState(native.context, native.node);
+  }
+  failed() {
+    if (!this._metadata)
+      return false;
+    try {
+      return this.readState().failed;
+    } catch {
+      return true;
+    }
+  }
+  errorDetail(fallback) {
+    try {
+      const native = this.native();
+      return native.lib.videoGetError(native.context, native.node) || fallback;
+    } catch {
+      return fallback;
+    }
+  }
+  applyOption(call) {
+    return !this._metadata || this.control(call);
+  }
+  control(call) {
+    let reported = false;
+    try {
+      return call(this.native()) !== false;
+    } catch (error) {
+      reported = true;
+      this.reportError(error);
+      return false;
+    } finally {
+      this.syncPlayback(!reported);
+      this.requestRender();
+    }
+  }
+  syncPlayback(report = true) {
+    if (this.isDestroyed)
+      return;
+    let active = false;
+    try {
+      active = this._metadata !== null && (this._playRequested || this.readState().playing);
+    } catch (error) {
+      if (report)
+        this.reportError(error);
+    }
+    this.stopTick?.();
+    this.stopTick = active ? this._ctx.onAnimationTick(this._maxFps, () => this.poll()) : undefined;
+  }
+  setNativeSceneVideo(fit = this._fit) {
+    this._ctx.nativeScene.setVideo(this, fit, this.buffered ? this.frameBuffer : null);
+  }
+  acceptCrop(crop) {
+    try {
+      return crop && checkCrop2(crop, this._metadata?.width, this._metadata?.height);
+    } catch (error) {
+      queueMicrotask(() => this.isDestroyed || this.reportError(error, ""));
+      return null;
+    }
+  }
+  startRequested() {
+    if (!this._playRequested)
+      return;
+    this._playRequested = false;
+    if (this.control((native) => native.lib.videoCall(native.context, native.node, "ot_video_play")))
+      this.onPlay?.();
+  }
+  afterOpen(report) {
+    const opens = this._opens;
+    queueMicrotask(() => {
+      if (this._opens === opens && !this.isDestroyed)
+        report();
+    });
+  }
+  reportError(error, detail = this.errorDetail("")) {
+    const value = error instanceof Error ? error : new Error(String(error));
+    this.onError?.(detail && !value.message.includes(detail) ? new Error(`${value.message}: ${detail}`) : value);
+  }
+  destroySelf() {
+    this.runCleanup((run) => {
+      run(() => this.stopTick?.());
+      run(() => super.destroySelf());
+    });
+  }
+}
 // ../../node_modules/.bun/marked@17.0.1/node_modules/marked/lib/marked.esm.js
 function L() {
   return { async: false, breaks: false, extensions: null, gfm: true, hooks: null, pedantic: false, renderer: null, silent: false, tokenizer: null, walkTokens: null };
@@ -10448,7 +10903,6 @@ class TextTableRenderable extends Renderable2 {
   _columnCount = 0;
   _layout = this.createEmptyLayout();
   _layoutDirty = true;
-  _rasterDirty = true;
   _cachedMeasureLayout = null;
   _cachedMeasureWidth = undefined;
   _defaultOptions = {
@@ -10475,7 +10929,7 @@ class TextTableRenderable extends Renderable2 {
     attributes: 0
   };
   constructor(ctx, options = {}) {
-    super(ctx, { ...options, flexShrink: options.flexShrink ?? 0, buffered: true });
+    super(ctx, { ...options, flexShrink: options.flexShrink ?? 0 });
     try {
       this._content = options.content ?? this._defaultOptions.content;
       this._wrapMode = options.wrapMode ?? this._defaultOptions.wrapMode;
@@ -10522,7 +10976,7 @@ class TextTableRenderable extends Renderable2 {
         for (const cell of row)
           cell.textBufferView.setWrapMode(value);
       }
-      this.invalidateLayoutAndRaster();
+      this.invalidateLayout();
     });
   }
   get columnWidthMode() {
@@ -10532,7 +10986,7 @@ class TextTableRenderable extends Renderable2 {
     if (this._columnWidthMode === value)
       return;
     this._columnWidthMode = value;
-    this.invalidateLayoutAndRaster();
+    this.invalidateLayout();
   }
   get columnFitter() {
     return this._columnFitter;
@@ -10542,7 +10996,7 @@ class TextTableRenderable extends Renderable2 {
     if (this._columnFitter === next)
       return;
     this._columnFitter = next;
-    this.invalidateLayoutAndRaster();
+    this.invalidateLayout();
   }
   get cellPadding() {
     return this._cellPaddingX === this._cellPaddingY ? this._cellPaddingX : 0;
@@ -10553,7 +11007,7 @@ class TextTableRenderable extends Renderable2 {
       return;
     this._cellPaddingX = next;
     this._cellPaddingY = next;
-    this.invalidateLayoutAndRaster();
+    this.invalidateLayout();
   }
   get cellPaddingX() {
     return this._cellPaddingX;
@@ -10563,7 +11017,7 @@ class TextTableRenderable extends Renderable2 {
     if (this._cellPaddingX === next)
       return;
     this._cellPaddingX = next;
-    this.invalidateLayoutAndRaster();
+    this.invalidateLayout();
   }
   get cellPaddingY() {
     return this._cellPaddingY;
@@ -10573,7 +11027,7 @@ class TextTableRenderable extends Renderable2 {
     if (this._cellPaddingY === next)
       return;
     this._cellPaddingY = next;
-    this.invalidateLayoutAndRaster();
+    this.invalidateLayout();
   }
   get columnGap() {
     return this._columnGap;
@@ -10583,7 +11037,7 @@ class TextTableRenderable extends Renderable2 {
     if (this._columnGap === next)
       return;
     this._columnGap = next;
-    this.invalidateLayoutAndRaster();
+    this.invalidateLayout();
   }
   get showBorders() {
     return this._showBorders;
@@ -10592,7 +11046,7 @@ class TextTableRenderable extends Renderable2 {
     if (this._showBorders === value)
       return;
     this._showBorders = value;
-    this.invalidateRasterOnly();
+    this.requestRender();
   }
   get outerBorder() {
     return this._outerBorder;
@@ -10605,7 +11059,7 @@ class TextTableRenderable extends Renderable2 {
       return;
     this._hasExplicitOuterBorder = value != null;
     this._outerBorder = next;
-    this.invalidateLayoutAndRaster();
+    this.invalidateLayout();
   }
   get border() {
     return this._border;
@@ -10617,7 +11071,7 @@ class TextTableRenderable extends Renderable2 {
     if (!this._hasExplicitOuterBorder) {
       this._outerBorder = value;
     }
-    this.invalidateLayoutAndRaster();
+    this.invalidateLayout();
   }
   get borderStyle() {
     return this._borderStyle;
@@ -10627,14 +11081,14 @@ class TextTableRenderable extends Renderable2 {
     if (this._borderStyle === next)
       return;
     this._borderStyle = next;
-    this.invalidateRasterOnly();
+    this.requestRender();
   }
   get borderColor() {
     return RGBA2.clone(this._borderColor);
   }
   set borderColor(value) {
     this._borderColor = RGBA2.clone(parseColor2(value ?? this._defaultOptions.borderColor));
-    this.invalidateRasterOnly();
+    this.requestRender();
   }
   get fg() {
     return this._defaultFg;
@@ -10649,7 +11103,7 @@ class TextTableRenderable extends Renderable2 {
         cell.textBuffer.setDefaultFg(next);
       }
     }
-    this.invalidateRasterOnly();
+    this.requestRender();
   }
   shouldStartSelection(x, y) {
     if (!this.selectable)
@@ -10661,19 +11115,15 @@ class TextTableRenderable extends Renderable2 {
   }
   onSelectionChanged(selection) {
     this.ensureLayoutReady();
-    const previousLocalSelection = this._lastLocalSelection;
     const localSelection = convertGlobalToLocalSelection2(selection, Math.trunc(this.x), Math.trunc(this.y));
     this._lastLocalSelection = localSelection;
-    const dirtyRows = this.getDirtySelectionRowRange(previousLocalSelection, localSelection);
     if (!localSelection?.isActive) {
       this.resetCellSelections();
       this._lastSelectionMode = null;
     } else {
       this.applySelectionToCells(localSelection, selection?.isStart ?? false);
     }
-    if (dirtyRows !== null) {
-      this.redrawSelectionRows(dirtyRows.firstRow, dirtyRows.lastRow);
-    }
+    this.requestRender();
     return this.hasSelection();
   }
   hasSelection() {
@@ -10718,25 +11168,23 @@ class TextTableRenderable extends Renderable2 {
 `);
   }
   onResize(width, height) {
-    this.invalidateLayoutAndRaster(false);
+    this.invalidateLayout(false);
     super.onResize(width, height);
   }
   renderSelf(buffer) {
     if (!this.visible || this.isDestroyed)
       return;
-    if (this._layoutDirty) {
-      this.rebuildLayoutForCurrentWidth();
+    this.ensureLayoutReady();
+    const [x, y] = this._paintOrigin(buffer);
+    buffer.pushScissorRect(x, y, this._paintWidth, this._paintHeight);
+    if (buffer === this.frameBuffer)
+      buffer.clear(this._backgroundColor);
+    else if (this._backgroundColor.a > 0) {
+      buffer.fillRect(x, y, this._paintWidth, this._paintHeight, this._backgroundColor);
     }
-    if (!this._rasterDirty)
-      return;
-    buffer.clear(this._backgroundColor);
-    if (this._rowCount === 0 || this._columnCount === 0) {
-      this._rasterDirty = false;
-      return;
-    }
-    this.drawBorders(buffer);
-    this.drawCells(buffer);
-    this._rasterDirty = false;
+    this.drawBorders(buffer, x, y);
+    this.drawCells(buffer, x, y);
+    buffer.popScissorRect();
   }
   destroySelf() {
     this.destroyCells();
@@ -10822,7 +11270,7 @@ class TextTableRenderable extends Renderable2 {
     this._rowCount = newRowCount;
     this._columnCount = newColumnCount;
     this.runCleanup((run) => {
-      run(() => this.invalidateLayoutAndRaster());
+      run(() => this.invalidateLayout());
       for (let rowIdx = 0;rowIdx < previous.length; rowIdx++) {
         for (let colIdx = 0;colIdx < previous[rowIdx].length; colIdx++) {
           const cell = previous[rowIdx][colIdx];
@@ -11122,7 +11570,7 @@ class TextTableRenderable extends Renderable2 {
   getHorizontalBorderCount(borderLayout) {
     return (borderLayout.top ? 1 : 0) + (borderLayout.bottom ? 1 : 0) + (borderLayout.innerHorizontal ? Math.max(0, this._rowCount - 1) : 0);
   }
-  drawBorders(buffer) {
+  drawBorders(buffer, x, y) {
     if (!this._showBorders) {
       return;
     }
@@ -11130,59 +11578,31 @@ class TextTableRenderable extends Renderable2 {
     if (this.getVerticalBorderCount(borderLayout) === 0 && this.getHorizontalBorderCount(borderLayout) === 0) {
       return;
     }
+    const { columnOffsets, rowOffsets, columnOffsetsI32, rowOffsetsI32 } = this._layout;
+    columnOffsets.forEach((offset, index) => columnOffsetsI32[index] = offset + x);
+    rowOffsets.forEach((offset, index) => rowOffsetsI32[index] = offset + y);
     buffer.drawGrid({
       borderChars: BorderCharArrays2[this._borderStyle],
       borderFg: this._borderColor,
       borderBg: this._borderBackgroundColor,
-      columnOffsets: this._layout.columnOffsetsI32,
-      rowOffsets: this._layout.rowOffsetsI32,
+      columnOffsets: columnOffsetsI32,
+      rowOffsets: rowOffsetsI32,
       drawInner: this._border,
       drawOuter: this._outerBorder
     });
   }
-  drawCells(buffer) {
-    this.drawCellRange(buffer, 0, this._rowCount - 1);
-  }
-  drawCellRange(buffer, firstRow, lastRow) {
+  drawCells(buffer, x, y) {
     const colOffsets = this._layout.columnOffsets;
     const rowOffsets = this._layout.rowOffsets;
-    const cellPaddingX = this._cellPaddingX;
+    const cellX = x + 1 + this._cellPaddingX;
     const cellPaddingY = this._cellPaddingY;
-    for (let rowIdx = firstRow;rowIdx <= lastRow; rowIdx++) {
-      const cellY = (rowOffsets[rowIdx] ?? 0) + 1 + cellPaddingY;
+    for (let rowIdx = 0;rowIdx < this._rowCount; rowIdx++) {
+      const cellY = y + (rowOffsets[rowIdx] ?? 0) + 1 + cellPaddingY;
       for (let colIdx = 0;colIdx < this._columnCount; colIdx++) {
         const cell = this._cells[rowIdx]?.[colIdx];
         if (!cell)
           continue;
-        buffer.drawTextBuffer(cell.textBufferView, (colOffsets[colIdx] ?? 0) + 1 + cellPaddingX, cellY);
-      }
-    }
-  }
-  redrawSelectionRows(firstRow, lastRow) {
-    if (firstRow > lastRow)
-      return;
-    if (this._backgroundColor.a < 1) {
-      this.invalidateRasterOnly();
-      return;
-    }
-    const buffer = this.frameBuffer;
-    if (!buffer)
-      return;
-    this.clearCellRange(buffer, firstRow, lastRow);
-    this.drawCellRange(buffer, firstRow, lastRow);
-    this.requestRender();
-  }
-  clearCellRange(buffer, firstRow, lastRow) {
-    const colWidths = this._layout.columnWidths;
-    const rowHeights = this._layout.rowHeights;
-    const colOffsets = this._layout.columnOffsets;
-    const rowOffsets = this._layout.rowOffsets;
-    for (let rowIdx = firstRow;rowIdx <= lastRow; rowIdx++) {
-      const cellY = (rowOffsets[rowIdx] ?? 0) + 1;
-      const rowHeight = rowHeights[rowIdx] ?? 1;
-      for (let colIdx = 0;colIdx < this._columnCount; colIdx++) {
-        const cellX = (colOffsets[colIdx] ?? 0) + 1;
-        buffer.fillRect(cellX, cellY, colWidths[colIdx] ?? 1, rowHeight, this._backgroundColor);
+        buffer.drawTextBuffer(cell.textBufferView, cellX + (colOffsets[colIdx] ?? 0), cellY);
       }
     }
   }
@@ -11338,28 +11758,6 @@ class TextTableRenderable extends Renderable2 {
     }
     return this._rowCount - 1;
   }
-  getSelectionRowRange(selection) {
-    if (!selection?.isActive || this._rowCount === 0)
-      return null;
-    const minSelY = Math.min(selection.anchorY, selection.focusY);
-    const maxSelY = Math.max(selection.anchorY, selection.focusY);
-    return {
-      firstRow: this.findRowForLocalY(minSelY),
-      lastRow: this.findRowForLocalY(maxSelY)
-    };
-  }
-  getDirtySelectionRowRange(previousSelection, currentSelection) {
-    const previousRange = this.getSelectionRowRange(previousSelection);
-    const currentRange = this.getSelectionRowRange(currentSelection);
-    if (previousRange === null)
-      return currentRange;
-    if (currentRange === null)
-      return previousRange;
-    return {
-      firstRow: Math.min(previousRange.firstRow, currentRange.firstRow),
-      lastRow: Math.max(previousRange.lastRow, currentRange.lastRow)
-    };
-  }
   resetRowSelection(rowIdx) {
     const row = this._cells[rowIdx];
     if (!row)
@@ -11418,9 +11816,8 @@ class TextTableRenderable extends Renderable2 {
     }
     return Math.max(0, Math.floor(value));
   }
-  invalidateLayoutAndRaster(markYogaDirty = true) {
+  invalidateLayout(markYogaDirty = true) {
     this._layoutDirty = true;
-    this._rasterDirty = true;
     this._cachedMeasureLayout = null;
     this._cachedMeasureWidth = undefined;
     if (markYogaDirty) {
@@ -11428,15 +11825,13 @@ class TextTableRenderable extends Renderable2 {
     }
     this.requestRender();
   }
-  invalidateRasterOnly() {
-    this._rasterDirty = true;
-    this.requestRender();
-  }
 }
 
 // src/renderables/markdown-parser.ts
 function parseMarkdownIncremental(newContent, prevState, trailingUnstable = 2) {
-  if (!prevState || prevState.tokens.length === 0) {
+  if (trailingUnstable === 0 && prevState?.content === newContent && prevState.stableTokenCount === prevState.tokens.length)
+    return prevState;
+  if (!prevState || prevState.tokens.length === 0 || trailingUnstable === 0) {
     try {
       const tokens = x.lex(newContent, { gfm: true });
       return {
@@ -11466,19 +11861,12 @@ function parseMarkdownIncremental(newContent, prevState, trailingUnstable = 2) {
   }
   const stableTokens = prevState.tokens.slice(0, reuseCount);
   const remainingContent = newContent.slice(offset);
-  if (!remainingContent) {
-    return {
-      content: newContent,
-      tokens: stableTokens,
-      stableTokenCount: stableTokens.length
-    };
-  }
   try {
     const newTokens = x.lex(remainingContent, { gfm: true });
     return {
       content: newContent,
       tokens: [...stableTokens, ...newTokens],
-      stableTokenCount: trailingUnstable === 0 ? stableTokens.length + newTokens.length : stableTokens.length
+      stableTokenCount: stableTokens.length
     };
   } catch {
     try {
@@ -11728,6 +12116,7 @@ class MarkdownRenderable extends Renderable2 {
     if (this._streaming !== value) {
       this.assertMutable();
       this._streaming = value;
+      this._parseState = parseMarkdownIncremental(this._content, this._parseState, value ? 2 : 0);
       this.updateBlocks(true);
     }
   }
@@ -12260,13 +12649,16 @@ class MarkdownRenderable extends Renderable2 {
       return this.createTableBlock(token, id).renderable;
     return token.raw ? this.createMarkdownCodeRenderable(token.raw, id, 0, this._linkifyMarkdownChunks, undefined, this.createInitialStyledText(token)) : null;
   }
+  getHorizontalRuleColor() {
+    return this.getStyle("conceal")?.fg ?? this._fg ?? "#888888";
+  }
   createHorizontalRuleRenderable(id, marginBottom = 0) {
     return new BoxRenderable2(this.ctx, {
       id,
       width: "100%",
       height: 1,
       border: ["top"],
-      borderColor: this.getStyle("conceal")?.fg ?? this._fg ?? "#888888",
+      borderColor: this.getHorizontalRuleColor(),
       flexShrink: 0,
       marginBottom
     });
@@ -12840,6 +13232,8 @@ class MarkdownRenderable extends Renderable2 {
       return;
     }
     if (token.type === "hr") {
+      if (state.renderable instanceof BoxRenderable2)
+        state.renderable.borderColor = this.getHorizontalRuleColor();
       state.renderable.marginBottom = marginBottom;
       return;
     }
@@ -12875,12 +13269,13 @@ class MarkdownRenderable extends Renderable2 {
       state.tableContentCache = cache;
       return;
     }
+    const raw = this._internalBlockMode === "top-level" ? this.getTopLevelBlockRaw(token) ?? token.raw : token.raw;
     if (state.renderable instanceof CodeRenderable2) {
-      this.applyMarkdownCodeRenderable(state.renderable, this.getTopLevelBlockRaw(token) ?? token.raw, marginBottom, undefined, this.createInitialStyledText(token));
+      this.applyMarkdownCodeRenderable(state.renderable, raw, marginBottom, undefined, this.createInitialStyledText(token));
       return;
     }
     state.renderable.destroyRecursively();
-    const markdownRenderable = this.createMarkdownCodeRenderable(this.getTopLevelBlockRaw(token) ?? token.raw, `${this.id}-block-${index}`, marginBottom, this._linkifyMarkdownChunks, undefined, this.createInitialStyledText(token));
+    const markdownRenderable = this.createMarkdownCodeRenderable(raw, `${this.id}-block-${index}`, marginBottom, this._linkifyMarkdownChunks, undefined, this.createInitialStyledText(token));
     this.add(markdownRenderable, index);
     state.renderable = markdownRenderable;
   }
@@ -12907,7 +13302,7 @@ class MarkdownRenderable extends Renderable2 {
         blockIndex++;
         continue;
       }
-      if (existing && existing.canUpdateInPlace && existing.token.type === block.token.type && this.canUpdateBlockRenderable(existing.renderable, block.token)) {
+      if (existing && existing.canUpdateInPlace && existing.token.type === block.token.type && (block.token.type !== "table" || block.token.rows.length > 0 === existing.renderable instanceof TextTableRenderable)) {
         if (this._renderNode) {
           const custom = this.createTopLevelCustomRenderable(block, blockIndex);
           if (custom.renderable && !custom.canUpdateInPlace) {
@@ -12961,19 +13356,6 @@ class MarkdownRenderable extends Renderable2 {
       removed.renderable.destroyRecursively();
     }
   }
-  canUpdateBlockRenderable(renderable, token) {
-    if (token.type === "code")
-      return renderable instanceof CodeRenderable2;
-    if (token.type === "table")
-      return renderable instanceof TextTableRenderable;
-    if (token.type === "blockquote")
-      return renderable instanceof BoxRenderable2;
-    if (token.type === "list")
-      return renderable instanceof BoxRenderable2;
-    if (token.type === "hr")
-      return renderable instanceof BoxRenderable2;
-    return renderable instanceof CodeRenderable2;
-  }
   updateBlocks(forceTableRefresh = false) {
     if (this.isDestroyed)
       return;
@@ -12983,8 +13365,9 @@ class MarkdownRenderable extends Renderable2 {
       this._stableBlockCount = 0;
       return;
     }
-    const trailingUnstable = this._streaming ? 2 : 0;
-    this._parseState = parseMarkdownIncremental(this._content, this._parseState, trailingUnstable);
+    if (this._parseState?.content !== this._content) {
+      this._parseState = parseMarkdownIncremental(this._content, this._parseState, this._streaming ? 2 : 0);
+    }
     const tokens = this._parseState.tokens;
     if (tokens.length === 0 && this._content.length > 0) {
       this.clearBlockStates();
@@ -13014,22 +13397,10 @@ class MarkdownRenderable extends Renderable2 {
       const token = blockTokens[i];
       const nextToken = blockTokens[i + 1];
       const existing = this._blockStates[blockIndex];
-      const shouldForceRefresh = forceTableRefresh;
-      if (existing && existing.token === token) {
-        if (shouldForceRefresh) {
-          this.updateBlockRenderable(existing, token, blockIndex, nextToken);
-          existing.tokenRaw = token.raw;
-        } else {
-          this.applyInterBlockMargin(existing, token, nextToken);
-        }
-        blockIndex++;
-        continue;
-      }
-      if (existing && existing.tokenRaw === token.raw && existing.token.type === token.type) {
+      if (existing && existing.tokenRaw === token.raw && existing.token.type === token.type && (existing.canUpdateInPlace || !forceTableRefresh)) {
         existing.token = token;
-        if (shouldForceRefresh) {
-          this.updateBlockRenderable(existing, token, blockIndex, nextToken);
-          existing.tokenRaw = token.raw;
+        if (forceTableRefresh) {
+          this.updateBlockRenderable(existing, token, blockIndex, nextToken, true);
         } else {
           this.applyInterBlockMargin(existing, token, nextToken);
         }
@@ -13112,69 +13483,6 @@ class MarkdownRenderable extends Renderable2 {
     this._blockStates = [];
     this._stableBlockCount = 0;
   }
-  rerenderBlocks() {
-    if (this._internalBlockMode === "top-level") {
-      this.updateBlocks(true);
-      return;
-    }
-    for (let i = 0;i < this._blockStates.length; i++) {
-      const state = this._blockStates[i];
-      const marginBottom = this.getInterBlockMargin(state.token, this._blockStates[i + 1]?.token);
-      if (state.token.type === "code") {
-        this.applyCodeBlockRenderable(state.renderable, state.token, marginBottom);
-        continue;
-      }
-      if (state.token.type === "blockquote") {
-        this.applyBlockquoteRenderable(state.renderable, state.token, marginBottom);
-        continue;
-      }
-      if (state.token.type === "list") {
-        this.updateBlockRenderable(state, state.token, i, this._blockStates[i + 1]?.token, true);
-        continue;
-      }
-      if (state.token.type === "hr") {
-        state.renderable.marginBottom = marginBottom;
-        continue;
-      }
-      if (state.token.type === "table") {
-        const tableToken = state.token;
-        const { cache } = this.buildTableContentCache(tableToken, state.tableContentCache, true);
-        if (!cache) {
-          if (state.renderable instanceof CodeRenderable2) {
-            this.applyMarkdownCodeRenderable(state.renderable, tableToken.raw, marginBottom);
-          } else {
-            state.renderable.destroyRecursively();
-            const fallbackRenderable = this.createMarkdownCodeRenderable(tableToken.raw, `${this.id}-block-${i}`, marginBottom);
-            this.add(fallbackRenderable, i);
-            state.renderable = fallbackRenderable;
-          }
-          state.tableContentCache = undefined;
-          continue;
-        }
-        if (state.renderable instanceof TextTableRenderable) {
-          state.renderable.content = cache.content;
-          this.applyTableRenderableOptions(state.renderable, this.resolveTableRenderableOptions());
-          state.renderable.marginBottom = marginBottom;
-          state.tableContentCache = cache;
-          continue;
-        }
-        state.renderable.destroyRecursively();
-        const tableRenderable = this.createTextTableRenderable(cache.content, `${this.id}-block-${i}`, marginBottom);
-        this.add(tableRenderable, i);
-        state.renderable = tableRenderable;
-        state.tableContentCache = cache;
-        continue;
-      }
-      if (state.renderable instanceof CodeRenderable2) {
-        this.applyMarkdownCodeRenderable(state.renderable, this.getTopLevelBlockRaw(state.token) ?? state.token.raw, marginBottom, undefined, this.createInitialStyledText(state.token));
-        continue;
-      }
-      state.renderable.destroyRecursively();
-      const markdownRenderable = this.createMarkdownCodeRenderable(this.getTopLevelBlockRaw(state.token) ?? state.token.raw, `${this.id}-block-${i}`, marginBottom, this._linkifyMarkdownChunks, undefined, this.createInitialStyledText(state.token));
-      this.add(markdownRenderable, i);
-      state.renderable = markdownRenderable;
-    }
-  }
   clearCache() {
     this._parseState = null;
     this.clearBlockStates();
@@ -13184,7 +13492,7 @@ class MarkdownRenderable extends Renderable2 {
   refreshStyles() {
     this._styleDirty = false;
     this._ctx.nativeScene.lifecyclePasses.refresh(this);
-    this.rerenderBlocks();
+    this.updateBlocks(true);
     this.requestRender();
   }
   markStyleDirty() {
@@ -13196,7 +13504,7 @@ class MarkdownRenderable extends Renderable2 {
       return;
     this._styleDirty = false;
     this._ctx.nativeScene.lifecyclePasses.refresh(this);
-    this.rerenderBlocks();
+    this.updateBlocks(true);
   }
   _needsLifecyclePass() {
     if (this.onLifecyclePass !== this.applyStyleChanges)
@@ -14351,7 +14659,7 @@ class ScrollBoxRenderable extends BoxRenderable2 {
   horizontalScrollBar;
   verticalScrollBar;
   static defaultFocusable = true;
-  selectionListener;
+  selectionListener = () => this.stopAutoScroll();
   autoScrollMouseX = 0;
   autoScrollMouseY = 0;
   autoScrollThresholdVertical = 3;
@@ -14486,15 +14794,6 @@ class ScrollBoxRenderable extends BoxRenderable2 {
       this._applyScrollArrows(1);
       this.content._assign({ ...forwardedContentPadding, ...contentOptions }, ScrollBoxContent.keys);
       this._refreshScrollHook();
-      this.selectionListener = () => {
-        if (this.isDestroyed)
-          return;
-        const selection = this._ctx.getSelection();
-        if (!selection || !selection.isDragging) {
-          this.stopAutoScroll();
-        }
-      };
-      this._ctx.on("selection", this.selectionListener);
       this.setNativeScenePaint();
     } catch (error) {
       this.abortConstruction(error, (run) => run(() => this.destroySelf()));
@@ -14798,12 +15097,15 @@ class ScrollBoxRenderable extends BoxRenderable2 {
     this.scrollAccumulatorY = 0;
   }
   startAutoScroll(mouseX, mouseY) {
+    if (this.isDestroyed)
+      return;
     this.stopAutoScroll();
     this.autoScrollMouseX = mouseX;
     this.autoScrollMouseY = mouseY;
     this.cachedAutoScrollSpeed = this.getAutoScrollSpeed(mouseX, mouseY);
     this.isAutoScrolling = true;
     this.live = true;
+    this._ctx.on("selection", this.selectionListener);
     this.refreshNativeSceneHooks();
   }
   updateAutoScroll(mouseX, mouseY) {
@@ -14824,6 +15126,7 @@ class ScrollBoxRenderable extends BoxRenderable2 {
     this.autoScrollAccumulatorX = 0;
     this.autoScrollAccumulatorY = 0;
     if (wasAutoScrolling) {
+      this._ctx.off("selection", this.selectionListener);
       this.live = false;
       this.refreshNativeSceneHooks();
     }
@@ -14947,13 +15250,10 @@ class ScrollBoxRenderable extends BoxRenderable2 {
   destroySelf() {
     if (!this.isFreed())
       this._scrollState();
-    const selectionListener = this.selectionListener;
-    this.selectionListener = undefined;
     this.layoutCallbacks = [];
     this.endBarPress();
     this.runCleanup((run) => {
-      if (selectionListener)
-        run(() => this._ctx.off("selection", selectionListener));
+      run(() => this._ctx.off("selection", this.selectionListener));
       run(() => super.destroySelf());
     });
   }
@@ -14967,6 +15267,8 @@ for (const key of SCROLLBOX_PADDING_KEYS) {
   });
 }
 // src/renderables/Select.ts
+var transparent2 = RGBA2.fromValues(0, 0, 0, 0);
+var indicatorColor = parseColor2("#666666");
 var defaultSelectKeybindings = [
   { name: "up", action: "move-up" },
   { name: "k", action: "move-up" },
@@ -15027,7 +15329,7 @@ class SelectRenderable extends Renderable2 {
     fastScrollStep: 5
   };
   constructor(ctx, options) {
-    super(ctx, { ...options, buffered: true });
+    super(ctx, options);
     try {
       this._options = options.options || [];
       const requestedIndex = options.selectedIndex ?? this._defaultOptions.selectedIndex;
@@ -15060,74 +15362,65 @@ class SelectRenderable extends Renderable2 {
     }
   }
   renderSelf(buffer, deltaTime) {
-    if (!this.visible || !this.frameBuffer)
-      return;
-    if (this.isDirty) {
-      this.refreshFrameBuffer();
-    }
-  }
-  refreshFrameBuffer() {
-    if (!this.frameBuffer)
-      return;
+    const [x, y] = this._paintOrigin(buffer);
+    const width = this._paintWidth;
+    const height = this._paintHeight;
     const bgColor = this._focused ? this._focusedBackgroundColor : this._backgroundColor;
-    this.frameBuffer.clear(bgColor);
-    if (this._options.length === 0)
-      return;
-    const contentX = 0;
-    const contentY = 0;
-    const contentWidth = this.width;
-    const contentHeight = this.height;
+    const selectedY = (this._selectedIndex - this.scrollOffset) * this.linesPerItem;
+    const selectedHeight = this.linesPerItem - this._itemSpacing;
+    const hole = this._options.length > 0 && selectedY + this.linesPerItem <= height && this._selectedBackgroundColor.a === 1;
+    const top = hole ? selectedY : height;
+    const bottom = hole ? selectedY + selectedHeight : height;
+    const scrolls = this._showScrollIndicator && this._options.length > this.maxVisibleItems;
+    const scrollPercent = this.scrollOffset / (this._options.length - this.maxVisibleItems);
+    const indicatorY = scrolls ? y + 1 + Math.floor(scrollPercent * Math.max(1, height - 2)) : -1;
+    const draw = (text, textX, textY, color) => {
+      const end = textY === indicatorY ? x + width - 1 : x + width;
+      buffer.drawTextFit(text, textX, textY, end - textX, color, transparent2);
+    };
+    buffer.pushScissorRect(x, y, width, height);
+    if (buffer === this.frameBuffer)
+      buffer.clear(bgColor);
+    else {
+      buffer.fillRect(x, y, width, top, bgColor);
+      buffer.fillRect(x, y + bottom, width, height - bottom, bgColor);
+    }
     const visibleOptions = this._options.slice(this.scrollOffset, this.scrollOffset + this.maxVisibleItems);
     for (let i = 0;i < visibleOptions.length; i++) {
-      const actualIndex = this.scrollOffset + i;
       const option = visibleOptions[i];
-      const isSelected = actualIndex === this._selectedIndex;
-      const itemY = contentY + i * this.linesPerItem;
-      if (itemY + this.linesPerItem - 1 >= contentY + contentHeight)
+      const isSelected = this.scrollOffset + i === this._selectedIndex;
+      const itemY = y + i * this.linesPerItem;
+      if (itemY + this.linesPerItem - 1 >= y + height)
         break;
       if (isSelected) {
-        const contentHeight = this.linesPerItem - this._itemSpacing;
-        this.frameBuffer.fillRect(contentX, itemY, contentWidth, contentHeight, this._selectedBackgroundColor);
+        buffer.fillRect(x, itemY, width, selectedHeight, this._selectedBackgroundColor);
       }
       const indicator = this._showSelectionIndicator ? isSelected ? "▶ " : "  " : "";
-      const indicatorWidth = this._showSelectionIndicator ? 2 : 0;
-      const nameContent = `${indicator}${option.name}`;
       const baseTextColor = this._focused ? this._focusedTextColor : this._textColor;
       const nameColor = isSelected ? this._selectedTextColor : baseTextColor;
-      const textX = contentX + 1 + indicatorWidth;
+      const textX = x + 1 + (this._showSelectionIndicator ? 2 : 0);
       if (this._font) {
-        if (indicator) {
-          this.frameBuffer.drawText(indicator, contentX + 1, itemY, nameColor);
-        }
-        renderFontToFrameBuffer2(this.frameBuffer, {
+        if (indicator)
+          draw(indicator, x + 1, itemY, nameColor);
+        renderFontToFrameBuffer2(buffer, {
           text: option.name,
           x: textX,
           y: itemY,
           color: nameColor,
-          backgroundColor: isSelected ? this._selectedBackgroundColor : bgColor,
+          backgroundColor: transparent2,
           font: this._font
         });
       } else {
-        this.frameBuffer.drawText(nameContent, contentX + 1, itemY, nameColor);
+        draw(`${indicator}${option.name}`, x + 1, itemY, nameColor);
       }
-      if (this._showDescription && itemY + this.fontHeight < contentY + contentHeight) {
+      if (this._showDescription && itemY + this.fontHeight < y + height) {
         const descColor = isSelected ? this._selectedDescriptionColor : this._descriptionColor;
-        this.frameBuffer.drawText(option.description, textX, itemY + this.fontHeight, descColor);
+        draw(option.description, textX, itemY + this.fontHeight, descColor);
       }
     }
-    if (this._showScrollIndicator && this._options.length > this.maxVisibleItems) {
-      this.renderScrollIndicatorToFrameBuffer(contentX, contentY, contentWidth, contentHeight);
-    }
-  }
-  renderScrollIndicatorToFrameBuffer(contentX, contentY, contentWidth, contentHeight) {
-    if (!this.frameBuffer)
-      return;
-    const maxScrollOffset = this._options.length - this.maxVisibleItems;
-    const scrollPercent = this.scrollOffset / maxScrollOffset;
-    const indicatorHeight = Math.max(1, contentHeight - 2);
-    const indicatorY = contentY + 1 + Math.floor(scrollPercent * indicatorHeight);
-    const indicatorX = contentX + contentWidth - 1;
-    this.frameBuffer.drawText("█", indicatorX, indicatorY, parseColor2("#666666"));
+    if (scrolls)
+      buffer.drawText("█", x + width - 1, indicatorY, indicatorColor, transparent2);
+    buffer.popScissorRect();
   }
   get options() {
     return this._options;
@@ -15328,6 +15621,8 @@ class SelectRenderable extends Renderable2 {
   }
 }
 // src/renderables/TabSelect.ts
+var transparent3 = RGBA2.fromValues(0, 0, 0, 0);
+var arrowColor = parseColor2("#AAAAAA");
 var defaultTabSelectKeybindings = [
   { name: "left", action: "move-left" },
   { name: "[", action: "move-left" },
@@ -15384,7 +15679,7 @@ class TabSelectRenderable extends Renderable2 {
   _keyBindings;
   constructor(ctx, options) {
     const calculatedHeight = calculateDynamicHeight(options.showUnderline ?? true, options.showDescription ?? true);
-    super(ctx, { ...options, height: calculatedHeight, buffered: true });
+    super(ctx, { ...options, height: calculatedHeight });
     try {
       this._backgroundColor = RGBA2.clone(parseColor2(options.backgroundColor || defaultColors2.backgroundColor));
       this._hasBackgroundColor = !!options.backgroundColor;
@@ -15416,71 +15711,52 @@ class TabSelectRenderable extends Renderable2 {
     return kind === "height" ? this.calculateDynamicHeight() : super.defaultDimension(kind);
   }
   renderSelf(buffer, deltaTime) {
-    if (!this.visible || !this.frameBuffer)
-      return;
-    if (this.isDirty) {
-      this.refreshFrameBuffer();
-    }
-  }
-  refreshFrameBuffer() {
-    if (!this.frameBuffer)
-      return;
+    const [x, y] = this._paintOrigin(buffer);
+    const width = this._paintWidth;
+    const height = this._paintHeight;
     const bgColor = this._focused ? this._focusedBackgroundColor : this._backgroundColor;
-    this.frameBuffer.clear(bgColor);
-    if (this._options.length === 0)
-      return;
-    const contentX = 0;
-    const contentY = 0;
-    const contentWidth = this.width;
-    const contentHeight = this.height;
+    const selectedX = (this.selectedIndex - this.scrollOffset) * this._tabWidth;
+    const selectedWidth = Math.min(this._tabWidth, width - selectedX);
+    const selectedRows = this._showUnderline && height >= 2 ? 2 : 1;
+    const hole = this._options.length > 0 && selectedX < width && this._selectedBackgroundColor.a === 1;
+    const rows = hole ? selectedRows : 0;
+    if (buffer === this.frameBuffer)
+      buffer.clear(bgColor);
+    else {
+      buffer.fillRect(x, y, selectedX, rows, bgColor);
+      buffer.fillRect(x + selectedX + selectedWidth, y, width - selectedX - selectedWidth, rows, bgColor);
+      buffer.fillRect(x, y + rows, width, height - rows, bgColor);
+    }
     const visibleOptions = this._options.slice(this.scrollOffset, this.scrollOffset + this.maxVisibleTabs);
     for (let i = 0;i < visibleOptions.length; i++) {
-      const actualIndex = this.scrollOffset + i;
       const option = visibleOptions[i];
-      const isSelected = actualIndex === this.selectedIndex;
-      const tabX = contentX + i * this._tabWidth;
-      if (tabX >= contentX + contentWidth)
+      const isSelected = this.scrollOffset + i === this.selectedIndex;
+      const tabX = x + i * this._tabWidth;
+      if (tabX >= x + width)
         break;
-      const actualTabWidth = Math.min(this._tabWidth, contentWidth - i * this._tabWidth);
-      if (isSelected) {
-        this.frameBuffer.fillRect(tabX, contentY, actualTabWidth, 1, this._selectedBackgroundColor);
-      }
+      const actualTabWidth = Math.min(this._tabWidth, width - i * this._tabWidth);
       const baseTextColor = this._focused ? this._focusedTextColor : this._textColor;
       const nameColor = isSelected ? this._selectedTextColor : baseTextColor;
-      const nameContent = this.truncateText(option.name, actualTabWidth - 2);
-      this.frameBuffer.drawText(nameContent, tabX + 1, contentY, nameColor);
-      if (isSelected && this._showUnderline && contentHeight >= 2) {
-        this.frameBuffer.drawText("▬".repeat(actualTabWidth), tabX, contentY + 1, nameColor, this._selectedBackgroundColor);
+      if (isSelected) {
+        buffer.fillRect(tabX, y, actualTabWidth, selectedRows, this._selectedBackgroundColor);
+      }
+      buffer.drawTextFit(option.name, tabX + 1, y, actualTabWidth - 2, nameColor, transparent3, true);
+      if (isSelected && selectedRows === 2) {
+        buffer.drawText("▬".repeat(actualTabWidth), tabX, y + 1, nameColor, transparent3);
       }
     }
-    if (this._showDescription && contentHeight >= (this._showUnderline ? 3 : 2)) {
-      const selectedOption = this.getSelectedOption();
-      if (selectedOption) {
-        const descriptionY = contentY + (this._showUnderline ? 2 : 1);
-        const descColor = this._selectedDescriptionColor;
-        const descContent = this.truncateText(selectedOption.description, contentWidth - 2);
-        this.frameBuffer.drawText(descContent, contentX + 1, descriptionY, descColor);
-      }
+    const selectedOption = this.getSelectedOption();
+    if (selectedOption && this._showDescription && height >= (this._showUnderline ? 3 : 2)) {
+      const descriptionY = y + (this._showUnderline ? 2 : 1);
+      const description = selectedOption.description;
+      buffer.drawTextFit(description, x + 1, descriptionY, width - 2, this._selectedDescriptionColor, transparent3, true);
     }
     if (this._showScrollArrows && this._options.length > this.maxVisibleTabs) {
-      this.renderScrollArrowsToFrameBuffer(contentX, contentY, contentWidth, contentHeight);
-    }
-  }
-  truncateText(text, maxWidth) {
-    if (text.length <= maxWidth)
-      return text;
-    return text.substring(0, Math.max(0, maxWidth - 1)) + "…";
-  }
-  renderScrollArrowsToFrameBuffer(contentX, contentY, contentWidth, contentHeight) {
-    if (!this.frameBuffer)
-      return;
-    const hasMoreLeft = this.scrollOffset > 0;
-    const hasMoreRight = this.scrollOffset + this.maxVisibleTabs < this._options.length;
-    if (hasMoreLeft) {
-      this.frameBuffer.drawText("‹", contentX, contentY, parseColor2("#AAAAAA"));
-    }
-    if (hasMoreRight) {
-      this.frameBuffer.drawText("›", contentX + contentWidth - 1, contentY, parseColor2("#AAAAAA"));
+      if (this.scrollOffset > 0)
+        buffer.drawText("‹", x, y, arrowColor, transparent3);
+      if (this.scrollOffset + this.maxVisibleTabs < this._options.length) {
+        buffer.drawText("›", x + width - 1, y, arrowColor, transparent3);
+      }
     }
   }
   setOptions(options) {
@@ -15665,28 +15941,19 @@ class TabSelectRenderable extends Renderable2 {
   }
 }
 // src/renderables/TimeToFirstDraw.ts
-var graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
-function measureCellWidth(buffer, text) {
+var transparent4 = RGBA2.fromValues(0, 0, 0, 0);
+function fittedWidth(buffer, text, maxWidth) {
+  if (/^[\x20-\x7e]*$/.test(text))
+    return Math.min(text.length, maxWidth);
   const encoded = buffer.encodeUnicode(text);
-  if (!encoded)
-    return 0;
-  try {
-    return encoded.data.reduce((width, glyph) => width + glyph.width, 0);
-  } finally {
-    buffer.freeUnicode(encoded);
-  }
-}
-function truncateToCellWidth(buffer, text, maxWidth) {
-  let visibleText = "";
-  let visibleWidth = 0;
-  for (const { segment } of graphemeSegmenter.segment(text)) {
-    const segmentWidth = measureCellWidth(buffer, segment);
-    if (visibleWidth + segmentWidth > maxWidth)
+  let width = 0;
+  for (const glyph of encoded.data) {
+    if (width + glyph.width > maxWidth)
       break;
-    visibleText += segment;
-    visibleWidth += segmentWidth;
+    width += glyph.width;
   }
-  return { text: visibleText, width: visibleWidth };
+  buffer.freeUnicode(encoded);
+  return width;
 }
 
 class TimeToFirstDrawRenderable extends Renderable2 {
@@ -15744,10 +16011,9 @@ class TimeToFirstDrawRenderable extends Renderable2 {
     }
     const content = `${this.label}: ${this._runtimeMs.toFixed(this.precision)}ms`;
     const maxWidth = Math.max(this.width, 1);
-    const visibleContent = truncateToCellWidth(buffer, content, maxWidth);
     const [x, y] = this._paintOrigin(buffer);
-    const centeredX = x + Math.max(0, Math.floor((maxWidth - visibleContent.width) / 2));
-    buffer.drawText(visibleContent.text, centeredX, y, this.textColor);
+    const width = fittedWidth(buffer, content, maxWidth);
+    buffer.drawTextFit(content, x + Math.floor((maxWidth - width) / 2), y, width, this.textColor, transparent4);
   }
   normalizePrecision(value) {
     if (!Number.isFinite(value)) {
@@ -15917,6 +16183,7 @@ export {
   Timeline2 as Timeline,
   TreeSitterClient2 as TreeSitterClient,
   VRenderable,
+  VideoRenderable,
   VignetteEffect,
   exports_yoga as Yoga,
   acquireSessionBufferLease2 as acquireSessionBufferLease,
@@ -15957,6 +16224,7 @@ export {
   buildKittyKeyboardFlags2 as buildKittyKeyboardFlags,
   buildTerminalPaletteSignature2 as buildTerminalPaletteSignature,
   capture2 as capture,
+  checkCrop2 as checkCrop,
   clearEnvCache2 as clearEnvCache,
   convertGlobalToLocalSelection2 as convertGlobalToLocalSelection,
   convertThemeToStyles,
@@ -16051,6 +16319,7 @@ export {
   resolveRenderLib2 as resolveRenderLib,
   reverse2 as reverse,
   rgbToHex2 as rgbToHex,
+  sameCrop2 as sameCrop,
   scrollUnitSize,
   setRenderLibPath2 as setRenderLibPath,
   setupAudio,
@@ -16069,5 +16338,5 @@ export {
   yellow2 as yellow
 };
 
-//# debugId=2A91AE76D6EE5C7764756E2164756E21
+//# debugId=3528385AF65ACA2764756E2164756E21
 //# sourceMappingURL=index.node.js.map
