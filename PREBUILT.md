@@ -7,7 +7,7 @@ toolchain can use the fork as-is:
   `packages/core`; the workspace-wide `bun run build` also works, but it re-bundles core
   once per sibling package — six redundant passes).
 - `packages/native/lib/{x86_64-linux,aarch64-linux}/libopentui.so` — the patched native
-  library (`zig build -Doptimize=ReleaseFast`, zig 0.16.0).
+  library (`zig build -Doptimize=ReleaseFast`, zig 0.17.0).
 
 They are the build outputs this branch carries. Downstream projects do NOT
 point at them: they install the published npm packages (see below), whose
@@ -98,9 +98,9 @@ literal (the asset updater writes the consumer's parser file with one) is left
 alone, and the build fails if a self-import survives. `bun run test:dist`
 asserts both.
 
-Versions are `0.8.0-fork.N`: the upstream version the fork is based on, plus
+Versions are `0.8.1-fork.N`: the upstream version the fork is based on, plus
 the fork's own release counter. They are prereleases of the upstream version,
-so a consumer has to ask for them explicitly (`^0.8.0-fork.4`), which is what
+so a consumer has to ask for them explicitly (`^0.8.1-fork.1`), which is what
 `package.json` pins.
 
 To publish:
