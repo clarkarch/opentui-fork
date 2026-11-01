@@ -4568,7 +4568,7 @@ test "tfm fork: a dimming box fill keeps and dims image placements" {
     defer test_renderer.deinit();
     const value = try image.createFromRgba(std.testing.allocator, &[_]u8{ 200, 100, 50, 255 }, 1, 1, 4);
     defer value.deinit();
-    const border_chars = [_]u32{' '} ** 11;
+    const border_chars = @as([11]u32, @splat(' '));
     const white = ansi.rgbColor(255, 255, 255, 255);
 
     var next = test_renderer.renderer.getNextBuffer();
@@ -4619,7 +4619,7 @@ test "tfm fork: a dimming fill blends image cells over their neighbours' backdro
     defer test_renderer.deinit();
     const value = try image.createFromRgba(std.testing.allocator, &[_]u8{ 200, 100, 50, 255 }, 1, 1, 4);
     defer value.deinit();
-    const border_chars = [_]u32{' '} ** 11;
+    const border_chars = @as([11]u32, @splat(' '));
     const white = ansi.rgbColor(255, 255, 255, 255);
 
     const next = test_renderer.renderer.getNextBuffer();
