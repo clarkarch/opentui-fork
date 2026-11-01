@@ -1,7 +1,8 @@
-5f72b1df3710691fde2c79e900efb703ac72dc38761620b7d0b65c11bdf718fb  zig-deps.tar.gz
-8226d46392d097d3a9f6c82b899e35e2782453ebc88b4ee67c52f820ae6c3555  update-zig-deps.sh
+6c04088e44249a98faac6d43d4d8645babeb95058144314fb37a3afe3f4e925a  zig-deps.tar.gz
+932efc321a3b347286ecf72f89af0357a22bbc489bf6aeb228ab9e5e4d132e10  update-zig-deps.sh
 7ca5be7c38dd7fd8cdbe886d54c92b7a123dd83d1f23bf77fb6383342e7c2058  zig-deps/ghostty-build.zig
 a93b7e3e22462d3f026de428d458f0f5bc6b63fcd44687d851c6bde339abc129  zig-deps/ghostty-build.zig.zon
+6ed4b814b81bb71a4ee1601da8a916f83c5b4edf23726c91f0603a4c9fe039a8  zig-deps/ghostty-kitty-graphics-zig-0.17.patch
 2116b6cfc3b1100737e2c89cf73a61633256a6f3984ef86e281cf4288923ff99  zig-deps/ghostty-shared-deps.patch
 8ce83f9f08e9549ffab6a074884287d5199ec0528a8775c1af20183a83de79a0  zig-deps/ghostty-zig-0.17.patch
 5b22873efe6f2c63eb51045538f4eafb6f35020e9ff2538817e164afd47ffea1  zig-deps/wuffs/build.zig
