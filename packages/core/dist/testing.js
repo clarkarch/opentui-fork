@@ -3,10 +3,10 @@ import {
   TreeSitterClient2,
   ANSI,
   CliRenderer2
-} from "./chunk-node-y9jsacqf.js";
+} from "./chunk-node-1ab0hd0x.js";
 import {
   nativeConstants
-} from "./chunk-node-68spbb5k.js";
+} from "./chunk-node-3xmy5yva.js";
 
 // src/testing/mock-keys.ts
 import { Buffer as Buffer2 } from "node:buffer";

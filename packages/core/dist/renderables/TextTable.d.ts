@@ -61,7 +61,6 @@ export declare class TextTableRenderable extends Renderable {
     private _columnCount;
     private _layout;
     private _layoutDirty;
-    private _rasterDirty;
     private _cachedMeasureLayout;
     private _cachedMeasureWidth;
     private readonly _defaultOptions;
@@ -130,9 +129,6 @@ export declare class TextTableRenderable extends Renderable {
     private getHorizontalBorderCount;
     private drawBorders;
     private drawCells;
-    private drawCellRange;
-    private redrawSelectionRows;
-    private clearCellRange;
     private ensureLayoutReady;
     private getCellAtLocalPosition;
     private applySelectionToCells;
@@ -140,8 +136,6 @@ export declare class TextTableRenderable extends Renderable {
     private getColumnAtLocalX;
     private getFullCellSelectionCoords;
     private findRowForLocalY;
-    private getSelectionRowRange;
-    private getDirtySelectionRowRange;
     private resetRowSelection;
     private resetCellSelections;
     private createEmptyLayout;
@@ -151,6 +145,5 @@ export declare class TextTableRenderable extends Renderable {
     private resolveColumnFitter;
     private resolveCellPadding;
     private resolveColumnGap;
-    private invalidateLayoutAndRaster;
-    private invalidateRasterOnly;
+    private invalidateLayout;
 }

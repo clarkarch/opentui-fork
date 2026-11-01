@@ -1,5 +1,5 @@
 import { Renderable, type BaseRenderable, type RenderableOptions } from "../Renderable.js";
-import { OptimizedBuffer } from "../buffer.js";
+import type { OptimizedBuffer } from "../buffer.js";
 import type { RenderContext, LineInfoProvider } from "../types.js";
 import { RGBA } from "../lib/RGBA.js";
 export interface LineSign {

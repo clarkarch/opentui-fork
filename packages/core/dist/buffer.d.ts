@@ -113,6 +113,8 @@ export declare class OptimizedBuffer {
         bgColor?: RGBA;
         fgColor?: RGBA;
     } | null): void;
+    /** @internal Draws text within maxWidth cells from x, cut on a glyph; nothing when maxWidth < 1. */
+    drawTextFit(text: string, x: number, y: number, maxWidth: number, fg: RGBA, bg?: RGBA, ellipsis?: boolean): void;
     fillRect(x: number, y: number, width: number, height: number, bg: RGBA): void;
     colorMatrix(matrix: Float32Array, cellMask: Float32Array, strength?: number, target?: TargetChannel): void;
     colorMatrixUniform(matrix: Float32Array, strength?: number, target?: TargetChannel): void;

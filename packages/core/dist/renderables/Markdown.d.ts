@@ -205,6 +205,7 @@ export declare class MarkdownRenderable extends Renderable {
     private destroyListItemChildrenAfter;
     private applyListItemMarker;
     private createListChildRenderable;
+    private getHorizontalRuleColor;
     private createHorizontalRuleRenderable;
     private createCodeRenderable;
     private applyMarkdownCodeRenderable;
@@ -247,14 +248,8 @@ export declare class MarkdownRenderable extends Renderable {
     private destroyUnusedDefaultRenderable;
     private updateBlockRenderable;
     private updateTopLevelBlocks;
-    private canUpdateBlockRenderable;
     private updateBlocks;
     private clearBlockStates;
-    /**
-     * Re-render existing blocks without rebuilding the parse state or block structure.
-     * Used when only style/conceal changes - much faster than full rebuild.
-     */
-    private rerenderBlocks;
     clearCache(): void;
     refreshStyles(): void;
     private markStyleDirty;

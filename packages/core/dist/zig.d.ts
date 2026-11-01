@@ -1,6 +1,7 @@
 import { type FFICallbackInstance, type Pointer, type PointerInput } from "./platform/ffi.js";
 import { type CursorStyle, type CursorStyleOptions, type SelectionOccupancy, type SelectionBehavior, type DebugOverlayCorner, type WidthMethod, type TerminalCapabilities, type Highlight, type LineInfo, type MousePointerStyle, type ImageRenderProtocol, type ProgramStatus } from "./types.js";
 export type { LineInfo, AllocatorStats, AudioStreamCreateOptions, BuildOptions, NativeAudioCaptureStats, NativeAudioStreamStats, NativeFrameWork, NativeRenderStats, };
+import type { ExtractOptions } from "./image.js";
 import { RGBA } from "./lib/RGBA.js";
 import { type StyledText } from "./lib/styled-text.js";
 import { type MeasureFunction } from "./yoga.js";
@@ -441,6 +442,8 @@ export type NativeBufferDraw = {
     operation: "text";
     text?: string;
     attributes?: number;
+    maxWidth?: number;
+    ellipsis?: boolean;
 }) | (BufferDrawPosition & BufferDrawColors & {
     operation: "cell" | "cellBlend" | "char";
     char?: number;
@@ -614,6 +617,12 @@ export interface NativeSessionRendererState {
     height: number;
     frameCount: bigint;
     framePending: boolean;
+    /** Presented Kitty and Sixel placements whose image a later frame still sends. */
+    imageUploadsPending: number;
+    /** Distinct frame contents dropped because their output is larger than the write limit. */
+    droppedFrames: number;
+    /** The size of the last attempt's frame when it was dropped for size, else 0. */
+    droppedFrameBytes: number;
 }
 export interface NativeSessionKittyImageTransportStatus {
     requested: number;
@@ -731,7 +740,27 @@ export declare enum NativeStatus {
     StaleFrame = -25,
     LayoutLimit = -26,
     FrameBusy = -27,
-    FrameRequestLimit = -28
+    FrameRequestLimit = -28,
+    VideoFailed = -60
+}
+export interface NativeVideoInfo {
+    durationUs: bigint;
+    width: number;
+    height: number;
+    fpsNum: number;
+    fpsDen: number;
+    hasAudio: boolean;
+}
+export interface NativeVideoState {
+    currentTimeUs: bigint;
+    framePtsUs: bigint;
+    playing: boolean;
+    ended: boolean;
+    buffering: boolean;
+    audio: boolean;
+    hasFrame: boolean;
+    failed: boolean;
+    qualityTier: number;
 }
 export declare class NativeError extends Error {
     readonly operation: string;
@@ -820,7 +849,7 @@ export type EmbeddedTerminalMouse = {
     y: number;
     anyButtonPressed?: boolean;
 };
-declare const SCENE_NODE_KINDS: readonly ["root", "box", "text", "slider", "arrow", "editor", "custom", "text_view", "image"];
+declare const SCENE_NODE_KINDS: readonly ["root", "box", "text", "slider", "arrow", "editor", "custom", "text_view", "image", "video"];
 /** One ordered property stream, stored in native wire layout. Visual writes coalesce
  * at the node's latest visual record; last write wins per field. New or changed
  * translations only merge into the last record so prepared coordinates observe
@@ -1008,6 +1037,8 @@ export declare class FFIRenderLib {
     private sceneFlushApplied;
     private editorSelectionRecord;
     private readonly editorViewInfoRecord;
+    private readonly videoStateRecord;
+    private readonly videoStateView;
     private readonly selectionResetRecord;
     private readonly localSelectionResetRecord;
     private readonly selectionResetChanged;
@@ -1182,6 +1213,20 @@ export declare class FFIRenderLib {
     sceneSetEditorOptions(context: NativeContextHandle, node: SceneNodeHandle, options: NativeSceneEditorOptions): void;
     destroyContextImage(context: NativeContextHandle, image: ContextImageHandle): void;
     sceneSetImage(context: NativeContextHandle, node: SceneNodeHandle, image: ContextImageHandle | null, fit: "fit" | "cover" | "fill", protocol: ImageRenderProtocol, buffer: ContextBufferHandle | null, placementOpacity?: number | null): void;
+    sceneSetVideo(context: NativeContextHandle, node: SceneNodeHandle, fit: "fit" | "cover" | "fill", buffer: ContextBufferHandle | null): void;
+    /** Sets the source region an image or video node shows; undefined shows the whole source. */
+    sceneSetCrop(context: NativeContextHandle, node: SceneNodeHandle, crop: ExtractOptions | undefined): void;
+    /** Replaces the node's player; an empty path closes it. Without audio, playback opens no audio device. */
+    videoOpen(context: NativeContextHandle, node: SceneNodeHandle, path: string, audio: boolean): NativeVideoInfo;
+    videoCall(context: NativeContextHandle, node: SceneNodeHandle, operation: "ot_video_play" | "ot_video_pause"): void;
+    videoSeek(context: NativeContextHandle, node: SceneNodeHandle, timeUs: bigint): void;
+    videoSetLoop(context: NativeContextHandle, node: SceneNodeHandle, loop: boolean): void;
+    videoSetMuted(context: NativeContextHandle, node: SceneNodeHandle, muted: boolean): void;
+    videoSetVolume(context: NativeContextHandle, node: SceneNodeHandle, volume: number): void;
+    videoSetAvSyncOffset(context: NativeContextHandle, node: SceneNodeHandle, offsetUs: bigint): void;
+    videoSetMaxFps(context: NativeContextHandle, node: SceneNodeHandle, fps: number): void;
+    videoGetState(context: NativeContextHandle, node: SceneNodeHandle): NativeVideoState;
+    videoGetError(context: NativeContextHandle, node: SceneNodeHandle): string;
     contextDrawImage({ context, target, frame }: NativeDrawingTarget, image: ContextImageHandle, options: NativeContextImageDraw): boolean;
     sessionSetImageResolution(context: NativeContextHandle, session: SessionHandle, terminalWidth: number, terminalHeight: number, pixelWidth: number, pixelHeight: number): void;
     sessionSetKittyImageTransport(context: NativeContextHandle, session: SessionHandle, mode: number): void;
@@ -1242,8 +1287,15 @@ export declare class FFIRenderLib {
     sessionGetCapabilities(context: NativeContextHandle, session: SessionHandle): NativeSessionCapabilities;
     sessionReadOutput(context: NativeContextHandle, session: SessionHandle, bytes: Uint8Array): NativeOutputTicket | null;
     sessionDrainStdout(context: NativeContextHandle, session: SessionHandle, maxBytes?: number): number;
+    /** Collects a finished stdout writer copy and, when `maxBytes` is positive, starts the next. `wait` waits for
+     * the running copy (process exit). */
+    sessionPostStdout(context: NativeContextHandle, session: SessionHandle, maxBytes: number, wait: boolean): {
+        written: number;
+        inFlight: boolean;
+    };
     sessionCompleteOutput(context: NativeContextHandle, session: SessionHandle, ticket: NativeOutputTicket, success: boolean): void;
     sessionClose(context: NativeContextHandle, session: SessionHandle): void;
+    sessionDropOutput(context: NativeContextHandle, session: SessionHandle): void;
     sessionCancel(context: NativeContextHandle, session: SessionHandle): void;
     sessionGetState(context: NativeContextHandle, session: SessionHandle): NativeSessionState;
     destroySession(context: NativeContextHandle, session: SessionHandle): void;

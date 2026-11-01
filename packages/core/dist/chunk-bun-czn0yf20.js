@@ -1,36 +1,5 @@
-var __create = Object.create;
-var __getProtoOf = Object.getPrototypeOf;
+// @bun
 var __defProp = Object.defineProperty;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-function __accessProp(key) {
-  return this[key];
-}
-var __toESMCache_node;
-var __toESMCache_esm;
-var __toESM = (mod, isNodeMode, target) => {
-  var canCache = mod != null && typeof mod === "object";
-  if (canCache) {
-    var cache = isNodeMode ? __toESMCache_node ??= new WeakMap : __toESMCache_esm ??= new WeakMap;
-    var cached = cache.get(mod);
-    if (cached)
-      return cached;
-  }
-  target = mod != null ? __create(__getProtoOf(mod)) : {};
-  const to = isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
-  if (mod && typeof mod === "object" || typeof mod === "function") {
-    for (let key of __getOwnPropNames(mod))
-      if (!__hasOwnProp.call(to, key))
-        __defProp(to, key, {
-          get: __accessProp.bind(mod, key),
-          enumerable: true
-        });
-  }
-  if (canCache)
-    cache.set(mod, to);
-  return to;
-};
-var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 var __returnValue = (v) => v;
 function __exportSetter(name, newValue) {
   this[name] = __returnValue.bind(null, newValue);
@@ -44,13 +13,6 @@ var __export = (target, all) => {
       set: __exportSetter.bind(all, name)
     });
 };
-
-// ../../node_modules/.bun/emoji-regex@10.6.0/node_modules/emoji-regex/index.js
-var require_emoji_regex = __commonJS(function(exports, module) {
-  module.exports = () => {
-    return /[#*0-9]\uFE0F?\u20E3|[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23ED-\u23EF\u23F1\u23F2\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB\u25FC\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692\u2694-\u2697\u2699\u269B\u269C\u26A0\u26A7\u26AA\u26B0\u26B1\u26BD\u26BE\u26C4\u26C8\u26CF\u26D1\u26E9\u26F0-\u26F5\u26F7\u26F8\u26FA\u2702\u2708\u2709\u270F\u2712\u2714\u2716\u271D\u2721\u2733\u2734\u2744\u2747\u2757\u2763\u27A1\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B55\u3030\u303D\u3297\u3299]\uFE0F?|[\u261D\u270C\u270D](?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?|[\u270A\u270B](?:\uD83C[\uDFFB-\uDFFF])?|[\u23E9-\u23EC\u23F0\u23F3\u25FD\u2693\u26A1\u26AB\u26C5\u26CE\u26D4\u26EA\u26FD\u2705\u2728\u274C\u274E\u2753-\u2755\u2795-\u2797\u27B0\u27BF\u2B50]|\u26D3\uFE0F?(?:\u200D\uD83D\uDCA5)?|\u26F9(?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?(?:\u200D[\u2640\u2642]\uFE0F?)?|\u2764\uFE0F?(?:\u200D(?:\uD83D\uDD25|\uD83E\uDE79))?|\uD83C(?:[\uDC04\uDD70\uDD71\uDD7E\uDD7F\uDE02\uDE37\uDF21\uDF24-\uDF2C\uDF36\uDF7D\uDF96\uDF97\uDF99-\uDF9B\uDF9E\uDF9F\uDFCD\uDFCE\uDFD4-\uDFDF\uDFF5\uDFF7]\uFE0F?|[\uDF85\uDFC2\uDFC7](?:\uD83C[\uDFFB-\uDFFF])?|[\uDFC4\uDFCA](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDFCB\uDFCC](?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDCCF\uDD8E\uDD91-\uDD9A\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF43\uDF45-\uDF4A\uDF4C-\uDF7C\uDF7E-\uDF84\uDF86-\uDF93\uDFA0-\uDFC1\uDFC5\uDFC6\uDFC8\uDFC9\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF8-\uDFFF]|\uDDE6\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF]|\uDDE7\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF]|\uDDE8\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF7\uDDFA-\uDDFF]|\uDDE9\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF]|\uDDEA\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA]|\uDDEB\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7]|\uDDEC\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE]|\uDDED\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA]|\uDDEE\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9]|\uDDEF\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5]|\uDDF0\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF]|\uDDF1\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE]|\uDDF2\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF]|\uDDF3\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF]|\uDDF4\uD83C\uDDF2|\uDDF5\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE]|\uDDF6\uD83C\uDDE6|\uDDF7\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC]|\uDDF8\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF]|\uDDF9\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF]|\uDDFA\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF]|\uDDFB\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA]|\uDDFC\uD83C[\uDDEB\uDDF8]|\uDDFD\uD83C\uDDF0|\uDDFE\uD83C[\uDDEA\uDDF9]|\uDDFF\uD83C[\uDDE6\uDDF2\uDDFC]|\uDF44(?:\u200D\uD83D\uDFEB)?|\uDF4B(?:\u200D\uD83D\uDFE9)?|\uDFC3(?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D(?:[\u2640\u2642]\uFE0F?(?:\u200D\u27A1\uFE0F?)?|\u27A1\uFE0F?))?|\uDFF3\uFE0F?(?:\u200D(?:\u26A7\uFE0F?|\uD83C\uDF08))?|\uDFF4(?:\u200D\u2620\uFE0F?|\uDB40\uDC67\uDB40\uDC62\uDB40(?:\uDC65\uDB40\uDC6E\uDB40\uDC67|\uDC73\uDB40\uDC63\uDB40\uDC74|\uDC77\uDB40\uDC6C\uDB40\uDC73)\uDB40\uDC7F)?)|\uD83D(?:[\uDC3F\uDCFD\uDD49\uDD4A\uDD6F\uDD70\uDD73\uDD76-\uDD79\uDD87\uDD8A-\uDD8D\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA\uDECB\uDECD-\uDECF\uDEE0-\uDEE5\uDEE9\uDEF0\uDEF3]\uFE0F?|[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDC8F\uDC91\uDCAA\uDD7A\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC](?:\uD83C[\uDFFB-\uDFFF])?|[\uDC6E-\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4\uDEB5](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDD74\uDD90](?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?|[\uDC00-\uDC07\uDC09-\uDC14\uDC16-\uDC25\uDC27-\uDC3A\uDC3C-\uDC3E\uDC40\uDC44\uDC45\uDC51-\uDC65\uDC6A\uDC79-\uDC7B\uDC7D-\uDC80\uDC84\uDC88-\uDC8E\uDC90\uDC92-\uDCA9\uDCAB-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDDA4\uDDFB-\uDE2D\uDE2F-\uDE34\uDE37-\uDE41\uDE43\uDE44\uDE48-\uDE4A\uDE80-\uDEA2\uDEA4-\uDEB3\uDEB7-\uDEBF\uDEC1-\uDEC5\uDED0-\uDED2\uDED5-\uDED8\uDEDC-\uDEDF\uDEEB\uDEEC\uDEF4-\uDEFC\uDFE0-\uDFEB\uDFF0]|\uDC08(?:\u200D\u2B1B)?|\uDC15(?:\u200D\uD83E\uDDBA)?|\uDC26(?:\u200D(?:\u2B1B|\uD83D\uDD25))?|\uDC3B(?:\u200D\u2744\uFE0F?)?|\uDC41\uFE0F?(?:\u200D\uD83D\uDDE8\uFE0F?)?|\uDC68(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDC68\uDC69]\u200D\uD83D(?:\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?)|[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?)|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]))|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFC-\uDFFF])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFC-\uDFFF]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFD-\uDFFF]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFD\uDFFF]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFE])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFE]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?))?|\uDC69(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?[\uDC68\uDC69]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?|\uDC69\u200D\uD83D(?:\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?))|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]))|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFC-\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFC-\uDFFF]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFC-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB\uDFFD-\uDFFF]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFB\uDFFD-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB-\uDFFD\uDFFF]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFB-\uDFFD\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFB-\uDFFE])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB-\uDFFE]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFB-\uDFFE])))?))?|\uDD75(?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?(?:\u200D[\u2640\u2642]\uFE0F?)?|\uDE2E(?:\u200D\uD83D\uDCA8)?|\uDE35(?:\u200D\uD83D\uDCAB)?|\uDE36(?:\u200D\uD83C\uDF2B\uFE0F?)?|\uDE42(?:\u200D[\u2194\u2195]\uFE0F?)?|\uDEB6(?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D(?:[\u2640\u2642]\uFE0F?(?:\u200D\u27A1\uFE0F?)?|\u27A1\uFE0F?))?)|\uD83E(?:[\uDD0C\uDD0F\uDD18-\uDD1F\uDD30-\uDD34\uDD36\uDD77\uDDB5\uDDB6\uDDBB\uDDD2\uDDD3\uDDD5\uDEC3-\uDEC5\uDEF0\uDEF2-\uDEF8](?:\uD83C[\uDFFB-\uDFFF])?|[\uDD26\uDD35\uDD37-\uDD39\uDD3C-\uDD3E\uDDB8\uDDB9\uDDCD\uDDCF\uDDD4\uDDD6-\uDDDD](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDDDE\uDDDF](?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDD0D\uDD0E\uDD10-\uDD17\uDD20-\uDD25\uDD27-\uDD2F\uDD3A\uDD3F-\uDD45\uDD47-\uDD76\uDD78-\uDDB4\uDDB7\uDDBA\uDDBC-\uDDCC\uDDD0\uDDE0-\uDDFF\uDE70-\uDE7C\uDE80-\uDE8A\uDE8E-\uDEC2\uDEC6\uDEC8\uDECD-\uDEDC\uDEDF-\uDEEA\uDEEF]|\uDDCE(?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D(?:[\u2640\u2642]\uFE0F?(?:\u200D\u27A1\uFE0F?)?|\u27A1\uFE0F?))?|\uDDD1(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1|\uDDD1\u200D\uD83E\uDDD2(?:\u200D\uD83E\uDDD2)?|\uDDD2(?:\u200D\uD83E\uDDD2)?))|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFC-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFC-\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFC-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB\uDFFD-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFB\uDFFD-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB-\uDFFD\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFD\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB-\uDFFE]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFE])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFE])))?))?|\uDEF1(?:\uD83C(?:\uDFFB(?:\u200D\uD83E\uDEF2\uD83C[\uDFFC-\uDFFF])?|\uDFFC(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB\uDFFD-\uDFFF])?|\uDFFD(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])?|\uDFFE(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB-\uDFFD\uDFFF])?|\uDFFF(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB-\uDFFE])?))?)/g;
-  };
-});
 
 // src/yoga.ts
 var exports_yoga = {};
@@ -297,6 +259,19 @@ var nativeSymbols = {
   ot_image_take_pixels: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_image_pixels_release: { args: ["ptr", "buffer"], returns: "i32" },
   ot_scene_set_image: { args: ["ptr", "buffer", "ptr", "u32", "u32", "ptr", "f32"], returns: "i32" },
+  ot_scene_set_crop: { args: ["ptr", "buffer", "u32", "u32", "u32", "u32"], returns: "i32" },
+  ot_scene_set_video: { args: ["ptr", "buffer", "u32", "ptr"], returns: "i32" },
+  ot_video_open: { args: ["ptr", "buffer", "ptr", "u32", "u32", "buffer"], returns: "i32" },
+  ot_video_play: { args: ["ptr", "buffer"], returns: "i32" },
+  ot_video_pause: { args: ["ptr", "buffer"], returns: "i32" },
+  ot_video_seek: { args: ["ptr", "buffer", "i64"], returns: "i32" },
+  ot_video_set_loop: { args: ["ptr", "buffer", "u32"], returns: "i32" },
+  ot_video_set_muted: { args: ["ptr", "buffer", "u32"], returns: "i32" },
+  ot_video_set_volume: { args: ["ptr", "buffer", "f32"], returns: "i32" },
+  ot_video_set_av_sync_offset: { args: ["ptr", "buffer", "i64"], returns: "i32" },
+  ot_video_set_max_fps: { args: ["ptr", "buffer", "u32"], returns: "i32" },
+  ot_video_get_state: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
+  ot_video_get_error: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
   ot_buffer_draw_image: { args: ["ptr", "buffer", "ptr", "buffer", "buffer", "buffer"], returns: "i32" },
   ot_session_set_image_resolution: { args: ["ptr", "buffer", "u32", "u32", "u32", "u32"], returns: "i32" },
   ot_session_set_kitty_image_transport: { args: ["ptr", "buffer", "u32"], returns: "i32" },
@@ -411,8 +386,10 @@ var nativeSymbols = {
   ot_session_read_output: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
   ot_session_drain_output: { args: ["ptr", "buffer", "u32", "buffer", "ptr", "ptr"], returns: "i32" },
   ot_session_drain_stdout: { args: ["ptr", "buffer", "u32", "buffer"], returns: "i32" },
+  ot_session_post_stdout: { args: ["ptr", "buffer", "u32", "u32", "buffer", "buffer"], returns: "i32" },
   ot_session_complete_output: { args: ["ptr", "buffer", "buffer", "u32"], returns: "i32" },
   ot_session_close: { args: ["ptr", "buffer"], returns: "i32" },
+  ot_session_drop_output: { args: ["ptr", "buffer"], returns: "i32" },
   ot_session_pump_exit: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_terminal_flush_input: { args: [], returns: "i32" },
   ot_session_cancel: { args: ["ptr", "buffer"], returns: "i32" },
@@ -916,7 +893,7 @@ var nativeLayouts = {
     }
   },
   ot_session_renderer_state: {
-    size: 32,
+    size: 40,
     alignment: 8,
     fields: {
       struct_size: { offset: 0, size: 4, alignment: 4, type: "u32" },
@@ -925,7 +902,9 @@ var nativeLayouts = {
       height: { offset: 12, size: 4, alignment: 4, type: "u32" },
       frame_count: { offset: 16, size: 8, alignment: 8, type: "u64" },
       frame_pending: { offset: 24, size: 4, alignment: 4, type: "u32" },
-      reserved: { offset: 28, size: 4, alignment: 4, type: "u32" }
+      image_uploads_pending: { offset: 28, size: 4, alignment: 4, type: "u32" },
+      dropped_frames: { offset: 32, size: 4, alignment: 4, type: "u32" },
+      dropped_frame_bytes: { offset: 36, size: 4, alignment: 4, type: "u32" }
     }
   },
   ot_buffer_options: {
@@ -1181,6 +1160,29 @@ var nativeLayouts = {
       byte_count: { offset: 24, size: 8, alignment: 8, type: "u64" }
     }
   },
+  ot_video_info: {
+    size: 32,
+    alignment: 8,
+    fields: {
+      duration_us: { offset: 0, size: 8, alignment: 8, type: "i64" },
+      width: { offset: 8, size: 4, alignment: 4, type: "u32" },
+      height: { offset: 12, size: 4, alignment: 4, type: "u32" },
+      fps_num: { offset: 16, size: 4, alignment: 4, type: "u32" },
+      fps_den: { offset: 20, size: 4, alignment: 4, type: "u32" },
+      has_audio: { offset: 24, size: 4, alignment: 4, type: "u32" },
+      reserved: { offset: 28, size: 4, alignment: 4, type: "u32" }
+    }
+  },
+  ot_video_state: {
+    size: 24,
+    alignment: 8,
+    fields: {
+      current_time_us: { offset: 0, size: 8, alignment: 8, type: "i64" },
+      frame_pts_us: { offset: 8, size: 8, alignment: 8, type: "i64" },
+      flags: { offset: 16, size: 4, alignment: 4, type: "u32" },
+      quality_tier: { offset: 20, size: 4, alignment: 4, type: "u32" }
+    }
+  },
   ot_image_draw_options: {
     size: 64,
     alignment: 4,
@@ -1285,7 +1287,7 @@ var nativeLayouts = {
     }
   },
   ot_buffer_draw_text_record: {
-    size: 44,
+    size: 48,
     alignment: 4,
     fields: {
       header: { offset: 0, size: 16, alignment: 4, type: "ot_buffer_draw_header" },
@@ -1293,7 +1295,8 @@ var nativeLayouts = {
       y: { offset: 20, size: 4, alignment: 4, type: "i32" },
       attributes: { offset: 24, size: 4, alignment: 4, type: "u32" },
       foreground: { offset: 28, size: 8, alignment: 2, type: "[4]u16" },
-      background: { offset: 36, size: 8, alignment: 2, type: "[4]u16" }
+      background: { offset: 36, size: 8, alignment: 2, type: "[4]u16" },
+      max_width: { offset: 44, size: 4, alignment: 4, type: "u32" }
     }
   },
   ot_buffer_draw_cell: {
@@ -1707,6 +1710,7 @@ var nativeConstants = {
   OT_IMAGE_OUTPUT_TOO_SMALL: -45,
   OT_IMAGE_UNSUPPORTED_FEATURE: -46,
   OT_IMAGE_BUSY: -47,
+  OT_VIDEO_FAILED: -60,
   OT_SCENE_ROOT: 0,
   OT_SCENE_BOX: 1,
   OT_SCENE_TEXT: 2,
@@ -1716,6 +1720,7 @@ var nativeConstants = {
   OT_SCENE_CUSTOM: 6,
   OT_SCENE_TEXT_VIEW: 7,
   OT_SCENE_IMAGE: 8,
+  OT_SCENE_VIDEO: 9,
   OT_SCENE_WRAP_NONE: 0,
   OT_SCENE_WRAP_CHAR: 1,
   OT_SCENE_WRAP_WORD: 2,
@@ -2092,6 +2097,13 @@ var nativeConstants = {
   OT_IMAGE_BLEND_SOURCE_OVER: 0,
   OT_IMAGE_BLEND_SOURCE: 1,
   OT_IMAGE_BLEND_DESTINATION_OVER: 2,
+  OT_VIDEO_OPEN_NO_AUDIO: 1,
+  OT_VIDEO_PLAYING: 1,
+  OT_VIDEO_ENDED: 2,
+  OT_VIDEO_BUFFERING: 4,
+  OT_VIDEO_AUDIO: 8,
+  OT_VIDEO_HAS_FRAME: 16,
+  OT_VIDEO_ERROR: 32,
   OT_TEXT_VIEW_WRAP_WIDTH: 0,
   OT_TEXT_VIEW_WRAP_MODE: 1,
   OT_TEXT_VIEW_FIRST_LINE_OFFSET: 2,
@@ -2115,6 +2127,7 @@ var nativeConstants = {
   OT_BUFFER_DRAW_HAS_BACKGROUND: 1,
   OT_BUFFER_DRAW_HAS_SOURCE_WIDTH: 2,
   OT_BUFFER_DRAW_HAS_SOURCE_HEIGHT: 4,
+  OT_BUFFER_DRAW_FIT_ELLIPSIS: 16,
   OT_BUFFER_STACK_DEPTH_MAX: 256,
   OT_BUFFER_STACK_GET_OPACITY: 0,
   OT_BUFFER_STACK_PUSH_SCISSOR: 1,
@@ -2193,6 +2206,8 @@ var nativeConstants = {
   OT_PUMP_OUTPUT_PENDING: 2,
   OT_PUMP_WAIT_UNTIL: 3,
   OT_PUMP_CLOSED: 4,
+  OT_STDOUT_IDLE: 0,
+  OT_STDOUT_IN_FLIGHT: 1,
   OT_INPUT_KEY: 1,
   OT_INPUT_MOUSE: 2,
   OT_INPUT_PASTE: 3,
@@ -2362,8 +2377,8 @@ var nativeConstants = {
 };
 
 // src/platform/ffi.ts
-import { createRequire } from "node:module";
-import { fileURLToPath } from "node:url";
+import { createRequire } from "module";
+import { fileURLToPath } from "url";
 var FFIType = {
   char: "char",
   int8_t: "int8_t",
@@ -2850,10 +2865,10 @@ var suffix = backend.suffix;
 var toArrayBuffer = backend.toArrayBuffer;
 
 // src/platform/runtime.ts
-import { existsSync } from "node:fs";
-import { mkdir, writeFile as writeFileNode } from "node:fs/promises";
-import { dirname, isAbsolute as isAbsolute2, resolve } from "node:path";
-import { fileURLToPath as fileURLToPath3 } from "node:url";
+import { existsSync } from "fs";
+import { mkdir, writeFile as writeFileNode } from "fs/promises";
+import { dirname, isAbsolute as isAbsolute2, resolve } from "path";
+import { fileURLToPath as fileURLToPath3 } from "url";
 
 // ../../node_modules/.bun/ansi-regex@6.2.2/node_modules/ansi-regex/index.js
 function ansiRegex({ onlyFirst = false } = {}) {
@@ -2898,8 +2913,12 @@ function eastAsianWidth(codePoint, { ambiguousAsWide = false } = {}) {
   return 1;
 }
 
+// ../../node_modules/.bun/emoji-regex@10.6.0/node_modules/emoji-regex/index.mjs
+var emoji_regex_default = () => {
+  return /[#*0-9]\uFE0F?\u20E3|[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23ED-\u23EF\u23F1\u23F2\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB\u25FC\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692\u2694-\u2697\u2699\u269B\u269C\u26A0\u26A7\u26AA\u26B0\u26B1\u26BD\u26BE\u26C4\u26C8\u26CF\u26D1\u26E9\u26F0-\u26F5\u26F7\u26F8\u26FA\u2702\u2708\u2709\u270F\u2712\u2714\u2716\u271D\u2721\u2733\u2734\u2744\u2747\u2757\u2763\u27A1\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B55\u3030\u303D\u3297\u3299]\uFE0F?|[\u261D\u270C\u270D](?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?|[\u270A\u270B](?:\uD83C[\uDFFB-\uDFFF])?|[\u23E9-\u23EC\u23F0\u23F3\u25FD\u2693\u26A1\u26AB\u26C5\u26CE\u26D4\u26EA\u26FD\u2705\u2728\u274C\u274E\u2753-\u2755\u2795-\u2797\u27B0\u27BF\u2B50]|\u26D3\uFE0F?(?:\u200D\uD83D\uDCA5)?|\u26F9(?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?(?:\u200D[\u2640\u2642]\uFE0F?)?|\u2764\uFE0F?(?:\u200D(?:\uD83D\uDD25|\uD83E\uDE79))?|\uD83C(?:[\uDC04\uDD70\uDD71\uDD7E\uDD7F\uDE02\uDE37\uDF21\uDF24-\uDF2C\uDF36\uDF7D\uDF96\uDF97\uDF99-\uDF9B\uDF9E\uDF9F\uDFCD\uDFCE\uDFD4-\uDFDF\uDFF5\uDFF7]\uFE0F?|[\uDF85\uDFC2\uDFC7](?:\uD83C[\uDFFB-\uDFFF])?|[\uDFC4\uDFCA](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDFCB\uDFCC](?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDCCF\uDD8E\uDD91-\uDD9A\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF43\uDF45-\uDF4A\uDF4C-\uDF7C\uDF7E-\uDF84\uDF86-\uDF93\uDFA0-\uDFC1\uDFC5\uDFC6\uDFC8\uDFC9\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF8-\uDFFF]|\uDDE6\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF]|\uDDE7\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF]|\uDDE8\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF7\uDDFA-\uDDFF]|\uDDE9\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF]|\uDDEA\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA]|\uDDEB\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7]|\uDDEC\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE]|\uDDED\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA]|\uDDEE\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9]|\uDDEF\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5]|\uDDF0\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF]|\uDDF1\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE]|\uDDF2\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF]|\uDDF3\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF]|\uDDF4\uD83C\uDDF2|\uDDF5\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE]|\uDDF6\uD83C\uDDE6|\uDDF7\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC]|\uDDF8\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF]|\uDDF9\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF]|\uDDFA\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF]|\uDDFB\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA]|\uDDFC\uD83C[\uDDEB\uDDF8]|\uDDFD\uD83C\uDDF0|\uDDFE\uD83C[\uDDEA\uDDF9]|\uDDFF\uD83C[\uDDE6\uDDF2\uDDFC]|\uDF44(?:\u200D\uD83D\uDFEB)?|\uDF4B(?:\u200D\uD83D\uDFE9)?|\uDFC3(?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D(?:[\u2640\u2642]\uFE0F?(?:\u200D\u27A1\uFE0F?)?|\u27A1\uFE0F?))?|\uDFF3\uFE0F?(?:\u200D(?:\u26A7\uFE0F?|\uD83C\uDF08))?|\uDFF4(?:\u200D\u2620\uFE0F?|\uDB40\uDC67\uDB40\uDC62\uDB40(?:\uDC65\uDB40\uDC6E\uDB40\uDC67|\uDC73\uDB40\uDC63\uDB40\uDC74|\uDC77\uDB40\uDC6C\uDB40\uDC73)\uDB40\uDC7F)?)|\uD83D(?:[\uDC3F\uDCFD\uDD49\uDD4A\uDD6F\uDD70\uDD73\uDD76-\uDD79\uDD87\uDD8A-\uDD8D\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA\uDECB\uDECD-\uDECF\uDEE0-\uDEE5\uDEE9\uDEF0\uDEF3]\uFE0F?|[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDC8F\uDC91\uDCAA\uDD7A\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC](?:\uD83C[\uDFFB-\uDFFF])?|[\uDC6E-\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4\uDEB5](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDD74\uDD90](?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?|[\uDC00-\uDC07\uDC09-\uDC14\uDC16-\uDC25\uDC27-\uDC3A\uDC3C-\uDC3E\uDC40\uDC44\uDC45\uDC51-\uDC65\uDC6A\uDC79-\uDC7B\uDC7D-\uDC80\uDC84\uDC88-\uDC8E\uDC90\uDC92-\uDCA9\uDCAB-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDDA4\uDDFB-\uDE2D\uDE2F-\uDE34\uDE37-\uDE41\uDE43\uDE44\uDE48-\uDE4A\uDE80-\uDEA2\uDEA4-\uDEB3\uDEB7-\uDEBF\uDEC1-\uDEC5\uDED0-\uDED2\uDED5-\uDED8\uDEDC-\uDEDF\uDEEB\uDEEC\uDEF4-\uDEFC\uDFE0-\uDFEB\uDFF0]|\uDC08(?:\u200D\u2B1B)?|\uDC15(?:\u200D\uD83E\uDDBA)?|\uDC26(?:\u200D(?:\u2B1B|\uD83D\uDD25))?|\uDC3B(?:\u200D\u2744\uFE0F?)?|\uDC41\uFE0F?(?:\u200D\uD83D\uDDE8\uFE0F?)?|\uDC68(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDC68\uDC69]\u200D\uD83D(?:\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?)|[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?)|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]))|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFC-\uDFFF])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFC-\uDFFF]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFD-\uDFFF]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFD\uDFFF]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?\uDC68\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFE])|\uD83E(?:[\uDD1D\uDEEF]\u200D\uD83D\uDC68\uD83C[\uDFFB-\uDFFE]|[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3])))?))?|\uDC69(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:\uDC8B\u200D\uD83D)?[\uDC68\uDC69]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?|\uDC69\u200D\uD83D(?:\uDC66(?:\u200D\uD83D\uDC66)?|\uDC67(?:\u200D\uD83D[\uDC66\uDC67])?))|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]))|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFC-\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFC-\uDFFF]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFC-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB\uDFFD-\uDFFF]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFB\uDFFD-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB-\uDFFD\uDFFF]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFB-\uDFFD\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D\uD83D(?:[\uDC68\uDC69]|\uDC8B\u200D\uD83D[\uDC68\uDC69])\uD83C[\uDFFB-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83D\uDC69\uD83C[\uDFFB-\uDFFE])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3]|\uDD1D\u200D\uD83D[\uDC68\uDC69]\uD83C[\uDFFB-\uDFFE]|\uDEEF\u200D\uD83D\uDC69\uD83C[\uDFFB-\uDFFE])))?))?|\uDD75(?:\uD83C[\uDFFB-\uDFFF]|\uFE0F)?(?:\u200D[\u2640\u2642]\uFE0F?)?|\uDE2E(?:\u200D\uD83D\uDCA8)?|\uDE35(?:\u200D\uD83D\uDCAB)?|\uDE36(?:\u200D\uD83C\uDF2B\uFE0F?)?|\uDE42(?:\u200D[\u2194\u2195]\uFE0F?)?|\uDEB6(?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D(?:[\u2640\u2642]\uFE0F?(?:\u200D\u27A1\uFE0F?)?|\u27A1\uFE0F?))?)|\uD83E(?:[\uDD0C\uDD0F\uDD18-\uDD1F\uDD30-\uDD34\uDD36\uDD77\uDDB5\uDDB6\uDDBB\uDDD2\uDDD3\uDDD5\uDEC3-\uDEC5\uDEF0\uDEF2-\uDEF8](?:\uD83C[\uDFFB-\uDFFF])?|[\uDD26\uDD35\uDD37-\uDD39\uDD3C-\uDD3E\uDDB8\uDDB9\uDDCD\uDDCF\uDDD4\uDDD6-\uDDDD](?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDDDE\uDDDF](?:\u200D[\u2640\u2642]\uFE0F?)?|[\uDD0D\uDD0E\uDD10-\uDD17\uDD20-\uDD25\uDD27-\uDD2F\uDD3A\uDD3F-\uDD45\uDD47-\uDD76\uDD78-\uDDB4\uDDB7\uDDBA\uDDBC-\uDDCC\uDDD0\uDDE0-\uDDFF\uDE70-\uDE7C\uDE80-\uDE8A\uDE8E-\uDEC2\uDEC6\uDEC8\uDECD-\uDEDC\uDEDF-\uDEEA\uDEEF]|\uDDCE(?:\uD83C[\uDFFB-\uDFFF])?(?:\u200D(?:[\u2640\u2642]\uFE0F?(?:\u200D\u27A1\uFE0F?)?|\u27A1\uFE0F?))?|\uDDD1(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1|\uDDD1\u200D\uD83E\uDDD2(?:\u200D\uD83E\uDDD2)?|\uDDD2(?:\u200D\uD83E\uDDD2)?))|\uD83C(?:\uDFFB(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFC-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFC-\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFC-\uDFFF])))?|\uDFFC(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB\uDFFD-\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFB\uDFFD-\uDFFF])))?|\uDFFD(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])))?|\uDFFE(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB-\uDFFD\uDFFF]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFD\uDFFF])))?|\uDFFF(?:\u200D(?:[\u2695\u2696\u2708]\uFE0F?|\u2764\uFE0F?\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1\uD83C[\uDFFB-\uDFFE]|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D(?:[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uDC30\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFE])|\uD83E(?:[\uDDAF\uDDBC\uDDBD](?:\u200D\u27A1\uFE0F?)?|[\uDDB0-\uDDB3\uDE70]|\uDD1D\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFF]|\uDEEF\u200D\uD83E\uDDD1\uD83C[\uDFFB-\uDFFE])))?))?|\uDEF1(?:\uD83C(?:\uDFFB(?:\u200D\uD83E\uDEF2\uD83C[\uDFFC-\uDFFF])?|\uDFFC(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB\uDFFD-\uDFFF])?|\uDFFD(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])?|\uDFFE(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB-\uDFFD\uDFFF])?|\uDFFF(?:\u200D\uD83E\uDEF2\uD83C[\uDFFB-\uDFFE])?))?)/g;
+};
+
 // ../../node_modules/.bun/string-width@7.2.0/node_modules/string-width/index.js
-var import_emoji_regex = __toESM(require_emoji_regex(), 1);
 var segmenter = new Intl.Segmenter;
 var defaultIgnorableCodePointRegex = /^\p{Default_Ignorable_Code_Point}$/u;
 function stringWidth2(string, options = {}) {
@@ -2938,7 +2957,7 @@ function stringWidth2(string, options = {}) {
     if (defaultIgnorableCodePointRegex.test(character)) {
       continue;
     }
-    if (import_emoji_regex.default().test(character)) {
+    if (emoji_regex_default().test(character)) {
       width += 2;
       continue;
     }
@@ -2948,9 +2967,9 @@ function stringWidth2(string, options = {}) {
 }
 
 // src/platform/assets.ts
-import { statSync } from "node:fs";
-import { isAbsolute, join } from "node:path";
-import { fileURLToPath as fileURLToPath2 } from "node:url";
+import { statSync } from "fs";
+import { isAbsolute, join } from "path";
+import { fileURLToPath as fileURLToPath2 } from "url";
 
 // src/lib/singleton.ts
 var singletonCacheSymbol = Symbol.for("@opentui/core/singleton");
@@ -3510,7 +3529,7 @@ function setGlobalWorkerMessageHandler(handler) {
 }
 
 // src/zig.ts
-import { existsSync as existsSync2, writeFileSync } from "fs";
+import { existsSync as existsSync3, writeFileSync } from "fs";
 
 // src/types.ts
 var TextAttributes2 = {
@@ -3878,8 +3897,8 @@ function visualizeRenderableTree2(renderable, maxDepth = 10) {
       const lastChildIndex = children.length - 1;
       children.forEach((child, index) => {
         const childIsLast = index === lastChildIndex;
-        const connector = childIsLast ? "└── " : "├── ";
-        const childPrefix = parentPrefix + (isLastChild ? "    " : "│   ");
+        const connector = childIsLast ? "\u2514\u2500\u2500 " : "\u251C\u2500\u2500 ";
+        const childPrefix = parentPrefix + (isLastChild ? "    " : "\u2502   ");
         const childLines = buildTreeLines(child, childPrefix + connector, childPrefix, childIsLast, depth + 1);
         lines.push(...childLines);
       });
@@ -5630,7 +5649,7 @@ var AudioStatsStruct = defineStruct([
 ]);
 
 // src/lib/bunfs.ts
-import { basename, join as join2 } from "node:path";
+import { basename, join as join2 } from "path";
 function isBunfsPath(path) {
   return path.includes("$bunfs") || /^B:[\\/]~BUN/i.test(path);
 }
@@ -5639,6 +5658,35 @@ function getBunfsRootPath() {
 }
 function normalizeBunfsPath(fileName) {
   return join2(getBunfsRootPath(), basename(fileName));
+}
+
+// src/platform/runtime-assets.bun.ts
+import { existsSync as existsSync2 } from "fs";
+import { dirname as dirname2, resolve as resolve2 } from "path";
+import { fileURLToPath as fileURLToPath4 } from "url";
+
+// src/lib/tree-sitter/default-parser-assets.bun.ts
+var bundledAssetLoaders = {
+  "assets/javascript/highlights.scm": () => import("./assets/javascript/highlights.scm", { with: { type: "file" } }),
+  "assets/javascript/tree-sitter-javascript.wasm": () => import("./assets/javascript/tree-sitter-javascript.wasm", { with: { type: "file" } }),
+  "assets/typescript/highlights.scm": () => import("./assets/typescript/highlights.scm", { with: { type: "file" } }),
+  "assets/typescript/tree-sitter-typescript.wasm": () => import("./assets/typescript/tree-sitter-typescript.wasm", { with: { type: "file" } }),
+  "assets/typescriptreact/highlights.scm": () => import("./assets/typescriptreact/highlights.scm", { with: { type: "file" } }),
+  "assets/typescriptreact/tree-sitter-tsx.wasm": () => import("./assets/typescriptreact/tree-sitter-tsx.wasm", { with: { type: "file" } }),
+  "assets/markdown/highlights.scm": () => import("./assets/markdown/highlights.scm", { with: { type: "file" } }),
+  "assets/markdown/tree-sitter-markdown.wasm": () => import("./assets/markdown/tree-sitter-markdown.wasm", { with: { type: "file" } }),
+  "assets/markdown/injections.scm": () => import("./assets/markdown/injections.scm", { with: { type: "file" } }),
+  "assets/markdown_inline/highlights.scm": () => import("./assets/markdown_inline/highlights.scm", { with: { type: "file" } }),
+  "assets/markdown_inline/tree-sitter-markdown_inline.wasm": () => import("./assets/markdown_inline/tree-sitter-markdown_inline.wasm", { with: { type: "file" } }),
+  "assets/zig/highlights.scm": () => import("./assets/zig/highlights.scm", { with: { type: "file" } }),
+  "assets/zig/tree-sitter-zig.wasm": () => import("./assets/zig/tree-sitter-zig.wasm", { with: { type: "file" } })
+};
+function resolveBundledDefaultParserAsset(relativePath, fallbackPath) {
+  const loadBundledFile = bundledAssetLoaders[relativePath];
+  if (!loadBundledFile) {
+    throw new Error(`Unknown OpenTUI default parser asset: ${JSON.stringify(relativePath)}`);
+  }
+  return resolveBundledFilePath2(`@opentui/core/${relativePath}`, loadBundledFile, fallbackPath, import.meta.url);
 }
 
 // src/published-package.ts
@@ -5684,18 +5732,44 @@ function getCurrentNodeAssetTarget() {
   };
 }
 
-// src/platform/runtime-assets.node.ts
+// src/platform/runtime-assets.bun.ts
 var CORE_ASSET_PREFIX = "@opentui/core/";
 var PARSER_WORKER_ASSET_KEY = `${CORE_ASSET_PREFIX}parser.worker.js`;
 var TREE_SITTER_WASM_ASSET_KEY = "web-tree-sitter/tree-sitter.wasm";
-function resolveDefaultParserAsset(relativePath, fallbackPath) {
-  return Promise.resolve(resolveAssetPath(`${CORE_ASSET_PREFIX}${relativePath}`, fallbackPath));
+var REBUILT_LIB_OUTPUT_NAMES = {
+  "darwin-x64": "x86_64-macos",
+  "darwin-arm64": "aarch64-macos",
+  "linux-x64": "x86_64-linux",
+  "linux-arm64": "aarch64-linux",
+  "linux-x64-musl": "x86_64-linux-musl",
+  "linux-arm64-musl": "aarch64-linux-musl",
+  "win32-x64": "x86_64-windows",
+  "win32-arm64": "aarch64-windows"
+};
+var REBUILT_LIB_ROOTS = ["../../../native/lib", "../../native/lib"];
+function rebuiltNativeLibraryPath(fileName) {
+  const target = getCurrentNodeAssetTarget();
+  const libcSuffix = target.platform === "linux" && target.libc === "musl" ? "-musl" : "";
+  const outputName = REBUILT_LIB_OUTPUT_NAMES[`${target.platform}-${target.arch}${libcSuffix}`];
+  if (outputName === undefined)
+    return null;
+  const moduleDir = dirname2(fileURLToPath4(import.meta.url));
+  for (const root of REBUILT_LIB_ROOTS) {
+    const candidate = resolve2(moduleDir, root, outputName, fileName);
+    if (existsSync2(candidate))
+      return candidate;
+  }
+  return null;
 }
-function resolveDefaultTreeSitterWorkerPath(fallbackPath) {
-  return resolveAssetPath(PARSER_WORKER_ASSET_KEY, fallbackPath);
+var bundledTreeSitterWorkerPath = await resolveBundledFilePath2(PARSER_WORKER_ASSET_KEY, () => import("./parser.worker.js", { with: { type: "file" } }), new URL("../lib/tree-sitter/parser.worker.js", import.meta.url), import.meta.url, { useAssetRoot: false });
+function resolveDefaultParserAsset(relativePath, fallbackPath) {
+  return resolveBundledDefaultParserAsset(relativePath, fallbackPath);
+}
+function resolveDefaultTreeSitterWorkerPath(_fallbackPath) {
+  return resolveAssetPath(PARSER_WORKER_ASSET_KEY, bundledTreeSitterWorkerPath);
 }
 function resolveTreeSitterWasm() {
-  return Promise.resolve(resolveAssetPath(TREE_SITTER_WASM_ASSET_KEY, () => new URL(import.meta.resolve(TREE_SITTER_WASM_ASSET_KEY))));
+  return resolveBundledFilePath2(TREE_SITTER_WASM_ASSET_KEY, () => import("web-tree-sitter/tree-sitter.wasm", { with: { type: "wasm" } }), () => import.meta.resolve(TREE_SITTER_WASM_ASSET_KEY), import.meta.url);
 }
 async function resolveNativeLibraryPath() {
   const asset = getNativeAssetDescriptor(getCurrentNodeAssetTarget());
@@ -5703,8 +5777,41 @@ async function resolveNativeLibraryPath() {
   if (configuredPath !== undefined) {
     return configuredPath;
   }
-  const specifier = asset.packageName;
-  return (await import(specifier)).default;
+  const rebuiltPath = rebuiltNativeLibraryPath(asset.fileName);
+  if (rebuiltPath !== null) {
+    return rebuiltPath;
+  }
+  if (process.platform === "darwin") {
+    if (process.arch === "x64") {
+      return (await import("@clarkarch/opentui-fork-darwin-x64")).default;
+    }
+    if (process.arch === "arm64") {
+      return (await import("@clarkarch/opentui-fork-darwin-arm64")).default;
+    }
+  }
+  if (process.platform === "linux") {
+    if (process.arch === "x64") {
+      if (process.env.OPENTUI_LIBC === "musl") {
+        return (await import("@clarkarch/opentui-fork-linux-x64-musl")).default;
+      }
+      return (await import("@clarkarch/opentui-fork-linux-x64")).default;
+    }
+    if (process.arch === "arm64") {
+      if (process.env.OPENTUI_LIBC === "musl") {
+        return (await import("@clarkarch/opentui-fork-linux-arm64-musl")).default;
+      }
+      return (await import("@clarkarch/opentui-fork-linux-arm64")).default;
+    }
+  }
+  if (process.platform === "win32") {
+    if (process.arch === "x64") {
+      return (await import("@clarkarch/opentui-fork-win32-x64")).default;
+    }
+    if (process.arch === "arm64") {
+      return (await import("@clarkarch/opentui-fork-win32-arm64")).default;
+    }
+  }
+  throw new Error(`OpenTUI is not supported on the current platform: ${asset.packageName}`);
 }
 
 // src/zig.ts
@@ -5974,6 +6081,7 @@ var NativeStatus2;
   NativeStatus[NativeStatus["LayoutLimit"] = -26] = "LayoutLimit";
   NativeStatus[NativeStatus["FrameBusy"] = -27] = "FrameBusy";
   NativeStatus[NativeStatus["FrameRequestLimit"] = -28] = "FrameRequestLimit";
+  NativeStatus[NativeStatus["VideoFailed"] = -60] = "VideoFailed";
 })(NativeStatus2 ||= {});
 
 class NativeError2 extends Error {
@@ -6057,7 +6165,7 @@ try {
   if (isBunfsPath(targetLibPath)) {
     targetLibPath = targetLibPath.replace("../", "");
   }
-  if (!existsSync2(targetLibPath)) {
+  if (!existsSync3(targetLibPath)) {
     throw new Error(`OpenTUI native library does not exist at ${JSON.stringify(targetLibPath)}`);
   }
 } catch (error) {
@@ -6102,6 +6210,12 @@ registerEnvVar2({
 registerEnvVar2({
   name: "OPENTUI_FORCE_NOZWJ",
   description: "Use no_zwj width mode when the variable is present",
+  type: "string",
+  required: false
+});
+registerEnvVar2({
+  name: "OPENTUI_EXPERIMENTAL_VIDEO_HWACCEL",
+  description: "Experimental: decode video with VideoToolbox on macOS when set to exactly 1 or true; otherwise or on failure, decode in software",
   type: "string",
   required: false
 });
@@ -6161,7 +6275,18 @@ var MOUSE_STYLE_TO_ID = {
 var SCENE_BORDER_STYLES = ["single", "double", "rounded", "heavy"];
 var SCENE_TEXT_WRAP_MODES = ["none", "char", "word"];
 var SCENE_TEXT_ALIGNS = ["left", "center", "right"];
-var SCENE_NODE_KINDS = ["root", "box", "text", "slider", "arrow", "editor", "custom", "text_view", "image"];
+var SCENE_NODE_KINDS = [
+  "root",
+  "box",
+  "text",
+  "slider",
+  "arrow",
+  "editor",
+  "custom",
+  "text_view",
+  "image",
+  "video"
+];
 var IMAGE_PROTOCOL_TO_ID = { auto: 0, kitty: 1, sixel: 2, blocks: 3 };
 var IMAGE_FITS = ["fit", "cover", "fill"];
 var BUFFER_DRAW_OPERATIONS = new Map([
@@ -6538,8 +6663,8 @@ function encodeBufferDrawRecord(context, options, words, signed, colors, base, s
       const fields = nativeLayouts.ot_buffer_draw_text_record.fields;
       encodeDrawPosition(signed, fields, options, base);
       words[word + fields.attributes.offset / 4] = toSafeFFIU32Length(options.attributes ?? 0, "Buffer attributes");
-      if (encodeDrawColors(colors, fields, options, base))
-        words[word + header.flags.offset / 4] = nativeConstants.OT_BUFFER_DRAW_HAS_BACKGROUND;
+      words[word + fields.max_width.offset / 4] = toSafeFFIU32Length(options.maxWidth ?? 0, "Buffer text width");
+      words[word + header.flags.offset / 4] = (encodeDrawColors(colors, fields, options, base) ? nativeConstants.OT_BUFFER_DRAW_HAS_BACKGROUND : 0) | (options.ellipsis ? nativeConstants.OT_BUFFER_DRAW_FIT_ELLIPSIS : 0);
       break;
     }
     case "cell":
@@ -8089,6 +8214,8 @@ class FFIRenderLib2 {
   sceneFlushApplied = new Uint32Array(1);
   editorSelectionRecord = createEditorSelectionRecord();
   editorViewInfoRecord = createContextRecord(nativeLayouts.ot_editor_view_info);
+  videoStateRecord = new Uint8Array(nativeLayouts.ot_video_state.size);
+  videoStateView = new DataView(this.videoStateRecord.buffer);
   selectionResetRecord = encodeEditorSelection({ operation: 2 /* Reset */ });
   localSelectionResetRecord = encodeEditorSelection({
     operation: 5 /* LocalReset */
@@ -9448,6 +9575,129 @@ class FFIRenderLib2 {
       nativeResult("ot_scene_set_image", this.opentui.symbols.ot_scene_set_image(pointer, handle, source, fitId, protocolId, storage, opacityOverride));
     });
   }
+  sceneSetVideo(context, node, fit, buffer) {
+    const handle = encodeContextHandle(context, node);
+    const storage = buffer === null ? null : encodeContextHandle(context, buffer);
+    const fitId = IMAGE_FITS.indexOf(fit);
+    if (fitId < 0)
+      throw new TypeError("Unknown video fit");
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_scene_set_video");
+      nativeResult("ot_scene_set_video", this.opentui.symbols.ot_scene_set_video(pointer, handle, fitId, storage));
+    });
+  }
+  sceneSetCrop(context, node, crop) {
+    const handle = encodeContextHandle(context, node);
+    const { left = 0, top = 0, width = 0, height = 0 } = crop ?? {};
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_scene_set_crop");
+      nativeResult("ot_scene_set_crop", this.opentui.symbols.ot_scene_set_crop(pointer, handle, left, top, width, height));
+    });
+  }
+  videoOpen(context, node, path, audio) {
+    const handle = encodeContextHandle(context, node);
+    const bytes = path.length === 0 ? null : sessionBytes(this.encoder.encode(path), "Video path length");
+    const layout = nativeLayouts.ot_video_info;
+    const output = new Uint8Array(layout.size);
+    const flags = audio ? 0 : nativeConstants.OT_VIDEO_OPEN_NO_AUDIO;
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_video_open");
+      nativeResult("ot_video_open", this.opentui.symbols.ot_video_open(pointer, handle, bytes, bytes?.byteLength ?? 0, flags, output));
+    });
+    const view = new DataView(output.buffer);
+    const fields = layout.fields;
+    return {
+      durationUs: view.getBigInt64(fields.duration_us.offset, true),
+      width: view.getUint32(fields.width.offset, true),
+      height: view.getUint32(fields.height.offset, true),
+      fpsNum: view.getUint32(fields.fps_num.offset, true),
+      fpsDen: view.getUint32(fields.fps_den.offset, true),
+      hasAudio: view.getUint32(fields.has_audio.offset, true) !== 0
+    };
+  }
+  videoCall(context, node, operation) {
+    const handle = encodeContextHandle(context, node);
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, operation);
+      nativeResult(operation, this.opentui.symbols[operation](pointer, handle));
+    });
+  }
+  videoSeek(context, node, timeUs) {
+    const handle = encodeContextHandle(context, node);
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_video_seek");
+      nativeResult("ot_video_seek", this.opentui.symbols.ot_video_seek(pointer, handle, timeUs));
+    });
+  }
+  videoSetLoop(context, node, loop) {
+    const handle = encodeContextHandle(context, node);
+    const value = toFFIBool(loop, "Video loop");
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_video_set_loop");
+      nativeResult("ot_video_set_loop", this.opentui.symbols.ot_video_set_loop(pointer, handle, value));
+    });
+  }
+  videoSetMuted(context, node, muted) {
+    const handle = encodeContextHandle(context, node);
+    const value = toFFIBool(muted, "Video muted");
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_video_set_muted");
+      nativeResult("ot_video_set_muted", this.opentui.symbols.ot_video_set_muted(pointer, handle, value));
+    });
+  }
+  videoSetVolume(context, node, volume) {
+    const handle = encodeContextHandle(context, node);
+    const value = toFFIF32(volume, "Video volume");
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_video_set_volume");
+      nativeResult("ot_video_set_volume", this.opentui.symbols.ot_video_set_volume(pointer, handle, value));
+    });
+  }
+  videoSetAvSyncOffset(context, node, offsetUs) {
+    const handle = encodeContextHandle(context, node);
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_video_set_av_sync_offset");
+      nativeResult("ot_video_set_av_sync_offset", this.opentui.symbols.ot_video_set_av_sync_offset(pointer, handle, offsetUs));
+    });
+  }
+  videoSetMaxFps(context, node, fps) {
+    const handle = encodeContextHandle(context, node);
+    if (!isFFIU32(fps))
+      throw new RangeError("Video maxFps must be a u32");
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_video_set_max_fps");
+      nativeResult("ot_video_set_max_fps", this.opentui.symbols.ot_video_set_max_fps(pointer, handle, fps));
+    });
+  }
+  videoGetState(context, node) {
+    const handle = encodeContextHandle(context, node);
+    const layout = nativeLayouts.ot_video_state;
+    const output = this.videoStateRecord;
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_video_get_state");
+      nativeResult("ot_video_get_state", this.opentui.symbols.ot_video_get_state(pointer, handle, output));
+    });
+    const view = this.videoStateView;
+    const flags = view.getUint32(layout.fields.flags.offset, true);
+    return {
+      currentTimeUs: view.getBigInt64(layout.fields.current_time_us.offset, true),
+      framePtsUs: view.getBigInt64(layout.fields.frame_pts_us.offset, true),
+      playing: (flags & nativeConstants.OT_VIDEO_PLAYING) !== 0,
+      ended: (flags & nativeConstants.OT_VIDEO_ENDED) !== 0,
+      buffering: (flags & nativeConstants.OT_VIDEO_BUFFERING) !== 0,
+      audio: (flags & nativeConstants.OT_VIDEO_AUDIO) !== 0,
+      hasFrame: (flags & nativeConstants.OT_VIDEO_HAS_FRAME) !== 0,
+      failed: (flags & nativeConstants.OT_VIDEO_ERROR) !== 0,
+      qualityTier: view.getUint32(layout.fields.quality_tier.offset, true)
+    };
+  }
+  videoGetError(context, node) {
+    const handle = encodeContextHandle(context, node);
+    return this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_video_get_error");
+      return this.readText("ot_video_get_error", (bytes, capacity, count) => this.opentui.symbols.ot_video_get_error(pointer, handle, bytes, capacity, count));
+    });
+  }
   contextDrawImage({ context, target, frame }, image, options) {
     const layout = nativeLayouts.ot_image_draw_options;
     const handle = encodeContextHandle(context, target);
@@ -9800,7 +10050,10 @@ class FFIRenderLib2 {
       width: words[layout.fields.width.offset / 4],
       height: words[layout.fields.height.offset / 4],
       frameCount: output[layout.fields.frame_count.offset / 8],
-      framePending: words[layout.fields.frame_pending.offset / 4] !== 0
+      framePending: words[layout.fields.frame_pending.offset / 4] !== 0,
+      imageUploadsPending: words[layout.fields.image_uploads_pending.offset / 4],
+      droppedFrames: words[layout.fields.dropped_frames.offset / 4],
+      droppedFrameBytes: words[layout.fields.dropped_frame_bytes.offset / 4]
     };
   }
   sessionAcquireBufferLease(context, session, which) {
@@ -10181,6 +10434,15 @@ class FFIRenderLib2 {
     nativeResult("ot_session_drain_stdout", this.opentui.symbols.ot_session_drain_stdout(pointer, handle, limit, output));
     return output[0];
   }
+  sessionPostStdout(context, session, maxBytes, wait) {
+    const handle = encodeContextHandle(context, session);
+    const limit = toSafeFFIU32Length(maxBytes, "Stdout byte limit");
+    const state = new Uint32Array(1);
+    const written = new Uint32Array(1);
+    const pointer = this.nativeContextPointer(context, "ot_session_post_stdout");
+    nativeResult("ot_session_post_stdout", this.opentui.symbols.ot_session_post_stdout(pointer, handle, limit, wait ? 1 : 0, state, written));
+    return { written: written[0], inFlight: state[0] === 1 };
+  }
   sessionCompleteOutput(context, session, ticket, success) {
     const layout = nativeLayouts.ot_output_ticket;
     const written = toFFIBool(success, "Session output success");
@@ -10195,6 +10457,10 @@ class FFIRenderLib2 {
   sessionClose(context, session) {
     const handle = encodeContextHandle(context, session);
     nativeResult("ot_session_close", this.opentui.symbols.ot_session_close(this.nativeContextPointer(context, "ot_session_close"), handle));
+  }
+  sessionDropOutput(context, session) {
+    const handle = encodeContextHandle(context, session);
+    nativeResult("ot_session_drop_output", this.opentui.symbols.ot_session_drop_output(this.nativeContextPointer(context, "ot_session_drop_output"), handle));
   }
   sessionCancel(context, session) {
     const handle = encodeContextHandle(context, session);
@@ -13085,5 +13351,5 @@ var yoga_default = Yoga;
 
 export { nativeLayouts, nativeConstants, toArrayBuffer, singleton, getSingleton, destroySingleton, envRegistry2, registerEnvVar2, clearEnvCache2, generateEnvMarkdown2, generateEnvColored2, env2, stringWidth, resolveBundledFilePath2, Worker, TextAttributes2, ATTRIBUTE_BASE_BITS2, ATTRIBUTE_BASE_MASK2, getBaseAttributes2, DebugOverlayCorner2, TargetChannel2, DEFAULT_FOREGROUND_RGB2, DEFAULT_BACKGROUND_RGB2, normalizeIndexedColorIndex2, ansi256IndexToRgb2, RGBA2, normalizeColorValue2, hexToRgb2, rgbToHex2, hsvToRgb2, parseColor2, createTextAttributes2, attributesWithLink2, getLinkId2, visualizeRenderableTree2, isStyledText2, StyledText2, stringToStyledText2, black2, red2, green2, yellow2, blue2, magenta2, cyan2, white2, brightBlack2, brightRed2, brightGreen2, brightYellow2, brightBlue2, brightMagenta2, brightCyan2, brightWhite2, bgBlack2, bgRed2, bgGreen2, bgYellow2, bgBlue2, bgMagenta2, bgCyan2, bgWhite2, bold2, italic2, underline2, strikethrough2, dim2, reverse2, blink2, fg2, bg2, link2, t2, YogaEnumKind, YogaFloatKind, YogaValueKind, sceneSetEnum, sceneGetEnum, sceneSetFloat, sceneGetFloat, sceneSetValue, sceneGetValue, sceneSetDimension, UNDEFINED_VALUE, parseYogaValue, SpanInfoStruct, NativeAudioStreamFormat2, NativeAudioStreamState2, NativeAudioStreamStateNames, NativeAudioStreamCloseReason2, isBunfsPath, normalizeBunfsPath, resolveDefaultParserAsset, resolveDefaultTreeSitterWorkerPath, resolveTreeSitterWasm, NativeAudioStreamState3, NativeAudioStreamCloseReason3, NativeAudioStreamFormat3, MAX_LINK_URL_BYTES2, NativeTextViewCommand2, NativeEditCommand2, NativeEditPositionQuery2, NativeEditorStyleMask2, NativeEditHighlightOperation2, NativeEditorCommand2, NativeEditorSelectionOperation2, NativeEditorPositionQuery2, NativeEditEvent2, NativeStyleGroup, NativeStyleFlags, NATIVE_EDGE_NONE2, NativeBorder2, NativeSceneHook2, NativeSceneFrame2, NativeScenePaintPhase2, emptySceneScrollState, NATIVE_BUFFER_TEXT_BYTES_MAX2, NativeSessionState2, NativeSessionRenderStatus2, NATIVE_SESSION_CONTROL_PACKET_BYTES2, NativeSessionTerminalPhase2, NativeSessionPumpStatus2, NativeStatus2, NativeError2, NativeClipboardOperationStatus2, NativeClipboardStartStatus2, NativeClipboardCancelStatus2, NativeClipboardCopyStatus2, NativeClipboardDestroyStatus2, NativeClipboardShutdownStatus2, SceneStaging, NativePaintRecorder, LogLevel2, FFIRenderLib2, setRenderLibPath2, resolveRenderLib2, Align2, BoxSizing2, Dimension2, Direction2, Display2, Edge2, Errata2, ExperimentalFeature2, FlexDirection2, Gutter2, Justify2, LogLevel3, MeasureMode2, NodeType2, Overflow2, PositionType2, Unit2, Wrap2, ALIGN_AUTO2, ALIGN_FLEX_START2, ALIGN_CENTER2, ALIGN_FLEX_END2, ALIGN_STRETCH2, ALIGN_BASELINE2, ALIGN_SPACE_BETWEEN2, ALIGN_SPACE_AROUND2, ALIGN_SPACE_EVENLY2, BOX_SIZING_BORDER_BOX2, BOX_SIZING_CONTENT_BOX2, DIMENSION_WIDTH2, DIMENSION_HEIGHT2, DIRECTION_INHERIT2, DIRECTION_LTR2, DIRECTION_RTL2, DISPLAY_FLEX2, DISPLAY_NONE2, DISPLAY_CONTENTS2, EDGE_LEFT2, EDGE_TOP2, EDGE_RIGHT2, EDGE_BOTTOM2, EDGE_START2, EDGE_END2, EDGE_HORIZONTAL2, EDGE_VERTICAL2, EDGE_ALL2, ERRATA_NONE2, ERRATA_STRETCH_FLEX_BASIS2, ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2, ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2, ERRATA_ALL2, ERRATA_CLASSIC2, EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2, FLEX_DIRECTION_COLUMN2, FLEX_DIRECTION_COLUMN_REVERSE2, FLEX_DIRECTION_ROW2, FLEX_DIRECTION_ROW_REVERSE2, GUTTER_COLUMN2, GUTTER_ROW2, GUTTER_ALL2, JUSTIFY_FLEX_START2, JUSTIFY_CENTER2, JUSTIFY_FLEX_END2, JUSTIFY_SPACE_BETWEEN2, JUSTIFY_SPACE_AROUND2, JUSTIFY_SPACE_EVENLY2, LOG_LEVEL_ERROR2, LOG_LEVEL_WARN2, LOG_LEVEL_INFO2, LOG_LEVEL_DEBUG2, LOG_LEVEL_VERBOSE2, LOG_LEVEL_FATAL2, MEASURE_MODE_UNDEFINED2, MEASURE_MODE_EXACTLY2, MEASURE_MODE_AT_MOST2, NODE_TYPE_DEFAULT2, NODE_TYPE_TEXT2, OVERFLOW_VISIBLE2, OVERFLOW_HIDDEN2, OVERFLOW_SCROLL2, POSITION_TYPE_STATIC2, POSITION_TYPE_RELATIVE2, POSITION_TYPE_ABSOLUTE2, UNIT_UNDEFINED2, UNIT_POINT2, UNIT_PERCENT2, UNIT_AUTO2, WRAP_NO_WRAP2, WRAP_WRAP2, WRAP_WRAP_REVERSE2, YogaStatus2, YogaError2, Config2, Node2, exports_yoga, yoga_default };
 
-//# debugId=C6507EC814390D9E64756E2164756E21
-//# sourceMappingURL=chunk-node-68spbb5k.js.map
+//# debugId=D90DEF407AECCE3D64756E2164756E21
+//# sourceMappingURL=chunk-bun-czn0yf20.js.map

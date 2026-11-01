@@ -92,6 +92,13 @@ export interface CliRendererErrorEvent {
     error: Error;
     renderable: Renderable | undefined;
 }
+/** A frame whose output, without image uploads, is larger than one frame of Session output. */
+export interface CliRendererFrameDroppedEvent {
+    /** The frame's encoded size in bytes. */
+    bytes: number;
+    /** The most bytes one frame can write. */
+    limit: number;
+}
 export interface RendererSchedulerState {
     isRunning: boolean;
     isRendering: boolean;
@@ -204,6 +211,7 @@ export declare enum CliRenderEvents {
     RESIZE = "resize",
     FRAME = "frame",
     RENDER_ERROR = "render:error",
+    FRAME_DROPPED = "frame:dropped",
     HANDLER_ERROR = "handler:error",
     EXTERNAL_OUTPUT = "external_output",
     FOCUS = "focus",
@@ -344,11 +352,16 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private pendingSplitFooterTransition;
     private forceFullRepaintRequested;
     private readonly maxSplitCommitsPerFrame;
+    private splitCommitLimit;
+    private droppedFrames;
+    private dropRetried;
     private _terminalWidth;
     private _terminalHeight;
     private _terminalIsSetup;
     private externalOutputQueue;
     private pendingExternalOutputMode;
+    private readonly stdoutDecoder;
+    private stdoutEscape;
     private realStdoutWrite;
     private _useConsole;
     private sigwinchHandler;
@@ -477,8 +490,8 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     /**
      * Report program status with OSC 7501. Terminals that do not implement the
      * protocol ignore it, so this does not wait for `capabilities.program_status`.
-     * Returns false when the report is not queued: the renderer is destroyed, the
-     * terminal is not active, or output is full. Invalid reports throw.
+     * Returns false when the report is not queued: the session failed or is closing (from the
+     * microtask after `destroy()`), the terminal is not active, or output is full. Invalid reports throw.
      */
     setProgramStatus(status: ProgramStatus): boolean;
     get themeMode(): ThemeMode | null;
@@ -500,9 +513,12 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private getPendingSplitTailColumn;
     private enqueueRenderedScrollbackCommit;
     private enqueueSplitCommits;
+    private emitExternalOutput;
     private splitStdoutRows;
     private createStdoutSnapshotCommits;
+    private flushStdoutDecoder;
     private interceptStdoutWrite;
+    private createDroppedRowCommit;
     private getSplitPinnedRenderOffset;
     private getSplitCursorSeedRows;
     private isSplitCursorSeedFrameBlocked;
@@ -650,6 +666,11 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
      * `nativeTerminalTransition` first, so a frame without a transition does not yield. */
     private waitForTerminalTransition;
     intermediateRender(): void;
+    /**
+     * After a failed frame: false unless the frame was dropped for its size. A dropped scrollback batch goes again one
+     * commit at a time, and a single commit is dropped. Each dropped content is reported once.
+     */
+    private handleDroppedFrame;
     private presentNativeScene;
     private completeNativeSplitCommits;
     private flushNativeSplitOutput;

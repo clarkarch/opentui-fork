@@ -1,5 +1,5 @@
 import { Renderable, type RenderableOptions, type NativeRenderableIntegration } from "../Renderable.js";
-import { NativeImage, type ImageSource } from "../image.js";
+import { NativeImage, type ExtractOptions, type ImageSource } from "../image.js";
 import type { OptimizedBuffer } from "../buffer.js";
 import type { ImageRenderProtocol, RenderContext, TerminalCapabilities } from "../types.js";
 export type ImageFit = "fit" | "cover" | "fill";
@@ -7,6 +7,8 @@ export type ImageRenderableSource = ImageSource | NativeImage;
 export interface ImageRenderableOptions extends RenderableOptions<ImageRenderable> {
     source?: ImageRenderableSource;
     fit?: ImageFit;
+    /** The region of the source to show, in source pixels; `fit` applies to it. */
+    crop?: ExtractOptions;
     protocol?: ImageRenderProtocol;
     /** tfm fork (scrims): 0..1 replaces the inherited render-tree opacity for this
      * image's placements (survives a dimmed ancestor, e.g. a modal scrim); leaving
@@ -16,6 +18,10 @@ export interface ImageRenderableOptions extends RenderableOptions<ImageRenderabl
     onError?: (error: unknown) => void;
 }
 export declare function resolveImageRenderProtocol(requested: ImageRenderProtocol, capabilities: TerminalCapabilities | null, hasResolution: boolean): Exclude<ImageRenderProtocol, "auto">;
+/** @internal Copies a crop of u32 pixels with a positive size that lies inside a width x height source, or throws. */
+export declare function checkCrop(crop: ExtractOptions, width?: number, height?: number): ExtractOptions;
+/** @internal */
+export declare function sameCrop(a: ExtractOptions | undefined, b: ExtractOptions | undefined): boolean;
 export declare class ImageRenderable extends Renderable {
     static readonly nativeIntegration: NativeRenderableIntegration;
     private _source;
@@ -26,6 +32,7 @@ export declare class ImageRenderable extends Renderable {
     onLoad?: (image: NativeImage) => void;
     onError?: (error: unknown) => void;
     private _fit;
+    private _crop;
     private _protocol;
     private _placementOpacity;
     loadPromise: Promise<void> | null;
@@ -35,6 +42,9 @@ export declare class ImageRenderable extends Renderable {
     get image(): NativeImage | null;
     get fit(): ImageFit;
     set fit(value: ImageFit | null | undefined);
+    get crop(): ExtractOptions | undefined;
+    /** A crop that is not whole pixels, or lies outside the loaded image, reports through onError and keeps the previous one. */
+    set crop(value: ExtractOptions | null | undefined);
     get protocol(): ImageRenderProtocol;
     set protocol(value: ImageRenderProtocol | null | undefined);
     /** tfm fork (scrims): placement-level opacity override, see placementOpacity. */
@@ -51,6 +61,8 @@ export declare class ImageRenderable extends Renderable {
     protected createFrameBuffer(): void;
     protected renderSelf(buffer: OptimizedBuffer): void;
     private load;
+    private region;
+    private acceptCrop;
     private setNativeSceneImage;
     protected destroySelf(): void;
 }
