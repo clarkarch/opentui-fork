@@ -84,6 +84,13 @@ This branch is a fork that carries patches upstream does not have. It is publish
 - A vendored patch written for a FEATURE-DISABLED build only covers the code that build actually analyzed. When the fork
   turns a protocol ON that upstream turns OFF, the newly-live code needs its own audit against the upstream Zig version,
   not just the vendored patch.
+- The fork carries an **aspect-preserving placement** patch (`OT_IMAGE_DRAW_PRESERVE_ASPECT`): the Kitty and Sixel
+  writers used to resize a placement's source to the placement's pixel box, and a cell grid makes a mismatched box the
+  common case (the fitted cell size is rounded). A "fit" placement is now letterboxed inside its box instead — the art
+  keeps its shape and the box gets transparent margins. The point is not only geometry: the old resize was a RESAMPLE,
+  so a small raster was both warped and softened by the area filter. Letterboxing keeps a source that already fits the
+  box at its native size (no resample at all), so it stays crisp. `fill` (stretch) and `cover` (crop) are unchanged, and
+  a zeroed options record still stretches.
 
 ## Portable FFI
 
