@@ -725,6 +725,11 @@ pub const OptimizedBuffer = struct {
         /// `opacity`, so a multi-pass frame applies a region exactly once per
         /// placement (a re-place in a later pass starts false again).
         dim_applied: bool = false,
+        /// true when the source keeps its aspect inside the pixel box: the
+        /// protocol writers letterbox the image instead of stretching it to
+        /// the box (the "fit" mode). A stretched icon arrives distorted
+        /// whenever the box's aspect differs from the source's.
+        preserve_aspect: bool = false,
         protocol: native_image.RenderProtocol,
     };
 
@@ -3674,7 +3679,7 @@ pub const OptimizedBuffer = struct {
         source_height: u32,
         protocol: native_image.RenderProtocol,
     ) !bool {
-        return self.drawImageWithOptions(image, image_handle, pos_x, pos_y, width, height, pixel_width, pixel_height, source_x, source_y, source_width, source_height, protocol, -1.0);
+        return self.drawImageWithOptions(image, image_handle, pos_x, pos_y, width, height, pixel_width, pixel_height, source_x, source_y, source_width, source_height, protocol, -1.0, false);
     }
 
     pub fn drawImageWithOptions(
@@ -3693,6 +3698,9 @@ pub const OptimizedBuffer = struct {
         source_height: u32,
         protocol: native_image.RenderProtocol,
         opacity_override: f32,
+        /// The source keeps its aspect inside the pixel box; the protocol
+        /// writers letterbox it instead of stretching it to the box.
+        preserve_aspect: bool,
     ) !bool {
         const chosen_opacity: f32 = if (opacity_override >= 0) opacity_override else self.getCurrentOpacity();
         const opacity = opacityToU8(chosen_opacity);
@@ -3743,6 +3751,7 @@ pub const OptimizedBuffer = struct {
             .source_height = source_end_y - clipped_source_y,
             .opacity = opacity,
             .opacity_overridden = opacity_override >= 0,
+            .preserve_aspect = preserve_aspect,
             .protocol = protocol,
         });
         @constCast(image).retain();

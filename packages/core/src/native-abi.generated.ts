@@ -1,7 +1,7 @@
 // Generated from packages/native/include/opentui.h and scripts/native-abi-pointers.ts.
 // Run `bun run generate:abi` in packages/core. Do not edit.
 // Inspect audit input: bun scripts/native-abi.ts --audit
-// ABI audit SHA-256: 503a785e6116e76d19d2d203d0b38c1f61f4e87b7e9b06a286068ff346b52094
+// ABI audit SHA-256: f4a21f4d262894c57793c6b8d861eecb181f93731de94e09ab033e02ee1fc7c9
 
 export const OT_CONTEXT_ABI_VERSION = 2
 export const OT_OK = 0
@@ -521,6 +521,7 @@ export const OT_IMAGE_PROTOCOL_BLOCKS = 3
 export const OT_IMAGE_DRAW_SOURCE_WIDTH = 1
 export const OT_IMAGE_DRAW_SOURCE_HEIGHT = 2
 export const OT_IMAGE_DRAW_OPACITY_OVERRIDE = 4
+export const OT_IMAGE_DRAW_PRESERVE_ASPECT = 8
 export const OT_IMAGE_ENCODED_BYTES_MAX = 67108864
 export const OT_IMAGE_FORMAT_UNKNOWN = 0
 export const OT_IMAGE_FORMAT_PNG = 1
@@ -3010,6 +3011,7 @@ export const nativeConstants = {
   OT_IMAGE_DRAW_SOURCE_WIDTH: 1,
   OT_IMAGE_DRAW_SOURCE_HEIGHT: 2,
   OT_IMAGE_DRAW_OPACITY_OVERRIDE: 4,
+  OT_IMAGE_DRAW_PRESERVE_ASPECT: 8,
   OT_IMAGE_ENCODED_BYTES_MAX: 67108864,
   OT_IMAGE_FORMAT_UNKNOWN: 0,
   OT_IMAGE_FORMAT_PNG: 1,

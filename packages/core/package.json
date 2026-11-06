@@ -9,7 +9,7 @@
   "types": "src/index.ts",
   "module": "src/index.ts",
   "main": "src/index.ts",
-  "version": "0.8.4-fork.1",
+  "version": "0.8.4-fork.2",
   "type": "module",
   "imports": {
     "#opentui/runtime-assets": {
@@ -78,14 +78,14 @@
     "web-tree-sitter": "0.25.10"
   },
   "optionalDependencies": {
-    "@clarkarch/opentui-fork-darwin-x64": "0.8.4-fork.1",
-    "@clarkarch/opentui-fork-darwin-arm64": "0.8.4-fork.1",
-    "@clarkarch/opentui-fork-linux-x64": "0.8.4-fork.1",
-    "@clarkarch/opentui-fork-linux-arm64": "0.8.4-fork.1",
-    "@clarkarch/opentui-fork-win32-x64": "0.8.4-fork.1",
-    "@clarkarch/opentui-fork-win32-arm64": "0.8.4-fork.1",
-    "@clarkarch/opentui-fork-linux-x64-musl": "0.8.4-fork.1",
-    "@clarkarch/opentui-fork-linux-arm64-musl": "0.8.4-fork.1"
+    "@clarkarch/opentui-fork-darwin-x64": "0.8.4-fork.2",
+    "@clarkarch/opentui-fork-darwin-arm64": "0.8.4-fork.2",
+    "@clarkarch/opentui-fork-linux-x64": "0.8.4-fork.2",
+    "@clarkarch/opentui-fork-linux-arm64": "0.8.4-fork.2",
+    "@clarkarch/opentui-fork-win32-x64": "0.8.4-fork.2",
+    "@clarkarch/opentui-fork-win32-arm64": "0.8.4-fork.2",
+    "@clarkarch/opentui-fork-linux-x64-musl": "0.8.4-fork.2",
+    "@clarkarch/opentui-fork-linux-arm64-musl": "0.8.4-fork.2"
   },
   "exports": {
     ".": {

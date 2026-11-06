@@ -611,6 +611,9 @@ export interface NativeContextImageDraw {
   /** tfm fork (scrims): 0..1 replaces the inherited render-tree opacity for this
    * draw; undefined/null inherits. Values > 1 are rejected natively. */
   opacityOverride?: number | null
+  /** Keep the source's aspect inside the pixel box: the native writer
+   * letterboxes the image instead of stretching it to the box. */
+  preserveAspect?: boolean
 }
 
 export interface NativeSceneTextSelectionOptions {
@@ -1778,10 +1781,12 @@ function encodeImageDrawOptions(options: NativeContextImageDraw, words: Uint32Ar
   if (opacityOverride !== undefined && opacityOverride !== null && (typeof opacityOverride !== "number" || Number.isNaN(opacityOverride))) throw new TypeError("Image opacity override must be a number")
   if (opacityOverride != null && (opacityOverride < 0 || opacityOverride > 1)) throw new TypeError("Image opacity override must be within 0..1")
   const hasOpacityOverride = opacityOverride !== undefined && opacityOverride !== null
+  const preserveAspect = options.preserveAspect === true
   words[word + fields.flags.offset / 4] =
     (sourceWidth === undefined || sourceWidth === null ? 0 : 1) |
     (sourceHeight === undefined || sourceHeight === null ? 0 : 2) |
-    (hasOpacityOverride ? nativeConstants.OT_IMAGE_DRAW_OPACITY_OVERRIDE : 0)
+    (hasOpacityOverride ? nativeConstants.OT_IMAGE_DRAW_OPACITY_OVERRIDE : 0) |
+    (preserveAspect ? nativeConstants.OT_IMAGE_DRAW_PRESERVE_ASPECT : 0)
   new Float32Array(signed.buffer, base + fields.opacity_override.offset, 1)[0] = hasOpacityOverride ? opacityOverride : -1
   for (const [field, value] of [
     ["width", options.width],

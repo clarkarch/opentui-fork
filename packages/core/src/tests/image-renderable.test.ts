@@ -226,6 +226,39 @@ describe("ImageRenderable image loading", () => {
     }
   })
 
+  test("asks the writer to keep the source's aspect only for fit", async () => {
+    // The pixel box of a fitted placement is rounded to whole cells, so its
+    // aspect rarely matches the source's. "fit" asks the native writer to
+    // letterbox the source inside the box; "cover" crops and "fill" stretches,
+    // so neither may letterbox.
+    const calls: unknown[][] = []
+    const fake = {
+      drawImage: (...args: unknown[]) => {
+        calls.push(args)
+        return true
+      },
+    }
+    for (const [fit, preservesAspect] of [
+      ["fit", true],
+      ["cover", false],
+      ["fill", false],
+    ] as const) {
+      const renderable = new ImageRenderable(renderer, {
+        source: await readFile(new URL("rgba.png", FIXTURES)),
+        fit,
+        width: 4,
+        height: 2,
+      })
+      await renderable.loadPromise
+      try {
+        ;(renderable as unknown as { renderSelf(buffer: unknown): void }).renderSelf(fake)
+        expect(calls.at(-1)?.at(-1)).toBe(preservesAspect)
+      } finally {
+        renderable.destroy()
+      }
+    }
+  })
+
   test("renders the centered source crop for cover", async () => {
     const renderable = new ImageRenderable(renderer, {
       source: await readFile(new URL("orientation.jpg", FIXTURES)),

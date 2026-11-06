@@ -242,6 +242,64 @@ test "renderer separates translucent Sixel cache entries by cell geometry" {
     );
 }
 
+test "renderer letterboxes a Kitty placement that keeps its aspect" {
+    var pools = TestPools.init(std.testing.allocator);
+    defer pools.deinit();
+
+    var test_renderer = try TestRenderer.create(std.testing.allocator, 4, 2, &pools.graphemes, &pools.links);
+    defer test_renderer.deinit();
+    // A 16x16 red source in a 4x2 pixel box. Stretching it to the box would
+    // squash the square art; letterboxing keeps the art 2x2 and pads the box
+    // with a transparent column on each side.
+    var pixels: [16 * 16 * 4]u8 = @splat(0);
+    for (0..16 * 16) |index| {
+        pixels[index * 4] = 255;
+        pixels[index * 4 + 3] = 255;
+    }
+    const value = try image.createFromRgba(std.testing.allocator, &pixels, 16, 16, 16 * 4);
+    defer value.deinit();
+    const image_handle: u32 = 1;
+    test_renderer.renderer.terminal.caps.kitty_graphics = true;
+    test_renderer.renderer.terminal.multiplexer = .none;
+
+    try std.testing.expect(try test_renderer.renderer.getNextBuffer().drawImageWithOptions(
+        value,
+        image_handle,
+        0,
+        0,
+        2,
+        1,
+        4,
+        2,
+        0,
+        0,
+        16,
+        16,
+        .auto,
+        -1.0,
+        true,
+    ));
+    try std.testing.expectEqual(renderer.RenderStatus.rendered, test_renderer.render(true));
+
+    const output = test_renderer.memory.lastWrite();
+    const transmit_start = std.mem.find(u8, output, "\x1b_Ga=t").?;
+    const transmit_end = std.mem.findPos(u8, output, transmit_start, "\x1b\\").? + 2;
+    const transmitted = try terminal_image_test.decodeKittyChunks(output[transmit_start..transmit_end]);
+    defer std.testing.allocator.free(transmitted);
+    // The padded image carries alpha, so the transmit is RGBA (4 bytes a pixel).
+    try std.testing.expectEqual(@as(usize, 4 * 2 * 4), transmitted.len);
+    for (0..2) |row| {
+        const line = transmitted[row * 4 * 4 ..][0 .. 4 * 4];
+        // the first column is transparent padding
+        try std.testing.expectEqualSlices(u8, &[_]u8{ 0, 0, 0, 0 }, line[0..4]);
+        // the art sits in the middle columns
+        try std.testing.expectEqualSlices(u8, &[_]u8{ 255, 0, 0, 255 }, line[4..8]);
+        try std.testing.expectEqualSlices(u8, &[_]u8{ 255, 0, 0, 255 }, line[8..12]);
+        // the last column is transparent padding
+        try std.testing.expectEqualSlices(u8, &[_]u8{ 0, 0, 0, 0 }, line[12..16]);
+    }
+}
+
 test "renderer does not copy identity Sixel geometry" {
     var pools = TestPools.init(std.testing.allocator);
     defer pools.deinit();
@@ -4519,7 +4577,7 @@ test "tfm fork: image opacity override replaces the inherited placement opacity"
     // does not multiply it (this is what keeps scrim-dimmed icons crisp).
     var next = test_renderer.renderer.getNextBuffer();
     try next.pushOpacity(0.5);
-    try std.testing.expect(try next.drawImageWithOptions(value, value_handle, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto, 1.0));
+    try std.testing.expect(try next.drawImageWithOptions(value, value_handle, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto, 1.0, false));
     next.popOpacity();
     try std.testing.expectEqual(renderer.RenderStatus.rendered, test_renderer.render(true));
     const output = test_renderer.memory.lastWrite();
@@ -4536,7 +4594,7 @@ test "tfm fork: image opacity override replaces the inherited placement opacity"
     // An override below 1 scales the alpha independently of the stack: with no
     // ancestor dim (stack 1.0) an override of 0.5 still transmits ~128.
     next = test_renderer.renderer.getNextBuffer();
-    try std.testing.expect(try next.drawImageWithOptions(value, value_handle, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto, 0.5));
+    try std.testing.expect(try next.drawImageWithOptions(value, value_handle, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto, 0.5, false));
     try std.testing.expectEqual(renderer.RenderStatus.rendered, test_renderer.render(false));
     const second = test_renderer.memory.lastWrite();
     const second_start = std.mem.find(u8, second, "\x1b_Ga=t").?;
@@ -4561,7 +4619,7 @@ test "tfm fork: a dimming box fill keeps and dims image placements" {
     try std.testing.expect(try next.drawImage(value, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto));
     // The second placement carries an explicit opacity override (the app shades
     // those itself and expects them opaque).
-    try std.testing.expect(try next.drawImageWithOptions(value, 2, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto, 1.0));
+    try std.testing.expect(try next.drawImageWithOptions(value, 2, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, .auto, 1.0, false));
     try std.testing.expectEqual(@as(usize, 2), next.image_placements.items.len);
 
     // A translucent fill via the opt-in path keeps both placements and their

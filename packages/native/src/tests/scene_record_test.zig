@@ -851,11 +851,15 @@ test "Scene image crop selects the source rectangle it fits" {
     }) |row| {
         // Setting the image keeps the crop.
         try f.owner.sceneSetCrop(picture, row.crop);
-        try f.owner.sceneSetImage(picture, try f.owner.createImagePixels(&pixels, 8, 4, .{ .stride = 32 }), row.fit, .blocks, null);
+        try f.owner.sceneSetImage(picture, try f.owner.createImagePixels(&pixels, 8, 4, .{ .stride = 32 }), row.fit, .blocks, null, -1.0);
         try @import("scene_fixture_test.zig").repaint(f.owner, f.id, options.background, true, 0);
         const placement = f.cli.getNextBuffer().image_placements.items[0];
         try testing.expectEqual(row.cells, placement.width);
         try testing.expectEqual(row.source, [4]u32{ placement.source_x, placement.source_y, placement.source_width, placement.source_height });
+        // "fit" keeps the source's aspect inside the pixel box (the protocol
+        // writers letterbox it); "fill" stretches and "cover" crops, so
+        // neither needs the letterbox.
+        try testing.expectEqual(row.fit == .fit, placement.preserve_aspect);
     }
     try testing.expectError(error.WrongKind, f.owner.sceneSetCrop(f.root, null));
 }

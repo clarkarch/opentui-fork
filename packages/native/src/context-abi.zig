@@ -2892,7 +2892,9 @@ test "Context image ABI rejects invalid records identities and mutation reentry"
         switch (field) {
             0 => invalid.struct_size -= 1,
             1 => invalid.abi_version += 1,
-            2 => invalid.flags = 8,
+            // 16 is not a flag the draw record knows (tfm fork: 8 is
+            // OT_IMAGE_DRAW_PRESERVE_ASPECT and is valid).
+            2 => invalid.flags = 16,
             3 => invalid.protocol = 4,
             4 => invalid.reserved[0] = 1,
             5 => {
@@ -2909,6 +2911,12 @@ test "Context image ABI rejects invalid records identities and mutation reentry"
         try std.testing.expectEqual(99, drawn);
         try std.testing.expectEqual(before, (try core.raw().getBuffer(handleFromC(target))).buffer.char[0]);
     }
+    // tfm fork: the preserve-aspect flag is a valid draw (the writers letterbox
+    // the source inside the pixel box instead of stretching it).
+    var aspect = draw;
+    aspect.flags = c.OT_IMAGE_DRAW_PRESERVE_ASPECT;
+    try std.testing.expectEqual(c.OT_OK, ot_buffer_draw_image(context, &target, null, &image, &aspect, &drawn));
+    drawn = 99;
     try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_buffer_draw_image(null, &target, null, &image, &draw, &drawn));
     try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_buffer_draw_image(context, null, null, &image, &draw, &drawn));
     try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, ot_buffer_draw_image(context, &target, null, null, &draw, &drawn));

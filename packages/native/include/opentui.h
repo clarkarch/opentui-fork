@@ -2088,6 +2088,10 @@ ot_status ot_scene_set_editor_options(ot_context *, const ot_handle *node, const
 /* tfm fork: read opacity_override (0..1) instead of the inherited render-tree
  * opacity. Without the flag the field is ignored, so a zeroed struct inherits. */
 #define OT_IMAGE_DRAW_OPACITY_OVERRIDE UINT32_C(4)
+/* Keep the source's aspect inside the pixel box: the protocol writers
+ * letterbox the image (centered, transparent margins) instead of stretching it
+ * to the box. Without the flag the source is stretched to the box. */
+#define OT_IMAGE_DRAW_PRESERVE_ASPECT UINT32_C(8)
 
 ot_status ot_image_destroy(ot_context *, const ot_handle *image);
 
@@ -2276,8 +2280,9 @@ ot_status ot_audio_mix(ot_context *, const ot_handle *engine, float *samples, ui
 /* x/y and width/height count terminal cells. pixel_* and source_* count image
  * pixels. Absent source extents and reserved fields must be zero. Exact size and
  * version are required. Only the two SOURCE_* flags plus
- * OT_IMAGE_DRAW_OPACITY_OVERRIDE (tfm fork) are accepted. opacity_override is
- * read only with that flag and must be 0..1 (absent source extents inherit). */
+ * OT_IMAGE_DRAW_OPACITY_OVERRIDE and OT_IMAGE_DRAW_PRESERVE_ASPECT (tfm fork)
+ * are accepted. opacity_override is read only with that flag and must be 0..1
+ * (absent source extents inherit). */
 typedef struct ot_image_draw_options {
     uint32_t struct_size;
     uint32_t abi_version;
