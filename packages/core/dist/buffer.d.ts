@@ -128,7 +128,12 @@ export declare class OptimizedBuffer {
     drawImage(image: NativeImage, x: number, y: number, width: number, height: number, pixelWidth?: number, pixelHeight?: number, sourceX?: number, sourceY?: number, sourceWidth?: number, sourceHeight?: number, protocol?: ImageRenderProtocol, 
     /** tfm fork (scrims): 0..1 replaces the inherited render-tree opacity for this
      * placement; null/undefined inherits the node opacity exactly as before. */
-    opacityOverride?: number | null): boolean;
+    opacityOverride?: number | null, 
+    /** Keep the source's aspect inside the pixel box: the native writer
+     * letterboxes the image (centered, transparent margins) instead of
+     * stretching it to the box. The "fit" mode needs this, because the
+     * cell-rounded box rarely matches the source's shape. */
+    preserveAspect?: boolean): boolean;
     drawPackedBuffer(data: PointerInput | Uint8Array, dataLen: number, posX: number, posY: number, terminalWidthCells: number, terminalHeightCells: number): void;
     drawGrayscaleBuffer(posX: number, posY: number, intensities: Float32Array, srcWidth: number, srcHeight: number, fg?: RGBA | null, bg?: RGBA | null): void;
     drawGrayscaleBufferSupersampled(posX: number, posY: number, intensities: Float32Array, srcWidth: number, srcHeight: number, fg?: RGBA | null, bg?: RGBA | null): void;

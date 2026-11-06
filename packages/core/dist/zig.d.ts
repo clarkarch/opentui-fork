@@ -483,6 +483,9 @@ export interface NativeContextImageDraw {
     /** tfm fork (scrims): 0..1 replaces the inherited render-tree opacity for this
      * draw; undefined/null inherits. Values > 1 are rejected natively. */
     opacityOverride?: number | null;
+    /** Keep the source's aspect inside the pixel box: the native writer
+     * letterboxes the image instead of stretching it to the box. */
+    preserveAspect?: boolean;
 }
 export interface NativeSceneTextSelectionOptions {
     operation: "reset" | "set" | "update";

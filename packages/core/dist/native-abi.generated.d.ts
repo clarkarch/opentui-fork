@@ -6151,6 +6151,7 @@ export declare const nativeConstants: {
     readonly OT_IMAGE_DRAW_SOURCE_WIDTH: 1;
     readonly OT_IMAGE_DRAW_SOURCE_HEIGHT: 2;
     readonly OT_IMAGE_DRAW_OPACITY_OVERRIDE: 4;
+    readonly OT_IMAGE_DRAW_PRESERVE_ASPECT: 8;
     readonly OT_IMAGE_FORMAT_UNKNOWN: 0;
     readonly OT_IMAGE_FORMAT_PNG: 1;
     readonly OT_IMAGE_FORMAT_RGBA: 2;
