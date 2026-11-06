@@ -104,6 +104,11 @@ This branch is a fork that carries patches upstream does not have. It is publish
   so a small raster was both warped and softened by the area filter. Letterboxing keeps a source that already fits the
   box at its native size (no resample at all), so it stays crisp. `fill` (stretch) and `cover` (crop) are unchanged, and
   a zeroed options record still stretches.
+  - Two limits of the letterbox, learned from tfm: the margins are TRANSPARENT and Sixel DROPS alpha < 128 pixels
+    (index 255), so a padded source becomes a HOLE in the payload — a caller that wants a filled box should render the
+    source at the box's aspect itself (tfm renders its icon rasters into the EXACT placement box for this reason). And
+    the flag is inert for a Kitty placement the writer does not resize: a small placement is transmitted as-is and the
+    TERMINAL scales it into the cell rect, so only the caller's own pixels can make that 1:1.
 
 ## Portable FFI
 
