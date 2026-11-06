@@ -3171,7 +3171,12 @@ pub const Scene = struct {
         // Paint geometry fits i32 cells, and the image stays within its node.
         std.debug.assert(x >= std.math.minInt(i32) and x <= std.math.maxInt(i32) and y >= std.math.minInt(i32) and y <= std.math.maxInt(i32));
         const target = state.buffer orelse cli.getNextBuffer();
-        _ = try target.drawImageWithOptions(source, source.render_id, @intFromFloat(x), @intFromFloat(y), @intFromFloat(width), @intFromFloat(height), @intFromFloat(pixel_width), @intFromFloat(pixel_height), source_x, source_y, source_width, source_height, state.protocol, state.opacity_override);
+        // "fit" keeps the source's aspect inside the pixel box: the protocol
+        // writers letterbox it instead of stretching it to the box, so a
+        // source whose aspect differs from the (cell-rounded) box's shape
+        // arrives undistorted.
+        const preserve_aspect = state.fit == .fit;
+        _ = try target.drawImageWithOptions(source, source.render_id, @intFromFloat(x), @intFromFloat(y), @intFromFloat(width), @intFromFloat(height), @intFromFloat(pixel_width), @intFromFloat(pixel_height), source_x, source_y, source_width, source_height, state.protocol, state.opacity_override, preserve_aspect);
     }
 
     /// Once per painted frame: place the cursor for the focused editor member, or release it.

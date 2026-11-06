@@ -151,6 +151,43 @@ test "image operations release partial allocations on OOM" {
     try std.testing.checkAllAllocationFailures(std.testing.allocator, encodePngWithAllocator, .{});
 }
 
+test "fitWithin keeps the source's aspect and pads the box with transparency" {
+    // A 4x4 red source in a 6x4 box: the art keeps its 4x4 shape and the box
+    // gets one transparent column on each side. Stretching the source to the
+    // box instead would make the square art 6x4 (distorted).
+    const pixels = utils.repeat(u8, &.{ 255, 0, 0, 255 }, 16);
+    const source = try makeImage(pixels, 4, 4);
+    defer source.deinit();
+
+    const fitted = try image.fitWithin(std.testing.allocator, source, 6, 4);
+    defer fitted.deinit();
+    try std.testing.expectEqual(@as(u32, 6), fitted.width());
+    try std.testing.expectEqual(@as(u32, 4), fitted.height());
+    const out = try fitted.ensurePixels();
+    // the art columns are opaque red, the padded columns are transparent
+    try std.testing.expectEqualSlices(u8, &[_]u8{ 0, 0, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 0, 0 }, out[0..24]);
+    // row 1 starts with the transparent pad column, then the art
+    try std.testing.expectEqualSlices(u8, utils.repeat(u8, &.{ 255, 0, 0, 255 }, 3), out[28..40]);
+
+    // A source that already matches the box comes back resized to it.
+    const square = try image.fitWithin(std.testing.allocator, source, 8, 8);
+    defer square.deinit();
+    try std.testing.expectEqual(@as(u32, 8), square.width());
+    try std.testing.expectEqual(@as(u32, 8), square.height());
+
+    // A taller box keeps the art's height and centers it vertically.
+    const tall = try image.fitWithin(std.testing.allocator, source, 4, 6);
+    defer tall.deinit();
+    try std.testing.expectEqual(@as(u32, 4), tall.width());
+    try std.testing.expectEqual(@as(u32, 6), tall.height());
+    const tall_pixels = try tall.ensurePixels();
+    try std.testing.expectEqual(@as(u8, 0), tall_pixels[0]); // the top row is padding
+    try std.testing.expectEqual(@as(u8, 255), tall_pixels[16]); // the art starts below it
+
+    try std.testing.expectError(error.InvalidArgument, image.fitWithin(std.testing.allocator, source, 0, 4));
+    try std.testing.expectError(error.InvalidArgument, image.fitWithin(std.testing.allocator, source, 4, 0));
+}
+
 test "image inspection does not retain encoded PNG bytes" {
     const png = try decodeBase64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4AWP4z8DwHwAFAAH/e+m+7wAAAABJRU5ErkJggg==");
     defer std.testing.allocator.free(png);

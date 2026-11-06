@@ -11,7 +11,7 @@
     },
     "packages/core": {
       "name": "@opentui/core",
-      "version": "0.8.1-fork.1",
+      "version": "0.8.1-fork.2",
       "dependencies": {
         "bun-ffi-structs": "0.3.1",
         "diff": "9.0.0",
@@ -27,14 +27,14 @@
         "web-tree-sitter": "0.25.10",
       },
       "optionalDependencies": {
-        "@clarkarch/opentui-fork-darwin-arm64": "0.8.1-fork.1",
-        "@clarkarch/opentui-fork-darwin-x64": "0.8.1-fork.1",
-        "@clarkarch/opentui-fork-linux-arm64": "0.8.1-fork.1",
-        "@clarkarch/opentui-fork-linux-arm64-musl": "0.8.1-fork.1",
-        "@clarkarch/opentui-fork-linux-x64": "0.8.1-fork.1",
-        "@clarkarch/opentui-fork-linux-x64-musl": "0.8.1-fork.1",
-        "@clarkarch/opentui-fork-win32-arm64": "0.8.1-fork.1",
-        "@clarkarch/opentui-fork-win32-x64": "0.8.1-fork.1",
+        "@clarkarch/opentui-fork-darwin-arm64": "0.8.1-fork.2",
+        "@clarkarch/opentui-fork-darwin-x64": "0.8.1-fork.2",
+        "@clarkarch/opentui-fork-linux-arm64": "0.8.1-fork.2",
+        "@clarkarch/opentui-fork-linux-arm64-musl": "0.8.1-fork.2",
+        "@clarkarch/opentui-fork-linux-x64": "0.8.1-fork.2",
+        "@clarkarch/opentui-fork-linux-x64-musl": "0.8.1-fork.2",
+        "@clarkarch/opentui-fork-win32-arm64": "0.8.1-fork.2",
+        "@clarkarch/opentui-fork-win32-x64": "0.8.1-fork.2",
       },
       "peerDependencies": {
         "web-tree-sitter": "0.25.10",
@@ -356,22 +356,6 @@
     "@clack/core": ["@clack/core@1.4.1", "", { "dependencies": { "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-FILJa1gGKEFTGZAJE9RpVhrjKz3c3h4ar60dSv6cGuDqufQ84YEIS3GAGvZiN+H6yaLbbvTFNejjCC4tXpZEuw=="],
 
     "@clack/prompts": ["@clack/prompts@1.5.1", "", { "dependencies": { "@clack/core": "1.4.1", "fast-string-width": "^3.0.2", "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-zccHj2z2oCCO4yrDiRSlFOxWerGqRiysP7a5jPK6uoI9URKAquwY42Dd/iUP8JWHxEzdRe4TlbvZCo8z1/mhrw=="],
-
-    "@clarkarch/opentui-fork-darwin-arm64": ["@clarkarch/opentui-fork-darwin-arm64@0.8.0-fork.4", "", { "os": "darwin", "cpu": "arm64" }, "sha512-CuL8dVXFAXvvHAtffdmql8gXmoiTGgvnGClyG1Jp15ykOAN4Y1vm+ctWbzQ/sGafn9E7qvVrQr0Z6J7+t4VoSA=="],
-
-    "@clarkarch/opentui-fork-darwin-x64": ["@clarkarch/opentui-fork-darwin-x64@0.8.0-fork.4", "", { "os": "darwin", "cpu": "x64" }, "sha512-srO8e3dFD9bJXq4hVse+IibyKCYsw5VQk75/Un5Xzl+lgDk96VjmkSffZG22Clg7OwPdsKVDunuORx1/0X862g=="],
-
-    "@clarkarch/opentui-fork-linux-arm64": ["@clarkarch/opentui-fork-linux-arm64@0.8.0-fork.4", "", { "os": "linux", "cpu": "arm64" }, "sha512-xkZDKo/19u+mrCfIohVDjCHRIL7yID4VDV2Vgm8GAD72LvTexfefhKilaH0UcNq5XSV932UFVv6MJV4kd/6O/w=="],
-
-    "@clarkarch/opentui-fork-linux-arm64-musl": ["@clarkarch/opentui-fork-linux-arm64-musl@0.8.0-fork.4", "", { "os": "linux", "cpu": "arm64" }, "sha512-3sXAYmE8tBm49cOMym5HGCtP6fFnGCa7d7D3DRTWWMnGNfG/FND7Pus4kVssH6l+rJzO9n2yM/F+eWGCjPZt+w=="],
-
-    "@clarkarch/opentui-fork-linux-x64": ["@clarkarch/opentui-fork-linux-x64@0.8.0-fork.4", "", { "os": "linux", "cpu": "x64" }, "sha512-wseqFGZXrva7tpEIo7BmNV8xUsDewbupg9PjiCygjoonW18jxJMSU2Rz4OwaJNPJEv+1pyF82TUYivRDRBX1Bg=="],
-
-    "@clarkarch/opentui-fork-linux-x64-musl": ["@clarkarch/opentui-fork-linux-x64-musl@0.8.0-fork.4", "", { "os": "linux", "cpu": "x64" }, "sha512-8uKhkNzHzNGiPk1MwVbgVrS+tTBW2HtvFZqlSvH+4j2caRXpd48lgmsVLsZcuplAf2BXer9TIZ50jcBlHGgfBA=="],
-
-    "@clarkarch/opentui-fork-win32-arm64": ["@clarkarch/opentui-fork-win32-arm64@0.8.0-fork.4", "", { "os": "win32", "cpu": "arm64" }, "sha512-NExQtNFk8oyMv/gzI1SCEzZKdEFEgdTDfaJRfnND+4UYcLyr8i7flpZC1DdcPZK7hMILorzGLu5I7MVOjYJHSQ=="],
-
-    "@clarkarch/opentui-fork-win32-x64": ["@clarkarch/opentui-fork-win32-x64@0.8.0-fork.4", "", { "os": "win32", "cpu": "x64" }, "sha512-XRJR2lMPmHrdBneBP7/uCehWCMLH8vigOyVijN2ShM/mqpNvdEPTdAU3BQLS1Oo79SCBCNjQ6YnQgAIRKV3o6Q=="],
 
     "@dimforge/rapier2d-simd-compat": ["@dimforge/rapier2d-simd-compat@0.17.3", "", {}, "sha512-bijvwWz6NHsNj5e5i1vtd3dU2pDhthSaTUZSh14DUGGKJfw8eMnlWZsxwHBxB/a3AXVNDjL9abuHw1k9FGR+jg=="],
 

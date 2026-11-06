@@ -257,6 +257,21 @@ fn kittySourceSpan(origin: u32, length: u32, offset: u32, count: u32, span: u32)
     return .{ .start = @intCast(start_u64), .len = @intCast(end - start_u64) };
 }
 
+// The protocol writers show the source inside the placement's pixel box. A box
+// whose aspect differs from the source's distorts the image when the source is
+// stretched to it, so a placement that keeps its aspect ("fit") is letterboxed
+// inside the box instead: the art keeps its shape and still fills the box.
+fn sourceForPixelBox(
+    allocator: Allocator,
+    source: *native_image.Image,
+    pixel_width: u32,
+    pixel_height: u32,
+    preserve_aspect: bool,
+) !*native_image.Image {
+    if (preserve_aspect) return native_image.fitWithin(allocator, source, pixel_width, pixel_height);
+    return native_image.resize(allocator, source, pixel_width, pixel_height, .area);
+}
+
 // Per-frame invalidation state for one placement. Sixel pixels live inside the
 // covered cells, so a changed Sixel placement must clear and repaint its own
 // rectangle; everything outside placements diffs normally. The resolved
@@ -292,6 +307,9 @@ const SixelCacheKey = struct {
     pixel_width: u32,
     pixel_height: u32,
     opacity: u8,
+    /// A letterboxed payload differs from a stretched one, so the fit mode is
+    /// part of the cache key.
+    preserve_aspect: bool,
     background_hash: u64,
 };
 
@@ -1371,7 +1389,13 @@ pub const CliRenderer = struct {
             prepared_owned = true;
         }
         if (placement.pixel_width != prepared.width() or placement.pixel_height != prepared.height()) {
-            const resized = try native_image.resize(self.allocator, prepared, placement.pixel_width, placement.pixel_height, .area);
+            const resized = try sourceForPixelBox(
+                self.allocator,
+                prepared,
+                placement.pixel_width,
+                placement.pixel_height,
+                placement.preserve_aspect,
+            );
             if (prepared_owned) prepared.deinit();
             prepared = resized;
             prepared_owned = true;
@@ -2096,7 +2120,13 @@ pub const CliRenderer = struct {
             );
             if (downscaled) {
                 defer cropped.deinit();
-                const resized = try native_image.resize(self.allocator, cropped, placement.pixel_width, placement.pixel_height, .area);
+                const resized = try sourceForPixelBox(
+                    self.allocator,
+                    cropped,
+                    placement.pixel_width,
+                    placement.pixel_height,
+                    placement.preserve_aspect,
+                );
                 if (placement.opacity < 255) try applyAlphaOpacity(resized, placement.opacity);
                 return .{ .image = resized, .owned = true };
             }
@@ -2359,6 +2389,7 @@ pub const CliRenderer = struct {
                 .pixel_width = placement.pixel_width,
                 .pixel_height = placement.pixel_height,
                 .opacity = placement.opacity,
+                .preserve_aspect = placement.preserve_aspect,
                 .background_hash = if (placement.placement_id <= self.imageDirty.items.len)
                     self.imageDirty.items[placement.placement_id - 1].background_hash
                 else
@@ -2392,7 +2423,13 @@ pub const CliRenderer = struct {
                 prepared_owned = true;
             }
             if (placement.pixel_width != prepared.width() or placement.pixel_height != prepared.height()) {
-                const resized = try native_image.resize(self.allocator, prepared, placement.pixel_width, placement.pixel_height, .area);
+                const resized = try sourceForPixelBox(
+                    self.allocator,
+                    prepared,
+                    placement.pixel_width,
+                    placement.pixel_height,
+                    placement.preserve_aspect,
+                );
                 if (prepared_owned) prepared.deinit();
                 prepared = resized;
                 prepared_owned = true;

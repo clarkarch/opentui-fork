@@ -302,6 +302,10 @@ export class ImageRenderable extends Renderable {
       this._protocol,
       // tfm fork (scrims): placements can stay opaque under a dimmed ancestor.
       this._placementOpacity ?? undefined,
+      // "fit" keeps the source's aspect inside the pixel box: the native
+      // writer letterboxes it instead of stretching it, so the cell-rounded
+      // box cannot distort the art.
+      this._fit === "fit",
     )
   }
 

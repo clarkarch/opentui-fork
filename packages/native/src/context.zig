@@ -119,6 +119,9 @@ pub const ImageDraw = struct {
     protocol: image.RenderProtocol = .auto,
     /// tfm fork: negative = inherit the render-tree opacity; 0..1 overrides it.
     opacity_override: f32 = -1.0,
+    /// The source keeps its aspect inside the pixel box (the "fit" mode): the
+    /// protocol writers letterbox the image instead of stretching it.
+    preserve_aspect: bool = false,
 };
 
 pub const BufferGrid = struct {
@@ -1597,7 +1600,7 @@ pub const Context = struct {
         const height = options.source_height orelse source.height() - options.source_y;
         if (width > source.width() - options.source_x or height > source.height() - options.source_y) return error.InvalidOptions;
         if (source.ref_count == std.math.maxInt(u32)) return error.ObjectLimit;
-        return target.drawImageWithOptions(source, source.render_id, options.x, options.y, options.width, options.height, options.pixel_width, options.pixel_height, options.source_x, options.source_y, width, height, options.protocol, options.opacity_override);
+        return target.drawImageWithOptions(source, source.render_id, options.x, options.y, options.width, options.height, options.pixel_width, options.pixel_height, options.source_x, options.source_y, width, height, options.protocol, options.opacity_override, options.preserve_aspect);
     }
 
     pub fn sessionSetImageResolution(self: *Context, handle: Handle, terminal_width: u32, terminal_height: u32, pixel_width: u32, pixel_height: u32) !void {

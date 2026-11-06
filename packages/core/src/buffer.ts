@@ -722,6 +722,11 @@ export class OptimizedBuffer {
     /** tfm fork (scrims): 0..1 replaces the inherited render-tree opacity for this
      * placement; null/undefined inherits the node opacity exactly as before. */
     opacityOverride?: number | null,
+    /** Keep the source's aspect inside the pixel box: the native writer
+     * letterboxes the image (centered, transparent margins) instead of
+     * stretching it to the box. The "fit" mode needs this, because the
+     * cell-rounded box rarely matches the source's shape. */
+    preserveAspect?: boolean,
   ): boolean {
     this.guard()
     requireInteger(x, "x", -0x80000000, 0x7fffffff)
@@ -750,6 +755,7 @@ export class OptimizedBuffer {
       sourceHeight,
       protocol,
       opacityOverride: opacityOverride ?? null,
+      preserveAspect: preserveAspect === true,
     }
     const handle = image._getContextHandle(this.lib, this.source.context)
     const recorder = this.recorder

@@ -1222,6 +1222,39 @@ pub fn extend(
     return output;
 }
 
+/// Fits `source` inside `width` x `height` without changing its aspect and
+/// pads the result to the full box with transparent margins, centered.
+///
+/// The protocol writers used to stretch the source to the placement's pixel
+/// box, which distorted any image whose aspect differed from the box's. A
+/// cell grid makes that common: the fitted cell size is rounded, so a square
+/// icon in a 3x1-cell slot at 7x18 pixel cells became a 21x18 box and the
+/// square art was stretched into it. Letterboxing keeps the art's shape and
+/// still fills the box, which is what a graphics terminal does with an image
+/// that does not match its placement.
+pub fn fitWithin(allocator: Allocator, source: *Image, width: u32, height: u32) !*Image {
+    if (width == 0 or height == 0) return error.InvalidArgument;
+    const source_width = source.width();
+    const source_height = source.height();
+    if (source_width == 0 or source_height == 0) return error.InvalidArgument;
+    const scale = @min(
+        @as(f64, @floatFromInt(width)) / @as(f64, @floatFromInt(source_width)),
+        @as(f64, @floatFromInt(height)) / @as(f64, @floatFromInt(source_height)),
+    );
+    const fitted_width = @max(1, @as(u32, @intFromFloat(@round(@as(f64, @floatFromInt(source_width)) * scale))));
+    const fitted_height = @max(1, @as(u32, @intFromFloat(@round(@as(f64, @floatFromInt(source_height)) * scale))));
+    if (fitted_width == width and fitted_height == height) return resize(allocator, source, width, height, .area);
+    const resized = try resize(allocator, source, fitted_width, fitted_height, .area);
+    errdefer resized.deinit();
+    const left = (width - fitted_width) / 2;
+    const top = (height - fitted_height) / 2;
+    const right = width - fitted_width - left;
+    const bottom = height - fitted_height - top;
+    const padded = try extend(allocator, resized, top, right, bottom, left, .{ 0, 0, 0, 0 });
+    resized.deinit();
+    return padded;
+}
+
 pub fn resize(allocator: Allocator, source: *Image, width: u32, height: u32, filter: ResizeFilter) !*Image {
     if (width == 0 or height == 0) return error.InvalidArgument;
     if (width == source.width() and height == source.height()) return source.clone();
