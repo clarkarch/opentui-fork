@@ -29,37 +29,42 @@ jobs:
       matrix:
         include:
           - output: x86_64-linux
-            target: x86_64-linux-gnu.2.17
+            targets: x86_64-linux-gnu.2.17
+            dirs: x86_64-linux
             os: ubuntu-latest
             file: libopentui.so
           - output: aarch64-linux
-            target: aarch64-linux-gnu.2.17
+            targets: aarch64-linux-gnu.2.17
+            dirs: aarch64-linux
             os: ubuntu-latest
             file: libopentui.so
           - output: x86_64-linux-musl
-            target: x86_64-linux-musl
+            targets: x86_64-linux-musl
+            dirs: x86_64-linux-musl
             os: ubuntu-latest
             file: libopentui.so
           - output: aarch64-linux-musl
-            target: aarch64-linux-musl
+            targets: aarch64-linux-musl
+            dirs: aarch64-linux-musl
             os: ubuntu-latest
             file: libopentui.so
           - output: x86_64-windows
-            target: x86_64-windows-gnu
+            targets: x86_64-windows-gnu
+            dirs: x86_64-windows
             os: ubuntu-latest
             file: opentui.dll
           - output: aarch64-windows
-            target: aarch64-windows-gnu
+            targets: aarch64-windows-gnu
+            dirs: aarch64-windows
             os: ubuntu-latest
             file: opentui.dll
           # macOS needs the macOS SDK to link CoreAudio; Zig cannot cross to
-          # Darwin without it, so these build on a macOS host.
-          - output: x86_64-macos
-            target: x86_64-macos.13.0
-            os: macos-latest
-            file: libopentui.dylib
-          - output: aarch64-macos
-            target: aarch64-macos.13.0
+          # Darwin without it, so these build on a macOS host. Both arches
+          # build in one job: the macOS runner pool is small, and two jobs
+          # waiting for it is how a whole release gets cancelled.
+          - output: macos
+            targets: x86_64-macos.13.0 aarch64-macos.13.0
+            dirs: x86_64-macos aarch64-macos
             os: macos-latest
             file: libopentui.dylib
 
@@ -83,18 +88,14 @@ jobs:
 
       - name: Build
         working-directory: packages/native
-        run: zig build -Doptimize=ReleaseFast -Dlibrary-target=${{ matrix.target }}
+        run: |
+          for target in ${{ matrix.targets }}; do
+            zig build -Doptimize=ReleaseFast -Dlibrary-target="$target"
+          done
 
       - name: Verify and strip
         working-directory: packages/native
         run: |
-          dir="lib/${{ matrix.output }}"
-          lib="$dir/${{ matrix.file }}"
-          if [ ! -f "$lib" ]; then
-            echo "expected $lib to exist after the build"
-            ls -R lib || true
-            exit 1
-          fi
           # The release copies are stripped so downloads stay small. The static
           # archive is stripped too: it is what the Rust crates link by default,
           # and unstripped it is 51 MB against 8 MB stripped.
@@ -104,36 +105,45 @@ jobs:
           # instead of 5 MB) — and the failure was swallowed, so nobody saw
           # it. llvm-strip is multi-target, and a failed strip now fails the
           # build instead of shipping a fat library.
-          archive="$dir/libopentui.a"
-          if [ "${{ runner.os }}" = "Linux" ]; then
-            if ! command -v llvm-strip >/dev/null; then
-              sudo apt-get update -qq
-              sudo apt-get install -y -qq llvm
+          for dir in ${{ matrix.dirs }}; do
+            lib="lib/$dir/${{ matrix.file }}"
+            if [ ! -f "$lib" ]; then
+              echo "expected $lib to exist after the build"
+              ls -R lib || true
+              exit 1
             fi
-            llvm-strip --strip-unneeded "$lib"
-            [ -f "$archive" ] && llvm-strip --strip-unneeded "$archive"
-          else
-            strip -x "$lib"
-            # BSD strip reads no archives; llvm-strip does. The runner's Xcode
-            # ships no llvm-strip (xcrun cannot find it), so take the one
-            # Homebrew installs.
-            if [ -f "$archive" ]; then
-              brew install llvm
-              "$(brew --prefix llvm)/bin/llvm-strip" --strip-unneeded "$archive"
+            archive="lib/$dir/libopentui.a"
+            if [ "${{ runner.os }}" = "Linux" ]; then
+              if ! command -v llvm-strip >/dev/null; then
+                sudo apt-get update -qq
+                sudo apt-get install -y -qq llvm
+              fi
+              llvm-strip --strip-unneeded "$lib"
+              [ -f "$archive" ] && llvm-strip --strip-unneeded "$archive"
+            else
+              strip -x "$lib"
+              # BSD strip reads no archives; llvm-strip does. The runner's
+              # Xcode ships no llvm-strip (xcrun cannot find it), so take the
+              # one Homebrew installs.
+              if [ -f "$archive" ]; then
+                brew install llvm
+                "$(brew --prefix llvm)/bin/llvm-strip" --strip-unneeded "$archive"
+              fi
             fi
-          fi
-          # The header travels with the library: the Rust crates check it
-          # against the bindings they were generated from, so a consumer needs
-          # it beside the library it links.
-          [ -f "$dir/opentui.h" ] || { echo "expected $dir/opentui.h to exist after the build"; exit 1; }
-          ls -l "$dir"
+            # The header travels with the library: the Rust crates check it
+            # against the bindings they were generated from, so a consumer needs
+            # it beside the library it links.
+            [ -f "lib/$dir/opentui.h" ] || { echo "expected lib/$dir/opentui.h to exist after the build"; exit 1; }
+            ls -l "lib/$dir"
+          done
 
       - uses: actions/upload-artifact@v4
         with:
-          name: native-${{ matrix.output }}
           # The whole directory: the library, the static archive, and the
-          # header the crates check their bindings against.
-          path: packages/native/lib/${{ matrix.output }}/
+          # header the crates check their bindings against. One directory per
+          # target, so the publish job reads the target from the directory.
+          name: native-${{ matrix.output }}
+          path: packages/native/lib/
           if-no-files-found: error
 
   publish:
@@ -155,19 +165,23 @@ jobs:
       - name: Stage release assets
         run: |
           mkdir -p release
-          for dir in artifacts/native-*; do
-            target=$(basename "$dir" | sed 's/^native-//')
-            # Every file of the artifact directory travels: the library, the
-            # static archive, and the header.
-            for file in "$dir"/*; do
-              name=$(basename "$file")
-              # Windows' static archive is not usable by the Rust crates:
-              # they link the DLL there, through its import library. It is
-              # 50 MB unstripped, so it stays out of the release.
-              case "$target/$name" in
-                *-windows/opentui-static.lib) continue ;;
-              esac
-              cp "$file" "release/native-${target}-${name}"
+          for artifact in artifacts/native-*; do
+            # An artifact holds one directory per target the job built.
+            for dir in "$artifact"/*/; do
+              [ -d "$dir" ] || continue
+              target=$(basename "$dir")
+              # Every file of the target directory travels: the library, the
+              # static archive, and the header.
+              for file in "$dir"*; do
+                name=$(basename "$file")
+                # Windows' static archive is not usable by the Rust crates:
+                # they link the DLL there, through its import library. It is
+                # 50 MB unstripped, so it stays out of the release.
+                case "$target/$name" in
+                  *-windows/opentui-static.lib) continue ;;
+                esac
+                cp "$file" "release/native-${target}-${name}"
+              done
             done
           done
           ls -l release

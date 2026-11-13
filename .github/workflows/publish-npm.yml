@@ -46,37 +46,42 @@ jobs:
       matrix:
         include:
           - output: x86_64-linux
-            target: x86_64-linux-gnu.2.17
+            targets: x86_64-linux-gnu.2.17
+            dirs: x86_64-linux
             os: ubuntu-latest
             file: libopentui.so
           - output: aarch64-linux
-            target: aarch64-linux-gnu.2.17
+            targets: aarch64-linux-gnu.2.17
+            dirs: aarch64-linux
             os: ubuntu-latest
             file: libopentui.so
           - output: x86_64-linux-musl
-            target: x86_64-linux-musl
+            targets: x86_64-linux-musl
+            dirs: x86_64-linux-musl
             os: ubuntu-latest
             file: libopentui.so
           - output: aarch64-linux-musl
-            target: aarch64-linux-musl
+            targets: aarch64-linux-musl
+            dirs: aarch64-linux-musl
             os: ubuntu-latest
             file: libopentui.so
           - output: x86_64-windows
-            target: x86_64-windows-gnu
+            targets: x86_64-windows-gnu
+            dirs: x86_64-windows
             os: ubuntu-latest
             file: opentui.dll
           - output: aarch64-windows
-            target: aarch64-windows-gnu
+            targets: aarch64-windows-gnu
+            dirs: aarch64-windows
             os: ubuntu-latest
             file: opentui.dll
           # macOS needs the macOS SDK to link CoreAudio; Zig cannot cross to
-          # Darwin without it, so these build on a macOS host.
-          - output: x86_64-macos
-            target: x86_64-macos.13.0
-            os: macos-latest
-            file: libopentui.dylib
-          - output: aarch64-macos
-            target: aarch64-macos.13.0
+          # Darwin without it, so these build on a macOS host. Both arches
+          # build in one job: the macOS runner pool is small, and two jobs
+          # waiting for it is how a whole publish gets cancelled.
+          - output: macos
+            targets: x86_64-macos.13.0 aarch64-macos.13.0
+            dirs: x86_64-macos aarch64-macos
             os: macos-latest
             file: libopentui.dylib
 
@@ -99,17 +104,14 @@ jobs:
 
       - name: Build
         working-directory: packages/native
-        run: zig build -Doptimize=ReleaseFast -Dlibrary-target=${{ matrix.target }}
+        run: |
+          for target in ${{ matrix.targets }}; do
+            zig build -Doptimize=ReleaseFast -Dlibrary-target="$target"
+          done
 
       - name: Verify and strip
         working-directory: packages/native
         run: |
-          lib="lib/${{ matrix.output }}/${{ matrix.file }}"
-          if [ ! -f "$lib" ]; then
-            echo "expected $lib to exist after the build"
-            ls -R lib || true
-            exit 1
-          fi
           # The published packages ship without debug symbols: the library is
           # what every consumer downloads.
           #
@@ -118,21 +120,31 @@ jobs:
           # instead of 5 MB) — and the failure was swallowed, so nobody saw
           # it. llvm-strip is multi-target, and a failed strip now fails the
           # build instead of shipping a fat library.
-          if [ "${{ runner.os }}" = "Linux" ]; then
-            if ! command -v llvm-strip >/dev/null; then
-              sudo apt-get update -qq
-              sudo apt-get install -y -qq llvm
+          for dir in ${{ matrix.dirs }}; do
+            lib="lib/$dir/${{ matrix.file }}"
+            if [ ! -f "$lib" ]; then
+              echo "expected $lib to exist after the build"
+              ls -R lib || true
+              exit 1
             fi
-            llvm-strip --strip-unneeded "$lib"
-          else
-            strip -x "$lib"
-          fi
-          ls -l "$lib"
+            if [ "${{ runner.os }}" = "Linux" ]; then
+              if ! command -v llvm-strip >/dev/null; then
+                sudo apt-get update -qq
+                sudo apt-get install -y -qq llvm
+              fi
+              llvm-strip --strip-unneeded "$lib"
+            else
+              strip -x "$lib"
+            fi
+            ls -l "$lib"
+          done
 
       - uses: actions/upload-artifact@v4
         with:
+          # One directory per target, so the publish job reads the target from
+          # the directory.
           name: native-${{ matrix.output }}
-          path: packages/native/lib/${{ matrix.output }}/${{ matrix.file }}
+          path: packages/native/lib/
           if-no-files-found: error
 
   publish:
@@ -156,11 +168,14 @@ jobs:
       - name: Collect the libraries
         run: |
           mkdir -p native
-          for dir in artifacts/native-*; do
-            target=$(basename "$dir" | sed 's/^native-//')
-            file=$(ls "$dir")
-            mkdir -p "native/$target"
-            cp "$dir/$file" "native/$target/$file"
+          for artifact in artifacts/native-*; do
+            # An artifact holds one directory per target the job built.
+            for dir in "$artifact"/*/; do
+              [ -d "$dir" ] || continue
+              target=$(basename "$dir")
+              mkdir -p "native/$target"
+              cp "$dir"* "native/$target/"
+            done
           done
           ls -lR native
 
