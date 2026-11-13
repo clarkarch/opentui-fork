@@ -33,20 +33,40 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
 # The native artifacts: the library, the static archive, and the header.
+#
+# Each file is downloaded by its exact name. A glob ("native-x86_64-linux-*")
+# also matches the musl assets, which are a different platform.
 for target in $TARGETS; do
     echo "native: $target"
     mkdir -p "$work/$target"
-    gh release download "$RELEASE" --repo "$REPO" \
-        --pattern "native-${target}-*" --dir "$work/$target"
+    for file in libopentui.so libopentui.a opentui.h; do
+        gh release download "$RELEASE" --repo "$REPO" \
+            --pattern "native-${target}-${file}" --dir "$work/$target"
+    done
+done
+
+# The header and the bindings must agree: the crates compare this hash when
+# they link, and a mismatch is a broken consumer, not a warning. The check
+# runs before anything is copied, so a mismatch leaves the tree untouched.
+bun -e '
+const header = await Bun.file(process.argv[1]).bytes()
+const generated = await Bun.file("packages/rust/crates/opentui-sys/src/generated.rs").text()
+let hash = 0xcbf2_9ce4_8422_2325n
+for (const byte of header) hash = BigInt.asUintN(64, (hash ^ BigInt(byte)) * 0x0100_0000_01b3n)
+const expected = generated.match(/pub const OPENTUI_HEADER_FNV1A64: u64 = 0x([0-9a-f]+);/)?.[1]
+if (!expected) throw new Error("the generated bindings carry no header hash")
+const actual = hash.toString(16).padStart(16, "0")
+if (actual !== expected) {
+  throw new Error(`the header hashes to ${actual}, the bindings expect ${expected}`)
+}
+console.log(`header: ${actual} matches the bindings`)
+' "$work/x86_64-linux/native-x86_64-linux-opentui.h"
+
+for target in $TARGETS; do
     dir="packages/native/lib/$target"
     mkdir -p "$dir"
     for file in libopentui.so libopentui.a opentui.h; do
-        source="$work/$target/native-${target}-${file}"
-        if [ ! -f "$source" ]; then
-            echo "error: the release has no $source" >&2
-            exit 1
-        fi
-        cp "$source" "$dir/$file"
+        cp "$work/$target/native-${target}-${file}" "$dir/$file"
     done
 done
 
@@ -60,22 +80,6 @@ tar -xzf "$tarball" -C "$work/package"
 rm -rf packages/core/dist
 mkdir -p packages/core/dist
 cp -R "$work/package/package/." packages/core/dist/
-
-# The header and the bindings must agree: the crates compare this hash when
-# they link, and a mismatch is a broken consumer, not a warning.
-bun -e '
-const header = await Bun.file("packages/native/lib/x86_64-linux/opentui.h").bytes()
-const generated = await Bun.file("packages/rust/crates/opentui-sys/src/generated.rs").text()
-let hash = 0xcbf2_9ce4_8422_2325n
-for (const byte of header) hash = BigInt.asUintN(64, (hash ^ BigInt(byte)) * 0x0100_0000_01b3n)
-const expected = generated.match(/pub const OPENTUI_HEADER_FNV1A64: u64 = 0x([0-9a-f]+);/)?.[1]
-if (!expected) throw new Error("the generated bindings carry no header hash")
-const actual = hash.toString(16).padStart(16, "0")
-if (actual !== expected) {
-  throw new Error(`the header hashes to ${actual}, the bindings expect ${expected}`)
-}
-console.log(`header: ${actual} matches the bindings`)
-'
 
 echo
 echo "Refreshed:"
