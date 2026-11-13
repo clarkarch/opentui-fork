@@ -14,6 +14,12 @@ on:
     branches: [tfm]
     paths:
       - "packages/native/**"
+      # The committed artifacts are this workflow's own output, copied back
+      # into the tree by scripts/refresh-prebuilt.sh. Rebuilding on them
+      # would republish what the release already carries, and the republish
+      # would not match the committed bytes, so the tree would drift from the
+      # release on every refresh.
+      - "!packages/native/lib/**"
       - "scripts/build-native-manifest.ts"
       - ".github/workflows/native-artifacts.yml"
 

@@ -26,6 +26,10 @@ on:
       - "packages/core/scripts/**"
       - "packages/core/package.json"
       - "packages/native/**"
+      # The committed native artifacts are the native-artifacts workflow's
+      # output, copied back into the tree. Publishing on them would try to
+      # publish the same npm version again.
+      - "!packages/native/lib/**"
       - "scripts/publish-fork.ts"
       - "scripts/npm-publish.ts"
       - "scripts/*.test.ts"
