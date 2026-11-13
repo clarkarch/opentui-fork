@@ -16,6 +16,10 @@
 #   export OPENTUI_LIB_DIR=$(sh packages/rust/scripts/fetch-native.sh x86_64-macos)
 #   cargo build
 #
+# Every asset is fetched by its exact name and checked against the checksum
+# the release reports. A pattern would not do: `native-x86_64-linux-*` also
+# matches the musl assets, and a consumer would get the wrong library.
+#
 # The repository itself carries the Linux artifacts, so a Linux consumer needs
 # nothing here: the crates find them in the git dependency's clone. This is
 # for the other platforms.
@@ -34,9 +38,18 @@ target=$1
 dir=${2:-}
 
 case "$target" in
-    x86_64-linux | aarch64-linux | x86_64-linux-musl | aarch64-linux-musl | \
-        x86_64-macos | aarch64-macos | x86_64-windows | aarch64-windows) ;;
+    x86_64-linux | aarch64-linux | x86_64-linux-musl | aarch64-linux-musl) shared=libopentui.so ;;
+    x86_64-macos | aarch64-macos) shared=libopentui.dylib ;;
+    x86_64-windows | aarch64-windows) shared=opentui.dll ;;
     *) usage ;;
+esac
+
+# The files the crates' build script asks for on this platform: the header,
+# the library, and the static archive. Windows links its DLL through the
+# import library instead of an archive.
+case "$target" in
+    *-windows) files="opentui.h $shared opentui.lib" ;;
+    *) files="opentui.h $shared libopentui.a" ;;
 esac
 
 REPO=clarkarch/opentui-fork
@@ -54,21 +67,39 @@ else
 fi
 dir=$(CDPATH='' cd -- "$dir" && pwd)
 
-# The manifest names every asset of a target, so the download is exact.
-assets=$(gh release download "$RELEASE" --repo "$REPO" \
-    --pattern "native-${target}-*" --dir "$dir" 2>&1) || {
-    echo "error: could not download the $target assets from $RELEASE:" >&2
-    echo "$assets" >&2
-    exit 1
-}
+# The release's assets with their checksums, one per line: name, checksum.
+assets=$(gh release view "$RELEASE" --repo "$REPO" --json assets \
+    --jq '.assets[] | [.name, .digest] | @tsv')
 
-# The assets carry the target in their name; the directory holds the plain
-# names, because that is what the crates' build script looks for.
-for file in "$dir"/native-${target}-*; do
-    [ -f "$file" ] || continue
-    name=$(basename "$file")
-    name=${name#native-${target}-}
-    mv "$file" "$dir/$name"
+for file in $files; do
+    asset="native-${target}-${file}"
+    checksum=$(printf '%s\n' "$assets" | awk -v name="$asset" '$1 == name { print $2; exit }')
+    if [ -z "$checksum" ]; then
+        echo "error: the release has no $asset" >&2
+        exit 1
+    fi
+
+    gh release download "$RELEASE" --repo "$REPO" --pattern "$asset" --dir "$dir" >/dev/null
+
+    if [ -n "$checksum" ]; then
+        case "$checksum" in
+            sha256:*) expected=${checksum#sha256:} ;;
+            *) expected=$checksum ;;
+        esac
+        if command -v sha256sum >/dev/null 2>&1; then
+            actual=$(sha256sum "$dir/$asset" | cut -d' ' -f1)
+        else
+            actual=$(shasum -a 256 "$dir/$asset" | cut -d' ' -f1)
+        fi
+        if [ "$actual" != "$expected" ]; then
+            echo "error: $asset does not match the checksum the release reports" >&2
+            exit 1
+        fi
+    fi
+
+    # The assets carry the target in their name; the directory holds the plain
+    # names, because that is what the crates' build script looks for.
+    mv "$dir/$asset" "$dir/$file"
 done
 
 if [ ! -f "$dir/opentui.h" ]; then
