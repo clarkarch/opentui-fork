@@ -35,12 +35,14 @@ toolchain can use the fork as-is:
 
    ```sh
    for target in x86_64-linux aarch64-linux; do
-     gh release download native-latest --repo clarkarch/opentui-fork \
-       --pattern "native-${target}-*" --dir /tmp/native-$target
      mkdir -p "packages/native/lib/$target"
-     cp /tmp/native-$target/native-$target-libopentui.so "packages/native/lib/$target/"
-     cp /tmp/native-$target/native-$target-libopentui.a "packages/native/lib/$target/"
-     cp /tmp/native-$target/native-$target-opentui.h "packages/native/lib/$target/"
+     # One file at a time, by its exact name: a pattern would fetch the musl
+     # assets too, and they would land in the same directory.
+     for file in libopentui.so libopentui.a opentui.h; do
+       gh release download native-latest --repo clarkarch/opentui-fork \
+         --pattern "native-${target}-${file}" --dir /tmp/native-$target
+       cp "/tmp/native-$target/native-${target}-${file}" "packages/native/lib/$target/"
+     done
    done
    npm pack @clarkarch/opentui-fork@0.8.4-fork.3 --pack-destination /tmp
    tar -xzf /tmp/clarkarch-opentui-fork-0.8.4-fork.3.tgz -C /tmp
@@ -74,7 +76,21 @@ release `native-latest`, together with `native-artifacts.json`:
       "file": "libopentui.so",
       "asset": "native-x86_64-linux-libopentui.so",
       "sha256": "...",
-      "bytes": 5451896
+      "bytes": 5988800,
+      "files": {
+        "libopentui.a": {
+          "file": "libopentui.a",
+          "asset": "native-x86_64-linux-libopentui.a",
+          "sha256": "...",
+          "bytes": 8508396
+        },
+        "opentui.h": {
+          "file": "opentui.h",
+          "asset": "native-x86_64-linux-opentui.h",
+          "sha256": "...",
+          "bytes": 212518
+        }
+      }
     }
   }
 }
@@ -83,7 +99,18 @@ release `native-latest`, together with `native-artifacts.json`:
 Consumers fetch the asset for their host from that manifest. The asset names
 follow `native-<target>-<file>`, where `<target>` is the directory name under
 `packages/native/lib` and `<file>` is `libopentui.so`, `libopentui.dylib` or
-`opentui.dll`.
+`opentui.dll`. The `file`/`asset`/`sha256`/`bytes` of the entry's top level are
+the shared library, the shape existing consumers read; the `files` map holds
+the static archive and the header beside it.
+
+Fetch every asset **by its exact name**. A pattern does not do: the pattern
+`native-x86_64-linux-*` also matches the musl assets, so a consumer on glibc
+would end up with the musl library. `packages/rust/scripts/fetch-native.sh` does
+it right, and checks every file against the checksum the release reports:
+
+```sh
+export OPENTUI_LIB_DIR=$(sh packages/rust/scripts/fetch-native.sh x86_64-macos)
+```
 
 The release copies are stripped. They are the ones the committed artifacts are
 copied from, so a Rust consumer that depends on this repository links the same

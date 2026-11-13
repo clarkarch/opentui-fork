@@ -28,9 +28,11 @@ A terminal UI framework for Rust built on
 > ```
 >
 > The script prints the directory it filled; the crates' build script finds
-> the library, the static archive, and the header there. On Linux the same
-> script works, but it is not needed: the committed artifacts are in the
-> dependency's clone.
+> the library, the static archive, and the header there. It downloads every
+> file by its exact name and checks it against the checksum the release
+> reports, so a consumer never gets another target's library by accident. On
+> Linux the same script works, but it is not needed: the committed artifacts
+> are in the dependency's clone.
 >
 > `sh packages/rust/scripts/consumer-smoke.sh` builds a throwaway project that
 > depends on the repository this way, which is what the fork's CI runs.
@@ -230,6 +232,13 @@ Ctrl+C quits, and Ctrl+Z suspends to the shell.
 App-level handlers (`App::on_key`, `on_mouse`, `on_message`, and the rest)
 return a `HandlerId`; `App::remove_handler` removes one, for screens that come
 and go.
+
+An image needs the terminal's size in pixels, which the terminal reports when
+it answers the query for it: `App::pixel_resolution()` gives the size, and
+`App::on_pixel_resolution` reports it when it arrives. A terminal that never
+answers has none, and images keep their fallback form. A resize forgets the
+size, because the cell size may have changed with it, and the terminal answers
+the next query.
 
 Widgets with built-in keys take Core's default bindings, which you can change
 per widget. Each widget names what its keys can do in an action enum
