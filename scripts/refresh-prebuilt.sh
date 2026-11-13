@@ -36,12 +36,29 @@ trap 'rm -rf "$work"' EXIT
 #
 # Each file is downloaded by its exact name. A glob ("native-x86_64-linux-*")
 # also matches the musl assets, which are a different platform.
+#
+# Every file is checked against the checksum the release reports, so a
+# truncated download cannot land in the tree.
+assets=$(gh release view "$RELEASE" --repo "$REPO" --json assets \
+    --jq '.assets[] | [.name, .digest] | @tsv')
+
 for target in $TARGETS; do
     echo "native: $target"
     mkdir -p "$work/$target"
     for file in libopentui.so libopentui.a opentui.h; do
+        asset="native-${target}-${file}"
         gh release download "$RELEASE" --repo "$REPO" \
-            --pattern "native-${target}-${file}" --dir "$work/$target"
+            --pattern "$asset" --dir "$work/$target"
+        expected=$(printf '%s\n' "$assets" | awk -v name="$asset" '$1 == name { print $2; exit }')
+        case "$expected" in
+            sha256:*) expected=${expected#sha256:} ;;
+            "") echo "error: the release has no $asset" >&2; exit 1 ;;
+        esac
+        actual=$(sha256sum "$work/$target/$asset" | cut -d' ' -f1)
+        if [ "$actual" != "$expected" ]; then
+            echo "error: $asset does not match the checksum the release reports" >&2
+            exit 1
+        fi
     done
 done
 
