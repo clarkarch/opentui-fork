@@ -1,17 +1,49 @@
 import { type NativeContextHandle, type RenderLib, type SessionHandle } from "../zig.js";
-import type { StdinEvent, StdinParserOptions, StdinParserProtocolContext } from "./stdin-parser.js";
+import { type Clock } from "./clock.js";
+import type { ParsedKey } from "./parse.keypress.js";
+import type { RawMouseEvent } from "./parse.mouse.js";
+export type StdinResponseProtocol = "csi" | "cpr" | "osc" | "dcs" | "apc" | "unknown";
+export type StdinEvent = {
+    type: "key";
+    raw: string;
+    key: ParsedKey;
+} | {
+    type: "mouse";
+    raw: string;
+    encoding: "sgr" | "x10";
+    event: RawMouseEvent;
+} | {
+    type: "paste";
+    bytes: Uint8Array;
+} | {
+    type: "response";
+    protocol: StdinResponseProtocol;
+    sequence: string;
+};
+export interface StdinParserProtocolContext {
+    kittyKeyboardEnabled: boolean;
+    privateCapabilityRepliesActive: boolean;
+    pixelResolutionQueryActive: boolean;
+    explicitWidthCprActive: boolean;
+    startupCursorCprActive: boolean;
+    /** A query batch's DA1 reply is outstanding, so split replies wait for it without a deadline. */
+    replySentinelActive: boolean;
+}
 export interface NativeInputSession {
     lib: RenderLib;
     context: NativeContextHandle;
     session: SessionHandle;
 }
-export interface NativeStdinParserOptions extends Pick<StdinParserOptions, "armTimeouts" | "onTimeoutFlush" | "protocolContext" | "clock"> {
+export interface NativeStdinParserOptions {
+    armTimeouts?: boolean;
+    onTimeoutFlush?: () => void;
+    protocolContext?: Partial<StdinParserProtocolContext>;
+    clock?: Clock;
     /** Parse through this Session's input parser. Without one, the parser owns a private Context and Session. */
     session?: NativeInputSession;
 }
 /**
- * Same surface as StdinParser for renderer.ts, without the hooks that coordinated
- * parser and renderer state: a deferred reply has no deadline, so CPR aborts and
+ * The renderer's stdin parser. A deferred reply has no deadline, so CPR aborts and
  * pixel queries need no special handling; suspension needs only suspend and resume.
  */
 export declare class NativeStdinParser {
@@ -67,24 +99,4 @@ export declare class NativeStdinParser {
     private clearTimeout;
     private span;
     private translate;
-}
-/**
- * Pairs the events of the delivering parser with the events of a parser that only
- * sees the same input (OTUI_NATIVE_INPUT_SHADOW) and logs one line per difference.
- * Events pair in order, so the parsers' separate timers cannot misalign them. After
- * a difference, pairing resumes once each side has reported its next event.
- */
-export declare class StdinShadowComparator {
-    private readonly primaryName;
-    private readonly log;
-    private readonly delivered;
-    private readonly shadowed;
-    constructor(primaryName: "legacy" | "native", log: (line: string) => void);
-    primary(event: StdinEvent): void;
-    shadow(event: StdinEvent): void;
-    /** Reports every event still unpaired. Call when both parsers have stopped. */
-    flush(): void;
-    private queue;
-    private pair;
-    private report;
 }

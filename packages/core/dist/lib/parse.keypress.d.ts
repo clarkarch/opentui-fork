@@ -1,6 +1,4 @@
 import { Buffer } from "node:buffer";
-export declare const nonAlphanumericKeys: string[];
-export declare const terminalNamedSingleStrokeKeys: string[];
 export type KeyEventType = "press" | "repeat" | "release";
 export interface ParsedKey {
     name: string;
@@ -24,4 +22,11 @@ export interface ParsedKey {
 export type ParseKeypressOptions = {
     useKittyKeyboard?: boolean;
 };
-export declare const parseKeypress: (s?: Buffer | string, options?: ParseKeypressOptions) => ParsedKey | null;
+/** The input parser's key names: Kitty's functional keys, linefeed, space, and the SS3 keypad keys' names. */
+export declare const terminalNamedSingleStrokeKeys: string[];
+/**
+ * Decodes `s` as one complete input with the native input parser and returns its first event if that is a key, else
+ * null. A live renderer can read the same bytes differently: it delivers keys after a leading mouse, focus or paste
+ * event, and while it awaits a terminal reply it takes `CSI 1;2 R` as that reply instead of Shift+F3.
+ */
+export declare function parseKeypress(s?: Buffer | string, options?: ParseKeypressOptions): ParsedKey | null;

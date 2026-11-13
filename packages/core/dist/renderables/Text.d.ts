@@ -26,8 +26,10 @@ export declare class TextRenderable extends TextBufferRenderable {
     _needsLifecyclePass(): boolean;
     requestRender(): void;
     add(obj: TextNodeRenderable | StyledText | string, index?: number): number;
+    add(obj: never, index?: number): number;
     remove(child: BaseRenderable): void;
-    insertBefore(obj: BaseRenderable | any, anchor?: TextNodeRenderable): number;
+    insertBefore(obj: TextNodeRenderable | StyledText | string, anchor?: TextNodeRenderable): number;
+    insertBefore(obj: never, anchor?: never): number;
     getTextChildren(): BaseRenderable[];
     clear(): void;
     protected onFgChanged(newColor: RGBA): void;

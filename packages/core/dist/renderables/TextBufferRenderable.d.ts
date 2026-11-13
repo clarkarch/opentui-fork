@@ -67,6 +67,8 @@ export declare abstract class TextBufferRenderable extends Renderable implements
     get scrollHeight(): number;
     get maxScrollY(): number;
     get maxScrollX(): number;
+    /** The cells the text fills: native text leaves its padding out once it has a layout; until then, its box. */
+    private get textViewport();
     protected updateViewportOffset(scrollX?: number, scrollY?: number): void;
     get plainText(): string;
     get textLength(): number;

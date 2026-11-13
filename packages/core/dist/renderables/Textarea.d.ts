@@ -59,7 +59,7 @@ export declare class TextareaRenderable extends EditBufferRenderable {
     submit(): boolean;
     set onSubmit(handler: ((event: SubmitEvent) => void) | undefined);
     get onSubmit(): ((event: SubmitEvent) => void) | undefined;
-    set keyBindings(bindings: KeyBinding[]);
+    set keyBindings(bindings: KeyBinding[] | null | undefined);
     set keyAliasMap(aliases: TextareaKeyAliasMap);
     get extmarks(): ExtmarksController;
 }

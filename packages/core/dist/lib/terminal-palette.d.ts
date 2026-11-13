@@ -40,6 +40,9 @@ export interface TerminalPaletteOptions {
     oscSource?: OscSubscriptionSource;
     clock?: Clock;
 }
+export declare function emptyTerminalColors(size: number): TerminalColors;
+/** Copies the OSC 4 and OSC 10-19 color replies in `sequence` into `colors`; returns whether a color changed. */
+export declare function applyPaletteReplies(colors: TerminalColors, sequence: string): boolean;
 export declare class TerminalPalette implements TerminalPaletteDetector {
     private stdin;
     private stdout;

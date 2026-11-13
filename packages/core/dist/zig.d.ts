@@ -4,6 +4,7 @@ export type { LineInfo, AllocatorStats, AudioStreamCreateOptions, BuildOptions, 
 import type { ExtractOptions } from "./image.js";
 import { RGBA } from "./lib/RGBA.js";
 import { type StyledText } from "./lib/styled-text.js";
+import type { TextChunk } from "./text-buffer.js";
 import { type MeasureFunction } from "./yoga.js";
 import { YogaHost } from "./yoga.internal.js";
 import type { NativeSpanFeedOptions, NativeSpanFeedStats, ReserveInfo, AudioCreateOptions, AudioStartOptions, AudioVoiceOptions, AudioStreamCreateOptions, NativeAudioStreamCloseReason as NativeAudioStreamCloseReasonType, NativeAudioStreamFormat as NativeAudioStreamFormatType, NativeAudioStreamState as NativeAudioStreamStateType, NativeAudioStreamStats, NativeAudioCaptureStats, AudioStats, BuildOptions, AllocatorStats, NativeFrameWork, NativeRenderStats, NativeImageInfo } from "./zig-structs.js";
@@ -82,6 +83,40 @@ export type ContextImagePixelsHandle = ContextObjectHandle & {
 export type ContextUnicodeHandle = ContextObjectHandle & {
     readonly [contextResourceBrand]: "unicode";
 };
+export type ContextMarkdownHandle = ContextObjectHandle & {
+    readonly [contextResourceBrand]: "markdown";
+};
+/** `ot_markdown_options`: OT_MD_* flags, the style bound nodes draw with, and the hook filter's substrings. */
+export interface NativeMarkdownOptions {
+    flags: number;
+    syntaxStyle: ContextSyntaxStyleHandle | null;
+    hookFilter?: readonly string[];
+    /** Lowers the 64 MiB source limit; 0 or absent keeps it. */
+    sourceByteLimit?: number;
+}
+/** `ot_markdown_result`; `removedFrom` is undefined when nothing was removed. */
+export interface NativeMarkdownResult {
+    changed: number;
+    committed: number;
+    removedFrom: number | undefined;
+}
+/** `ot_markdown_block`; `parent` is undefined at top level. */
+export interface NativeMarkdownBlock {
+    index: number;
+    parent: number | undefined;
+    kind: number;
+    flags: number;
+    sourceStart: number;
+    sourceEnd: number;
+    infoStart: number;
+    infoEnd: number;
+    number: number;
+}
+/** A leaf's parser output: its display text as chunks, and OT_MD_SPAN_* flags per chunk. */
+export interface NativeMarkdownLeaf {
+    chunks: TextChunk[];
+    spans: Uint32Array;
+}
 export type ContextEmbeddedTerminalHandle = ContextObjectHandle & {
     readonly [contextResourceBrand]: "embedded_terminal";
 };
@@ -156,6 +191,8 @@ export interface NativeEditorStyle {
     fg?: RGBA | null;
     bg?: RGBA | null;
     attributes?: number | null;
+    /** Syntax styles only: the attribute bits the style sets or clears when a group set composes it. */
+    suppliedAttributes?: number | null;
 }
 export declare enum NativeEditHighlightOperation {
     AddLine = 0,
@@ -686,6 +723,7 @@ export type NativeSessionControl = {
 } | {
     kind: "palette-query";
     bytes: Uint8Array;
+    sentinel?: boolean;
 } | {
     kind: "title";
     title: string;
@@ -699,10 +737,10 @@ export type NativeSessionControl = {
     kind: "program-status";
     status: ProgramStatus;
 } | {
-    kind: "query-pixel-resolution";
+    kind: "query-pixel-resolution" | "query-theme-colors";
     sentinel?: boolean;
 } | {
-    kind: "restore-modes" | "query-theme-colors" | "reset-background";
+    kind: "restore-modes" | "reset-background" | "end-reply-sentinel";
 };
 export interface NativeSessionCursorOptions extends CursorStyleOptions {
     position?: {
@@ -1070,6 +1108,7 @@ export declare class FFIRenderLib {
     readonly encoder: TextEncoder;
     private readonly emptyBytes;
     readonly decoder: TextDecoder;
+    private readonly textDecoder;
     private logCallbackWrapper;
     private diagnosticDrain?;
     private nativeSpanFeedCallbackWrapper;
@@ -1124,6 +1163,11 @@ export declare class FFIRenderLib {
     contextEmbeddedTerminalGetSelectedText(context: NativeContextHandle, terminal: ContextEmbeddedTerminalHandle): Uint8Array;
     contextEmbeddedTerminalCompose({ context, target, frame }: NativeDrawingTarget, terminal: ContextEmbeddedTerminalHandle, x: number, y: number): void;
     contextEmbeddedTerminalCursor(context: NativeContextHandle, terminal: ContextEmbeddedTerminalHandle): EmbeddedTerminalCursor;
+    contextEmbeddedTerminalScrollbar(context: NativeContextHandle, terminal: ContextEmbeddedTerminalHandle): {
+        offset: number;
+        total: number;
+        visible: number;
+    };
     contextEmbeddedTerminalEncodeKey(context: NativeContextHandle, terminal: ContextEmbeddedTerminalHandle, key: EmbeddedTerminalKey): Uint8Array;
     contextEmbeddedTerminalEncodeMouse(context: NativeContextHandle, terminal: ContextEmbeddedTerminalHandle, mouse: EmbeddedTerminalMouse): Uint8Array;
     contextEmbeddedTerminalEncodePaste(context: NativeContextHandle, terminal: ContextEmbeddedTerminalHandle, input: Uint8Array): Uint8Array;
@@ -1306,6 +1350,8 @@ export declare class FFIRenderLib {
     sceneDestroyNode(context: NativeContextHandle, node: SceneNodeHandle): void;
     sceneSetMeasure(context: NativeContextHandle, node: SceneNodeHandle, measure: MeasureFunction | null): void;
     sceneHasMeasure(context: NativeContextHandle, node: SceneNodeHandle): boolean;
+    sceneReachesHooks(context: NativeContextHandle, node: SceneNodeHandle): boolean;
+    scenePainted(context: NativeContextHandle, node: SceneNodeHandle): boolean;
     sceneMarkDirty(context: NativeContextHandle, node: SceneNodeHandle): void;
     sceneMoveNode(context: NativeContextHandle, node: SceneNodeHandle, parent: SceneNodeHandle | null, index: number): void;
     sceneSetViewport(context: NativeContextHandle, node: SceneNodeHandle, viewport: SceneNodeHandle | null): void;
@@ -1326,6 +1372,26 @@ export declare class FFIRenderLib {
     sceneFlush(context: NativeContextHandle, staging: SceneStaging): void;
     sceneSetText(context: NativeContextHandle, node: SceneNodeHandle, bytes: Uint8Array): void;
     sceneSetStyledText(context: NativeContextHandle, node: SceneNodeHandle, content: StyledText): void;
+    /** The byte the latest finished frame drew at cell (x, y) of a text node, or undefined. */
+    sceneGetTextByteAt(context: NativeContextHandle, node: SceneNodeHandle, x: number, y: number): number | undefined;
+    private markdownOptions;
+    private markdownCall;
+    markdownCreate(context: NativeContextHandle, options: NativeMarkdownOptions): ContextMarkdownHandle;
+    markdownDestroy(context: NativeContextHandle, doc: ContextMarkdownHandle): void;
+    markdownSetOptions(context: NativeContextHandle, doc: ContextMarkdownHandle, options: NativeMarkdownOptions): NativeMarkdownResult;
+    /** Appends `bytes`, or with `replace` parses them as the whole document. */
+    markdownWrite(context: NativeContextHandle, doc: ContextMarkdownHandle, bytes: Uint8Array, replace: boolean): NativeMarkdownResult;
+    markdownFinish(context: NativeContextHandle, doc: ContextMarkdownHandle): NativeMarkdownResult;
+    /** The source's bytes `start` to `end` (default: all), read in place. */
+    markdownGetSource(context: NativeContextHandle, doc: ContextMarkdownHandle, start?: number, end?: number): string;
+    /** The blocks changed since the last read, in document order; reading acknowledges them. */
+    markdownReadChanges(context: NativeContextHandle, doc: ContextMarkdownHandle, count: number): NativeMarkdownBlock[];
+    /** A paragraph's, heading's or cell's inline source, as an inline hook gets it. */
+    markdownReadSource(context: NativeContextHandle, doc: ContextMarkdownHandle, block: number): string;
+    /** A leaf's parser output with its styles resolved through the doc's style. */
+    markdownReadLeaf(context: NativeContextHandle, doc: ContextMarkdownHandle, block: number): NativeMarkdownLeaf;
+    /** Binds a scene text node to a paragraph or heading, which the doc then writes. */
+    markdownBind(context: NativeContextHandle, doc: ContextMarkdownHandle, block: number, node: SceneNodeHandle): void;
     private encodeStyledText;
     sceneSetSlider(context: NativeContextHandle, node: SceneNodeHandle, options: NativeSceneSliderOptions): void;
     sceneGetSliderThumb(context: NativeContextHandle, node: SceneNodeHandle): {
@@ -1353,7 +1419,7 @@ export declare class FFIRenderLib {
     private sceneTextMetrics;
     sceneGetText(context: NativeContextHandle, node: SceneNodeHandle): string;
     sceneGetTextLineInfo(context: NativeContextHandle, node: SceneNodeHandle, firstLine?: number, lineCount?: number): LineInfo;
-    sceneGetLayout(context: NativeContextHandle, node: SceneNodeHandle, observation?: boolean | "paint"): NativeSceneLayout;
+    sceneGetLayout(context: NativeContextHandle, node: SceneNodeHandle, observation?: boolean | "paint" | "content"): NativeSceneLayout;
     sceneSetHooks(context: NativeContextHandle, node: SceneNodeHandle, flags: number, generation: bigint, initialWidth: number, initialHeight: number): void;
     /** Paint options can change between steps; attempt limits remain fixed.
      * A RECORD acknowledgement passes its recording; null records nothing. */
@@ -1369,7 +1435,8 @@ export declare class FFIRenderLib {
     /** Every returned status consumes the draft; an admission exception preserves it for retry. */
     sceneFrameCommit(context: NativeContextHandle, session: SessionHandle, frame: NativeSceneFrameRequest, force: boolean): NativeSessionRenderStatus;
     sceneFrameCancel(context: NativeContextHandle, session: SessionHandle, frameId: bigint): void;
-    sceneHitTest(context: NativeContextHandle, session: SessionHandle, x: number, y: number): number;
+    /** `excluded` is a node's public number whose own hits the test skips, or zero. */
+    sceneHitTest(context: NativeContextHandle, session: SessionHandle, x: number, y: number, excluded?: number): number;
     /** @internal Tests set this through `createTestRenderer({ nativeSceneFullFrame })`. */
     sceneSetDebugFlags(context: NativeContextHandle, session: SessionHandle, flags: number): void;
     sceneGetStats(context: NativeContextHandle, session: SessionHandle): NativeRenderStats;

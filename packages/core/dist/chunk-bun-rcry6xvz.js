@@ -10,6 +10,7 @@ import {
   env2,
   stringWidth,
   Worker,
+  getBaseAttributes2,
   DEFAULT_FOREGROUND_RGB2,
   DEFAULT_BACKGROUND_RGB2,
   ansi256IndexToRgb2,
@@ -43,6 +44,7 @@ import {
   NativeSceneHook2,
   NativeSceneFrame2,
   NativeScenePaintPhase2,
+  emptySceneScrollState,
   NativeError2,
   NativeClipboardOperationStatus2,
   NativeClipboardStartStatus2,
@@ -56,19 +58,22 @@ import {
   BoxSizing2,
   Dimension2,
   Direction2,
+  Display2,
   Edge2,
   FlexDirection2,
   Gutter2,
   Justify2,
+  LogLevel3,
   MeasureMode2,
   Overflow2,
   PositionType2,
   Unit2,
   Wrap2
-} from "./chunk-bun-5y8y95v3.js";
+} from "./chunk-bun-3tbfth66.js";
 
 // src/Renderable.ts
 import { EventEmitter as EventEmitter4 } from "events";
+import util from "util";
 
 // src/lib/border.ts
 var VALID_BORDER_STYLES = ["single", "double", "rounded", "heavy"];
@@ -3338,9 +3343,10 @@ class SystemClock2 {
   }
 }
 // src/lib/parse.keypress.ts
-import { Buffer as Buffer2 } from "buffer";
+import { Buffer as Buffer3 } from "buffer";
 
-// src/lib/parse.keypress-kitty.ts
+// src/lib/kitty-keys.ts
+var keypadKeyNames = "0123456789./*-+=,";
 var kittyKeyMap = {
   27: "escape",
   9: "tab",
@@ -3458,600 +3464,427 @@ var kittyKeyMap = {
   57453: "iso_level3_shift",
   57454: "iso_level5_shift"
 };
-var kittyNamedSingleStrokeKeys = [...new Set(Object.values(kittyKeyMap))];
-var printableKeypadText = {
-  kp0: "0",
-  kp1: "1",
-  kp2: "2",
-  kp3: "3",
-  kp4: "4",
-  kp5: "5",
-  kp6: "6",
-  kp7: "7",
-  kp8: "8",
-  kp9: "9",
-  kpdecimal: ".",
-  kpdivide: "/",
-  kpmultiply: "*",
-  kpminus: "-",
-  kpplus: "+",
-  kpequal: "=",
-  kpseparator: ","
+
+// src/lib/stdin-parser-native.ts
+import { Buffer as Buffer2 } from "buffer";
+var RECORD_CAPACITY = 64;
+var PAYLOAD_CAPACITY = 16 * 1024;
+var RECORD = nativeLayouts.ot_input_event;
+var FIELD = {
+  kind: RECORD.fields.kind.offset,
+  action: RECORD.fields.action.offset,
+  modifiers: RECORD.fields.modifiers.offset,
+  flags: RECORD.fields.flags.offset,
+  code: RECORD.fields.code.offset / 4,
+  baseCode: RECORD.fields.base_code.offset / 4,
+  x: RECORD.fields.x.offset / 2,
+  y: RECORD.fields.y.offset / 2,
+  rawOffset: RECORD.fields.raw_offset.offset / 4,
+  rawLength: RECORD.fields.raw_len.offset / 4,
+  textOffset: RECORD.fields.text_offset.offset / 4,
+  textLength: RECORD.fields.text_len.offset / 4
 };
-function getPrintableKittyKeyText(key) {
-  return printableKeypadText[key.name];
-}
-function fromKittyMods(mod) {
-  return {
-    shift: !!(mod & 1),
-    alt: !!(mod & 2),
-    ctrl: !!(mod & 4),
-    super: !!(mod & 8),
-    hyper: !!(mod & 16),
-    meta: !!(mod & 32),
-    capsLock: !!(mod & 64),
-    numLock: !!(mod & 128)
-  };
-}
-var functionalKeyMap = {
-  A: "up",
-  B: "down",
-  C: "right",
-  D: "left",
-  H: "home",
-  F: "end",
-  E: "clear",
-  P: "f1",
-  Q: "f2",
-  S: "f4"
+var C = nativeConstants;
+var EMPTY = new Uint8Array(0);
+var UTF8 = new TextDecoder("utf-8", { ignoreBOM: true });
+var MOUSE_TYPES = {
+  [C.OT_INPUT_MOUSE_DOWN]: "down",
+  [C.OT_INPUT_MOUSE_UP]: "up",
+  [C.OT_INPUT_MOUSE_MOVE]: "move",
+  [C.OT_INPUT_MOUSE_DRAG]: "drag",
+  [C.OT_INPUT_MOUSE_SCROLL]: "scroll"
 };
-var tildeKeyMap = {
-  "1": "home",
-  "2": "insert",
-  "3": "delete",
-  "4": "end",
-  "5": "pageup",
-  "6": "pagedown",
-  "7": "home",
-  "8": "end",
-  "11": "f1",
-  "12": "f2",
-  "13": "f3",
-  "14": "f4",
-  "15": "f5",
-  "17": "f6",
-  "18": "f7",
-  "19": "f8",
-  "20": "f9",
-  "21": "f10",
-  "23": "f11",
-  "24": "f12",
-  "29": "menu",
-  "57427": "clear"
+var SCROLL_DIRECTIONS = ["up", "down", "left", "right"];
+var NO_EXPECTATIONS = {
+  kittyKeyboardEnabled: false,
+  privateCapabilityRepliesActive: false,
+  pixelResolutionQueryActive: false,
+  explicitWidthCprActive: false,
+  startupCursorCprActive: false,
+  replySentinelActive: false
 };
-function parseKittySpecialKey(sequence) {
-  const specialKeyRe = /^\x1b\[(\d+);(\d+):(\d+)([A-Z~])$/;
-  const match = specialKeyRe.exec(sequence);
-  if (!match)
-    return null;
-  const keyNumOrOne = match[1];
-  const modifierStr = match[2];
-  const eventTypeStr = match[3];
-  const terminator = match[4];
-  let keyName;
-  if (terminator === "~") {
-    keyName = tildeKeyMap[keyNumOrOne];
-  } else {
-    if (keyNumOrOne !== "1")
-      return null;
-    keyName = functionalKeyMap[terminator];
+var REPLY_PROTOCOLS = {
+  [C.OT_INPUT_REPLY_CSI]: "csi",
+  [C.OT_INPUT_REPLY_SS3]: "unknown",
+  [C.OT_INPUT_REPLY_OSC]: "osc",
+  [C.OT_INPUT_REPLY_DCS]: "dcs",
+  [C.OT_INPUT_REPLY_APC]: "apc"
+};
+var LEGACY_CODE_RE = /^\x1b+(O|\[\[?)(?:(\d+)(?:;\d+)?([~^$])|(?:1;)?\d*([a-zA-Z]))/;
+var LEGACY_SEQUENCE_RE = /^\x1b\x1b?[[O]./s;
+function concat(parts) {
+  let length = 0;
+  for (const part of parts)
+    length += part.length;
+  const bytes = new Uint8Array(length);
+  let offset = 0;
+  for (const part of parts) {
+    bytes.set(part, offset);
+    offset += part.length;
   }
-  if (!keyName)
-    return null;
-  const key = {
-    name: keyName,
-    ctrl: false,
-    meta: false,
-    shift: false,
-    option: false,
-    number: false,
-    sequence,
-    raw: sequence,
-    eventType: "press",
-    source: "kitty",
-    super: false,
-    hyper: false,
-    capsLock: false,
-    numLock: false
-  };
-  if (modifierStr) {
-    const modifierMask = parseInt(modifierStr, 10);
-    if (!isNaN(modifierMask) && modifierMask > 1) {
-      const mods = fromKittyMods(modifierMask - 1);
-      key.shift = mods.shift;
-      key.ctrl = mods.ctrl;
-      key.meta = mods.alt || mods.meta;
-      key.option = mods.alt;
-      key.super = mods.super;
-      key.hyper = mods.hyper;
-      key.capsLock = mods.capsLock;
-      key.numLock = mods.numLock;
+  return bytes;
+}
+function latin1(bytes) {
+  return Buffer2.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString("latin1");
+}
+function expectationFlags(context) {
+  const cursorPosition = context.explicitWidthCprActive || context.startupCursorCprActive;
+  const replies = context.privateCapabilityRepliesActive || context.pixelResolutionQueryActive || cursorPosition;
+  return (replies ? C.OT_INPUT_EXPECT_REPLIES : 0) | (context.kittyKeyboardEnabled ? C.OT_INPUT_EXPECT_KITTY_KEYBOARD : 0) | (cursorPosition ? C.OT_INPUT_EXPECT_CURSOR_POSITION : 0) | (context.replySentinelActive ? C.OT_INPUT_EXPECT_SENTINEL : 0);
+}
+
+class NativeStdinParser {
+  lib;
+  context;
+  session;
+  ownsContext;
+  records = new Uint8Array(RECORD_CAPACITY * RECORD.size);
+  words = new Uint32Array(this.records.buffer);
+  halves = new Uint16Array(this.records.buffer);
+  payload = new Uint8Array(PAYLOAD_CAPACITY);
+  events = [];
+  clock;
+  armTimeouts;
+  onTimeoutFlush;
+  protocolContext;
+  appliedExpectations = 0;
+  timeoutId = null;
+  deadlineNs = null;
+  lastNs = 0n;
+  paste = null;
+  suspended = false;
+  sessionGone = false;
+  destroyed = false;
+  constructor(options = {}) {
+    this.clock = options.clock ?? new SystemClock2;
+    this.armTimeouts = options.armTimeouts ?? true;
+    this.onTimeoutFlush = options.onTimeoutFlush ?? null;
+    this.protocolContext = { ...NO_EXPECTATIONS, ...options.protocolContext };
+    if (options.session) {
+      this.lib = options.session.lib;
+      this.context = options.session.context;
+      this.session = options.session.session;
+      this.ownsContext = false;
+    } else {
+      this.lib = resolveRenderLib2();
+      this.context = this.lib.createContext({ objectCapacity: 4, renderCellsMax: 1 });
+      try {
+        this.session = this.lib.createSession(this.context, { chunkSize: 4096, spanCapacity: 2, maxBytes: 8192n });
+      } catch (error) {
+        this.destroyContext();
+        throw error;
+      }
+      this.ownsContext = true;
+    }
+    try {
+      this.applyExpectations();
+    } catch (error) {
+      if (this.ownsContext)
+        this.destroyContext();
+      throw error;
     }
   }
-  if (eventTypeStr === "1" || !eventTypeStr) {
-    key.eventType = "press";
-  } else if (eventTypeStr === "2") {
-    key.eventType = "press";
+  updateProtocolContext(patch) {
+    this.ensureAlive();
+    this.protocolContext = { ...this.protocolContext, ...patch };
+    this.native(() => {
+      this.applyExpectations();
+      this.feed(EMPTY, this.nowNs());
+    });
+    this.reconcileTimeout(this.events.length > 0);
+  }
+  get pasting() {
+    return this.paste !== null;
+  }
+  push(data) {
+    this.ensureAlive();
+    this.native(() => this.feed(data, this.nowNs()));
+    this.reconcileTimeout();
+  }
+  read() {
+    this.ensureAlive();
+    return this.events.shift() ?? null;
+  }
+  drain(onEvent) {
+    this.ensureAlive();
+    while (!this.destroyed) {
+      const event = this.events.shift();
+      if (!event)
+        return;
+      onEvent(event);
+    }
+  }
+  flushTimeout(nowMsValue = this.clock.now()) {
+    this.ensureAlive();
+    this.native(() => this.feed(EMPTY, this.toNs(nowMsValue)));
+    this.reconcileTimeout();
+  }
+  suspend() {
+    this.ensureAlive();
+    this.suspended = true;
+    this.clearTimeout();
+  }
+  resume() {
+    this.ensureAlive();
+    this.suspended = false;
+    this.native(() => this.lib.sessionInputReset(this.context, this.session, C.OT_INPUT_RESET_KEEP_REPLY));
+    this.paste = null;
+    this.deadlineNs = null;
+  }
+  reset() {
+    if (this.destroyed)
+      return;
+    this.clearTimeout();
+    this.native(() => this.lib.sessionInputReset(this.context, this.session, 0));
+    this.events.length = 0;
+    this.paste = null;
+    this.deadlineNs = null;
+  }
+  destroy() {
+    if (this.destroyed)
+      return;
+    this.clearTimeout();
+    this.destroyed = true;
+    this.events.length = 0;
+    this.paste = null;
+    if (this.ownsContext)
+      this.destroyContext();
+  }
+  ensureAlive() {
+    if (this.destroyed)
+      throw new Error("StdinParser has been destroyed");
+  }
+  native(call) {
+    if (this.sessionGone)
+      return;
+    try {
+      call();
+    } catch (error) {
+      if (!(error instanceof NativeError2) || error.status !== -12 /* SessionClosed */ && error.status !== -15 /* OutputFailed */ && error.status !== -9 /* StaleHandle */ && error.status !== -7 /* WrongContext */) {
+        throw error;
+      }
+      this.sessionGone = true;
+      this.deadlineNs = null;
+      this.paste = null;
+      this.clearTimeout();
+    }
+  }
+  destroyContext() {
+    this.lib.getYogaHost().runMutation(() => this.lib.destroyContext(this.context));
+  }
+  applyExpectations() {
+    const flags = expectationFlags(this.protocolContext);
+    if (flags === this.appliedExpectations)
+      return;
+    this.lib.sessionInputExpect(this.context, this.session, flags);
+    this.appliedExpectations = flags;
+  }
+  toNs(ms) {
+    const ns = BigInt(Math.max(0, Math.round(ms * 1e6)));
+    return ns > this.lastNs ? ns : this.lastNs;
+  }
+  nowNs() {
+    return this.suspended ? this.lastNs : this.toNs(this.clock.now());
+  }
+  feed(bytes, nowNs) {
+    this.lastNs = nowNs;
+    let offset = 0;
+    do {
+      const rest = offset === 0 ? bytes : bytes.subarray(offset);
+      const drain = this.lib.sessionInputFeed(this.context, this.session, rest, nowNs, this.records, this.payload);
+      this.deadlineNs = drain.deadlineNs;
+      for (let index = 0;index < drain.count; index++)
+        this.translate(index);
+      if (drain.consumed === 0 && drain.count === 0 && offset < bytes.length) {
+        throw new Error("native input parser made no progress");
+      }
+      offset += drain.consumed;
+    } while (offset < bytes.length);
+  }
+  reconcileTimeout(flushNow = false) {
+    if (!this.armTimeouts)
+      return;
+    this.clearTimeout();
+    const deadline = flushNow ? null : this.deadlineNs;
+    if (deadline === null && !flushNow || this.suspended || this.sessionGone)
+      return;
+    const delayMs = deadline === null ? 0 : Number((deadline - this.lastNs + 999999n) / 1000000n);
+    this.timeoutId = this.clock.setTimeout(() => {
+      this.timeoutId = null;
+      if (this.destroyed)
+        return;
+      try {
+        const now = this.nowNs();
+        this.native(() => this.feed(EMPTY, deadline !== null && now < deadline ? deadline : now));
+        this.reconcileTimeout();
+        this.onTimeoutFlush?.();
+      } catch (error) {
+        console.error("stdin parser timeout flush failed", error);
+      }
+    }, delayMs);
+  }
+  clearTimeout() {
+    if (this.timeoutId === null)
+      return;
+    this.clock.clearTimeout(this.timeoutId);
+    this.timeoutId = null;
+  }
+  span(offset, length) {
+    return this.payload.subarray(offset, offset + length);
+  }
+  translate(index) {
+    const base = index * RECORD.size;
+    const word = base / 4;
+    const half = base / 2;
+    const kind = this.records[base + FIELD.kind];
+    const action = this.records[base + FIELD.action];
+    const modifiers = this.records[base + FIELD.modifiers];
+    const flags = this.records[base + FIELD.flags];
+    const code = this.words[word + FIELD.code];
+    const raw = this.span(this.words[word + FIELD.rawOffset], this.words[word + FIELD.rawLength]);
+    const text = this.span(this.words[word + FIELD.textOffset], this.words[word + FIELD.textLength]);
+    switch (kind) {
+      case C.OT_INPUT_KEY: {
+        const key = parsedKey(code, this.words[word + FIELD.baseCode], action, modifiers, flags, raw, text);
+        this.events.push({ type: "key", raw: key.raw, key });
+        return;
+      }
+      case C.OT_INPUT_MOUSE: {
+        const sequence = latin1(raw);
+        const encoding = raw[2] === 60 ? "sgr" : "x10";
+        const event = rawMouseEvent(action, code, this.halves[half + FIELD.x], this.halves[half + FIELD.y], modifiers, encoding);
+        this.events.push({ type: "mouse", raw: sequence, encoding, event });
+        return;
+      }
+      case C.OT_INPUT_PASTE: {
+        if (flags & C.OT_INPUT_PASTE_START)
+          this.paste = [];
+        if (text.length > 0)
+          this.paste.push(Uint8Array.from(text));
+        if (flags & C.OT_INPUT_PASTE_END) {
+          const parts = this.paste;
+          this.paste = null;
+          this.events.push({ type: "paste", bytes: parts.length === 1 ? parts[0] : concat(parts) });
+        }
+        return;
+      }
+      case C.OT_INPUT_FOCUS:
+        this.events.push({ type: "response", protocol: "csi", sequence: latin1(raw) });
+        return;
+      case C.OT_INPUT_REPLY: {
+        const protocol = flags & C.OT_INPUT_REPLY_CURSOR_POSITION ? "cpr" : flags & C.OT_INPUT_REPLY_FRAGMENT ? "unknown" : REPLY_PROTOCOLS[code];
+        this.events.push({ type: "response", protocol, sequence: latin1(raw) });
+        return;
+      }
+    }
+    throw new Error(`Unknown native input event kind: ${kind}`);
+  }
+}
+function keyRaw(raw) {
+  if (raw.length === 1 && raw[0] >= 128)
+    return "\x1B" + String.fromCharCode(raw[0] & 127);
+  return UTF8.decode(raw);
+}
+function compatCode(raw, code, kitty) {
+  if (kitty) {
+    if (!raw.endsWith("u") || kittyKeyMap[code] === undefined)
+      return;
+    return `[${/^\x1b+\[(\d+)/.exec(raw)[1]}u`;
+  }
+  const match = LEGACY_CODE_RE.exec(raw);
+  return match ? [match[1], match[2], match[3], match[4]].filter(Boolean).join("") : undefined;
+}
+function parsedKey(code, baseCode, action, modifiers, flags, rawBytes, textBytes) {
+  const kitty = (flags & C.OT_INPUT_KEY_KITTY) !== 0;
+  const raw = keyRaw(rawBytes);
+  const text = textBytes.length === 0 ? "" : UTF8.decode(textBytes);
+  const alt = (modifiers & C.OT_INPUT_MOD_ALT) !== 0;
+  const sequence = kitty || LEGACY_SEQUENCE_RE.test(raw);
+  let shift = (modifiers & C.OT_INPUT_MOD_SHIFT) !== 0;
+  let name;
+  if (code === 0) {
+    name = text;
+  } else if (kittyKeyMap[code] !== undefined && !(flags & C.OT_INPUT_KEY_TYPED)) {
+    name = code === C.OT_INPUT_KEY_ENTER && !kitty && raw.endsWith(`
+`) ? "linefeed" : kittyKeyMap[code];
+  } else if (code === 32) {
+    name = "space";
+  } else {
+    name = String.fromCodePoint(code);
+    if (!sequence && code >= 65 && code <= 90) {
+      shift = true;
+      if (!alt)
+        name = name.toLowerCase();
+    }
+  }
+  const key = {
+    name,
+    ctrl: (modifiers & C.OT_INPUT_MOD_CTRL) !== 0,
+    meta: alt || (modifiers & C.OT_INPUT_MOD_META) !== 0,
+    shift,
+    option: alt && sequence,
+    sequence: text || raw,
+    number: /^[0-9]$/.test(name),
+    raw,
+    eventType: action === C.OT_INPUT_KEY_RELEASE ? "release" : "press",
+    source: kitty ? "kitty" : "raw",
+    super: (modifiers & C.OT_INPUT_MOD_SUPER) !== 0,
+    hyper: (modifiers & C.OT_INPUT_MOD_HYPER) !== 0,
+    capsLock: (modifiers & C.OT_INPUT_MOD_CAPS_LOCK) !== 0,
+    numLock: (modifiers & C.OT_INPUT_MOD_NUM_LOCK) !== 0
+  };
+  if (action === C.OT_INPUT_KEY_REPEAT)
     key.repeated = true;
-  } else if (eventTypeStr === "3") {
-    key.eventType = "release";
-  }
+  if (baseCode !== 0)
+    key.baseCode = baseCode;
+  const legacy = compatCode(raw, code, kitty);
+  if (legacy !== undefined)
+    key.code = legacy;
   return key;
 }
-function parseKittyKeyboard(sequence) {
-  const specialResult = parseKittySpecialKey(sequence);
-  if (specialResult)
-    return specialResult;
-  const kittyRe = /^\x1b\[([^\x1b]+)u$/;
-  const match = kittyRe.exec(sequence);
-  if (!match)
-    return null;
-  const params = match[1];
-  const fields = params.split(";");
-  if (fields.length < 1)
-    return null;
-  const key = {
-    name: "",
-    ctrl: false,
-    meta: false,
-    shift: false,
-    option: false,
-    number: false,
-    sequence,
-    raw: sequence,
-    eventType: "press",
-    source: "kitty",
-    super: false,
-    hyper: false,
-    capsLock: false,
-    numLock: false
+function rawMouseEvent(action, code, x, y, modifiers, encoding) {
+  const type = MOUSE_TYPES[action];
+  if (!type)
+    throw new Error(`Unknown native mouse action: ${action}`);
+  let button = code;
+  if (code === C.OT_INPUT_MOUSE_BUTTON_NONE)
+    button = encoding === "x10" ? -1 : 0;
+  if (type === "scroll")
+    button = encoding === "x10" || code === 3 ? 0 : code;
+  const event = {
+    type,
+    button,
+    x,
+    y,
+    modifiers: {
+      shift: (modifiers & C.OT_INPUT_MOD_SHIFT) !== 0,
+      alt: (modifiers & C.OT_INPUT_MOD_ALT) !== 0,
+      ctrl: (modifiers & C.OT_INPUT_MOD_CTRL) !== 0
+    }
   };
-  let text = "";
-  const field1 = fields[0]?.split(":") || [];
-  const codepointStr = field1[0];
-  if (!codepointStr)
-    return null;
-  const codepoint = parseInt(codepointStr, 10);
-  if (isNaN(codepoint))
-    return null;
-  let shiftedCodepoint;
-  let baseCodepoint;
-  if (field1[1]) {
-    const shifted = parseInt(field1[1], 10);
-    if (!isNaN(shifted) && shifted > 0 && shifted <= 1114111) {
-      shiftedCodepoint = shifted;
-    }
-  }
-  if (field1[2]) {
-    const base = parseInt(field1[2], 10);
-    if (!isNaN(base) && base > 0 && base <= 1114111) {
-      baseCodepoint = base;
-    }
-  }
-  const knownKey = kittyKeyMap[codepoint];
-  if (knownKey) {
-    key.name = knownKey;
-    key.code = `[${codepoint}u`;
-  } else if (codepoint === 0) {
-    key.name = "";
-  } else {
-    if (codepoint > 0 && codepoint <= 1114111) {
-      const char = String.fromCodePoint(codepoint);
-      key.name = char === " " ? "space" : char;
-      if (baseCodepoint) {
-        key.baseCode = baseCodepoint;
-      }
-    } else {
-      return null;
-    }
-  }
-  if (fields[1]) {
-    const field2 = fields[1].split(":");
-    const modifierStr = field2[0];
-    const eventTypeStr = field2[1];
-    if (modifierStr) {
-      const modifierMask = parseInt(modifierStr, 10);
-      if (!isNaN(modifierMask) && modifierMask > 1) {
-        const mods = fromKittyMods(modifierMask - 1);
-        key.shift = mods.shift;
-        key.ctrl = mods.ctrl;
-        key.meta = mods.alt || mods.meta;
-        key.option = mods.alt;
-        key.super = mods.super;
-        key.hyper = mods.hyper;
-        key.capsLock = mods.capsLock;
-        key.numLock = mods.numLock;
-      }
-    }
-    if (eventTypeStr === "1" || !eventTypeStr) {
-      key.eventType = "press";
-    } else if (eventTypeStr === "2") {
-      key.eventType = "press";
-      key.repeated = true;
-    } else if (eventTypeStr === "3") {
-      key.eventType = "release";
-    } else {
-      key.eventType = "press";
-    }
-  }
-  if (fields[2]) {
-    const codepoints = fields[2].split(":");
-    for (const cpStr of codepoints) {
-      const cp = parseInt(cpStr, 10);
-      if (!isNaN(cp) && cp > 0 && cp <= 1114111) {
-        text += String.fromCodePoint(cp);
-      }
-    }
-  }
-  if (text === "") {
-    text = getPrintableKittyKeyText(key) ?? "";
-  }
-  if (text === "") {
-    const isPrintable = key.name.length > 0 && !kittyKeyMap[codepoint];
-    if (isPrintable) {
-      if (codepoint === 32) {
-        text = " ";
-      } else if (key.shift && shiftedCodepoint) {
-        text = String.fromCodePoint(shiftedCodepoint);
-      } else if (key.shift && key.name.length === 1) {
-        text = key.name.toLocaleUpperCase();
-      } else {
-        text = key.name;
-      }
-    }
-  }
-  if (text) {
-    if (codepoint === 0) {
-      key.name = text;
-    }
-    key.sequence = text;
-  }
-  if (codepoint === 0 && text === "") {
-    return null;
-  }
-  return key;
+  if (type === "scroll")
+    event.scroll = { direction: SCROLL_DIRECTIONS[code & 3], delta: 1 };
+  return event;
 }
 
 // src/lib/parse.keypress.ts
-var metaKeyCodeRe = /^(?:\x1b)([a-zA-Z0-9])$/;
-var fnKeyRe = /^(?:\x1b+)(O|N|\[|\[\[)(?:(\d+)(?:;(\d+))?([~^$])|(?:1;)?(\d+)?([a-zA-Z]))/;
-var keyName = {
-  OP: "f1",
-  OQ: "f2",
-  OR: "f3",
-  OS: "f4",
-  "[11~": "f1",
-  "[12~": "f2",
-  "[13~": "f3",
-  "[14~": "f4",
-  "[[A": "f1",
-  "[[B": "f2",
-  "[[C": "f3",
-  "[[D": "f4",
-  "[[E": "f5",
-  "[15~": "f5",
-  "[17~": "f6",
-  "[18~": "f7",
-  "[19~": "f8",
-  "[20~": "f9",
-  "[21~": "f10",
-  "[23~": "f11",
-  "[24~": "f12",
-  "[29~": "menu",
-  "[57427~": "clear",
-  "[A": "up",
-  "[B": "down",
-  "[C": "right",
-  "[D": "left",
-  "[E": "clear",
-  "[F": "end",
-  "[H": "home",
-  "[P": "f1",
-  "[Q": "f2",
-  "[S": "f4",
-  OA: "up",
-  OB: "down",
-  OC: "right",
-  OD: "left",
-  OE: "clear",
-  OF: "end",
-  OH: "home",
-  OM: "return",
-  Oj: "*",
-  Ok: "+",
-  Ol: ",",
-  Om: "-",
-  On: ".",
-  Oo: "/",
-  Op: "0",
-  Oq: "1",
-  Or: "2",
-  Os: "3",
-  Ot: "4",
-  Ou: "5",
-  Ov: "6",
-  Ow: "7",
-  Ox: "8",
-  Oy: "9",
-  OX: "=",
-  "[1~": "home",
-  "[2~": "insert",
-  "[3~": "delete",
-  "[4~": "end",
-  "[5~": "pageup",
-  "[6~": "pagedown",
-  "[[5~": "pageup",
-  "[[6~": "pagedown",
-  "[7~": "home",
-  "[8~": "end",
-  "[a": "up",
-  "[b": "down",
-  "[c": "right",
-  "[d": "left",
-  "[e": "clear",
-  f: "right",
-  b: "left",
-  p: "up",
-  n: "down",
-  "[2$": "insert",
-  "[3$": "delete",
-  "[5$": "pageup",
-  "[6$": "pagedown",
-  "[7$": "home",
-  "[8$": "end",
-  Oa: "up",
-  Ob: "down",
-  Oc: "right",
-  Od: "left",
-  Oe: "clear",
-  "[2^": "insert",
-  "[3^": "delete",
-  "[5^": "pageup",
-  "[6^": "pagedown",
-  "[7^": "home",
-  "[8^": "end",
-  "[Z": "tab"
-};
-var nonAlphanumericKeys2 = [...Object.values(keyName), "backspace"];
 var terminalNamedSingleStrokeKeys2 = [
-  ...new Set(["return", "linefeed", "tab", "escape", "space", ...nonAlphanumericKeys2, ...kittyNamedSingleStrokeKeys])
+  ...new Set(["linefeed", "space", ...Object.values(kittyKeyMap), ...keypadKeyNames])
 ];
-var isShiftKey = (code) => {
-  return ["[a", "[b", "[c", "[d", "[e", "[2$", "[3$", "[5$", "[6$", "[7$", "[8$", "[Z"].includes(code);
-};
-var isCtrlKey = (code) => {
-  return ["Oa", "Ob", "Oc", "Od", "Oe", "[2^", "[3^", "[5^", "[6^", "[7^", "[8^"].includes(code);
-};
-var getCtrlKeyName = (charCode) => {
-  if (charCode === 0) {
-    return "space";
+function parseKeypress2(s = "", options = {}) {
+  const parser = new NativeStdinParser({
+    armTimeouts: false,
+    protocolContext: { kittyKeyboardEnabled: options.useKittyKeyboard === true }
+  });
+  try {
+    parser.push(typeof s === "string" ? Buffer3.from(s) : s);
+    parser.flushTimeout(1000000000000);
+    const event = parser.read();
+    return event?.type === "key" ? event.key : null;
+  } finally {
+    parser.destroy();
   }
-  if (charCode >= 1 && charCode <= 26) {
-    return String.fromCharCode(charCode + 97 - 1);
-  }
-  if (charCode >= 28 && charCode <= 31) {
-    return String.fromCharCode(charCode + 64);
-  }
-  return;
-};
-var ss3NumpadPrintable = {
-  Op: "0",
-  Oq: "1",
-  Or: "2",
-  Os: "3",
-  Ot: "4",
-  Ou: "5",
-  Ov: "6",
-  Ow: "7",
-  Ox: "8",
-  Oy: "9",
-  Oj: "*",
-  Ok: "+",
-  Ol: ",",
-  Om: "-",
-  On: ".",
-  Oo: "/",
-  OX: "="
-};
-var modifyOtherKeysRe = /^\x1b\[27;(\d+);(\d+)~$/;
-var parseKeypress2 = (s = "", options = {}) => {
-  let parts;
-  if (Buffer2.isBuffer(s)) {
-    if (s[0] > 127 && s[1] === undefined) {
-      s = "\x1B" + String.fromCharCode(s[0] - 128);
-    } else {
-      s = String(s);
-    }
-  } else if (s !== undefined && typeof s !== "string") {
-    s = String(s);
-  } else if (!s) {
-    s = "";
-  }
-  if (/^\x1b\[<\d+;\d+;\d+[Mm]$/.test(s)) {
-    return null;
-  }
-  if (/^\[<\d+;\d+;\d+[Mm]$/.test(s)) {
-    return null;
-  }
-  if (/^\x1b\[<[\d;]*$/.test(s)) {
-    return null;
-  }
-  if (/^\[<[\d;]*$/.test(s)) {
-    return null;
-  }
-  if (s.startsWith("\x1B[M") && s.length >= 6) {
-    return null;
-  }
-  if (/^\x1b\[\d+;\d+;\d+t$/.test(s)) {
-    return null;
-  }
-  if (/^\x1b\[\d+;\d+R$/.test(s)) {
-    return null;
-  }
-  if (/^\x1b\[\?[\d;]+c$/.test(s)) {
-    return null;
-  }
-  if (/^\x1b\[\?[\d;]+\$y$/.test(s)) {
-    return null;
-  }
-  if (s === "\x1B[I" || s === "\x1B[O") {
-    return null;
-  }
-  if (/^\x1b\][\d;].*(\x1b\\|\x07)$/.test(s)) {
-    return null;
-  }
-  if (s === "\x1B[200~" || s === "\x1B[201~") {
-    return null;
-  }
-  const key = {
-    name: "",
-    ctrl: false,
-    meta: false,
-    shift: false,
-    option: false,
-    number: false,
-    sequence: s,
-    raw: s,
-    eventType: "press",
-    source: "raw"
-  };
-  key.sequence = key.sequence || s || key.name;
-  const ctrlKeyName = s.length === 1 ? getCtrlKeyName(s.charCodeAt(0)) : undefined;
-  const metaCtrlKeyName = s.length === 2 && s[0] === "\x1B" ? getCtrlKeyName(s.charCodeAt(1)) : undefined;
-  if (options.useKittyKeyboard) {
-    const kittyResult = parseKittyKeyboard(s);
-    if (kittyResult) {
-      return kittyResult;
-    }
-  }
-  const modifyOtherKeysMatch = modifyOtherKeysRe.exec(s);
-  if (modifyOtherKeysMatch) {
-    const modifier = parseInt(modifyOtherKeysMatch[1], 10) - 1;
-    const charCode = parseInt(modifyOtherKeysMatch[2], 10);
-    key.ctrl = !!(modifier & 4);
-    key.meta = !!(modifier & 2);
-    key.shift = !!(modifier & 1);
-    key.option = !!(modifier & 2);
-    key.super = !!(modifier & 8);
-    key.hyper = !!(modifier & 16);
-    if (charCode === 13) {
-      key.name = "return";
-    } else if (charCode === 27) {
-      key.name = "escape";
-    } else if (charCode === 9) {
-      key.name = "tab";
-    } else if (charCode === 32) {
-      key.name = "space";
-    } else if (charCode === 127 || charCode === 8) {
-      key.name = "backspace";
-    } else {
-      const char = String.fromCharCode(charCode);
-      key.name = char;
-      key.sequence = char;
-      if (charCode >= 48 && charCode <= 57) {
-        key.number = true;
-      }
-    }
-    return key;
-  }
-  if (s === "\r" || s === "\x1B\r") {
-    key.name = "return";
-    key.meta = s.length === 2;
-  } else if (s === `
-` || s === `\x1B
-`) {
-    key.name = "linefeed";
-    key.meta = s.length === 2;
-  } else if (s === "\t") {
-    key.name = "tab";
-  } else if (s === "\b" || s === "\x1B\b" || s === "\x7F" || s === "\x1B\x7F") {
-    key.name = "backspace";
-    key.meta = s.charAt(0) === "\x1B";
-  } else if (s === "\x1B" || s === "\x1B\x1B") {
-    key.name = "escape";
-    key.meta = s.length === 2;
-  } else if (s === " " || s === "\x1B ") {
-    key.name = "space";
-    key.meta = s.length === 2;
-  } else if (ctrlKeyName) {
-    key.name = ctrlKeyName;
-    key.ctrl = true;
-  } else if (s.length === 1 && s >= "0" && s <= "9") {
-    key.name = s;
-    key.number = true;
-  } else if (s.length === 1 && s >= "a" && s <= "z") {
-    key.name = s;
-  } else if (s.length === 1 && s >= "A" && s <= "Z") {
-    key.name = s.toLowerCase();
-    key.shift = true;
-  } else if (s.length === 1 || s.length === 2 && s.codePointAt(0) > 65535) {
-    key.name = s;
-  } else if (parts = metaKeyCodeRe.exec(s)) {
-    key.meta = true;
-    const char = parts[1];
-    const isUpperCase = /^[A-Z]$/.test(char);
-    if (char === "F") {
-      key.name = "right";
-    } else if (char === "B") {
-      key.name = "left";
-    } else if (isUpperCase) {
-      key.shift = true;
-      key.name = char;
-    } else {
-      key.name = char;
-    }
-  } else if (metaCtrlKeyName) {
-    key.meta = true;
-    key.ctrl = true;
-    key.name = metaCtrlKeyName;
-  } else if (parts = fnKeyRe.exec(s)) {
-    const segs = [...s];
-    if (segs[0] === "\x1B" && segs[1] === "\x1B") {
-      key.option = true;
-      key.meta = true;
-    }
-    const code = [parts[1], parts[2], parts[4], parts[6]].filter(Boolean).join("");
-    const modifier = parseInt(parts[3] || parts[5] || "1", 10) - 1;
-    key.ctrl = key.ctrl || !!(modifier & 4);
-    key.meta = key.meta || !!(modifier & 2);
-    key.shift = key.shift || !!(modifier & 1);
-    key.option = key.option || !!(modifier & 2);
-    key.super = !!(modifier & 8);
-    key.hyper = !!(modifier & 16);
-    key.code = code;
-    const keyNameResult = keyName[code];
-    if (keyNameResult) {
-      key.name = keyNameResult;
-      key.shift = isShiftKey(code) || key.shift;
-      key.ctrl = isCtrlKey(code) || key.ctrl;
-      const ss3Char = ss3NumpadPrintable[code];
-      if (ss3Char !== undefined) {
-        key.sequence = ss3Char;
-        if (key.name >= "0" && key.name <= "9") {
-          key.number = true;
-        }
-      }
-    } else {
-      key.name = "";
-      key.code = undefined;
-    }
-  } else if (s === "\x1B[3~") {
-    key.name = "delete";
-    key.meta = false;
-    key.code = "[3~";
-  }
-  return key;
-};
+}
 // src/lib/scroll-acceleration.ts
 class LinearScrollAccel2 {
   tick(_now) {
@@ -4198,17 +4031,17 @@ function parseDirection2(value) {
 }
 function parseDisplay2(value) {
   if (value == null) {
-    return 0 /* Flex */;
+    return Display2.Flex;
   }
   switch (value.toLowerCase()) {
     case "flex":
-      return 0 /* Flex */;
+      return Display2.Flex;
     case "none":
-      return 1 /* None */;
+      return Display2.None;
     case "contents":
-      return 2 /* Contents */;
+      return Display2.Contents;
     default:
-      return 0 /* Flex */;
+      return Display2.Flex;
   }
 }
 function parseEdge2(value) {
@@ -4291,25 +4124,28 @@ function parseJustify2(value) {
       return Justify2.FlexStart;
   }
 }
+function parseLayoutMode2(value) {
+  return value?.toLowerCase() === "list" ? nativeConstants.OT_LAYOUT_MODE_LIST : nativeConstants.OT_LAYOUT_MODE_FLEX;
+}
 function parseLogLevel2(value) {
   if (value == null) {
-    return 2 /* Info */;
+    return LogLevel3.Info;
   }
   switch (value.toLowerCase()) {
     case "error":
-      return 0 /* Error */;
+      return LogLevel3.Error;
     case "warn":
-      return 1 /* Warn */;
+      return LogLevel3.Warn;
     case "info":
-      return 2 /* Info */;
+      return LogLevel3.Info;
     case "debug":
-      return 3 /* Debug */;
+      return LogLevel3.Debug;
     case "verbose":
-      return 4 /* Verbose */;
+      return LogLevel3.Verbose;
     case "fatal":
-      return 5 /* Fatal */;
+      return LogLevel3.Fatal;
     default:
-      return 2 /* Info */;
+      return LogLevel3.Info;
   }
 }
 function parseMeasureMode2(value) {
@@ -4387,183 +4223,6 @@ function parseWrap2(value) {
       return Wrap2.WrapReverse;
     default:
       return Wrap2.NoWrap;
-  }
-}
-// src/lib/parse.mouse.ts
-class MouseParser2 {
-  mouseButtonsPressed = new Set;
-  static SCROLL_DIRECTIONS = {
-    0: "up",
-    1: "down",
-    2: "left",
-    3: "right"
-  };
-  reset() {
-    this.mouseButtonsPressed.clear();
-  }
-  decodeInput(data) {
-    const buf = Buffer.isBuffer(data) ? data : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
-    return buf.toString("latin1");
-  }
-  parseMouseEvent(data) {
-    const str = this.decodeInput(data);
-    const parsed = this.parseMouseSequenceAt(str, 0);
-    return parsed?.event ?? null;
-  }
-  parseAllMouseEvents(data) {
-    const str = this.decodeInput(data);
-    const events = [];
-    let offset = 0;
-    while (offset < str.length) {
-      const parsed = this.parseMouseSequenceAt(str, offset);
-      if (!parsed) {
-        break;
-      }
-      events.push(parsed.event);
-      offset += parsed.consumed;
-    }
-    return events;
-  }
-  parseMouseSequenceAt(str, offset) {
-    if (!str.startsWith("\x1B[", offset))
-      return null;
-    const introducer = str[offset + 2];
-    if (introducer === "<") {
-      return this.parseSgrSequence(str, offset);
-    }
-    if (introducer === "M") {
-      return this.parseBasicSequence(str, offset);
-    }
-    return null;
-  }
-  parseSgrSequence(str, offset) {
-    let index = offset + 3;
-    const values = [0, 0, 0];
-    let part = 0;
-    let hasDigit = false;
-    while (index < str.length) {
-      const char = str[index];
-      const charCode = str.charCodeAt(index);
-      if (charCode >= 48 && charCode <= 57) {
-        hasDigit = true;
-        values[part] = values[part] * 10 + (charCode - 48);
-        index++;
-        continue;
-      }
-      switch (char) {
-        case ";": {
-          if (!hasDigit || part >= 2)
-            return null;
-          part++;
-          hasDigit = false;
-          index++;
-          break;
-        }
-        case "M":
-        case "m": {
-          if (!hasDigit || part !== 2)
-            return null;
-          return {
-            event: this.decodeSgrEvent(values[0], values[1], values[2], char),
-            consumed: index - offset + 1
-          };
-        }
-        default:
-          return null;
-      }
-    }
-    return null;
-  }
-  parseBasicSequence(str, offset) {
-    if (offset + 6 > str.length)
-      return null;
-    const buttonByte = str.charCodeAt(offset + 3) - 32;
-    const x = str.charCodeAt(offset + 4) - 33;
-    const y = str.charCodeAt(offset + 5) - 33;
-    return {
-      event: this.decodeBasicEvent(buttonByte, x, y),
-      consumed: 6
-    };
-  }
-  decodeSgrEvent(rawButtonCode, wireX, wireY, pressRelease) {
-    const button = rawButtonCode & 3;
-    const isScroll = (rawButtonCode & 64) !== 0;
-    const scrollDirection = !isScroll ? undefined : MouseParser2.SCROLL_DIRECTIONS[button];
-    const isMotion = (rawButtonCode & 32) !== 0;
-    const modifiers = {
-      shift: (rawButtonCode & 4) !== 0,
-      alt: (rawButtonCode & 8) !== 0,
-      ctrl: (rawButtonCode & 16) !== 0
-    };
-    let type;
-    let scrollInfo;
-    if (isMotion) {
-      const isDragging = this.mouseButtonsPressed.size > 0;
-      if (button === 3) {
-        type = "move";
-      } else if (isDragging) {
-        type = "drag";
-      } else {
-        type = "move";
-      }
-    } else if (isScroll && pressRelease === "M") {
-      type = "scroll";
-      scrollInfo = {
-        direction: scrollDirection,
-        delta: 1
-      };
-    } else {
-      type = pressRelease === "M" ? "down" : "up";
-      if (type === "down" && button !== 3) {
-        this.mouseButtonsPressed.add(button);
-      } else if (type === "up") {
-        this.mouseButtonsPressed.delete(button);
-      }
-    }
-    return {
-      type,
-      button: button === 3 ? 0 : button,
-      x: wireX - 1,
-      y: wireY - 1,
-      modifiers,
-      scroll: scrollInfo
-    };
-  }
-  decodeBasicEvent(buttonByte, x, y) {
-    const button = buttonByte & 3;
-    const isScroll = (buttonByte & 64) !== 0;
-    const isMotion = (buttonByte & 32) !== 0;
-    const scrollDirection = !isScroll ? undefined : MouseParser2.SCROLL_DIRECTIONS[button];
-    const modifiers = {
-      shift: (buttonByte & 4) !== 0,
-      alt: (buttonByte & 8) !== 0,
-      ctrl: (buttonByte & 16) !== 0
-    };
-    let type;
-    let actualButton;
-    let scrollInfo;
-    if (isMotion) {
-      type = "move";
-      actualButton = button === 3 ? -1 : button;
-    } else if (isScroll) {
-      type = "scroll";
-      actualButton = 0;
-      scrollInfo = {
-        direction: scrollDirection,
-        delta: 1
-      };
-    } else {
-      type = button === 3 ? "up" : "down";
-      actualButton = button === 3 ? 0 : button;
-    }
-    return {
-      type,
-      button: actualButton,
-      x,
-      y,
-      modifiers,
-      scroll: scrollInfo
-    };
   }
 }
 // src/lib/selection.ts
@@ -4758,1509 +4417,6 @@ class ASCIIFontSelectionHelper2 {
     return previousSelection?.start !== this.localSelection?.start || previousSelection?.end !== this.localSelection?.end;
   }
 }
-// src/lib/stdin-parser.ts
-import { Buffer as Buffer3 } from "buffer";
-var DEFAULT_TIMEOUT_MS = 20;
-var DEFAULT_MAX_PENDING_BYTES = 64 * 1024;
-var INITIAL_PENDING_CAPACITY = 256;
-var ESC = 27;
-var BEL = 7;
-var BRACKETED_PASTE_START = Buffer3.from("\x1B[200~");
-var BRACKETED_PASTE_END = Buffer3.from("\x1B[201~");
-var EMPTY_BYTES = new Uint8Array(0);
-var KEY_DECODER = new TextDecoder;
-var DEFAULT_PROTOCOL_CONTEXT = {
-  kittyKeyboardEnabled: false,
-  privateCapabilityRepliesActive: false,
-  pixelResolutionQueryActive: false,
-  explicitWidthCprActive: false,
-  startupCursorCprActive: false,
-  replySentinelActive: false
-};
-var RXVT_DOLLAR_CSI_RE = /^\x1b\[\d+\$$/;
-var SYSTEM_CLOCK = new SystemClock2;
-
-class ByteQueue {
-  buf;
-  start = 0;
-  end = 0;
-  constructor(capacity = INITIAL_PENDING_CAPACITY) {
-    this.buf = new Uint8Array(capacity);
-  }
-  get length() {
-    return this.end - this.start;
-  }
-  get capacity() {
-    return this.buf.length;
-  }
-  view() {
-    return this.buf.subarray(this.start, this.end);
-  }
-  take() {
-    const chunk = this.view();
-    this.start = 0;
-    this.end = 0;
-    return chunk;
-  }
-  append(chunk) {
-    if (chunk.length === 0) {
-      return;
-    }
-    this.ensureCapacity(this.length + chunk.length);
-    this.buf.set(chunk, this.end);
-    this.end += chunk.length;
-  }
-  consume(count) {
-    if (count <= 0) {
-      return;
-    }
-    if (count >= this.length) {
-      this.start = 0;
-      this.end = 0;
-      return;
-    }
-    this.start += count;
-    if (this.start >= this.buf.length / 2) {
-      this.buf.copyWithin(0, this.start, this.end);
-      this.end -= this.start;
-      this.start = 0;
-    }
-  }
-  clear() {
-    this.start = 0;
-    this.end = 0;
-  }
-  reset(capacity = INITIAL_PENDING_CAPACITY) {
-    this.buf = new Uint8Array(capacity);
-    this.start = 0;
-    this.end = 0;
-  }
-  ensureCapacity(requiredLength) {
-    const currentLength = this.length;
-    if (requiredLength <= this.buf.length) {
-      const availableAtEnd = this.buf.length - this.end;
-      if (availableAtEnd >= requiredLength - currentLength) {
-        return;
-      }
-      this.buf.copyWithin(0, this.start, this.end);
-      this.end = currentLength;
-      this.start = 0;
-      if (requiredLength <= this.buf.length) {
-        return;
-      }
-    }
-    let nextCapacity = this.buf.length;
-    while (nextCapacity < requiredLength) {
-      nextCapacity *= 2;
-    }
-    const next = new Uint8Array(nextCapacity);
-    next.set(this.view(), 0);
-    this.buf = next;
-    this.start = 0;
-    this.end = currentLength;
-  }
-}
-function normalizePositiveOption(value, fallback) {
-  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-    return fallback;
-  }
-  return Math.floor(value);
-}
-function utf8SequenceLength(first) {
-  if (first < 128)
-    return 1;
-  if (first >= 194 && first <= 223)
-    return 2;
-  if (first >= 224 && first <= 239)
-    return 3;
-  if (first >= 240 && first <= 244)
-    return 4;
-  return 0;
-}
-function bytesEqual(left, right) {
-  if (left.length !== right.length) {
-    return false;
-  }
-  for (let index = 0;index < left.length; index += 1) {
-    if (left[index] !== right[index]) {
-      return false;
-    }
-  }
-  return true;
-}
-function isMouseSgrSequence(sequence) {
-  if (sequence.length < 7) {
-    return false;
-  }
-  if (sequence[0] !== ESC || sequence[1] !== 91 || sequence[2] !== 60) {
-    return false;
-  }
-  const final = sequence[sequence.length - 1];
-  if (final !== 77 && final !== 109) {
-    return false;
-  }
-  let part = 0;
-  let hasDigit = false;
-  for (let index = 3;index < sequence.length - 1; index += 1) {
-    const byte = sequence[index];
-    if (byte >= 48 && byte <= 57) {
-      hasDigit = true;
-      continue;
-    }
-    if (byte === 59 && hasDigit && part < 2) {
-      part += 1;
-      hasDigit = false;
-      continue;
-    }
-    return false;
-  }
-  return part === 2 && hasDigit;
-}
-function isAsciiDigit(byte) {
-  return byte >= 48 && byte <= 57;
-}
-function parsePositiveDecimalPrefix(sequence, start, endExclusive) {
-  if (start >= endExclusive)
-    return null;
-  let value = 0;
-  let sawDigit = false;
-  for (let index = start;index < endExclusive; index += 1) {
-    const byte = sequence[index];
-    if (!isAsciiDigit(byte))
-      return null;
-    sawDigit = true;
-    value = value * 10 + (byte - 48);
-  }
-  return sawDigit ? value : null;
-}
-function parseKittyFirstFieldCodepoint(sequence, start, endExclusive) {
-  if (start >= endExclusive)
-    return null;
-  let firstColon = -1;
-  for (let index = start;index < endExclusive; index += 1) {
-    if (sequence[index] === 58) {
-      firstColon = index;
-      break;
-    }
-  }
-  if (firstColon === -1)
-    return null;
-  const codepoint = parsePositiveDecimalPrefix(sequence, start, firstColon);
-  if (codepoint === null)
-    return null;
-  for (let index = firstColon + 1;index < endExclusive; index += 1) {
-    const byte = sequence[index];
-    if (byte !== 58 && !isAsciiDigit(byte))
-      return null;
-  }
-  return codepoint;
-}
-function canStillBeKittyU(state) {
-  return state.semicolons >= 1;
-}
-function canStillBeKittySpecial(state) {
-  return state.semicolons === 1 && state.segments > 1;
-}
-function canStillBeExplicitWidthCpr(state) {
-  return state.firstParamValue === 1 && state.semicolons === 1;
-}
-function canStillBeStartupCursorCpr(state) {
-  return state.semicolons === 1;
-}
-function canStillBeStartupCursorCprPrefix(state) {
-  return state.segments === 1 && state.semicolons <= 1;
-}
-function canStillBePixelResolution(state) {
-  return state.firstParamValue === 4 && state.semicolons === 2;
-}
-function canStillBePixelResolutionPrefix(bytes) {
-  const fixedPrefix = [ESC, 91, 52, 59];
-  const fixedLength = Math.min(bytes.length, fixedPrefix.length);
-  for (let index = 0;index < fixedLength; index += 1) {
-    if (bytes[index] !== fixedPrefix[index])
-      return false;
-  }
-  if (bytes.length <= fixedPrefix.length)
-    return bytes.length > 0;
-  let index = fixedPrefix.length;
-  const heightStart = index;
-  while (index < bytes.length && isAsciiDigit(bytes[index]))
-    index += 1;
-  if (index === bytes.length)
-    return index > heightStart;
-  if (index === heightStart || bytes[index] !== 59)
-    return false;
-  index += 1;
-  const widthStart = index;
-  while (index < bytes.length && isAsciiDigit(bytes[index]))
-    index += 1;
-  if (index === bytes.length)
-    return true;
-  return index > widthStart && bytes[index] === 116;
-}
-function canDeferParametricCsi(state, context) {
-  return context.kittyKeyboardEnabled && (canStillBeKittyU(state) || canStillBeKittySpecial(state)) || context.explicitWidthCprActive && canStillBeExplicitWidthCpr(state) || context.startupCursorCprActive && canStillBeStartupCursorCpr(state) || context.pixelResolutionQueryActive && canStillBePixelResolution(state);
-}
-function canCompleteDeferredParametricCsi(state, byte, context) {
-  if (context.kittyKeyboardEnabled) {
-    if (state.hasDigit && byte === 117)
-      return true;
-    if (state.hasDigit && state.semicolons === 1 && state.segments > 1 && (byte === 126 || byte >= 65 && byte <= 90)) {
-      return true;
-    }
-  }
-  if (context.explicitWidthCprActive && state.hasDigit && state.firstParamValue === 1 && state.semicolons === 1 && byte === 82) {
-    return true;
-  }
-  if (context.startupCursorCprActive && state.hasDigit && state.semicolons === 1 && byte === 82) {
-    return true;
-  }
-  if (context.pixelResolutionQueryActive && state.hasDigit && state.firstParamValue === 4 && state.semicolons === 2 && byte === 116) {
-    return true;
-  }
-  return false;
-}
-function classifyParametricCsiProtocol(state, finalByte) {
-  if (finalByte === 82 && state.semicolons === 1 && state.segments === 1 && state.hasDigit) {
-    return "cpr";
-  }
-  return "csi";
-}
-function canDeferPrivateReplyCsi(context) {
-  return context.privateCapabilityRepliesActive;
-}
-function canCompleteDeferredPrivateReplyCsi(state, byte, context) {
-  if (!context.privateCapabilityRepliesActive)
-    return false;
-  if (state.sawDollar)
-    return state.hasDigit && byte === 121;
-  if (byte === 99)
-    return state.hasDigit || state.semicolons > 0;
-  if (byte === 110)
-    return state.hasDigit;
-  return state.hasDigit && byte === 117;
-}
-function concatBytes(left, right) {
-  if (left.length === 0) {
-    return right;
-  }
-  if (right.length === 0) {
-    return left;
-  }
-  const combined = new Uint8Array(left.length + right.length);
-  combined.set(left, 0);
-  combined.set(right, left.length);
-  return combined;
-}
-function withEscPrefix(bytes) {
-  const prefixed = new Uint8Array(bytes.length + 1);
-  prefixed[0] = ESC;
-  prefixed.set(bytes, 1);
-  return prefixed;
-}
-function indexOfBytes(haystack, needle) {
-  if (needle.length === 0) {
-    return 0;
-  }
-  const limit = haystack.length - needle.length;
-  for (let offset = 0;offset <= limit; offset += 1) {
-    let matched = true;
-    for (let index = 0;index < needle.length; index += 1) {
-      if (haystack[offset + index] !== needle[index]) {
-        matched = false;
-        break;
-      }
-    }
-    if (matched) {
-      return offset;
-    }
-  }
-  return -1;
-}
-function decodeLatin1(bytes) {
-  return Buffer3.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString("latin1");
-}
-function decodeUtf8(bytes) {
-  return KEY_DECODER.decode(bytes);
-}
-function createPasteCollector() {
-  return {
-    tail: EMPTY_BYTES,
-    parts: [],
-    totalLength: 0
-  };
-}
-function joinPasteBytes(parts, totalLength) {
-  if (totalLength === 0) {
-    return EMPTY_BYTES;
-  }
-  if (parts.length === 1) {
-    return parts[0];
-  }
-  const bytes = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const part of parts) {
-    bytes.set(part, offset);
-    offset += part.length;
-  }
-  return bytes;
-}
-
-class StdinParser2 {
-  pending = new ByteQueue(INITIAL_PENDING_CAPACITY);
-  events = [];
-  timeoutMs;
-  maxPendingBytes;
-  armTimeouts;
-  onTimeoutFlush;
-  useKittyKeyboard;
-  mouseParser = new MouseParser2;
-  clock;
-  protocolContext;
-  timeoutId = null;
-  destroyed = false;
-  pendingSinceMs = null;
-  pendingTimeoutPaused = false;
-  suspendedPixelResolutionPrefixLength = 0;
-  forceFlush = false;
-  justFlushedEsc = false;
-  state = { tag: "ground" };
-  cursor = 0;
-  unitStart = 0;
-  paste = null;
-  constructor(options = {}) {
-    this.timeoutMs = normalizePositiveOption(options.timeoutMs, DEFAULT_TIMEOUT_MS);
-    this.maxPendingBytes = normalizePositiveOption(options.maxPendingBytes, DEFAULT_MAX_PENDING_BYTES);
-    this.armTimeouts = options.armTimeouts ?? true;
-    this.onTimeoutFlush = options.onTimeoutFlush ?? null;
-    this.useKittyKeyboard = options.useKittyKeyboard ?? true;
-    this.clock = options.clock ?? SYSTEM_CLOCK;
-    this.protocolContext = {
-      ...DEFAULT_PROTOCOL_CONTEXT,
-      kittyKeyboardEnabled: options.protocolContext?.kittyKeyboardEnabled ?? false,
-      privateCapabilityRepliesActive: options.protocolContext?.privateCapabilityRepliesActive ?? false,
-      pixelResolutionQueryActive: options.protocolContext?.pixelResolutionQueryActive ?? false,
-      explicitWidthCprActive: options.protocolContext?.explicitWidthCprActive ?? false,
-      startupCursorCprActive: options.protocolContext?.startupCursorCprActive ?? false
-    };
-  }
-  get bufferCapacity() {
-    return this.pending.capacity;
-  }
-  updateProtocolContext(patch) {
-    this.ensureAlive();
-    this.protocolContext = { ...this.protocolContext, ...patch };
-    if (!this.protocolContext.pixelResolutionQueryActive && this.suspendedPixelResolutionPrefixLength > 0) {
-      const prefixLength = this.suspendedPixelResolutionPrefixLength;
-      this.state = { tag: "ground" };
-      this.consumePrefix(prefixLength);
-      this.scanPending();
-    }
-    this.reconcileDeferredStateWithProtocolContext();
-    this.reconcileTimeoutState();
-  }
-  getAbortableStartupCursorCprState() {
-    if (this.pending.length === 0) {
-      return null;
-    }
-    switch (this.state.tag) {
-      case "csi": {
-        const bytes = this.pending.view();
-        const firstParamStart = this.unitStart + 2;
-        if (this.cursor < firstParamStart) {
-          return null;
-        }
-        let firstParamValue = null;
-        for (let index = firstParamStart;index < this.cursor; index += 1) {
-          const byte = bytes[index];
-          if (!isAsciiDigit(byte)) {
-            return null;
-          }
-          firstParamValue = (firstParamValue ?? 0) * 10 + (byte - 48);
-        }
-        return {
-          tag: "csi_parametric_ignored",
-          semicolons: 0,
-          segments: 1,
-          hasDigit: this.cursor > firstParamStart,
-          firstParamValue
-        };
-      }
-      case "csi_parametric":
-      case "csi_parametric_deferred":
-        if (!canStillBeStartupCursorCprPrefix(this.state) || this.protocolContext.explicitWidthCprActive && canStillBeExplicitWidthCpr(this.state)) {
-          return null;
-        }
-        return {
-          tag: "csi_parametric_ignored",
-          semicolons: this.state.semicolons,
-          segments: this.state.segments,
-          hasDigit: this.state.hasDigit,
-          firstParamValue: this.state.firstParamValue
-        };
-    }
-    return null;
-  }
-  abortPendingStartupCursorCpr() {
-    this.ensureAlive();
-    const nextState = this.getAbortableStartupCursorCprState();
-    if (!nextState) {
-      return;
-    }
-    this.state = nextState;
-    if (this.pendingSinceMs === null) {
-      this.markPending();
-    }
-    this.forceFlush = false;
-    this.reconcileTimeoutState();
-  }
-  push(data) {
-    this.ensureAlive();
-    if (data.length === 0) {
-      this.emitKeyOrResponse("unknown", "");
-      return;
-    }
-    let remainder = data;
-    while (remainder.length > 0) {
-      if (this.paste) {
-        remainder = this.consumePasteBytes(remainder);
-        continue;
-      }
-      const immediatePasteStartIndex = this.state.tag === "ground" && this.pending.length === 0 ? indexOfBytes(remainder, BRACKETED_PASTE_START) : -1;
-      const appendEnd = immediatePasteStartIndex === -1 ? remainder.length : immediatePasteStartIndex + BRACKETED_PASTE_START.length;
-      this.pending.append(remainder.subarray(0, appendEnd));
-      remainder = remainder.subarray(appendEnd);
-      if (this.suspendedPixelResolutionPrefixLength > 0 && this.protocolContext.pixelResolutionQueryActive && !canStillBePixelResolutionPrefix(this.pending.view())) {
-        const prefixLength = this.suspendedPixelResolutionPrefixLength;
-        this.state = { tag: "ground" };
-        this.consumePrefix(prefixLength);
-      }
-      this.scanPending();
-      if (this.paste && this.pending.length > 0) {
-        remainder = this.consumePasteBytes(this.takePendingBytes());
-        continue;
-      }
-      if (!this.paste && this.pending.length > this.maxPendingBytes) {
-        this.flushPendingOverflow();
-        this.scanPending();
-        if (this.paste && this.pending.length > 0) {
-          remainder = this.consumePasteBytes(this.takePendingBytes());
-        }
-      }
-    }
-    this.reconcileTimeoutState();
-  }
-  read() {
-    this.ensureAlive();
-    if (this.events.length === 0 && this.forceFlush) {
-      this.scanPending();
-      this.reconcileTimeoutState();
-    }
-    return this.events.shift() ?? null;
-  }
-  drain(onEvent) {
-    this.ensureAlive();
-    while (true) {
-      if (this.destroyed) {
-        return;
-      }
-      const event = this.read();
-      if (!event) {
-        return;
-      }
-      onEvent(event);
-    }
-  }
-  flushTimeout(nowMsValue = this.clock.now()) {
-    this.ensureAlive();
-    if (this.pendingSinceMs !== null && (nowMsValue < this.pendingSinceMs || nowMsValue - this.pendingSinceMs < this.timeoutMs)) {
-      return;
-    }
-    this.tryForceFlush();
-  }
-  tryForceFlush() {
-    if (this.paste || this.pendingSinceMs === null || this.pending.length === 0) {
-      return;
-    }
-    this.forceFlush = true;
-  }
-  reset() {
-    if (this.destroyed) {
-      return;
-    }
-    this.clearTimeout();
-    this.resetState();
-  }
-  hasPendingPixelResolutionResponse() {
-    if (!this.protocolContext.pixelResolutionQueryActive || this.pending.length === 0)
-      return false;
-    return canStillBePixelResolutionPrefix(this.pending.view());
-  }
-  pausePendingTimeout() {
-    this.ensureAlive();
-    this.pendingTimeoutPaused = true;
-    this.suspendedPixelResolutionPrefixLength = this.pending.length;
-    this.clearTimeout();
-  }
-  resumePendingTimeout() {
-    this.ensureAlive();
-    if (this.pending.length === 0)
-      this.pendingTimeoutPaused = false;
-    this.reconcileTimeoutState();
-  }
-  resetMouseState() {
-    this.ensureAlive();
-    this.mouseParser.reset();
-  }
-  destroy() {
-    if (this.destroyed) {
-      return;
-    }
-    this.clearTimeout();
-    this.destroyed = true;
-    this.resetState();
-  }
-  ensureAlive() {
-    if (this.destroyed) {
-      throw new Error("StdinParser has been destroyed");
-    }
-  }
-  scanPending() {
-    while (!this.paste) {
-      const bytes = this.pending.view();
-      if (this.state.tag === "ground" && this.cursor >= bytes.length) {
-        this.pending.clear();
-        this.cursor = 0;
-        this.unitStart = 0;
-        this.pendingSinceMs = null;
-        this.forceFlush = false;
-        return;
-      }
-      const byte = this.cursor < bytes.length ? bytes[this.cursor] : -1;
-      switch (this.state.tag) {
-        case "ground": {
-          this.unitStart = this.cursor;
-          if (this.justFlushedEsc) {
-            if (byte === 91) {
-              this.justFlushedEsc = false;
-              this.cursor += 1;
-              this.state = { tag: "esc_recovery" };
-              continue;
-            }
-            this.justFlushedEsc = false;
-          }
-          if (byte === ESC) {
-            this.cursor += 1;
-            this.state = { tag: "esc" };
-            continue;
-          }
-          if (byte < 128) {
-            this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.cursor, this.cursor + 1)));
-            this.consumePrefix(this.cursor + 1);
-            continue;
-          }
-          const expected = utf8SequenceLength(byte);
-          if (expected === 0) {
-            if (!this.forceFlush && this.cursor + 1 === bytes.length) {
-              this.markPending();
-              return;
-            }
-            this.emitLegacyHighByte(byte);
-            this.consumePrefix(this.cursor + 1);
-            continue;
-          }
-          this.cursor += 1;
-          this.state = { tag: "utf8", expected, seen: 1 };
-          continue;
-        }
-        case "utf8": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitLegacyHighByte(bytes[this.unitStart]);
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.unitStart + 1);
-            continue;
-          }
-          if ((byte & 192) !== 128) {
-            this.emitLegacyHighByte(bytes[this.unitStart]);
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.unitStart + 1);
-            continue;
-          }
-          const nextSeen = this.state.seen + 1;
-          this.cursor += 1;
-          if (nextSeen < this.state.expected) {
-            this.state = { tag: "utf8", expected: this.state.expected, seen: nextSeen };
-            continue;
-          }
-          this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "esc": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            const flushedLoneEsc = this.cursor === this.unitStart + 1 && bytes[this.unitStart] === ESC;
-            this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-            this.justFlushedEsc = flushedLoneEsc;
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          switch (byte) {
-            case 91:
-              this.cursor += 1;
-              this.state = { tag: "csi" };
-              continue;
-            case 79:
-              this.cursor += 1;
-              this.state = { tag: "ss3" };
-              continue;
-            case 93:
-              this.cursor += 1;
-              this.state = { tag: "osc", sawEsc: false };
-              continue;
-            case 80:
-              this.cursor += 1;
-              this.state = { tag: "dcs", sawEsc: false };
-              continue;
-            case 95:
-              this.cursor += 1;
-              this.state = { tag: "apc", sawEsc: false };
-              continue;
-            case ESC:
-              this.cursor += 1;
-              continue;
-            default:
-              this.cursor += 1;
-              this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-              this.state = { tag: "ground" };
-              this.consumePrefix(this.cursor);
-              continue;
-          }
-        }
-        case "ss3": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          this.cursor += 1;
-          this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "esc_recovery": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.cursor)));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === 60) {
-            this.cursor += 1;
-            this.state = { tag: "esc_less_mouse" };
-            continue;
-          }
-          if (byte === 77) {
-            this.cursor += 1;
-            this.state = { tag: "esc_less_x10_mouse" };
-            continue;
-          }
-          this.emitKeyOrResponse("unknown", decodeUtf8(bytes.subarray(this.unitStart, this.unitStart + 1)));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.unitStart + 1);
-          continue;
-        }
-        case "csi": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === 77 && this.cursor === this.unitStart + 2) {
-            const end = this.cursor + 4;
-            if (bytes.length < end) {
-              if (!this.forceFlush) {
-                this.markPending();
-                return;
-              }
-              this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, bytes.length));
-              this.state = { tag: "ground" };
-              this.consumePrefix(bytes.length);
-              continue;
-            }
-            this.emitMouse(bytes.subarray(this.unitStart, end), "x10");
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          if (byte === 36) {
-            const candidateEnd = this.cursor + 1;
-            const candidate = decodeUtf8(bytes.subarray(this.unitStart, candidateEnd));
-            if (RXVT_DOLLAR_CSI_RE.test(candidate)) {
-              this.emitKeyOrResponse("csi", candidate);
-              this.state = { tag: "ground" };
-              this.consumePrefix(candidateEnd);
-              continue;
-            }
-            if (!this.forceFlush && candidateEnd >= bytes.length) {
-              this.markPending();
-              return;
-            }
-          }
-          if (byte === 60 && this.cursor === this.unitStart + 2) {
-            this.cursor += 1;
-            this.state = { tag: "csi_sgr_mouse", part: 0, hasDigit: false };
-            continue;
-          }
-          if (byte === 91 && this.cursor === this.unitStart + 2) {
-            this.cursor += 1;
-            continue;
-          }
-          if (byte === 63 && this.cursor === this.unitStart + 2) {
-            this.cursor += 1;
-            this.state = { tag: "csi_private_reply", semicolons: 0, hasDigit: false, sawDollar: false };
-            continue;
-          }
-          if (byte === 59) {
-            const firstParamStart = this.unitStart + 2;
-            const firstParamEnd = this.cursor;
-            let firstParamValue = parsePositiveDecimalPrefix(bytes, firstParamStart, firstParamEnd);
-            if (firstParamValue === null && this.protocolContext.kittyKeyboardEnabled) {
-              firstParamValue = parseKittyFirstFieldCodepoint(bytes, firstParamStart, firstParamEnd);
-            }
-            if (firstParamValue !== null) {
-              this.cursor += 1;
-              this.state = {
-                tag: "csi_parametric",
-                semicolons: 1,
-                segments: 1,
-                hasDigit: false,
-                firstParamValue
-              };
-              continue;
-            }
-          }
-          if (byte >= 64 && byte <= 126) {
-            const end = this.cursor + 1;
-            const rawBytes = bytes.subarray(this.unitStart, end);
-            if (bytesEqual(rawBytes, BRACKETED_PASTE_START)) {
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              this.paste = createPasteCollector();
-              continue;
-            }
-            if (isMouseSgrSequence(rawBytes)) {
-              this.emitMouse(rawBytes, "sgr");
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              continue;
-            }
-            this.emitKeyOrResponse("csi", decodeUtf8(rawBytes));
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.cursor += 1;
-          continue;
-        }
-        case "csi_sgr_mouse": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.state = { tag: "csi_sgr_mouse_deferred", part: this.state.part, hasDigit: this.state.hasDigit };
-            this.pendingSinceMs = null;
-            this.forceFlush = false;
-            return;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte)) {
-            this.cursor += 1;
-            this.state = { tag: "csi_sgr_mouse", part: this.state.part, hasDigit: true };
-            continue;
-          }
-          if (byte === 59 && this.state.hasDigit && this.state.part < 2) {
-            this.cursor += 1;
-            this.state = { tag: "csi_sgr_mouse", part: this.state.part + 1, hasDigit: false };
-            continue;
-          }
-          if (byte >= 64 && byte <= 126) {
-            const end = this.cursor + 1;
-            const rawBytes = bytes.subarray(this.unitStart, end);
-            if (isMouseSgrSequence(rawBytes)) {
-              this.emitMouse(rawBytes, "sgr");
-            } else {
-              this.emitKeyOrResponse("csi", decodeUtf8(rawBytes));
-            }
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.state = { tag: "csi" };
-          continue;
-        }
-        case "csi_sgr_mouse_deferred": {
-          if (this.cursor >= bytes.length) {
-            this.pendingSinceMs = null;
-            this.forceFlush = false;
-            return;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte) || byte === 59 || byte === 77 || byte === 109) {
-            this.state = { tag: "csi_sgr_mouse", part: this.state.part, hasDigit: this.state.hasDigit };
-            continue;
-          }
-          this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "csi_parametric": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            if (canDeferParametricCsi(this.state, this.protocolContext)) {
-              this.state = {
-                tag: "csi_parametric_deferred",
-                semicolons: this.state.semicolons,
-                segments: this.state.segments,
-                hasDigit: this.state.hasDigit,
-                firstParamValue: this.state.firstParamValue
-              };
-              this.pendingSinceMs = null;
-              this.forceFlush = false;
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte)) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments,
-              hasDigit: true,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte === 58 && this.state.hasDigit && this.state.segments < 3) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments + 1,
-              hasDigit: false,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte === 59 && this.state.semicolons < 2) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons + 1,
-              segments: 1,
-              hasDigit: false,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte >= 64 && byte <= 126) {
-            const end = this.cursor + 1;
-            const protocol = classifyParametricCsiProtocol(this.state, byte);
-            this.emitKeyOrResponse(protocol, decodeUtf8(bytes.subarray(this.unitStart, end)));
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.state = { tag: "csi" };
-          continue;
-        }
-        case "csi_parametric_deferred": {
-          if (this.cursor >= bytes.length) {
-            this.pendingSinceMs = null;
-            this.forceFlush = false;
-            return;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte) || byte === 58 || byte === 59) {
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments,
-              hasDigit: this.state.hasDigit,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (canCompleteDeferredParametricCsi(this.state, byte, this.protocolContext)) {
-            this.state = {
-              tag: "csi_parametric",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments,
-              hasDigit: this.state.hasDigit,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "csi_parametric_ignored": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte)) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric_ignored",
-              semicolons: this.state.semicolons,
-              segments: this.state.segments,
-              hasDigit: true,
-              firstParamValue: this.state.semicolons === 0 ? (this.state.firstParamValue ?? 0) * 10 + (byte - 48) : this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte === 59 && this.state.semicolons === 0 && this.state.hasDigit) {
-            if (this.protocolContext.explicitWidthCprActive && this.state.firstParamValue === 1) {
-              this.state = { tag: "csi" };
-              continue;
-            }
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_parametric_ignored",
-              semicolons: 1,
-              segments: 1,
-              hasDigit: false,
-              firstParamValue: this.state.firstParamValue
-            };
-            continue;
-          }
-          if (byte === 82 && this.state.semicolons === 1 && this.state.hasDigit) {
-            const end = this.cursor + 1;
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          if (this.state.semicolons === 0) {
-            this.state = { tag: "csi" };
-            continue;
-          }
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "csi_private_reply": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            if (canDeferPrivateReplyCsi(this.protocolContext)) {
-              this.state = {
-                tag: "csi_private_reply_deferred",
-                semicolons: this.state.semicolons,
-                hasDigit: this.state.hasDigit,
-                sawDollar: this.state.sawDollar
-              };
-              this.pendingSinceMs = null;
-              this.forceFlush = false;
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte)) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons,
-              hasDigit: true,
-              sawDollar: this.state.sawDollar
-            };
-            continue;
-          }
-          if (byte === 59) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons + 1,
-              hasDigit: false,
-              sawDollar: false
-            };
-            continue;
-          }
-          if (byte === 36 && this.state.hasDigit && !this.state.sawDollar) {
-            this.cursor += 1;
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons,
-              hasDigit: true,
-              sawDollar: true
-            };
-            continue;
-          }
-          if (byte >= 64 && byte <= 126) {
-            const end = this.cursor + 1;
-            this.emitOpaqueResponse("csi", bytes.subarray(this.unitStart, end));
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.state = { tag: "csi" };
-          continue;
-        }
-        case "csi_private_reply_deferred": {
-          if (this.cursor >= bytes.length) {
-            this.pendingSinceMs = null;
-            this.forceFlush = false;
-            return;
-          }
-          if (byte === ESC) {
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (isAsciiDigit(byte) || byte === 59 || byte === 36) {
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons,
-              hasDigit: this.state.hasDigit,
-              sawDollar: this.state.sawDollar
-            };
-            continue;
-          }
-          if (canCompleteDeferredPrivateReplyCsi(this.state, byte, this.protocolContext)) {
-            this.state = {
-              tag: "csi_private_reply",
-              semicolons: this.state.semicolons,
-              hasDigit: this.state.hasDigit,
-              sawDollar: this.state.sawDollar
-            };
-            continue;
-          }
-          this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "osc": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (this.state.sawEsc) {
-            if (byte === 92) {
-              const end = this.cursor + 1;
-              this.emitOpaqueResponse("osc", bytes.subarray(this.unitStart, end));
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              continue;
-            }
-            this.state = { tag: "osc", sawEsc: false };
-            continue;
-          }
-          if (byte === BEL) {
-            const end = this.cursor + 1;
-            this.emitOpaqueResponse("osc", bytes.subarray(this.unitStart, end));
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          if (byte === ESC) {
-            this.cursor += 1;
-            this.state = { tag: "osc", sawEsc: true };
-            continue;
-          }
-          this.cursor += 1;
-          continue;
-        }
-        case "dcs": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (this.state.sawEsc) {
-            if (byte === 92) {
-              const end = this.cursor + 1;
-              this.emitOpaqueResponse("dcs", bytes.subarray(this.unitStart, end));
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              continue;
-            }
-            this.state = { tag: "dcs", sawEsc: false };
-            continue;
-          }
-          if (byte === ESC) {
-            this.cursor += 1;
-            this.state = { tag: "dcs", sawEsc: true };
-            continue;
-          }
-          this.cursor += 1;
-          continue;
-        }
-        case "apc": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (this.state.sawEsc) {
-            if (byte === 92) {
-              const end = this.cursor + 1;
-              this.emitOpaqueResponse("apc", bytes.subarray(this.unitStart, end));
-              this.state = { tag: "ground" };
-              this.consumePrefix(end);
-              continue;
-            }
-            this.state = { tag: "apc", sawEsc: false };
-            continue;
-          }
-          if (byte === ESC) {
-            this.cursor += 1;
-            this.state = { tag: "apc", sawEsc: true };
-            continue;
-          }
-          this.cursor += 1;
-          continue;
-        }
-        case "esc_less_mouse": {
-          if (this.cursor >= bytes.length) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-            this.state = { tag: "ground" };
-            this.consumePrefix(this.cursor);
-            continue;
-          }
-          if (byte >= 48 && byte <= 57 || byte === 59) {
-            this.cursor += 1;
-            continue;
-          }
-          if (byte === 77 || byte === 109) {
-            const end = this.cursor + 1;
-            const rawBytes = bytes.subarray(this.unitStart, end);
-            const prefixed = withEscPrefix(rawBytes);
-            if (isMouseSgrSequence(prefixed)) {
-              this.emitMouse(prefixed, "sgr");
-            } else {
-              this.emitOpaqueResponse("unknown", rawBytes);
-            }
-            this.state = { tag: "ground" };
-            this.consumePrefix(end);
-            continue;
-          }
-          this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-          continue;
-        }
-        case "esc_less_x10_mouse": {
-          const end = this.unitStart + 5;
-          if (bytes.length < end) {
-            if (!this.forceFlush) {
-              this.markPending();
-              return;
-            }
-            this.emitOpaqueResponse("unknown", bytes.subarray(this.unitStart, bytes.length));
-            this.state = { tag: "ground" };
-            this.consumePrefix(bytes.length);
-            continue;
-          }
-          const rawBytes = bytes.subarray(this.unitStart, end);
-          this.emitMouse(withEscPrefix(rawBytes), "x10");
-          this.state = { tag: "ground" };
-          this.consumePrefix(end);
-          continue;
-        }
-      }
-    }
-  }
-  emitKeyOrResponse(protocol, raw) {
-    const parsed = parseKeypress2(raw, { useKittyKeyboard: this.useKittyKeyboard });
-    if (parsed) {
-      this.events.push({
-        type: "key",
-        raw: parsed.raw,
-        key: parsed
-      });
-      return;
-    }
-    this.events.push({
-      type: "response",
-      protocol,
-      sequence: raw
-    });
-  }
-  emitMouse(rawBytes, encoding) {
-    const event = this.mouseParser.parseMouseEvent(rawBytes);
-    if (!event) {
-      this.emitOpaqueResponse("unknown", rawBytes);
-      return;
-    }
-    this.events.push({
-      type: "mouse",
-      raw: decodeLatin1(rawBytes),
-      encoding,
-      event
-    });
-  }
-  emitLegacyHighByte(byte) {
-    const parsed = parseKeypress2(Buffer3.from([byte]), { useKittyKeyboard: this.useKittyKeyboard });
-    if (parsed) {
-      this.events.push({
-        type: "key",
-        raw: parsed.raw,
-        key: parsed
-      });
-      return;
-    }
-    this.events.push({
-      type: "response",
-      protocol: "unknown",
-      sequence: String.fromCharCode(byte)
-    });
-  }
-  emitOpaqueResponse(protocol, rawBytes) {
-    this.events.push({
-      type: "response",
-      protocol,
-      sequence: decodeLatin1(rawBytes)
-    });
-  }
-  consumePrefix(endExclusive) {
-    this.pending.consume(endExclusive);
-    this.pendingTimeoutPaused = false;
-    this.suspendedPixelResolutionPrefixLength = 0;
-    this.cursor = 0;
-    this.unitStart = 0;
-    this.pendingSinceMs = null;
-    this.forceFlush = false;
-  }
-  takePendingBytes() {
-    const buffered = this.pending.take();
-    this.cursor = 0;
-    this.unitStart = 0;
-    this.pendingSinceMs = null;
-    this.forceFlush = false;
-    return buffered;
-  }
-  flushPendingOverflow() {
-    if (this.pending.length === 0) {
-      return;
-    }
-    this.emitOpaqueResponse("unknown", this.pending.view());
-    this.pending.clear();
-    this.cursor = 0;
-    this.unitStart = 0;
-    this.pendingSinceMs = null;
-    this.pendingTimeoutPaused = false;
-    this.suspendedPixelResolutionPrefixLength = 0;
-    this.forceFlush = false;
-    this.state = { tag: "ground" };
-  }
-  markPending() {
-    this.pendingSinceMs = this.clock.now();
-  }
-  consumePasteBytes(chunk) {
-    const paste = this.paste;
-    const combined = concatBytes(paste.tail, chunk);
-    const endIndex = indexOfBytes(combined, BRACKETED_PASTE_END);
-    if (endIndex !== -1) {
-      this.pushPasteBytes(combined.subarray(0, endIndex));
-      this.events.push({
-        type: "paste",
-        bytes: joinPasteBytes(paste.parts, paste.totalLength)
-      });
-      this.paste = null;
-      return combined.subarray(endIndex + BRACKETED_PASTE_END.length);
-    }
-    const keep = Math.min(BRACKETED_PASTE_END.length - 1, combined.length);
-    const stableLength = combined.length - keep;
-    if (stableLength > 0) {
-      this.pushPasteBytes(combined.subarray(0, stableLength));
-    }
-    paste.tail = Uint8Array.from(combined.subarray(stableLength));
-    return EMPTY_BYTES;
-  }
-  pushPasteBytes(bytes) {
-    if (bytes.length === 0) {
-      return;
-    }
-    this.paste.parts.push(Uint8Array.from(bytes));
-    this.paste.totalLength += bytes.length;
-  }
-  reconcileDeferredStateWithProtocolContext() {
-    switch (this.state.tag) {
-      case "csi_parametric_deferred":
-        if (!canDeferParametricCsi(this.state, this.protocolContext)) {
-          this.emitOpaqueResponse("unknown", this.pending.view().subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-        }
-        return;
-      case "csi_private_reply_deferred":
-        if (!canDeferPrivateReplyCsi(this.protocolContext)) {
-          this.emitOpaqueResponse("unknown", this.pending.view().subarray(this.unitStart, this.cursor));
-          this.state = { tag: "ground" };
-          this.consumePrefix(this.cursor);
-        }
-        return;
-    }
-  }
-  reconcileTimeoutState() {
-    if (!this.armTimeouts) {
-      return;
-    }
-    if (this.pendingTimeoutPaused) {
-      this.clearTimeout();
-      return;
-    }
-    if (this.paste || this.pendingSinceMs === null || this.pending.length === 0) {
-      this.clearTimeout();
-      return;
-    }
-    this.clearTimeout();
-    this.timeoutId = this.clock.setTimeout(() => {
-      this.timeoutId = null;
-      if (this.destroyed) {
-        return;
-      }
-      try {
-        this.tryForceFlush();
-        this.onTimeoutFlush?.();
-      } catch (error) {
-        console.error("stdin parser timeout flush failed", error);
-      }
-    }, this.timeoutMs);
-  }
-  clearTimeout() {
-    if (!this.timeoutId) {
-      return;
-    }
-    this.clock.clearTimeout(this.timeoutId);
-    this.timeoutId = null;
-  }
-  resetState() {
-    this.pending.reset(INITIAL_PENDING_CAPACITY);
-    this.events.length = 0;
-    this.pendingSinceMs = null;
-    this.pendingTimeoutPaused = false;
-    this.suspendedPixelResolutionPrefixLength = 0;
-    this.forceFlush = false;
-    this.justFlushedEsc = false;
-    this.state = { tag: "ground" };
-    this.cursor = 0;
-    this.unitStart = 0;
-    this.paste = null;
-    this.mouseParser.reset();
-  }
-}
 // src/lib/tree-sitter-styled-text.ts
 registerEnvVar2({ name: "OTUI_TS_STYLE_WARN", default: false, description: "Enable warnings for missing syntax styles" });
 function getSpecificity(group) {
@@ -6324,12 +4480,7 @@ function treeSitterToTextChunks2(content, highlights, syntaxStyle, options) {
             text: replacementText,
             fg: defaultStyle?.fg,
             bg: defaultStyle?.bg,
-            attributes: defaultStyle ? createTextAttributes2({
-              bold: defaultStyle.bold,
-              italic: defaultStyle.italic,
-              underline: defaultStyle.underline,
-              dim: defaultStyle.dim
-            }) : 0
+            attributes: createTextAttributes2(defaultStyle)
           });
           ranges?.push({ start: currentOffset, end: boundary.offset });
         }
@@ -6356,18 +4507,10 @@ function treeSitterToTextChunks2(content, highlights, syntaxStyle, options) {
             styleForGroup = syntaxStyle.getStyle(baseName);
           }
           if (styleForGroup) {
-            if (styleForGroup.fg !== undefined)
-              mergedStyle.fg = styleForGroup.fg;
-            if (styleForGroup.bg !== undefined)
-              mergedStyle.bg = styleForGroup.bg;
-            if (styleForGroup.bold !== undefined)
-              mergedStyle.bold = styleForGroup.bold;
-            if (styleForGroup.italic !== undefined)
-              mergedStyle.italic = styleForGroup.italic;
-            if (styleForGroup.underline !== undefined)
-              mergedStyle.underline = styleForGroup.underline;
-            if (styleForGroup.dim !== undefined)
-              mergedStyle.dim = styleForGroup.dim;
+            for (const [field, value] of Object.entries(styleForGroup)) {
+              if (value !== undefined)
+                Reflect.set(mergedStyle, field, value);
+            }
           } else {
             if (group.includes(".")) {
               const baseName = group.split(".")[0];
@@ -6387,12 +4530,7 @@ function treeSitterToTextChunks2(content, highlights, syntaxStyle, options) {
           text: segmentText,
           fg: finalStyle?.fg,
           bg: finalStyle?.bg,
-          attributes: finalStyle ? createTextAttributes2({
-            bold: finalStyle.bold,
-            italic: finalStyle.italic,
-            underline: finalStyle.underline,
-            dim: finalStyle.dim
-          }) : 0
+          attributes: createTextAttributes2(finalStyle)
         });
         ranges?.push({ start: currentOffset, end: boundary.offset });
       }
@@ -6404,12 +4542,7 @@ function treeSitterToTextChunks2(content, highlights, syntaxStyle, options) {
         text,
         fg: style?.fg,
         bg: style?.bg,
-        attributes: style ? createTextAttributes2({
-          bold: style.bold,
-          italic: style.italic,
-          underline: style.underline,
-          dim: style.dim
-        }) : 0
+        attributes: createTextAttributes2(style)
       });
       ranges?.push({ start: currentOffset, end: boundary.offset });
     }
@@ -6451,12 +4584,7 @@ function treeSitterToTextChunks2(content, highlights, syntaxStyle, options) {
       text,
       fg: style?.fg,
       bg: style?.bg,
-      attributes: style ? createTextAttributes2({
-        bold: style.bold,
-        italic: style.italic,
-        underline: style.underline,
-        dim: style.dim
-      }) : 0
+      attributes: createTextAttributes2(style)
     });
     ranges?.push({ start: currentOffset, end: content.length });
   }
@@ -6486,110 +4614,6 @@ async function treeSitterToStyledText2(content, filetype, syntaxStyle, client, o
 }
 // src/lib/tree-sitter/client.ts
 import { EventEmitter as EventEmitter2 } from "events";
-
-// src/lib/debounce.ts
-var TIMERS_MAP = new Map;
-
-class DebounceController {
-  scopeId;
-  constructor(scopeId) {
-    this.scopeId = scopeId;
-    if (!TIMERS_MAP.has(this.scopeId)) {
-      TIMERS_MAP.set(this.scopeId, new Map);
-    }
-  }
-  debounce(id, ms, fn) {
-    const scopeMap = TIMERS_MAP.get(this.scopeId);
-    return new Promise((resolve, reject) => {
-      if (scopeMap.has(id)) {
-        clearTimeout(scopeMap.get(id));
-      }
-      const timerId = setTimeout(() => {
-        try {
-          resolve(fn());
-        } catch (error) {
-          reject(error);
-        }
-        scopeMap.delete(id);
-      }, ms);
-      scopeMap.set(id, timerId);
-    });
-  }
-  clearDebounce(id) {
-    const scopeMap = TIMERS_MAP.get(this.scopeId);
-    if (scopeMap && scopeMap.has(id)) {
-      clearTimeout(scopeMap.get(id));
-      scopeMap.delete(id);
-    }
-  }
-  clear() {
-    const scopeMap = TIMERS_MAP.get(this.scopeId);
-    if (scopeMap) {
-      scopeMap.forEach((timerId) => clearTimeout(timerId));
-      scopeMap.clear();
-    }
-  }
-}
-function createDebounce(scopeId) {
-  return new DebounceController(scopeId);
-}
-function clearDebounceScope(scopeId) {
-  const scopeMap = TIMERS_MAP.get(scopeId);
-  if (scopeMap) {
-    scopeMap.forEach((timerId) => clearTimeout(timerId));
-    scopeMap.clear();
-  }
-}
-
-// src/lib/queue.ts
-class ProcessQueue {
-  processor;
-  queue = [];
-  processing = false;
-  autoProcess = true;
-  constructor(processor, autoProcess = true) {
-    this.processor = processor;
-    this.autoProcess = autoProcess;
-  }
-  enqueue(item) {
-    this.queue.push(item);
-    if (!this.processing && this.autoProcess) {
-      this.processQueue();
-    }
-  }
-  processQueue() {
-    if (this.queue.length === 0) {
-      return;
-    }
-    this.processing = true;
-    queueMicrotask(async () => {
-      if (this.queue.length === 0) {
-        this.processing = false;
-        return;
-      }
-      const item = this.queue.shift();
-      try {
-        await this.processor(item);
-      } catch (error) {
-        console.error("Error processing queue item:", error);
-      }
-      if (this.queue.length > 0) {
-        this.processQueue();
-      } else {
-        this.processing = false;
-      }
-    });
-  }
-  clear() {
-    this.queue = [];
-  }
-  isProcessing() {
-    return this.processing;
-  }
-  size() {
-    return this.queue.length;
-  }
-}
 
 // src/lib/tree-sitter/default-parsers.ts
 var defaultParserDescriptors = [
@@ -6702,8 +4726,7 @@ class TreeSitterClient2 extends EventEmitter2 {
   initializeResolvers;
   messageCallbacks = new Map;
   messageIdCounter = 0;
-  editQueues = new Map;
-  debouncer;
+  resetVersions = new Map;
   options;
   destroyCallbacks = new Set;
   lifecycleGeneration = 0;
@@ -6713,7 +4736,6 @@ class TreeSitterClient2 extends EventEmitter2 {
   constructor(options, internalOptions = {}) {
     super();
     this.options = options;
-    this.debouncer = createDebounce("tree-sitter-client");
     if (internalOptions.autoStartWorker ?? true) {
       this.startWorker();
     }
@@ -6791,9 +4813,8 @@ class TreeSitterClient2 extends EventEmitter2 {
     this.initializePromise = undefined;
     this.rejectActiveInitialization(error);
     this.rejectPendingRequests(error);
-    this.editQueues.clear();
+    this.resetVersions.clear();
     this.buffers.clear();
-    this.debouncer.clear();
     try {
       Promise.resolve(worker.terminate()).catch(() => {});
     } catch {}
@@ -6990,7 +5011,9 @@ class TreeSitterClient2 extends EventEmitter2 {
           return;
         }
         if (buffer.version !== message.version) {
-          this.resetBuffer(message.bufferId, buffer.version, buffer.content);
+          if ((this.resetVersions.get(message.bufferId) ?? -Infinity) <= message.version) {
+            this.resetBuffer(message.bufferId, buffer.version, buffer.content);
+          }
           return;
         }
         this.emit("highlights:response", message.bufferId, message.version, message.highlights);
@@ -7106,22 +5129,27 @@ class TreeSitterClient2 extends EventEmitter2 {
     return response.hasParser;
   }
   async createBuffer(id, content, filetype, version = 1, autoInitialize = true) {
-    if (!this.initialized) {
-      if (!autoInitialize) {
-        this.emitError("Could not create buffer because client is not initialized");
-        return false;
-      }
-      try {
-        await this.initialize();
-      } catch (error) {
-        this.emitError("Could not create buffer because of initialization error");
-        return false;
-      }
+    if (!this.initialized && !autoInitialize) {
+      this.emitError("Could not create buffer because client is not initialized");
+      return false;
     }
     if (this.buffers.has(id)) {
       throw new Error(`Buffer with id ${id} already exists`);
     }
-    this.buffers.set(id, { id, content, filetype, version, hasParser: false });
+    const created = { id, content, filetype, version, hasParser: false };
+    this.buffers.set(id, created);
+    const drop = () => this.buffers.get(id) === created && this.buffers.delete(id);
+    if (!this.initialized) {
+      try {
+        await this.initialize();
+      } catch (error) {
+        drop();
+        this.emitError("Could not create buffer because of initialization error");
+        return false;
+      }
+      if (this.buffers.get(id) !== created)
+        return false;
+    }
     const messageId = `init_${this.messageIdCounter++}`;
     const response = await new Promise((resolve, reject) => {
       this.messageCallbacks.set(messageId, { resolve, reject });
@@ -7138,7 +5166,9 @@ class TreeSitterClient2 extends EventEmitter2 {
         this.messageCallbacks.delete(messageId);
         reject(error instanceof Error ? error : new Error(String(error)));
       }
-    });
+    }).catch((error) => (drop(), Promise.reject(error)));
+    if (this.buffers.get(id) !== created)
+      return false;
     if (!response.hasParser) {
       this.emit("buffer:initialized", id, false);
       if (filetype !== "plaintext") {
@@ -7146,8 +5176,7 @@ class TreeSitterClient2 extends EventEmitter2 {
       }
       return false;
     }
-    const bufferState = { id, content, filetype, version, hasParser: true };
-    this.buffers.set(id, bufferState);
+    this.buffers.set(id, { id, content, filetype, version, hasParser: true });
     this.emit("buffer:initialized", id, true);
     return true;
   }
@@ -7160,34 +5189,23 @@ class TreeSitterClient2 extends EventEmitter2 {
       return;
     }
     this.buffers.set(id, { ...buffer, content: newContent, version });
-    if (!this.editQueues.has(id)) {
-      this.editQueues.set(id, new ProcessQueue((item) => this.processEdit(id, item.edits, item.newContent, item.version, item.isReset)));
-    }
-    const bufferQueue = this.editQueues.get(id);
-    bufferQueue.enqueue({ edits, newContent, version });
-  }
-  async processEdit(bufferId, edits, newContent, version, isReset = false) {
-    this.sendWorkerMessage({
-      type: isReset ? "RESET_BUFFER" : "HANDLE_EDITS",
-      bufferId,
-      version,
-      content: newContent,
-      edits
-    });
+    this.sendWorkerMessage({ type: "HANDLE_EDITS", bufferId: id, version, content: newContent, edits });
   }
   async removeBuffer(bufferId) {
+    this.buffers.delete(bufferId);
+    this.resetVersions.delete(bufferId);
     if (!this.initialized) {
       return;
-    }
-    this.buffers.delete(bufferId);
-    if (this.editQueues.has(bufferId)) {
-      this.editQueues.get(bufferId)?.clear();
-      this.editQueues.delete(bufferId);
     }
     if (this.worker) {
       await new Promise((resolve, reject) => {
         const messageId = `dispose_${bufferId}`;
-        this.messageCallbacks.set(messageId, { resolve, reject });
+        const previous = this.messageCallbacks.get(messageId);
+        const callback = {
+          resolve: (disposed) => (previous?.resolve(disposed), resolve(disposed)),
+          reject: (error) => (previous?.reject(error), reject(error))
+        };
+        this.messageCallbacks.set(messageId, callback);
         try {
           this.sendWorkerMessage({
             type: "DISPOSE_BUFFER",
@@ -7196,18 +5214,17 @@ class TreeSitterClient2 extends EventEmitter2 {
         } catch (error) {
           console.error("Error disposing buffer", error);
           this.messageCallbacks.delete(messageId);
-          resolve(false);
+          callback.resolve(false);
         }
         setTimeout(() => {
-          if (this.messageCallbacks.has(messageId)) {
+          if (this.messageCallbacks.get(messageId) === callback) {
             this.messageCallbacks.delete(messageId);
             console.warn({ bufferId }, "Timed out waiting for buffer to be disposed");
-            resolve(false);
+            callback.resolve(false);
           }
         }, 3000);
       });
     }
-    this.debouncer.clearDebounce(`reset-${bufferId}`);
   }
   destroy() {
     if (this.destroyPromise) {
@@ -7234,9 +5251,7 @@ class TreeSitterClient2 extends EventEmitter2 {
       }
     }
     this.destroyCallbacks.clear();
-    clearDebounceScope("tree-sitter-client");
-    this.debouncer.clear();
-    this.editQueues.clear();
+    this.resetVersions.clear();
     this.buffers.clear();
     this.stopWorker().then(() => {
       this.workerTerminationFailed = false;
@@ -7263,7 +5278,8 @@ class TreeSitterClient2 extends EventEmitter2 {
       return;
     }
     this.buffers.set(bufferId, { ...buffer, content, version });
-    this.debouncer.debounce(`reset-${bufferId}`, 10, () => this.processEdit(bufferId, [], content, version, true));
+    this.resetVersions.set(bufferId, version);
+    this.sendWorkerMessage({ type: "RESET_BUFFER", bufferId, version, content, edits: [] });
   }
   getBuffer(bufferId) {
     return this.buffers.get(bufferId);
@@ -7821,7 +5837,7 @@ class ExtmarksController2 {
       }
       const virtualExtmark = this.findVirtualExtmarkContaining(targetOffset);
       if (virtualExtmark && currentOffset >= virtualExtmark.end) {
-        this.editBuffer.setCursorByOffset(Math.max(0, virtualExtmark.start - 1));
+        this.moveBefore(virtualExtmark);
         return;
       }
       this.originalMoveCursorLeft();
@@ -7850,54 +5866,21 @@ class ExtmarksController2 {
       this.originalMoveCursorRight();
     };
     this.editorView.moveUpVisual = () => {
-      if (this.destroyed) {
+      if (this.destroyed || this.editorView.hasSelection()) {
         this.originalMoveUpVisual();
         return;
       }
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
-        this.originalMoveUpVisual();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
       this.originalMoveUpVisual();
-      const newOffset = this.editBuffer.getCursorPosition().offset;
-      const virtualExtmark = this.findVirtualExtmarkContaining(newOffset);
-      if (virtualExtmark) {
-        const distanceToStart = newOffset - virtualExtmark.start;
-        const distanceToEnd = virtualExtmark.end - newOffset;
-        if (distanceToStart < distanceToEnd) {
-          this.editorView.setCursorByOffset(Math.max(0, virtualExtmark.start - 1));
-        } else {
-          this.editorView.setCursorByOffset(virtualExtmark.end);
-        }
-      }
+      this.leaveVirtualExtmark();
     };
     this.editorView.moveDownVisual = () => {
-      if (this.destroyed) {
-        this.originalMoveDownVisual();
-        return;
-      }
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
+      if (this.destroyed || this.editorView.hasSelection()) {
         this.originalMoveDownVisual();
         return;
       }
       const currentOffset = this.editBuffer.getCursorPosition().offset;
       this.originalMoveDownVisual();
-      const newOffset = this.editBuffer.getCursorPosition().offset;
-      const virtualExtmark = this.findVirtualExtmarkContaining(newOffset);
-      if (virtualExtmark) {
-        const distanceToStart = newOffset - virtualExtmark.start;
-        const distanceToEnd = virtualExtmark.end - newOffset;
-        if (distanceToStart < distanceToEnd) {
-          const adjustedOffset = virtualExtmark.start - 1;
-          const targetOffset = adjustedOffset <= currentOffset ? virtualExtmark.end : adjustedOffset;
-          this.editorView.setCursorByOffset(targetOffset);
-        } else {
-          this.editorView.setCursorByOffset(virtualExtmark.end);
-        }
-      }
+      this.leaveVirtualExtmark(currentOffset);
     };
     this.editBuffer.setCursorByOffset = (offset) => {
       if (this.destroyed) {
@@ -7920,13 +5903,55 @@ class ExtmarksController2 {
       } else {
         for (const extmark of this.extmarks.values()) {
           if (extmark.virtual && currentOffset >= extmark.end && offset < extmark.end && offset >= extmark.start) {
-            this.originalSetCursorByOffset(Math.max(0, extmark.start - 1));
+            this.moveBefore(extmark);
             return;
           }
         }
       }
       this.originalSetCursorByOffset(offset);
     };
+  }
+  moveBefore(extmark) {
+    this.originalSetCursorByOffset(extmark.start);
+    this.originalMoveCursorLeft();
+    const inside = this.findVirtualExtmarkContaining(this.editBuffer.getCursorPosition().offset);
+    if (inside && inside.start < extmark.start)
+      this.moveBefore(inside);
+  }
+  leaveVirtualExtmark(from = -1) {
+    const offset = this.editBuffer.getCursorPosition().offset;
+    const extmark = this.findVirtualExtmarkContaining(offset);
+    if (!extmark)
+      return;
+    if (offset - extmark.start < extmark.end - offset) {
+      this.moveBefore(extmark);
+      if (this.editBuffer.getCursorPosition().offset > from)
+        return;
+    }
+    this.originalSetCursorByOffset(this.outside(extmark.end, 1));
+  }
+  _keepCursorOutside(direction) {
+    if (this.extmarks.size === 0 || this.editorView.hasSelection())
+      return;
+    const offset = this.editBuffer.getCursorPosition().offset;
+    const start = this.outside(offset, -1);
+    if (start === offset)
+      return;
+    const end = this.outside(offset, 1);
+    const toEnd = direction === 0 ? end - offset <= offset - start : direction > 0;
+    this.originalSetCursorByOffset(toEnd ? end : start);
+  }
+  outside(offset, direction) {
+    for (let inside = true;inside; ) {
+      inside = false;
+      for (const extmark of this.extmarks.values()) {
+        if (extmark.virtual && extmark.start < offset && offset < extmark.end) {
+          offset = direction > 0 ? extmark.end : extmark.start;
+          inside = true;
+        }
+      }
+    }
+    return offset;
   }
   wrapDeletion() {
     this.editBuffer.deleteCharBackward = () => this.editBuffer.runMutation(() => {
@@ -8403,7 +6428,7 @@ function createExtmarksController2(editBuffer, editorView) {
   return new ExtmarksController2(editBuffer, editorView);
 }
 // src/lib/terminal-palette.ts
-var SYSTEM_CLOCK2 = new SystemClock2;
+var SYSTEM_CLOCK = new SystemClock2;
 registerEnvVar2({
   name: "OTUI_PALETTE_IDLE_TIMEOUT_MS",
   description: "Milliseconds of silence after palette queries before using fallback colors.",
@@ -8423,6 +6448,46 @@ function toHex(r, g, b, hex6) {
   if (r && g && b)
     return `#${scaleComponent(r)}${scaleComponent(g)}${scaleComponent(b)}`;
   return "#000000";
+}
+var SPECIAL_COLORS = {
+  10: "defaultForeground",
+  11: "defaultBackground",
+  12: "cursorColor",
+  13: "mouseForeground",
+  14: "mouseBackground",
+  15: "tekForeground",
+  16: "tekBackground",
+  17: "highlightBackground",
+  19: "highlightForeground"
+};
+function emptyTerminalColors(size) {
+  const colors = { palette: Array(size).fill(null) };
+  for (const key of Object.values(SPECIAL_COLORS))
+    colors[key] = null;
+  return colors;
+}
+function applyPaletteReplies(colors, sequence) {
+  let changed = false;
+  let m;
+  OSC4_RESPONSE.lastIndex = 0;
+  while (m = OSC4_RESPONSE.exec(sequence)) {
+    const index = parseInt(m[1], 10);
+    const hex = toHex(m[2], m[3], m[4], m[5]);
+    if (index >= colors.palette.length || colors.palette[index] === hex)
+      continue;
+    colors.palette[index] = hex;
+    changed = true;
+  }
+  OSC_SPECIAL_RESPONSE.lastIndex = 0;
+  while (m = OSC_SPECIAL_RESPONSE.exec(sequence)) {
+    const key = SPECIAL_COLORS[parseInt(m[1], 10)];
+    const hex = toHex(m[2], m[3], m[4], m[5]);
+    if (!key || colors[key] === hex)
+      continue;
+    colors[key] = hex;
+    changed = true;
+  }
+  return changed;
 }
 function wrapForTmux(osc) {
   const escaped = osc.replace(/\x1b/g, "\x1B\x1B");
@@ -8446,7 +6511,7 @@ class TerminalPalette2 {
     this.inLegacyTmux = isLegacyTmux ?? false;
     this.inTmux = isTmux ?? this.inLegacyTmux;
     this.oscSource = oscSource;
-    this.clock = clock ?? SYSTEM_CLOCK2;
+    this.clock = clock ?? SYSTEM_CLOCK;
   }
   writeOsc(osc, wrapForLegacyTmux = false) {
     const data = wrapForLegacyTmux && this.inLegacyTmux ? wrapForTmux(osc) : osc;
@@ -8592,17 +6657,7 @@ class TerminalPalette2 {
   }
   async querySpecialColors(timeoutMs = 1200, idleTimeoutMs = env2.OTUI_PALETTE_IDLE_TIMEOUT_MS) {
     const out = this.stdout;
-    const results = {
-      10: null,
-      11: null,
-      12: null,
-      13: null,
-      14: null,
-      15: null,
-      16: null,
-      17: null,
-      19: null
-    };
+    const results = Object.fromEntries(Object.keys(SPECIAL_COLORS).map((osc) => [osc, null]));
     const queries = this.inTmux ? [10, 11, 12] : [10, 11, 12, 13, 14, 15, 16, 17, 19];
     if (!out.isTTY || !this.stdin.isTTY) {
       return results;
@@ -8650,38 +6705,19 @@ class TerminalPalette2 {
   async detect(options) {
     const { timeout = 5000, size = 16 } = options || {};
     const supported = await this.detectOSCSupport();
-    if (!supported) {
-      return {
-        palette: Array(size).fill(null),
-        defaultForeground: null,
-        defaultBackground: null,
-        cursorColor: null,
-        mouseForeground: null,
-        mouseBackground: null,
-        tekForeground: null,
-        tekBackground: null,
-        highlightBackground: null,
-        highlightForeground: null
-      };
-    }
+    if (!supported)
+      return emptyTerminalColors(size);
     const indicesToQuery = [...Array(size).keys()];
     const idleTimeout = env2.OTUI_PALETTE_IDLE_TIMEOUT_MS;
     const [paletteResults, specialColors] = await Promise.all([
       this.queryPalette(indicesToQuery, timeout, idleTimeout),
       this.querySpecialColors(timeout, idleTimeout)
     ]);
-    return {
-      palette: [...Array(size).keys()].map((i) => paletteResults.get(i) ?? null),
-      defaultForeground: specialColors[10],
-      defaultBackground: specialColors[11],
-      cursorColor: specialColors[12],
-      mouseForeground: specialColors[13],
-      mouseBackground: specialColors[14],
-      tekForeground: specialColors[15],
-      tekBackground: specialColors[16],
-      highlightBackground: specialColors[17],
-      highlightForeground: specialColors[19]
-    };
+    const colors = emptyTerminalColors(size);
+    colors.palette = colors.palette.map((_, i) => paletteResults.get(i) ?? null);
+    for (const [osc, key] of Object.entries(SPECIAL_COLORS))
+      colors[key] = specialColors[Number(osc)];
+    return colors;
   }
 }
 function createTerminalPalette2(options) {
@@ -9221,25 +7257,62 @@ var createClipboard2 = ({ host, terminal }) => {
       throw new Error("Clipboard service is disposed");
   };
   const canUseRemoteHost = (options) => !terminal.remote || options.allowRemoteHost === true;
-  const composeMutation = async (options, signal, hostOperation, terminalOperation) => {
-    if (options.destination === "terminal-only") {
-      return { host: { status: "not-attempted" }, terminal: terminalOperation() };
+  const inFlight = new Map;
+  const replace = (selection, newest) => {
+    const pending = inFlight.get(selection);
+    if (pending) {
+      pending.newest = newest;
+      pending.sent = undefined;
     }
+    return pending;
+  };
+  const sendNewest = (pending) => {
+    const newest = pending.newest;
+    if (!newest.write)
+      return NOT_ATTEMPTED_TERMINAL;
+    if (pending.sent)
+      return pending.sent;
+    const result = newest.write();
+    if (pending.newest === newest && result.status === "attempted")
+      pending.sent = result;
+    return result;
+  };
+  const composeMutation = async (options, signal, selection, hostOperation, terminalOperation) => {
+    const now = () => {
+      const pending = replace(selection, { write: terminalOperation });
+      return { host: { status: "not-attempted" }, terminal: pending ? sendNewest(pending) : terminalOperation() };
+    };
+    if (options.destination === "terminal-only")
+      return now();
     if (options.destination === "host-only") {
-      const hostResult = canUseRemoteHost(options) ? await hostOperation() : { status: "not-attempted" };
-      return { host: hostResult, terminal: NOT_ATTEMPTED_TERMINAL };
+      if (!canUseRemoteHost(options))
+        return { host: { status: "not-attempted" }, terminal: NOT_ATTEMPTED_TERMINAL };
+      replace(selection, { write: null });
+      return { host: await hostOperation(), terminal: NOT_ATTEMPTED_TERMINAL };
     }
-    if (options.destination === "best-available") {
-      if (terminal.remote) {
-        return { host: { status: "not-attempted" }, terminal: terminalOperation() };
+    const bestAvailable = options.destination === "best-available";
+    if (bestAvailable ? terminal.remote : !canUseRemoteHost(options))
+      return now();
+    const newest = { write: bestAvailable ? undefined : terminalOperation };
+    const pending = replace(selection, newest) ?? { count: 0, newest };
+    pending.count++;
+    inFlight.set(selection, pending);
+    let hostResult;
+    let terminalResult;
+    try {
+      hostResult = await hostOperation();
+    } finally {
+      if (--pending.count === 0)
+        inFlight.delete(selection);
+      const status = hostResult?.status;
+      if (status === undefined || status === "written" || status === "cleared")
+        pending.sent = undefined;
+      if (newest.write === undefined) {
+        newest.write = !signal.aborted && (status === "unsupported" || status === "failed") ? terminalOperation : null;
       }
-      const hostResult = await hostOperation();
-      const terminalResult = !signal.aborted && (hostResult.status === "unsupported" || hostResult.status === "failed") ? terminalOperation() : NOT_ATTEMPTED_TERMINAL;
-      return { host: hostResult, terminal: terminalResult };
+      terminalResult = sendNewest(pending);
     }
-    const hostPromise = canUseRemoteHost(options) ? hostOperation() : Promise.resolve({ status: "not-attempted" });
-    const terminalResult = terminalOperation();
-    return { host: await hostPromise, terminal: terminalResult };
+    return { host: hostResult, terminal: terminalResult };
   };
   return {
     read(options) {
@@ -9261,7 +7334,7 @@ var createClipboard2 = ({ host, terminal }) => {
         }
         return runTrackedOperation(active, options.signal, (signal) => {
           const operationOptions = { selection, signal };
-          return composeMutation(options, signal, () => host.writeText(text, operationOptions), () => terminal.writeText(text, selection));
+          return composeMutation(options, signal, selection, () => host.writeText(text, operationOptions), () => terminal.writeText(text, selection));
         });
       } catch (error) {
         return Promise.reject(error);
@@ -9277,7 +7350,7 @@ var createClipboard2 = ({ host, terminal }) => {
         }
         return runTrackedOperation(active, options.signal, (signal) => {
           const operationOptions = { selection, signal };
-          return composeMutation(options, signal, () => host.clear(operationOptions), () => terminal.clear(selection));
+          return composeMutation(options, signal, selection, () => host.clear(operationOptions), () => terminal.clear(selection));
         });
       } catch (error) {
         return Promise.reject(error);
@@ -9821,7 +7894,7 @@ class OptimizedBuffer2 {
           const i = y * width + x;
           const cellFg = RGBA2.fromArray(fg.subarray(i * 4, i * 4 + 4));
           const cellBg = RGBA2.fromArray(bg.subarray(i * 4, i * 4 + 4));
-          const cellAttrs = attributes[i] & 255;
+          const cellAttrs = getBaseAttributes2(attributes[i]);
           const end = offset + lengths[i];
           const cellChar = decoder.decode(bytes.subarray(offset, end));
           offset = end;
@@ -10205,161 +8278,6 @@ class OptimizedBuffer2 {
   }
 }
 
-// src/renderables/composition/vnode.ts
-import util from "util";
-var BrandedVNode = Symbol.for("@opentui/core/VNode");
-function isRenderableConstructor(value) {
-  return typeof value === "function" && value.prototype && Renderable2.prototype.isPrototypeOf(value.prototype);
-}
-function flattenChildren(children) {
-  const result = [];
-  for (const child of children) {
-    if (Array.isArray(child)) {
-      result.push(...flattenChildren(child));
-    } else if (child !== null && child !== undefined && child !== false) {
-      result.push(child);
-    }
-  }
-  return result;
-}
-function h2(type, props, ...children) {
-  if (typeof type !== "function") {
-    throw new TypeError("h() received an invalid vnode type");
-  }
-  const vnode = {
-    [BrandedVNode]: true,
-    type,
-    props,
-    children: flattenChildren(children),
-    __pendingCalls: []
-  };
-  if (isRenderableConstructor(type)) {
-    return new Proxy(vnode, {
-      get(target, prop, receiver) {
-        if (prop in target) {
-          return Reflect.get(target, prop, receiver);
-        }
-        if (typeof prop === "string") {
-          const prototype = type.prototype;
-          const hasMethod = prototype && (typeof prototype[prop] === "function" || Object.getOwnPropertyDescriptor(prototype, prop) || Object.getOwnPropertyDescriptor(Object.getPrototypeOf(prototype), prop));
-          if (hasMethod) {
-            return (...args) => {
-              target.__pendingCalls = target.__pendingCalls || [];
-              target.__pendingCalls.push({ method: prop, args });
-              return target;
-            };
-          }
-        }
-        return Reflect.get(target, prop, receiver);
-      },
-      set(target, prop, value, receiver) {
-        if (typeof prop === "string" && isRenderableConstructor(type)) {
-          const prototype = type.prototype;
-          const descriptor = Object.getOwnPropertyDescriptor(prototype, prop) || Object.getOwnPropertyDescriptor(Object.getPrototypeOf(prototype), prop);
-          if (descriptor && descriptor.set) {
-            target.__pendingCalls = target.__pendingCalls || [];
-            target.__pendingCalls.push({ method: prop, args: [value], isProperty: true });
-            return true;
-          }
-        }
-        return Reflect.set(target, prop, value, receiver);
-      }
-    });
-  }
-  return vnode;
-}
-function isVNode2(node) {
-  return node && node[BrandedVNode];
-}
-function maybeMakeRenderable2(ctx, node) {
-  if (isRenderable2(node))
-    return node;
-  if (isVNode2(node))
-    return instantiate2(ctx, node);
-  if (true) {
-    console.warn("maybeMakeRenderable received an invalid node", util.inspect(node, { depth: 2 }));
-  }
-  return null;
-}
-function wrapWithDelegates2(instance, delegateMap) {
-  if (!delegateMap || Object.keys(delegateMap).length === 0)
-    return instance;
-  const getDescendant = (id) => {
-    return instance.findDescendantById(id);
-  };
-  const proxy = new Proxy(instance, {
-    get(target, prop, receiver) {
-      if (typeof prop === "string" && delegateMap[prop]) {
-        const host = getDescendant(delegateMap[prop]);
-        if (host) {
-          const value = host[prop];
-          if (typeof value === "function") {
-            return value.bind(host);
-          }
-          return value;
-        }
-      }
-      return Reflect.get(target, prop, receiver);
-    },
-    set(target, prop, value, receiver) {
-      if (typeof prop === "string" && delegateMap[prop]) {
-        const host = getDescendant(delegateMap[prop]);
-        if (host) {
-          return Reflect.set(host, prop, value);
-        }
-      }
-      return Reflect.set(target, prop, value, receiver);
-    }
-  });
-  return proxy;
-}
-function instantiate2(ctx, node) {
-  if (isRenderable2(node))
-    return node;
-  if (!node || typeof node !== "object") {
-    throw new TypeError("mount() received an invalid vnode");
-  }
-  const vnode = node;
-  const { type, props } = vnode;
-  const children = flattenChildren(vnode.children || []);
-  const delegateMap = vnode.__delegateMap;
-  if (isRenderableConstructor(type)) {
-    const instance = new type(ctx, props || {});
-    for (const child of children) {
-      if (isRenderable2(child)) {
-        instance.add(child);
-      } else {
-        const mounted = instantiate2(ctx, child);
-        instance.add(mounted);
-      }
-    }
-    const delegatedInstance = wrapWithDelegates2(instance, delegateMap);
-    const pendingCalls = vnode.__pendingCalls;
-    if (pendingCalls) {
-      for (const call of pendingCalls) {
-        if (call.isProperty) {
-          delegatedInstance[call.method] = call.args[0];
-        } else {
-          delegatedInstance[call.method].apply(delegatedInstance, call.args);
-        }
-      }
-    }
-    return delegatedInstance;
-  }
-  const resolved = type(props || {}, children);
-  const inst = instantiate2(ctx, resolved);
-  return wrapWithDelegates2(inst, delegateMap);
-}
-function delegate2(mapping, vnode) {
-  if (isRenderable2(vnode)) {
-    return wrapWithDelegates2(vnode, mapping);
-  }
-  if (!vnode || typeof vnode !== "object")
-    return vnode;
-  vnode.__delegateMap = { ...vnode.__delegateMap || {}, ...mapping };
-  return vnode;
-}
-
 // src/lib/renderable.validations.ts
 function validateOptions(id, options) {
   if (typeof options.width === "number") {
@@ -10608,7 +8526,7 @@ class Renderable2 extends BaseRenderable2 {
           hooks[name] = Renderable2.normalizeHook(name, options[name]);
       }
       this.publishHooks(hooks);
-      this.setDisplay(this._visible ? 0 /* Flex */ : 1 /* None */);
+      this.setDisplay(this._visible ? Display2.Flex : Display2.None);
       this.setupYogaProperties(options);
       if (this.nativeIntegration.measure)
         this.setMeasureFunc(this.nativeIntegration.measure.bind(this));
@@ -10704,7 +8622,8 @@ class Renderable2 extends BaseRenderable2 {
     return this._visible;
   }
   get primaryAxis() {
-    return isRowFlexDirection(this.getFlexDirection()) ? "row" : "column";
+    const list = this.yogaGetEnum(YogaEnumKind.LayoutMode, nativeConstants.OT_LAYOUT_MODE_FLEX) === nativeConstants.OT_LAYOUT_MODE_LIST;
+    return !list && isRowFlexDirection(this.getFlexDirection()) ? "row" : "column";
   }
   set visible(value) {
     value ??= true;
@@ -10712,7 +8631,7 @@ class Renderable2 extends BaseRenderable2 {
       return;
     this.runMutation(() => {
       const wasVisible = this._visible;
-      this.setDisplay(value ? 0 /* Flex */ : 1 /* None */);
+      this.setDisplay(value ? Display2.Flex : Display2.None);
       this._visible = value;
       if (this._live) {
         if (!wasVisible && value) {
@@ -11282,6 +9201,8 @@ class Renderable2 extends BaseRenderable2 {
     }
     node.setFlexDirection(parseFlexDirection2(options.flexDirection));
     node.setFlexWrap(parseWrap2(options.flexWrap));
+    if (options.layoutMode !== undefined)
+      node.layoutMode = options.layoutMode;
     node.setAlignItems(parseAlignItems2(options.alignItems));
     node.setJustifyContent(parseJustify2(options.justifyContent));
     node.setAlignSelf(parseAlign2(options.alignSelf));
@@ -11433,6 +9354,10 @@ class Renderable2 extends BaseRenderable2 {
   }
   set flexWrap(wrap) {
     this.setFlexWrap(parseWrap2(wrap));
+    this.requestRender();
+  }
+  set layoutMode(mode) {
+    this.yogaSetEnum(YogaEnumKind.LayoutMode, parseLayoutMode2(mode));
     this.requestRender();
   }
   set alignItems(alignItems) {
@@ -11651,10 +9576,10 @@ class Renderable2 extends BaseRenderable2 {
     if (!obj) {
       return -1;
     }
-    if (isVNode2(obj))
-      this.assertMutable();
-    const renderable = maybeMakeRenderable2(this._ctx, obj);
-    if (!renderable) {
+    if (!isRenderable2(obj)) {
+      if (true) {
+        console.warn("add() received an invalid renderable", util.inspect(obj, { depth: 2 }));
+      }
       return -1;
     }
     if (this._isDestroyed) {
@@ -11663,17 +9588,17 @@ class Renderable2 extends BaseRenderable2 {
       }
       return -1;
     }
-    if (renderable.isDestroyed) {
+    if (obj.isDestroyed) {
       if (true) {
-        console.warn(`Renderable with id ${renderable.id} was already destroyed, skipping add`);
+        console.warn(`Renderable with id ${obj.id} was already destroyed, skipping add`);
       }
       return -1;
     }
     const anchorRenderable = index !== undefined ? this._childrenInLayoutOrder[index] : undefined;
     if (anchorRenderable) {
-      return this.insertBefore(renderable, anchorRenderable);
+      return this.insertBefore(obj, anchorRenderable);
     }
-    return this.placeChild(renderable);
+    return this.placeChild(obj);
   }
   insertBefore(obj, anchor) {
     if (!anchor) {
@@ -11682,10 +9607,10 @@ class Renderable2 extends BaseRenderable2 {
     if (!obj) {
       return -1;
     }
-    if (isVNode2(obj))
-      this.assertMutable();
-    const renderable = maybeMakeRenderable2(this._ctx, obj);
-    if (!renderable) {
+    if (!isRenderable2(obj)) {
+      if (true) {
+        console.warn("insertBefore() received an invalid renderable", util.inspect(obj, { depth: 2 }));
+      }
       return -1;
     }
     if (this._isDestroyed) {
@@ -11694,9 +9619,9 @@ class Renderable2 extends BaseRenderable2 {
       }
       return -1;
     }
-    if (renderable.isDestroyed) {
+    if (obj.isDestroyed) {
       if (true) {
-        console.warn(`Renderable with id ${renderable.id} was already destroyed, skipping insertBefore`);
+        console.warn(`Renderable with id ${obj.id} was already destroyed, skipping insertBefore`);
       }
       return -1;
     }
@@ -11715,22 +9640,22 @@ class Renderable2 extends BaseRenderable2 {
       }
       return -1;
     }
-    if (renderable === anchor) {
+    if (obj === anchor) {
       if (true) {
-        console.warn(`Anchor is the same as the node ${renderable.id} being inserted, skipping insertBefore`);
+        console.warn(`Anchor is the same as the node ${obj.id} being inserted, skipping insertBefore`);
       }
       return -1;
     }
-    return this.placeChild(renderable, anchor);
+    return this.placeChild(obj, anchor);
   }
   getRenderable(id) {
     return this._childrenInLayoutOrder.find((child) => child.id === id);
   }
   remove(child) {
-    if (!(child instanceof BaseRenderable2)) {
+    if (!isRenderable2(child)) {
       throw new Error("remove expects a renderable child object");
     }
-    const index = this._childrenInLayoutOrder.indexOf(child);
+    const index = this.layoutIndexOf(child);
     if (index === -1) {
       if (true) {
         console.warn(`Renderable with id ${child.id} is not a child of ${this.id}, skipping remove`);
@@ -12088,6 +10013,10 @@ class Renderable2 extends BaseRenderable2 {
       for (const resume of deferred)
         run(resume);
   }
+  layoutIndexOf(child) {
+    const children = this._childrenInLayoutOrder;
+    return children.at(-1) === child ? children.length - 1 : children.indexOf(child);
+  }
   removeLayoutChildAt(index) {
     const children = this._childrenInLayoutOrder;
     if (index === children.length - 1)
@@ -12099,7 +10028,7 @@ class Renderable2 extends BaseRenderable2 {
     const parent = this.parent;
     if (!parent)
       return;
-    const layoutIndex = parent._childrenInLayoutOrder.indexOf(this);
+    const layoutIndex = parent.layoutIndexOf(this);
     if (layoutIndex !== -1) {
       this._ctx.nativeScene.moveNode(this, null, 0);
       parent.removeLayoutChildAt(layoutIndex);
@@ -13312,6 +11241,9 @@ class EditorView2 {
     this.guard();
     return this.lib.contextEditorViewGetLines(this.native.handle.context, this.native.handle, true);
   }
+  _keepCursorOutside(direction) {
+    this._extmarksController?._keepCursorOutside(direction);
+  }
   get extmarks() {
     this.guard();
     if (!this._extmarksController) {
@@ -13875,7 +11807,8 @@ var ANSI = {
   clearScreen: "\x1B[2J",
   clearSavedLines: "\x1B[3J",
   scrollDown: (lines) => `\x1B[${lines}T`,
-  scrollUp: (lines) => `\x1B[${lines}S`,
+  scrollIntoHistory: (lines) => `\x1B[65535H${`
+`.repeat(Math.min(lines, 4000))}${lines > 4000 ? `\x1B[${lines - 4000}S` : ""}`,
   moveCursor: (row, col) => `\x1B[${row};${col}H`,
   moveCursorAndClear: (row, col) => `\x1B[${row};${col}H\x1B[J`,
   setRgbBackground: (r, g, b) => `\x1B[48;2;${r};${g};${b}m`,
@@ -14364,8 +12297,7 @@ class TextBufferRenderable2 extends Renderable2 {
     return this._scrollY;
   }
   set scrollY(value) {
-    const maxScrollY = Math.max(0, this.scrollHeight - this.height);
-    const clamped = Math.max(0, Math.min(value ?? 0, maxScrollY));
+    const clamped = Math.max(0, Math.min(value ?? 0, this.maxScrollY));
     if (this._scrollY !== clamped) {
       this.runMutation(() => {
         this.setNativeSceneTextOptions({ scrollY: clamped });
@@ -14380,8 +12312,7 @@ class TextBufferRenderable2 extends Renderable2 {
     return this._scrollX;
   }
   set scrollX(value) {
-    const maxScrollX = Math.max(0, this.scrollWidth - this.width);
-    const clamped = Math.max(0, Math.min(value ?? 0, maxScrollX));
+    const clamped = Math.max(0, Math.min(value ?? 0, this.maxScrollX));
     if (this._scrollX !== clamped) {
       this.runMutation(() => {
         this.setNativeSceneTextOptions({ scrollX: clamped });
@@ -14403,10 +12334,14 @@ class TextBufferRenderable2 extends Renderable2 {
     return this.virtualLineCount;
   }
   get maxScrollY() {
-    return Math.max(0, this.scrollHeight - this.height);
+    return Math.max(0, this.scrollHeight - this.textViewport.height);
   }
   get maxScrollX() {
-    return Math.max(0, this.scrollWidth - this.width);
+    return Math.max(0, this.scrollWidth - this.textViewport.width);
+  }
+  get textViewport() {
+    const scene = this.nativeTextScene;
+    return scene && scene.getLayout(this, "paint").width > 0 ? scene.getLayout(this, "content") : this;
   }
   updateViewportOffset(scrollX = this._scrollX, scrollY = this._scrollY) {
     const width = this.width;
@@ -14686,7 +12621,1778 @@ class TextBufferRenderable2 extends Renderable2 {
   onAttributesChanged(newAttributes) {}
 }
 
+// src/renderables/ScrollBoxParts.ts
+import { EventEmitter as EventEmitter6 } from "events";
+
+// src/renderables/Slider.ts
+var defaultThumbBackgroundColor = RGBA2.fromHex("#9a9ea3");
+var defaultTrackBackgroundColor = RGBA2.fromHex("#252527");
+var defaultMin = 0;
+var defaultMax = 100;
+
+class SliderRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    kind: "slider",
+    body: { native: this.prototype.renderSelf }
+  };
+  _orientation;
+  _value;
+  _min;
+  _max;
+  _viewPortSize;
+  _backgroundColor;
+  _foregroundColor;
+  _onChange;
+  constructor(ctx, options) {
+    super(ctx, { flexShrink: 0, ...options });
+    try {
+      this._orientation = options.orientation;
+      this._min = options.min ?? defaultMin;
+      this._max = options.max ?? defaultMax;
+      this._value = options.value ?? this._min;
+      this._viewPortSize = options.viewPortSize ?? this.defaultViewPortSize();
+      this._onChange = options.onChange;
+      this._backgroundColor = RGBA2.clone(parseColor2(options.backgroundColor || defaultTrackBackgroundColor));
+      this._foregroundColor = RGBA2.clone(parseColor2(options.foregroundColor || defaultThumbBackgroundColor));
+      this.setNativeSceneSlider();
+      this.setNativeScenePaint();
+      this.setupMouseHandling();
+    } catch (error) {
+      this.abortConstruction(error);
+    }
+  }
+  get orientation() {
+    return this._orientation;
+  }
+  set orientation(value) {
+    if (value === this._orientation)
+      return;
+    this.setNativeSceneSlider({ orientation: value });
+    this._orientation = value;
+    this.requestRender();
+  }
+  get value() {
+    return this._value;
+  }
+  set value(newValue) {
+    newValue ??= this._min;
+    const clamped = Math.max(this._min, Math.min(this._max, newValue));
+    if (clamped !== this._value) {
+      this.setNativeSceneSlider({ value: clamped });
+      this.publishValue(clamped);
+    }
+  }
+  publishValue(value) {
+    if (value === this._value)
+      return;
+    this._value = value;
+    this.requestRender();
+    this._onChange?.(value);
+    this.emit("change", { value });
+  }
+  get min() {
+    return this._min;
+  }
+  set min(newMin) {
+    newMin ??= defaultMin;
+    if (newMin !== this._min) {
+      const value = this._value < newMin ? newMin : this._value;
+      this.setNativeSceneSlider({ min: newMin, value });
+      this._min = newMin;
+      if (this._value < newMin) {
+        this.publishValue(value);
+      }
+      this.requestRender();
+    }
+  }
+  get max() {
+    return this._max;
+  }
+  set max(newMax) {
+    newMax ??= defaultMax;
+    if (newMax !== this._max) {
+      const value = this._value > newMax ? Math.max(this._min, newMax) : this._value;
+      this.setNativeSceneSlider({ max: newMax, value });
+      this._max = newMax;
+      if (this._value > newMax) {
+        this.publishValue(value);
+      }
+      this.requestRender();
+    }
+  }
+  set viewPortSize(size) {
+    size ??= this.defaultViewPortSize();
+    const clampedSize = Math.max(0.01, Math.min(size, this._max - this._min));
+    if (clampedSize !== this._viewPortSize) {
+      this.setNativeSceneSlider({ viewPortSize: clampedSize });
+      this._viewPortSize = clampedSize;
+      this.requestRender();
+    }
+  }
+  get viewPortSize() {
+    return this._viewPortSize;
+  }
+  defaultViewPortSize() {
+    return Math.max(1, (this._max - this._min) * 0.1);
+  }
+  get backgroundColor() {
+    return RGBA2.clone(this._backgroundColor);
+  }
+  set backgroundColor(value) {
+    const color = RGBA2.clone(parseColor2(value ?? defaultTrackBackgroundColor));
+    this.setNativeSceneSlider({ backgroundColor: color });
+    this._backgroundColor = color;
+    this.requestRender();
+  }
+  get foregroundColor() {
+    return RGBA2.clone(this._foregroundColor);
+  }
+  set foregroundColor(value) {
+    const color = RGBA2.clone(parseColor2(value ?? defaultThumbBackgroundColor));
+    this.setNativeSceneSlider({ foregroundColor: color });
+    this._foregroundColor = color;
+    this.requestRender();
+  }
+  setNativeSceneSlider(options = {}) {
+    if (this.isFreed())
+      return;
+    this._ctx.nativeScene.setSlider(this, {
+      orientation: this.orientation,
+      min: this._min,
+      max: this._max,
+      value: this._value,
+      viewPortSize: this._viewPortSize,
+      foregroundColor: this._foregroundColor,
+      backgroundColor: this._backgroundColor,
+      ...options
+    });
+  }
+  calculateDragOffsetVirtual(event) {
+    const trackStart = this.orientation === "vertical" ? this.y : this.x;
+    const trackSize = this.orientation === "vertical" ? this.height : this.width;
+    const mousePos = (this.orientation === "vertical" ? event.y : event.x) - trackStart;
+    const virtualMousePos = Math.max(0, Math.min(trackSize, mousePos)) * 2;
+    const thumbSize = this._ctx.nativeScene.getSliderThumb(this).size;
+    const maxThumbStart = Math.max(0, trackSize * 2 - thumbSize);
+    const range = this._max - this._min;
+    const ratio = range === 0 ? 0 : (this._value - this._min) / range;
+    return Math.max(0, Math.min(thumbSize, virtualMousePos - ratio * maxThumbStart));
+  }
+  setupMouseHandling() {
+    let isDragging = false;
+    let dragOffsetVirtual = 0;
+    let appliedMousePos = 0;
+    const pointerAxis = (event) => this.orientation === "vertical" ? event.y : event.x;
+    this.onMouseDown = (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      const thumb = this.getThumbRect();
+      const inThumb = event.x >= thumb.x && event.x < thumb.x + thumb.width && event.y >= thumb.y && event.y < thumb.y + thumb.height;
+      if (!inThumb) {
+        this.updateValueFromMouseDirect(event);
+        if (this.isDestroyed)
+          return;
+      }
+      isDragging = true;
+      dragOffsetVirtual = this.calculateDragOffsetVirtual(event);
+      appliedMousePos = pointerAxis(event);
+    };
+    const drag = (event) => {
+      const mousePos = pointerAxis(event);
+      if (mousePos === appliedMousePos)
+        return;
+      appliedMousePos = mousePos;
+      this.updateValueFromMouseWithOffset(event, dragOffsetVirtual);
+    };
+    this.onMouseDrag = (event) => {
+      if (!isDragging)
+        return;
+      event.stopPropagation();
+      drag(event);
+    };
+    this.onMouseUp = (event) => {
+      if (isDragging)
+        drag(event);
+      isDragging = false;
+    };
+  }
+  updateValueFromMouseDirect(event) {
+    const trackStart = this.orientation === "vertical" ? this.y : this.x;
+    const trackSize = this.orientation === "vertical" ? this.height : this.width;
+    const mousePos = this.orientation === "vertical" ? event.y : event.x;
+    const relativeMousePos = mousePos - trackStart;
+    const clampedMousePos = Math.max(0, Math.min(trackSize, relativeMousePos));
+    const ratio = trackSize === 0 ? 0 : clampedMousePos / trackSize;
+    const range = this._max - this._min;
+    const newValue = this._min + ratio * range;
+    this.value = newValue;
+  }
+  updateValueFromMouseWithOffset(event, offsetVirtual) {
+    const trackStart = this.orientation === "vertical" ? this.y : this.x;
+    const trackSize = this.orientation === "vertical" ? this.height : this.width;
+    const mousePos = this.orientation === "vertical" ? event.y : event.x;
+    const virtualTrackSize = trackSize * 2;
+    const relativeMousePos = mousePos - trackStart;
+    const clampedMousePos = Math.max(0, Math.min(trackSize, relativeMousePos));
+    const virtualMousePos = clampedMousePos * 2;
+    const virtualThumbSize = this._ctx.nativeScene.getSliderThumb(this).size;
+    const maxThumbStart = Math.max(0, virtualTrackSize - virtualThumbSize);
+    let desiredThumbStart = virtualMousePos - offsetVirtual;
+    desiredThumbStart = Math.max(0, Math.min(maxThumbStart, desiredThumbStart));
+    const ratio = maxThumbStart === 0 ? 0 : desiredThumbStart / maxThumbStart;
+    const range = this._max - this._min;
+    const newValue = this._min + ratio * range;
+    this.value = newValue;
+  }
+  getThumbRect() {
+    const thumb = this._ctx.nativeScene.getSliderThumb(this);
+    const virtualThumbSize = thumb.size;
+    const virtualThumbStart = thumb.start;
+    const realThumbStart = Math.floor(virtualThumbStart / 2);
+    const realThumbSize = Math.ceil((virtualThumbStart + virtualThumbSize) / 2) - realThumbStart;
+    if (this.orientation === "vertical") {
+      return {
+        x: this.x,
+        y: this.y + realThumbStart,
+        width: this.width,
+        height: Math.max(1, realThumbSize)
+      };
+    } else {
+      return {
+        x: this.x + realThumbStart,
+        y: this.y,
+        width: Math.max(1, realThumbSize),
+        height: this.height
+      };
+    }
+  }
+  renderSelf(buffer) {
+    this._drawNativeBody(buffer);
+  }
+}
+
+// src/renderables/ScrollBar.ts
+class ScrollBarRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    ...Renderable2.nativeIntegration,
+    kind: "box"
+  };
+  slider;
+  startArrow;
+  endArrow;
+  orientation;
+  static defaultFocusable = true;
+  _scrollSize = 0;
+  _scrollPosition = 0;
+  _viewportSize = 0;
+  _showArrows = false;
+  _manualVisibility = false;
+  _onChange;
+  arrowRepeat;
+  scrollStep = null;
+  get visible() {
+    return super.visible;
+  }
+  set visible(value) {
+    if (value == null) {
+      this.resetVisibilityControl();
+      return;
+    }
+    this._manualVisibility = true;
+    super.visible = value;
+  }
+  resetVisibilityControl() {
+    this._manualVisibility = false;
+    this.recalculateVisibility();
+  }
+  get scrollSize() {
+    return this._scrollSize;
+  }
+  get scrollPosition() {
+    return this._scrollPosition;
+  }
+  get viewportSize() {
+    return this._viewportSize;
+  }
+  set scrollSize(value) {
+    if (this.isDestroyed)
+      return;
+    this.assertMutable();
+    value ??= 0;
+    if (!Number.isFinite(value) || !Number.isFinite(value - this._viewportSize)) {
+      throw new RangeError("Scene scroll sizes and ranges must be finite numbers");
+    }
+    if (value === this.scrollSize)
+      return;
+    this._scrollSize = value;
+    this.recalculateVisibility();
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.updateSliderFromScrollState();
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.scrollPosition = this.scrollPosition;
+  }
+  set scrollPosition(value) {
+    if (this.isDestroyed)
+      return;
+    this.assertMutable();
+    const newPosition = Math.round(Math.max(0, Math.min(value ?? 0, this.scrollSize - this.viewportSize)));
+    if (!Number.isFinite(newPosition)) {
+      throw new RangeError("Scene scroll positions must be finite numbers");
+    }
+    if (newPosition !== this._scrollPosition) {
+      this._scrollPosition = newPosition;
+      this.updateSliderFromScrollState();
+    }
+  }
+  set viewportSize(value) {
+    if (this.isDestroyed)
+      return;
+    this.assertMutable();
+    value ??= 0;
+    if (!Number.isFinite(value) || !Number.isFinite(this._scrollSize - value)) {
+      throw new RangeError("Scene viewport sizes and ranges must be finite numbers");
+    }
+    if (value === this.viewportSize)
+      return;
+    this.slider.viewPortSize = Math.max(1, value);
+    this._viewportSize = value;
+    this.recalculateVisibility();
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.updateSliderFromScrollState();
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.scrollPosition = this.scrollPosition;
+  }
+  get showArrows() {
+    return this._showArrows;
+  }
+  set showArrows(value) {
+    value ??= false;
+    if (this.isDestroyed || value === this._showArrows)
+      return;
+    this.assertMutable();
+    this._showArrows = value;
+    this.startArrow.visible = value;
+    if (this.isDestroyed || this.endArrow.isDestroyed)
+      return;
+    this.endArrow.visible = value;
+  }
+  constructor(ctx, { trackOptions, arrowOptions, orientation, showArrows = false, ...options }) {
+    super(ctx, {
+      flexDirection: orientation === "vertical" ? "column" : "row",
+      alignSelf: "stretch",
+      alignItems: "stretch",
+      ...options
+    });
+    const children = [];
+    try {
+      this._onChange = options.onChange;
+      this.orientation = orientation;
+      this._showArrows = showArrows;
+      const scrollRange = Math.max(0, this._scrollSize - this._viewportSize);
+      const defaultStepSize = Math.max(1, this._viewportSize);
+      const stepSize = trackOptions?.viewPortSize ?? defaultStepSize;
+      this.slider = new SliderRenderable2(ctx, {
+        orientation,
+        min: 0,
+        max: scrollRange,
+        value: this._scrollPosition,
+        viewPortSize: stepSize,
+        onChange: (value) => {
+          if (this.isDestroyed)
+            return;
+          this._scrollPosition = Math.round(value);
+          this._onChange?.(this._scrollPosition);
+          if (!this.isDestroyed)
+            this.emit("change", { position: this._scrollPosition });
+        },
+        ...orientation === "vertical" ? {
+          width: Math.max(1, Math.min(2, this.width)),
+          height: "100%",
+          marginLeft: "auto"
+        } : {
+          width: "100%",
+          height: 1,
+          marginTop: "auto"
+        },
+        flexGrow: 1,
+        flexShrink: 1,
+        ...trackOptions
+      });
+      children.push(this.slider);
+      this.updateSliderFromScrollState();
+      const arrowOpts = arrowOptions ? {
+        foregroundColor: arrowOptions.backgroundColor,
+        backgroundColor: arrowOptions.backgroundColor,
+        attributes: arrowOptions.attributes,
+        ...arrowOptions
+      } : {};
+      this.startArrow = new ArrowRenderable2(ctx, {
+        alignSelf: "center",
+        visible: this.showArrows,
+        direction: this.orientation === "vertical" ? "up" : "left",
+        height: 1,
+        ...arrowOpts
+      });
+      children.push(this.startArrow);
+      this.endArrow = new ArrowRenderable2(ctx, {
+        alignSelf: "center",
+        visible: this.showArrows,
+        direction: this.orientation === "vertical" ? "down" : "right",
+        height: 1,
+        ...arrowOpts
+      });
+      children.push(this.endArrow);
+      this.add(this.startArrow);
+      this.add(this.slider);
+      this.add(this.endArrow);
+      for (const [arrow, direction] of [
+        [this.startArrow, -1],
+        [this.endArrow, 1]
+      ]) {
+        arrow.onMouseDown = (event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          this.stopArrowRepeat();
+          if (this.isDestroyed || arrow.isDestroyed)
+            return;
+          const repeat = { arrow, timer: undefined };
+          this.arrowRepeat = repeat;
+          this.scrollBy(direction * 0.5, "viewport");
+          if (this.arrowRepeat !== repeat || this.isDestroyed || arrow.isDestroyed)
+            return;
+          repeat.timer = setTimeout(() => {
+            repeat.timer = undefined;
+            if (this.arrowRepeat !== repeat || this.isDestroyed || arrow.isDestroyed)
+              return;
+            this.scrollBy(direction * 0.5, "viewport");
+            if (this.arrowRepeat !== repeat || this.isDestroyed || arrow.isDestroyed)
+              return;
+            repeat.timer = setInterval(() => {
+              if (this.arrowRepeat !== repeat)
+                return;
+              if (this.isDestroyed || arrow.isDestroyed) {
+                this.stopArrowRepeat();
+                return;
+              }
+              this.scrollBy(direction * 0.2, "viewport");
+            }, 200);
+          }, 500);
+        };
+        arrow.onMouseUp = (event) => {
+          event.stopPropagation();
+          this.stopArrowRepeat();
+        };
+        arrow.on("destroyed" /* DESTROYED */, () => {
+          if (this.arrowRepeat?.arrow === arrow)
+            this.stopArrowRepeat();
+        });
+      }
+      this.setNativeScenePaint();
+    } catch (error) {
+      this.abortConstruction(error, (run) => {
+        run(() => this.stopArrowRepeat());
+        for (let index = children.length - 1;index >= 0; index--) {
+          run(() => children[index].destroyRecursively());
+        }
+      });
+    }
+  }
+  stopArrowRepeat() {
+    const repeat = this.arrowRepeat;
+    this.arrowRepeat = undefined;
+    if (repeat)
+      clearTimeout(repeat.timer);
+  }
+  destroyOwnedResources() {
+    this.stopArrowRepeat();
+    super.destroyOwnedResources();
+  }
+  set arrowOptions(options) {
+    this.assignOptions(this.startArrow, options);
+    this.assignOptions(this.endArrow, options);
+    if (!this.isDestroyed)
+      this.requestRender();
+  }
+  set trackOptions(options) {
+    this.assignOptions(this.slider, options);
+    if (!this.isDestroyed)
+      this.requestRender();
+  }
+  updateSliderFromScrollState() {
+    const scrollRange = Math.max(0, this._scrollSize - this._viewportSize);
+    this.slider.min = 0;
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.slider.max = scrollRange;
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.slider.value = Math.min(this._scrollPosition, scrollRange);
+  }
+  scrollBy(delta, unit = "absolute") {
+    this.scrollPosition += scrollUnitSize2(this, unit) * delta;
+  }
+  recalculateVisibility() {
+    if (!this._manualVisibility) {
+      const sizeRatio = this.scrollSize <= this.viewportSize ? 1 : this.viewportSize / this.scrollSize;
+      super.visible = sizeRatio < 1;
+    }
+  }
+  handleKeyPress(key) {
+    switch (key.name) {
+      case "left":
+      case "h":
+        if (this.orientation !== "horizontal")
+          return false;
+        this.scrollBy(-1 / 5, "viewport");
+        return true;
+      case "right":
+      case "l":
+        if (this.orientation !== "horizontal")
+          return false;
+        this.scrollBy(1 / 5, "viewport");
+        return true;
+      case "up":
+      case "k":
+        if (this.orientation !== "vertical")
+          return false;
+        this.scrollBy(-1 / 5, "viewport");
+        return true;
+      case "down":
+      case "j":
+        if (this.orientation !== "vertical")
+          return false;
+        this.scrollBy(1 / 5, "viewport");
+        return true;
+      case "pageup":
+        this.scrollBy(-1 / 2, "viewport");
+        return true;
+      case "pagedown":
+        this.scrollBy(1 / 2, "viewport");
+        return true;
+      case "home":
+        this.scrollBy(-1, "content");
+        return true;
+      case "end":
+        this.scrollBy(1, "content");
+        return true;
+    }
+    return false;
+  }
+}
+var defaultArrowForeground = RGBA2.fromValues(1, 1, 1, 1);
+var defaultArrowBackground = RGBA2.fromValues(0, 0, 0, 0);
+
+class ArrowRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    kind: "arrow",
+    body: { native: this.prototype.renderSelf }
+  };
+  _direction;
+  _foregroundColor;
+  _backgroundColor;
+  _attributes;
+  _arrowChars;
+  constructor(ctx, options) {
+    super(ctx, options);
+    try {
+      this._direction = options.direction;
+      this._foregroundColor = RGBA2.clone(parseColor2(options.foregroundColor || defaultArrowForeground));
+      this._backgroundColor = RGBA2.clone(parseColor2(options.backgroundColor || defaultArrowBackground));
+      this._attributes = options.attributes ?? 0;
+      this._arrowChars = {
+        up: "\u25B2",
+        down: "\u25BC",
+        left: "\u25C0",
+        right: "\u25B6",
+        ...options.arrowChars
+      };
+      if (!options.width)
+        this.width = this.glyphWidth();
+      this.setNativeSceneArrow();
+      this.setNativeScenePaint();
+    } catch (error) {
+      this.abortConstruction(error);
+    }
+  }
+  get direction() {
+    return this._direction;
+  }
+  set direction(value) {
+    if (this._direction !== value) {
+      this.setNativeSceneArrow({ direction: value, text: this._arrowChars[value] });
+      this._direction = value;
+      this.requestRender();
+    }
+  }
+  get foregroundColor() {
+    return RGBA2.clone(this._foregroundColor);
+  }
+  set foregroundColor(value) {
+    const color = RGBA2.clone(parseColor2(value ?? defaultArrowForeground));
+    this.setNativeSceneArrow({ foregroundColor: color });
+    this._foregroundColor = color;
+    this.requestRender();
+  }
+  get backgroundColor() {
+    return RGBA2.clone(this._backgroundColor);
+  }
+  set backgroundColor(value) {
+    const color = RGBA2.clone(parseColor2(value ?? defaultArrowBackground));
+    this.setNativeSceneArrow({ backgroundColor: color });
+    this._backgroundColor = color;
+    this.requestRender();
+  }
+  get attributes() {
+    return this._attributes;
+  }
+  set attributes(value) {
+    value ??= 0;
+    if (this._attributes !== value) {
+      this.setNativeSceneArrow({ attributes: value });
+      this._attributes = value;
+      this.requestRender();
+    }
+  }
+  set arrowChars(value) {
+    const chars = {
+      ...this._arrowChars,
+      ...value
+    };
+    this.setNativeSceneArrow({ text: chars[this._direction] });
+    this._arrowChars = chars;
+    this.requestRender();
+  }
+  setNativeSceneArrow(options = {}) {
+    if (this.isFreed())
+      return;
+    this._ctx.nativeScene.setArrow(this, {
+      direction: this._direction,
+      attributes: this._attributes,
+      foregroundColor: this._foregroundColor,
+      backgroundColor: this._backgroundColor,
+      text: this.getArrowChar(),
+      ...options
+    });
+  }
+  renderSelf(buffer) {
+    this._drawNativeBody(buffer);
+  }
+  defaultDimension(kind) {
+    return kind === "width" ? this.glyphWidth() : super.defaultDimension(kind);
+  }
+  glyphWidth() {
+    const { context, renderLib } = this._ctx.nativeScene.driver;
+    const unicode = renderLib.createContextUnicode(context, this.getArrowChar(), this._ctx.widthMethod);
+    try {
+      return renderLib.getContextUnicode(context, unicode).reduce((width, glyph) => width + glyph.width, 0);
+    } finally {
+      renderLib.destroyContextUnicode(context, unicode);
+    }
+  }
+  getArrowChar() {
+    return this._arrowChars[this._direction];
+  }
+}
+function scrollUnitSize2(bar, unit) {
+  if (unit === "viewport")
+    return bar.viewportSize;
+  if (unit === "content")
+    return bar.scrollSize;
+  return unit === "step" ? bar.scrollStep ?? 1 : 1;
+}
+
+// src/renderables/ScrollBoxParts.ts
+class ScrollBoxPart extends EventEmitter6 {
+  box;
+  constructor(box, event) {
+    super();
+    this.box = box;
+    this.on("newListener", (name) => name === event && box._refreshScrollHook(true));
+    this.on("removeListener", (name) => name === event && box._refreshScrollHook());
+  }
+  get isDestroyed() {
+    return this.box.isDestroyed;
+  }
+  get x() {
+    return this.rect().x;
+  }
+  get y() {
+    return this.rect().y;
+  }
+  get screenX() {
+    return this.rect().x;
+  }
+  get screenY() {
+    return this.rect().y;
+  }
+  get width() {
+    return this.rect().width;
+  }
+  get height() {
+    return this.rect().height;
+  }
+  removeAllListeners(event) {
+    for (const name of event === undefined ? this.eventNames() : [event]) {
+      if (name !== "newListener" && name !== "removeListener")
+        super.removeAllListeners(name);
+    }
+    return this;
+  }
+  _assign(options, keys) {
+    if (options == null)
+      return;
+    for (const key of Reflect.ownKeys(options)) {
+      if (typeof key !== "string" || !keys.includes(key))
+        continue;
+      if (!Object.getOwnPropertyDescriptor(options, key)?.enumerable)
+        continue;
+      this[key] = Reflect.get(options, key);
+      if (this.box.isDestroyed)
+        return;
+    }
+  }
+}
+
+class ScrollBoxFilledPart extends ScrollBoxPart {
+  _backgroundColor;
+  get backgroundColor() {
+    return RGBA2.clone(this._backgroundColor ?? RGBA2.fromValues(0, 0, 0, 0));
+  }
+  set backgroundColor(value) {
+    this._backgroundColor = value == null ? undefined : RGBA2.clone(parseColor2(value));
+    this.box._applyScrollOptions();
+  }
+  _fill() {
+    return this._backgroundColor;
+  }
+}
+
+class ScrollBoxSizedPart extends ScrollBoxFilledPart {
+  _onSizeChange;
+  constructor(box) {
+    super(box, "resize");
+  }
+  get onSizeChange() {
+    return this._onSizeChange;
+  }
+  set onSizeChange(handler) {
+    this._onSizeChange = handler ?? undefined;
+    this.box._refreshScrollHook();
+  }
+  _listening() {
+    return this._onSizeChange !== undefined || this.listenerCount("resize") > 0;
+  }
+  _emitResize() {
+    this._onSizeChange?.();
+    if (!this.box.isDestroyed)
+      this.emit("resize");
+  }
+}
+
+class ScrollBoxWrapper2 extends ScrollBoxFilledPart {
+  static keys = ["backgroundColor"];
+  _listening() {
+    return false;
+  }
+  rect() {
+    return this.box._wrapperRect();
+  }
+}
+var paddingKeys = ["padding", "paddingX", "paddingY", "paddingLeft", "paddingTop", "paddingRight", "paddingBottom"];
+
+class ScrollBoxViewport2 extends ScrollBoxSizedPart {
+  static keys = ["backgroundColor", "onSizeChange", ...paddingKeys];
+  paddings = {};
+  constructor(box) {
+    super(box);
+    paddingKeys.forEach((key, index) => Object.defineProperty(this, key, {
+      configurable: true,
+      get: index < 3 ? undefined : () => this._edges()[index - 3],
+      set: (value) => this.setPadding(key, value)
+    }));
+  }
+  rect() {
+    return this.box._scrollState().viewport;
+  }
+  setPadding(key, value) {
+    const max = nativeConstants.OT_SCENE_SCROLL_PADDING_MAX;
+    if (value != null && (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > max)) {
+      throw new RangeError("ScrollBox viewport padding must be a whole number of cells");
+    }
+    if (value == null)
+      delete this.paddings[key];
+    else
+      this.paddings[key] = value;
+    this.box._applyScrollOptions();
+  }
+  _edges() {
+    const p = this.paddings;
+    const all = p.padding ?? 0;
+    const x = p.paddingX ?? all;
+    const y = p.paddingY ?? all;
+    return [p.paddingLeft ?? x, p.paddingTop ?? y, p.paddingRight ?? x, p.paddingBottom ?? y];
+  }
+}
+var content = NativeStyleFlags.Content;
+var contentStyles = {};
+{
+  const value = (kind, edge = NATIVE_EDGE_NONE2) => (scene, node, input) => sceneSetValue(scene, node, kind, edge, input ?? undefined, content);
+  const enums = [
+    ["flexDirection", YogaEnumKind.FlexDirection, parseFlexDirection2],
+    ["flexWrap", YogaEnumKind.FlexWrap, parseWrap2],
+    ["layoutMode", YogaEnumKind.LayoutMode, parseLayoutMode2],
+    ["alignItems", YogaEnumKind.AlignItems, parseAlignItems2],
+    ["justifyContent", YogaEnumKind.JustifyContent, parseJustify2],
+    ["alignSelf", YogaEnumKind.AlignSelf, parseAlign2]
+  ];
+  for (const [key, kind, parse] of enums) {
+    contentStyles[key] = (scene, node, input) => sceneSetEnum(scene, node, kind, parse(input ?? undefined), content);
+  }
+  contentStyles.flexGrow = (scene, node, input) => sceneSetFloat(scene, node, YogaFloatKind.FlexGrow, input ?? 0, content);
+  contentStyles.flexShrink = (scene, node, input) => sceneSetFloat(scene, node, YogaFloatKind.FlexShrink, input ?? 0, content);
+  for (const [key, kind] of [
+    ["width", YogaValueKind.Width],
+    ["height", YogaValueKind.Height],
+    ["flexBasis", YogaValueKind.FlexBasis],
+    ["minWidth", YogaValueKind.MinWidth],
+    ["minHeight", YogaValueKind.MinHeight],
+    ["maxWidth", YogaValueKind.MaxWidth],
+    ["maxHeight", YogaValueKind.MaxHeight]
+  ]) {
+    contentStyles[key] = value(kind);
+  }
+  for (const [suffix, edge] of [
+    ["", Edge2.All],
+    ["X", Edge2.Horizontal],
+    ["Y", Edge2.Vertical],
+    ["Top", Edge2.Top],
+    ["Right", Edge2.Right],
+    ["Bottom", Edge2.Bottom],
+    ["Left", Edge2.Left]
+  ]) {
+    contentStyles[`padding${suffix}`] = value(YogaValueKind.Padding, edge);
+    contentStyles[`margin${suffix}`] = value(YogaValueKind.Margin, edge);
+  }
+  contentStyles.gap = value(YogaValueKind.Gap, Gutter2.All);
+  contentStyles.rowGap = value(YogaValueKind.Gap, Gutter2.Row);
+  contentStyles.columnGap = value(YogaValueKind.Gap, Gutter2.Column);
+}
+
+class ScrollBoxContent2 extends ScrollBoxSizedPart {
+  static keys = ["backgroundColor", "onSizeChange", "viewportCulling", ...Object.keys(contentStyles)];
+  styles = new Map;
+  constructor(box) {
+    super(box);
+    for (const key of Object.keys(contentStyles)) {
+      const size = key === "width" || key === "height";
+      Object.defineProperty(this, key, {
+        configurable: true,
+        enumerable: false,
+        get: () => size ? this.rect()[key] : this.styles.get(key),
+        set: (input) => this.setStyle(key, input)
+      });
+    }
+  }
+  rect() {
+    const { content, offset } = this.box._scrollState();
+    return {
+      x: this.box.screenX + content.x - offset[0],
+      y: this.box.screenY + content.y - offset[1],
+      width: content.width,
+      height: content.height
+    };
+  }
+  setStyle(key, input) {
+    this.box._setContentStyle((scene, node) => contentStyles[key](scene, node, input));
+    if (input == null)
+      this.styles.delete(key);
+    else
+      this.styles.set(key, input);
+  }
+  get _row() {
+    const list = parseLayoutMode2(this.styles.get("layoutMode")) === nativeConstants.OT_LAYOUT_MODE_LIST;
+    const direction = parseFlexDirection2(this.styles.get("flexDirection"));
+    return !list && (direction === FlexDirection2.Row || direction === FlexDirection2.RowReverse);
+  }
+  get viewportCulling() {
+    return this.box.viewportCulling;
+  }
+  set viewportCulling(value) {
+    this.box.viewportCulling = value;
+  }
+  add(obj, index) {
+    return this.box.add(obj, index);
+  }
+  insertBefore(obj, anchor) {
+    return this.box.insertBefore(obj, anchor);
+  }
+  remove(child) {
+    this.box.remove(child);
+  }
+  getChildren() {
+    return this.box.getChildren();
+  }
+  getChildrenCount() {
+    return this.box.getChildrenCount();
+  }
+  getRenderable(id) {
+    return this.box.getRenderable(id);
+  }
+  findDescendantById(id) {
+    return this.box.findDescendantById(id);
+  }
+}
+var defaultTrack = RGBA2.fromHex("#252527");
+var defaultThumb = RGBA2.fromHex("#9a9ea3");
+var defaultArrowForeground2 = RGBA2.fromValues(1, 1, 1, 1);
+var defaultArrowBackground2 = RGBA2.fromValues(0, 0, 0, 0);
+
+class ScrollBoxBar2 extends ScrollBoxPart {
+  static keys = [
+    "visible",
+    "showArrows",
+    "arrowOptions",
+    "trackOptions",
+    "onChange",
+    "width",
+    "height",
+    "paddingLeft",
+    "paddingTop",
+    "position",
+    "scrollStep"
+  ];
+  orientation;
+  scrollStep = null;
+  axis;
+  policy = "auto";
+  _showArrows = false;
+  _arrowOptions = {};
+  trackForeground = defaultThumb;
+  trackBackground = defaultTrack;
+  thickness = 1;
+  gap = 0;
+  overlay = false;
+  _onChange;
+  constructor(box, orientation) {
+    super(box, "change");
+    this.orientation = orientation;
+    this.axis = orientation === "vertical" ? 1 : 0;
+  }
+  rect() {
+    const bar = this.box._scrollState().bars[this.axis];
+    const arrows = this._showArrows ? 1 : 0;
+    return this.axis === 1 ? {
+      x: bar.track.x - this.gap,
+      y: bar.track.y - arrows,
+      width: bar.track.width + this.gap,
+      height: bar.track.height + 2 * arrows
+    } : {
+      x: bar.track.x - arrows,
+      y: bar.track.y - this.gap,
+      width: bar.track.width + 2 * arrows,
+      height: bar.track.height + this.gap
+    };
+  }
+  _listening() {
+    return this._onChange !== undefined || this.listenerCount("change") > 0;
+  }
+  _native() {
+    return {
+      policy: this.policy,
+      overlay: this.overlay,
+      thickness: this.thickness,
+      gap: this.gap,
+      arrows: this._showArrows,
+      foregroundColor: this.trackForeground,
+      backgroundColor: this.trackBackground
+    };
+  }
+  _arrows() {
+    const options = this._arrowOptions;
+    const background = options.backgroundColor ?? undefined;
+    const foreground = options.foregroundColor ?? background;
+    const chars = options.arrowChars ?? {};
+    return (this.axis === 1 ? ["up", "down"] : ["left", "right"]).map((direction) => ({
+      attributes: options.attributes ?? 0,
+      foregroundColor: RGBA2.clone(parseColor2(foreground || defaultArrowForeground2)),
+      backgroundColor: RGBA2.clone(parseColor2(background || defaultArrowBackground2)),
+      text: chars[direction]
+    }));
+  }
+  _emitChange(position) {
+    this._onChange?.(position);
+    if (!this.box.isDestroyed)
+      this.emit("change", { position });
+  }
+  get visible() {
+    return this.box._scrollState().bars[this.axis].visible;
+  }
+  set visible(value) {
+    this.setOption(() => this.policy = value == null ? "auto" : value ? "always" : "never");
+  }
+  resetVisibilityControl() {
+    this.visible = null;
+  }
+  get onChange() {
+    return this._onChange;
+  }
+  set onChange(handler) {
+    this._onChange = handler ?? undefined;
+    this.box._refreshScrollHook();
+  }
+  get showArrows() {
+    return this._showArrows;
+  }
+  set showArrows(value) {
+    this.setOption(() => this._showArrows = value ?? false);
+  }
+  set arrowOptions(options) {
+    this._arrowOptions = { ...this._arrowOptions, ...options };
+    if (!this.box.isDestroyed)
+      this.box._applyScrollArrows(this.axis);
+  }
+  set trackOptions(options) {
+    this.setOption(() => {
+      if (options && "foregroundColor" in options) {
+        this.trackForeground = RGBA2.clone(parseColor2(options.foregroundColor ?? defaultThumb));
+      }
+      if (options && "backgroundColor" in options) {
+        this.trackBackground = RGBA2.clone(parseColor2(options.backgroundColor ?? defaultTrack));
+      }
+    });
+  }
+  get width() {
+    return super.width;
+  }
+  set width(value) {
+    if (this.axis === 1)
+      this.setOption(() => this.thickness = Math.max(1, cells(value, 1)));
+  }
+  get height() {
+    return super.height;
+  }
+  set height(value) {
+    if (this.axis === 0)
+      this.setOption(() => this.thickness = Math.max(1, cells(value, 1)));
+  }
+  set paddingLeft(value) {
+    if (this.axis === 1)
+      this.setOption(() => this.gap = cells(value, 0));
+  }
+  set paddingTop(value) {
+    if (this.axis === 0)
+      this.setOption(() => this.gap = cells(value, 0));
+  }
+  set position(value) {
+    this.setOption(() => this.overlay = value === "absolute");
+  }
+  setOption(change) {
+    if (this.box.isDestroyed)
+      return;
+    change();
+    this.box._applyScrollOptions();
+  }
+  get scrollSize() {
+    const { content } = this.box._scrollState();
+    return this.axis === 1 ? content.height : content.width;
+  }
+  get viewportSize() {
+    const { viewport } = this.box._scrollState();
+    return this.axis === 1 ? viewport.height : viewport.width;
+  }
+  get scrollPosition() {
+    return this.box._scrollState().offset[this.axis];
+  }
+  set scrollPosition(value) {
+    this.box._scrollAxis(this.axis, value, false);
+  }
+  scrollBy(delta, unit = "absolute") {
+    this.box._scrollAxis(this.axis, scrollUnitSize2(this, unit) * delta, true, true);
+  }
+  handleKeyPress(key) {
+    return ScrollBarRenderable2.prototype.handleKeyPress.call(this, key);
+  }
+}
+function cells(value, fallback) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(255, Math.trunc(value))) : fallback;
+}
+
+// src/renderables/ScrollBox.ts
+var SCROLLBOX_PADDING_KEYS = [
+  "padding",
+  "paddingX",
+  "paddingY",
+  "paddingTop",
+  "paddingRight",
+  "paddingBottom",
+  "paddingLeft"
+];
+function pickScrollBoxPadding(options) {
+  if (!options)
+    return {};
+  const picked = {};
+  for (const key of SCROLLBOX_PADDING_KEYS) {
+    const value = options[key];
+    if (value !== undefined) {
+      picked[key] = value;
+    }
+  }
+  return picked;
+}
+function stripScrollBoxPadding(options) {
+  const sanitized = { ...options };
+  for (const key of SCROLLBOX_PADDING_KEYS) {
+    delete sanitized[key];
+  }
+  return sanitized;
+}
+
+class ScrollBoxRenderable2 extends BoxRenderable2 {
+  static nativeIntegration = {
+    ...BoxRenderable2.nativeIntegration,
+    lifecycle: {
+      update: {
+        idle: this.prototype.onUpdate,
+        active: (renderable) => renderable["autoScrollOwner"] !== undefined
+      },
+      scroll: {
+        active: (renderable) => renderable.scrollHook,
+        notify: (renderable) => renderable.notifyScroll()
+      }
+    }
+  };
+  wrapper;
+  viewport;
+  content;
+  horizontalScrollBar;
+  verticalScrollBar;
+  static defaultFocusable = true;
+  selectionListener = () => this.stopAutoScroll();
+  autoScrollOwner;
+  autoScrollMouseX = 0;
+  autoScrollMouseY = 0;
+  autoScrollThresholdVertical = 3;
+  autoScrollThresholdHorizontal = 3;
+  autoScrollSpeedSlow = 6;
+  autoScrollSpeedMedium = 36;
+  autoScrollSpeedFast = 72;
+  cachedAutoScrollSpeed = 3;
+  autoScrollAccumulatorX = 0;
+  autoScrollAccumulatorY = 0;
+  scrollAccumulatorX = 0;
+  scrollAccumulatorY = 0;
+  _stickyScroll;
+  _stickyStart;
+  scrollAccel;
+  axes;
+  _viewportCulling;
+  state = emptySceneScrollState();
+  stateRevision;
+  scrollHook = false;
+  configured = false;
+  barPress;
+  layoutCallbacks = [];
+  anchorToken;
+  get stickyScroll() {
+    return this._stickyScroll;
+  }
+  set stickyScroll(value) {
+    this.setScrollOption(() => this._stickyScroll = value);
+  }
+  get stickyStart() {
+    return this._stickyStart;
+  }
+  set stickyStart(value) {
+    this.setScrollOption(() => this._stickyStart = value);
+  }
+  setScrollOption(change) {
+    const previous = [this._stickyScroll, this._stickyStart, this._viewportCulling];
+    change();
+    try {
+      this._applyScrollOptions();
+    } catch (error) {
+      [this._stickyScroll, this._stickyStart, this._viewportCulling] = previous;
+      throw error;
+    }
+  }
+  get scrollX() {
+    return this.axes.x;
+  }
+  set scrollX(value) {
+    this.axes.x = value ?? false;
+    this._applyScrollOptions();
+  }
+  get scrollY() {
+    return this.axes.y;
+  }
+  set scrollY(value) {
+    this.axes.y = value ?? true;
+    this._applyScrollOptions();
+  }
+  get scrollTop() {
+    return this._scrollState().offset[1];
+  }
+  set scrollTop(value) {
+    this._scrollAxis(1, value, false);
+  }
+  get scrollLeft() {
+    return this._scrollState().offset[0];
+  }
+  set scrollLeft(value) {
+    this._scrollAxis(0, value, false);
+  }
+  get scrollWidth() {
+    return this._scrollState().content.width;
+  }
+  get scrollHeight() {
+    return this._scrollState().content.height;
+  }
+  constructor(ctx, options) {
+    const {
+      wrapperOptions,
+      viewportOptions,
+      contentOptions,
+      rootOptions,
+      scrollbarOptions,
+      verticalScrollbarOptions,
+      horizontalScrollbarOptions,
+      stickyScroll = false,
+      stickyStart,
+      scrollX = false,
+      scrollY = true,
+      scrollAcceleration,
+      viewportCulling = true,
+      ...rootBoxOptions
+    } = options;
+    const forwardedContentPadding = {
+      ...pickScrollBoxPadding(rootBoxOptions),
+      ...pickScrollBoxPadding(rootOptions)
+    };
+    const sanitizedRootBoxOptions = stripScrollBoxPadding(rootBoxOptions);
+    const sanitizedRootOptions = rootOptions ? stripScrollBoxPadding(rootOptions) : undefined;
+    super(ctx, {
+      flexDirection: "row",
+      alignItems: "stretch",
+      ...sanitizedRootBoxOptions,
+      ...sanitizedRootOptions,
+      overflow: "hidden"
+    });
+    try {
+      this._stickyScroll = stickyScroll;
+      this._stickyStart = stickyStart;
+      this.scrollAccel = scrollAcceleration ?? new LinearScrollAccel2;
+      this.axes = { x: scrollX, y: scrollY };
+      this._viewportCulling = viewportCulling;
+      this.wrapper = new ScrollBoxWrapper2(this);
+      this.viewport = new ScrollBoxViewport2(this);
+      this.content = new ScrollBoxContent2(this);
+      this.verticalScrollBar = new ScrollBoxBar2(this, "vertical");
+      this.horizontalScrollBar = new ScrollBoxBar2(this, "horizontal");
+      this.wrapper._assign(wrapperOptions, ScrollBoxWrapper2.keys);
+      this.viewport._assign(viewportOptions, ScrollBoxViewport2.keys);
+      for (const [bar, own] of [
+        [this.verticalScrollBar, verticalScrollbarOptions],
+        [this.horizontalScrollBar, horizontalScrollbarOptions]
+      ]) {
+        bar._assign({ ...scrollbarOptions, ...own, arrowOptions: { ...scrollbarOptions?.arrowOptions, ...own?.arrowOptions } }, ScrollBoxBar2.keys);
+      }
+      this.configured = true;
+      this._applyScrollOptions();
+      this._applyScrollArrows(0);
+      this._applyScrollArrows(1);
+      this.content._assign({ ...forwardedContentPadding, ...contentOptions }, ScrollBoxContent2.keys);
+      this._refreshScrollHook();
+      this.setNativeScenePaint();
+    } catch (error) {
+      this.abortConstruction(error, (run) => run(() => this.destroySelf()));
+    }
+  }
+  _applyScrollOptions() {
+    if (!this.configured || this.isFreed())
+      return;
+    const sticky = this._stickyScroll && this._stickyStart;
+    this._ctx.nativeScene.setScroll(this, {
+      scrollX: this.axes.x,
+      scrollY: this.axes.y,
+      follow: sticky ? this._stickyStart : "none",
+      culling: this._viewportCulling,
+      padding: this.viewport._edges(),
+      fills: [this.wrapper._fill(), this.viewport._fill(), this.content._fill()],
+      bars: [this.horizontalScrollBar._native(), this.verticalScrollBar._native()]
+    });
+    this.requestRender();
+  }
+  _applyScrollArrows(axis) {
+    if (!this.configured || this.isFreed())
+      return;
+    const bar = axis === 1 ? this.verticalScrollBar : this.horizontalScrollBar;
+    bar._arrows().forEach((arrow, end) => this._ctx.nativeScene.setScrollArrow(this, axis, end, arrow));
+    this.requestRender();
+  }
+  _setContentStyle(apply) {
+    if (this.isFreed())
+      return;
+    apply(this._ctx.nativeScene, this);
+    this.requestRender();
+  }
+  _scrollState() {
+    if (this.isFreed())
+      return this.state;
+    const revision = this._ctx.nativeScene.observedLayoutRevision;
+    if (revision !== undefined && revision === this.stateRevision)
+      return this.state;
+    this.state = this._ctx.nativeScene.getScroll(this);
+    this.stateRevision = revision;
+    return this.state;
+  }
+  _wrapperRect() {
+    const { viewport, bars } = this._scrollState();
+    const horizontal = bars[0];
+    const gutter = horizontal.visible ? horizontal.track.y + horizontal.track.height - viewport.y - viewport.height : 0;
+    return { ...viewport, height: viewport.height + Math.max(0, gutter) };
+  }
+  _scrollAxis(axis, value, relative, reapply = false) {
+    if (this.isFreed())
+      return;
+    this.assertMutable();
+    value ??= 0;
+    if (Number.isNaN(value))
+      throw new RangeError("Scene scroll positions must be finite numbers");
+    const x = axis === 0 ? value : 0;
+    const y = axis === 1 ? value : 0;
+    this.commitScroll(() => this._ctx.nativeScene.scrollTo(this, x, y, axis !== 0 || relative, axis !== 1 || relative, reapply));
+  }
+  commitScroll(scroll) {
+    const before = this._scrollState().offset;
+    const state = scroll();
+    this.state = state;
+    this.stateRevision = this._ctx.nativeScene.observedLayoutRevision;
+    const moved = (state.offset[0] !== before[0] ? 1 : 0) | (state.offset[1] !== before[1] ? 2 : 0);
+    if (moved)
+      this.requestRender();
+    this.notifyOffsets(state, moved);
+  }
+  notifyOffsets(state, moved) {
+    for (const axis of [1, 0]) {
+      if ((moved & axis + 1) === 0)
+        continue;
+      (axis === 1 ? this.verticalScrollBar : this.horizontalScrollBar)._emitChange(state.offset[axis]);
+      if (this.isDestroyed)
+        return;
+    }
+  }
+  listening() {
+    return this.verticalScrollBar?._listening() || this.horizontalScrollBar?._listening() || this.content?._listening() || this.viewport?._listening() || this.layoutCallbacks.length > 0;
+  }
+  _refreshScrollHook(adding = false) {
+    if (!this.configured || this.isFreed())
+      return;
+    const listening = adding || this.listening();
+    if (listening === this.scrollHook)
+      return;
+    this.scrollHook = listening;
+    this.refreshNativeSceneHooks();
+  }
+  notifyScroll() {
+    const state = this._scrollState();
+    this.notifyOffsets(state, state.changes);
+    if (!this.isDestroyed && state.changes & 8)
+      this.viewport._emitResize();
+    if (!this.isDestroyed && state.changes & 4)
+      this.content._emitResize();
+    if (this.isDestroyed || !(state.changes & 16))
+      return;
+    const frame = this._ctx.frameId;
+    const due = this.layoutCallbacks.filter((entry) => entry.frame < frame);
+    this.layoutCallbacks = this.layoutCallbacks.filter((entry) => entry.frame >= frame);
+    if (this.layoutCallbacks.length > 0)
+      this._ctx.nativeScene.scrollRequest(this, "layout", null);
+    let failure;
+    for (const { callback } of due) {
+      if (this.isDestroyed)
+        break;
+      try {
+        callback();
+      } catch (error) {
+        failure ??= { error };
+      }
+    }
+    this._refreshScrollHook();
+    if (failure)
+      throw failure.error;
+  }
+  afterLayout(callback) {
+    if (this.isFreed())
+      return;
+    this.assertMutable();
+    this.layoutCallbacks.push({ frame: this._ctx.frameId, callback });
+    this._refreshScrollHook();
+    this._ctx.nativeScene.scrollRequest(this, "layout", null);
+    this.requestRender();
+  }
+  anchor(node) {
+    if (this.isFreed())
+      return () => {};
+    this.assertMutable();
+    this._ctx.nativeScene.scrollRequest(this, "anchor", node);
+    const token = {};
+    this.anchorToken = token;
+    return () => {
+      if (this.anchorToken !== token || this.isFreed())
+        return;
+      this._ctx.nativeScene.scrollRequest(this, "anchor", null);
+      this.anchorToken = undefined;
+    };
+  }
+  get primaryAxis() {
+    return this.content._row ? "row" : "column";
+  }
+  onUpdate(deltaTime) {
+    this.handleAutoScroll(deltaTime);
+  }
+  scrollBy(delta, unit = "absolute") {
+    if (typeof delta === "number") {
+      this.verticalScrollBar.scrollBy(delta, unit);
+    } else {
+      this.verticalScrollBar.scrollBy(delta.y, unit);
+      if (this.isDestroyed)
+        return;
+      this.horizontalScrollBar.scrollBy(delta.x, unit);
+    }
+  }
+  scrollChildIntoView(child, options = {}) {
+    const node = typeof child === "string" ? this.findDescendantById(child) : child;
+    if (!node || this.isFreed())
+      return;
+    this.assertMutable();
+    this.commitScroll(() => this._ctx.nativeScene.scrollRequest(this, "into-view", node, options.align, options.inset));
+  }
+  scrollTo(position) {
+    if (typeof position === "number") {
+      this._scrollAxis(1, position, false, true);
+    } else {
+      this._scrollAxis(1, position.y, false, true);
+      if (this.isDestroyed)
+        return;
+      this._scrollAxis(0, position.x, false, true);
+    }
+  }
+  scrollByWheel(event) {
+    const dir = wheelDirection(event);
+    const vertical = dir === "up" || dir === "down";
+    if (!vertical && dir !== "left" && dir !== "right")
+      return false;
+    const axis = vertical ? 1 : 0;
+    const sign = dir === "up" || dir === "left" ? -1 : 1;
+    const { offset, max } = this._scrollState();
+    const position = offset[axis];
+    if (sign < 0 ? position <= 0 : position >= max[axis])
+      return false;
+    let remainder = vertical ? this.scrollAccumulatorY : this.scrollAccumulatorX;
+    if (remainder * sign < 0)
+      remainder = 0;
+    remainder += sign * (event.scroll?.delta ?? 0) * this.scrollAccel.tick(Date.now());
+    const step = Math.trunc(remainder);
+    if (step !== 0)
+      this._scrollAxis(axis, position + step, false);
+    remainder = this._scrollState().offset[axis] - position === step ? remainder - step : 0;
+    if (vertical)
+      this.scrollAccumulatorY = remainder;
+    else
+      this.scrollAccumulatorX = remainder;
+    return true;
+  }
+  onMouseEvent(event) {
+    if (event.type === "scroll")
+      scrollOnce(event, this, () => this.scrollByWheel(event));
+    if (this.handleBarMouse(event))
+      return;
+    if (event.type === "drag" && event.isDragging) {
+      this.updateAutoScroll(event.x, event.y);
+    } else if (event.type === "up") {
+      this.stopAutoScroll();
+    }
+  }
+  handleBarMouse(event) {
+    const press = this.barPress;
+    if (press && (event.type === "drag" || event.type === "up" || event.type === "drag-end")) {
+      if ("offset" in press && event.type !== "drag-end")
+        this.dragThumb(press, event);
+      if (event.type === "up")
+        this.endBarPress();
+      event.stopPropagation();
+      return true;
+    }
+    if (event.type !== "down" || event.button !== 0 || event.target !== this)
+      return false;
+    const { bars } = this._scrollState();
+    for (const axis of [1, 0]) {
+      const bar = bars[axis];
+      if (!bar.visible)
+        continue;
+      const part = axis === 1 ? this.verticalScrollBar : this.horizontalScrollBar;
+      const inside = (rect) => event.x >= rect.x && event.x < rect.x + rect.width && event.y >= rect.y && event.y < rect.y + rect.height;
+      const arrow = part.showArrows ? inside(bar.startArrow) ? -1 : inside(bar.endArrow) ? 1 : 0 : 0;
+      if (arrow === 0 && !inside(bar.track))
+        continue;
+      event.stopPropagation();
+      event.preventDefault();
+      this.endBarPress();
+      if (arrow !== 0)
+        this.pressArrow(axis, arrow, part);
+      else
+        this.pressTrack(axis, event);
+      return true;
+    }
+    return false;
+  }
+  pressArrow(axis, arrow, part) {
+    const press = { axis, arrow, timer: undefined };
+    this.barPress = press;
+    const step = (amount, delay) => {
+      part.scrollBy(arrow * amount, "viewport");
+      if (this.barPress !== press)
+        return;
+      press.timer = this._ctx.clock.setTimeout(() => step(delay === 500 ? 0.5 : 0.2, 200), delay);
+    };
+    step(0.5, 500);
+  }
+  thumbPointer(axis, event) {
+    const bar = this._scrollState().bars[axis];
+    const along = axis === 1 ? event.y - bar.track.y : event.x - bar.track.x;
+    const length = axis === 1 ? bar.track.height : bar.track.width;
+    return {
+      at: Math.max(0, Math.min(length, along)) * 2,
+      length: length * 2,
+      start: bar.thumbStart,
+      size: bar.thumbSize
+    };
+  }
+  pressTrack(axis, event) {
+    let thumb = this.thumbPointer(axis, event);
+    const inThumb = thumb.at >= Math.floor(thumb.start / 2) * 2 && thumb.at < Math.ceil((thumb.start + thumb.size) / 2) * 2;
+    if (!inThumb) {
+      const max = this._scrollState().max[axis];
+      this._scrollAxis(axis, thumb.length === 0 ? 0 : thumb.at / thumb.length * max, false);
+      if (this.isDestroyed)
+        return;
+      thumb = this.thumbPointer(axis, event);
+    }
+    const { offset, max } = this._scrollState();
+    const start = max[axis] === 0 ? 0 : offset[axis] / max[axis] * Math.max(0, thumb.length - thumb.size);
+    this.barPress = { axis, offset: Math.max(0, Math.min(thumb.size, thumb.at - start)), at: thumb.at };
+  }
+  dragThumb(press, event) {
+    const thumb = this.thumbPointer(press.axis, event);
+    if (thumb.at === press.at)
+      return;
+    press.at = thumb.at;
+    const span = Math.max(0, thumb.length - thumb.size);
+    const start = Math.max(0, Math.min(span, thumb.at - press.offset));
+    this._scrollAxis(press.axis, span === 0 ? 0 : start / span * this._scrollState().max[press.axis], false);
+  }
+  endBarPress() {
+    const press = this.barPress;
+    this.barPress = undefined;
+    if (press && "timer" in press && press.timer !== undefined)
+      this._ctx.clock.clearTimeout(press.timer);
+  }
+  handleKeyPress(key) {
+    if (this.verticalScrollBar.handleKeyPress(key) || this.horizontalScrollBar.handleKeyPress(key)) {
+      this.scrollAccel.reset();
+      this.resetScrollAccumulators();
+      return true;
+    }
+    return false;
+  }
+  resetScrollAccumulators() {
+    this.scrollAccumulatorX = 0;
+    this.scrollAccumulatorY = 0;
+  }
+  startAutoScroll(mouseX, mouseY) {
+    if (this.isDestroyed)
+      return;
+    this.stopAutoScroll();
+    this.autoScrollMouseX = mouseX;
+    this.autoScrollMouseY = mouseY;
+    this.cachedAutoScrollSpeed = this.getAutoScrollSpeed(mouseX, mouseY);
+    this.autoScrollOwner = this.draggingSelection();
+    this.live = true;
+    this._ctx.on("selection", this.selectionListener);
+    this.refreshNativeSceneHooks();
+  }
+  updateAutoScroll(mouseX, mouseY) {
+    this.autoScrollMouseX = mouseX;
+    this.autoScrollMouseY = mouseY;
+    this.cachedAutoScrollSpeed = this.getAutoScrollSpeed(mouseX, mouseY);
+    const scrollX = this.getAutoScrollDirectionX(mouseX);
+    const scrollY = this.getAutoScrollDirectionY(mouseY);
+    if (scrollX === 0 && scrollY === 0) {
+      this.stopAutoScroll();
+    } else if (this.autoScrollOwner !== this.draggingSelection()) {
+      this.startAutoScroll(mouseX, mouseY);
+    }
+  }
+  draggingSelection() {
+    const selection = this._ctx.getSelection();
+    return selection?.isDragging ? selection : null;
+  }
+  stopAutoScroll() {
+    const wasAutoScrolling = this.autoScrollOwner !== undefined;
+    this.autoScrollOwner = undefined;
+    this.autoScrollAccumulatorX = 0;
+    this.autoScrollAccumulatorY = 0;
+    if (wasAutoScrolling) {
+      this._ctx.off("selection", this.selectionListener);
+      this.live = false;
+      this.refreshNativeSceneHooks();
+    }
+  }
+  handleAutoScroll(deltaTime) {
+    if (this.autoScrollOwner === undefined)
+      return;
+    if (this.autoScrollOwner?.isDragging === false)
+      return this.stopAutoScroll();
+    const scrollX = this.getAutoScrollDirectionX(this.autoScrollMouseX);
+    const scrollY = this.getAutoScrollDirectionY(this.autoScrollMouseY);
+    const scrollAmount = this.cachedAutoScrollSpeed * (deltaTime / 1000);
+    let scrolled = false;
+    if (scrollX !== 0) {
+      this.autoScrollAccumulatorX += scrollX * scrollAmount;
+      const integerScrollX = Math.trunc(this.autoScrollAccumulatorX);
+      if (integerScrollX !== 0) {
+        this.scrollLeft += integerScrollX;
+        if (this.isDestroyed)
+          return;
+        this.autoScrollAccumulatorX -= integerScrollX;
+        scrolled = true;
+      }
+    }
+    if (scrollY !== 0) {
+      this.autoScrollAccumulatorY += scrollY * scrollAmount;
+      const integerScrollY = Math.trunc(this.autoScrollAccumulatorY);
+      if (integerScrollY !== 0) {
+        this.scrollTop += integerScrollY;
+        if (this.isDestroyed)
+          return;
+        this.autoScrollAccumulatorY -= integerScrollY;
+        scrolled = true;
+      }
+    }
+    if (scrolled) {
+      this._ctx.requestSelectionUpdate();
+    }
+    if (scrollX === 0 && scrollY === 0) {
+      this.stopAutoScroll();
+    }
+  }
+  getAutoScrollDirectionX(mouseX) {
+    const relativeX = mouseX - this.x;
+    const distToLeft = relativeX;
+    const distToRight = this.width - relativeX;
+    if (distToLeft <= this.autoScrollThresholdHorizontal) {
+      return this.scrollLeft > 0 ? -1 : 0;
+    } else if (distToRight <= this.autoScrollThresholdHorizontal) {
+      return this.scrollLeft < this._scrollState().max[0] ? 1 : 0;
+    }
+    return 0;
+  }
+  getAutoScrollDirectionY(mouseY) {
+    const relativeY = mouseY - this.y;
+    const distToTop = relativeY;
+    const distToBottom = this.height - relativeY;
+    if (distToTop <= this.autoScrollThresholdVertical) {
+      return this.scrollTop > 0 ? -1 : 0;
+    } else if (distToBottom <= this.autoScrollThresholdVertical) {
+      return this.scrollTop < this._scrollState().max[1] ? 1 : 0;
+    }
+    return 0;
+  }
+  getAutoScrollSpeed(mouseX, mouseY) {
+    const relativeX = mouseX - this.x;
+    const relativeY = mouseY - this.y;
+    const distToLeft = relativeX;
+    const distToRight = this.width - relativeX;
+    const distToTop = relativeY;
+    const distToBottom = this.height - relativeY;
+    const minDistance = Math.min(distToLeft, distToRight, distToTop, distToBottom);
+    if (minDistance <= 1) {
+      return this.autoScrollSpeedFast;
+    } else if (minDistance <= 2) {
+      return this.autoScrollSpeedMedium;
+    } else {
+      return this.autoScrollSpeedSlow;
+    }
+  }
+  set rootOptions(options) {
+    this.assignOptions(this, options && stripScrollBoxPadding(options));
+    if (options)
+      this.content._assign(pickScrollBoxPadding(options), ScrollBoxContent2.keys);
+    if (!this.isDestroyed)
+      this.requestRender();
+  }
+  set wrapperOptions(options) {
+    this.wrapper._assign(options, ScrollBoxWrapper2.keys);
+  }
+  set viewportOptions(options) {
+    this.viewport._assign(options, ScrollBoxViewport2.keys);
+  }
+  set contentOptions(options) {
+    this.content._assign(options, ScrollBoxContent2.keys);
+  }
+  set scrollbarOptions(options) {
+    this.verticalScrollBar._assign(options ?? { onChange: undefined }, ScrollBoxBar2.keys);
+    this.horizontalScrollBar._assign(options ?? { onChange: undefined }, ScrollBoxBar2.keys);
+  }
+  set verticalScrollbarOptions(options) {
+    this.verticalScrollBar._assign(options ?? { onChange: undefined }, ScrollBoxBar2.keys);
+  }
+  set horizontalScrollbarOptions(options) {
+    this.horizontalScrollBar._assign(options ?? { onChange: undefined }, ScrollBoxBar2.keys);
+  }
+  get scrollAcceleration() {
+    return this.scrollAccel;
+  }
+  set scrollAcceleration(value) {
+    this.scrollAccel = value;
+  }
+  get viewportCulling() {
+    return this._viewportCulling;
+  }
+  set viewportCulling(value) {
+    this.setScrollOption(() => this._viewportCulling = value ?? true);
+  }
+  get overflow() {
+    return "hidden";
+  }
+  set overflow(_value) {}
+  destroySelf() {
+    if (!this.isFreed())
+      this._scrollState();
+    this.layoutCallbacks = [];
+    this.endBarPress();
+    this.runCleanup((run) => {
+      run(() => this._ctx.off("selection", this.selectionListener));
+      run(() => super.destroySelf());
+    });
+  }
+}
+for (const key of SCROLLBOX_PADDING_KEYS) {
+  Object.defineProperty(ScrollBoxRenderable2.prototype, key, {
+    configurable: true,
+    set(value) {
+      this.content[key] = value;
+    }
+  });
+}
+
 // src/renderables/Code.ts
+var PREVIEW = -2;
+
 class CodeRenderable2 extends TextBufferRenderable2 {
   static nativeIntegration = {
     ...TextBufferRenderable2.nativeIntegration,
@@ -14706,7 +14412,8 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   _isHighlighting = false;
   _treeSitterClient;
   _highlightsDirty = false;
-  _highlightSnapshotId = 0;
+  _version = 0;
+  _shownVersion = -1;
   _highlightLoopActive = false;
   _highlightPromise;
   _highlightRerun = false;
@@ -14715,7 +14422,7 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   _shouldRenderTextBuffer = true;
   _streaming;
   _initialStyledText;
-  _hadInitialContent = false;
+  _checkPainted = false;
   _baseHighlight;
   _onHighlight;
   _onChunks;
@@ -14752,6 +14459,7 @@ class CodeRenderable2 extends TextBufferRenderable2 {
         this.setShouldRenderTextBuffer(this._drawUnstyledText || !this._filetype);
       }
       this.setHighlightsDirty(this._content.length > 0);
+      this.onLifecyclePass = this.checkPainted;
     } catch (error) {
       this.rollbackConstruction(error);
     }
@@ -14759,9 +14467,61 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   get content() {
     return this._content;
   }
-  invalidateHighlights() {
+  invalidateHighlights(renders = true) {
     this.setHighlightsDirty(true);
-    this._highlightSnapshotId++;
+    if (renders)
+      this._version++;
+    if (this.isDestroyed)
+      return;
+    if (!this._drawUnstyledText && this._filetype)
+      this.paintHighlightsOnly();
+    if (this._shownVersion < 0 || this._shownVersion === this._version)
+      return;
+    if (this.onLifecyclePass === this.checkPainted && this._ctx.nativeScene.painted(this)) {
+      this._checkPainted = true;
+      this._ctx.nativeScene.lifecyclePasses.refresh(this);
+    } else
+      this.showPlainText();
+  }
+  showPlainText() {
+    this.setShouldRenderTextBuffer(false);
+    this.textBuffer.setText(this._content);
+    this._shownVersion = -1;
+    this.setRenderedLineSources(undefined);
+    this.updateTextInfo();
+  }
+  checkPainted = () => {
+    const stale = !this.isDestroyed && this._shownVersion >= 0 && this._shownVersion !== this._version;
+    if (stale && this._ctx.nativeScene.painted(this))
+      return;
+    this._checkPainted = false;
+    this._ctx.nativeScene.lifecyclePasses.refresh(this);
+    if (!stale)
+      return;
+    this.showPlainText();
+    if (this._highlightsDirty && !this._highlightLoopActive && this.belowView())
+      this.scheduleHighlights();
+  };
+  belowView() {
+    let box;
+    for (let node = this;node; node = node.parent) {
+      if (!node.visible)
+        return false;
+      if (!box && node instanceof ScrollBoxRenderable2)
+        box = node;
+    }
+    return !!box && this.y >= box.viewport.y;
+  }
+  _needsLifecyclePass() {
+    if (this.onLifecyclePass !== this.checkPainted)
+      return super._needsLifecyclePass();
+    return this._checkPainted;
+  }
+  changeStyle() {
+    if (this._shownVersion < 0 || this._shownVersion !== this._version || this.isDestroyed)
+      return this.invalidateHighlights();
+    this._shownVersion = ++this._version;
+    this.setHighlightsDirty(true);
   }
   setHighlightsDirty(value) {
     if (this._highlightsDirty === value)
@@ -14780,27 +14540,30 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   set content(value) {
     if (this._content === value)
       return;
-    this.runMutation(() => {
-      if (this._hadInitialContent && this._shouldRenderTextBuffer && this._filetype && !this._drawUnstyledText) {
-        this._content = value;
-        this.invalidateHighlights();
-        this.requestRender();
-        return;
-      }
-      if (value && this._initialStyledText && this._drawUnstyledText) {
-        this.textBuffer.setStyledText(this._initialStyledText);
-      } else {
-        this.textBuffer.setText(value);
-      }
-      this._content = value;
+    this.runMutation(() => this.writeContent(value));
+  }
+  writeContent(value) {
+    this._content = value;
+    if (this._streaming && this._shouldRenderTextBuffer && this._shownVersion >= 0 && !this._drawUnstyledText) {
       this.invalidateHighlights();
-      this.setRenderedLineSources(undefined);
-      this.updateTextInfo();
-    });
+      this.requestRender();
+      return;
+    }
+    if (value && this._initialStyledText && this._drawUnstyledText) {
+      this.textBuffer.setStyledText(this._initialStyledText);
+      this._shownVersion = PREVIEW;
+    } else {
+      this.textBuffer.setText(value);
+      this._shownVersion = -1;
+    }
+    this.invalidateHighlights();
+    this.setRenderedLineSources(undefined);
+    this.updateTextInfo();
   }
   updateStreamingPreview(content, initialStyledText) {
     this._content = content;
     this._initialStyledText = initialStyledText;
+    this._shownVersion = PREVIEW;
     this.invalidateHighlights();
     this.textBuffer.setStyledText(initialStyledText);
     this.setRenderedLineSources(undefined);
@@ -14859,7 +14622,7 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   set syntaxStyle(value) {
     if (this._syntaxStyle !== value) {
       this._syntaxStyle = value;
-      this.invalidateHighlights();
+      this.changeStyle();
     }
   }
   get conceal() {
@@ -14868,7 +14631,7 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   set conceal(value) {
     if (this._conceal !== value) {
       this._conceal = value;
-      this.invalidateHighlights();
+      this.changeStyle();
     }
   }
   get drawUnstyledText() {
@@ -14877,27 +14640,37 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   set drawUnstyledText(value) {
     if (this._drawUnstyledText !== value) {
       this._drawUnstyledText = value;
-      this.invalidateHighlights();
+      this.invalidateHighlights(false);
     }
   }
   get streaming() {
     return this._streaming;
   }
   set initialStyledText(value) {
-    if (this._initialStyledText !== value) {
-      if (value && this._streaming && this._drawUnstyledText && this._isHighlighting) {
-        this.updateStreamingPreview(this._content, value);
-        return;
-      }
-      this._initialStyledText = value;
-      this.invalidateHighlights();
-    }
+    if (this._initialStyledText === value)
+      return;
+    this._initialStyledText = value;
+    const shows = value && this._drawUnstyledText;
+    const replaces = shows && this._streaming && this._isHighlighting;
+    const previewed = this._shownVersion === PREVIEW;
+    if (!this._content || !(this._shownVersion < 0 || replaces) || !value && previewed)
+      return;
+    this.runMutation(() => {
+      if (shows)
+        this.textBuffer.setStyledText(value);
+      else
+        this.textBuffer.setText(this._content);
+      if (!shows && previewed && !this._drawUnstyledText && this._filetype)
+        this.setShouldRenderTextBuffer(false);
+      this._shownVersion = shows ? PREVIEW : -1;
+      this.setRenderedLineSources(undefined);
+      this.updateTextInfo();
+    });
   }
   set streaming(value) {
     if (this._streaming !== value) {
       this._streaming = value;
-      this._hadInitialContent = false;
-      this.invalidateHighlights();
+      this.invalidateHighlights(false);
     }
   }
   get treeSitterClient() {
@@ -14918,13 +14691,13 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   set baseHighlight(value) {
     if (this._baseHighlight !== value) {
       this._baseHighlight = value;
-      this.invalidateHighlights();
+      this.changeStyle();
     }
   }
   set onHighlight(value) {
     if (this._onHighlight !== value) {
       this._onHighlight = value;
-      this.invalidateHighlights();
+      this.changeStyle();
     }
   }
   get onChunks() {
@@ -14933,7 +14706,7 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   set onChunks(value) {
     if (this._onChunks !== value) {
       this._onChunks = value;
-      this.invalidateHighlights();
+      this.changeStyle();
     }
   }
   get isHighlighting() {
@@ -14949,42 +14722,52 @@ class CodeRenderable2 extends TextBufferRenderable2 {
     return modified ?? chunks;
   }
   ensureVisibleTextBeforeHighlight() {
-    const content = this._content;
-    const isInitialContent = this._streaming && !this._hadInitialContent;
-    const shouldDrawUnstyledNow = this._streaming ? isInitialContent && this._drawUnstyledText : this._drawUnstyledText;
-    if (this._streaming && !isInitialContent) {
-      if (this._drawUnstyledText)
-        this.setShouldRenderTextBuffer(true);
-    } else if (shouldDrawUnstyledNow) {
-      if (this._initialStyledText) {
-        this.textBuffer.setStyledText(this._initialStyledText);
-      } else {
-        this.textBuffer.setText(content);
-      }
-      this.setRenderedLineSources(undefined);
+    const keeps = this._streaming && this._shouldRenderTextBuffer;
+    if (this._drawUnstyledText) {
+      if (!keeps && this._shownVersion !== this._version) {
+        if (this._initialStyledText) {
+          this.textBuffer.setStyledText(this._initialStyledText);
+        } else {
+          this.textBuffer.setText(this._content);
+        }
+        this._shownVersion = this._initialStyledText ? PREVIEW : -1;
+        this.setRenderedLineSources(undefined);
+      } else if (keeps && this._shownVersion === -1 && this._initialStyledText)
+        this._shownVersion = PREVIEW;
       this.setShouldRenderTextBuffer(true);
     } else {
-      this.setShouldRenderTextBuffer(false);
+      this.paintHighlightsOnly();
     }
+  }
+  paintHighlightsOnly() {
+    if (!this._streaming || !this._shouldRenderTextBuffer || this._shownVersion === -1)
+      this.setShouldRenderTextBuffer(this._shownVersion === this._version);
   }
   async startHighlight() {
     const content = this._content;
     const filetype = this._filetype;
-    const snapshotId = ++this._highlightSnapshotId;
+    const version = this._version;
     if (!filetype)
       return;
-    const isInitialContent = this._streaming && !this._hadInitialContent;
-    if (isInitialContent) {
-      this._hadInitialContent = true;
-    }
     this._isHighlighting = true;
-    try {
-      const result = await this._treeSitterClient.highlightOnce(content, filetype);
-      if (snapshotId !== this._highlightSnapshotId) {
+    const current = () => {
+      if (version !== this._version)
         this.requestRender();
-        return;
-      }
-      if (this.isDestroyed)
+      return version === this._version && !this.isDestroyed;
+    };
+    const keeps = () => this._initialStyledText && this._drawUnstyledText || this._shownVersion !== -1;
+    try {
+      const result = await this._treeSitterClient.highlightOnce(content, filetype).then((answer) => {
+        if (answer.error)
+          throw new Error(answer.error);
+        return answer;
+      }).catch((error) => {
+        if (!this._onChunks || keeps())
+          throw error;
+        console.warn("Code highlighting failed, rendering without highlights:", error);
+        return { highlights: [] };
+      });
+      if (!current())
         return;
       let highlights = result.highlights ?? [];
       if (this._onHighlight && highlights.length >= 0) {
@@ -14998,11 +14781,7 @@ class CodeRenderable2 extends TextBufferRenderable2 {
           highlights = modified;
         }
       }
-      if (snapshotId !== this._highlightSnapshotId) {
-        this.requestRender();
-        return;
-      }
-      if (this.isDestroyed)
+      if (!current())
         return;
       if (highlights.length > 0 || this._onChunks || this._baseHighlight) {
         const sourceRanges = this._onChunks ? [] : undefined;
@@ -15020,40 +14799,37 @@ class CodeRenderable2 extends TextBufferRenderable2 {
         });
         const renderedLineSources = this._onChunks ? undefined : this.getConcealLinesSourceMap(content, highlights);
         chunks = await this.transformChunks(chunks, context);
-        if (snapshotId !== this._highlightSnapshotId) {
-          this.requestRender();
+        if (!current())
           return;
-        }
-        if (this.isDestroyed)
-          return;
-        const styledText = new StyledText2(chunks);
-        this.textBuffer.setStyledText(styledText);
-        this.setRenderedLineSources(renderedLineSources);
+        this.settle(version, new StyledText2(chunks), renderedLineSources);
       } else {
-        this.textBuffer.setText(content);
-        this.setRenderedLineSources(undefined);
+        this.settle(version, undefined, undefined);
       }
-      this.setShouldRenderTextBuffer(true);
-      this._isHighlighting = false;
-      this.setHighlightsDirty(false);
-      this.updateTextInfo();
-      this.requestRender();
     } catch (error) {
-      if (snapshotId !== this._highlightSnapshotId) {
+      if (version !== this._version) {
         this.requestRender();
         return;
       }
       console.warn("Code highlighting failed, falling back to plain text:", error);
       if (this.isDestroyed)
         return;
-      this.textBuffer.setText(content);
-      this.setRenderedLineSources(undefined);
-      this.setShouldRenderTextBuffer(true);
-      this._isHighlighting = false;
-      this.setHighlightsDirty(false);
-      this.updateTextInfo();
-      this.requestRender();
+      this.settle(-1, undefined, undefined, !!this._onChunks);
     }
+  }
+  settle(version, text, lineSources, keep = false) {
+    if (!keep) {
+      if (text)
+        this.textBuffer.setStyledText(text);
+      else
+        this.textBuffer.setText(this._content);
+      this.setRenderedLineSources(lineSources);
+      this._shownVersion = version;
+      this.setShouldRenderTextBuffer(true);
+    } else if (this._shouldRenderTextBuffer)
+      this._shownVersion = PREVIEW;
+    this._isHighlighting = false;
+    this.setHighlightsDirty(false);
+    this.updateTextInfo();
   }
   async runHighlights() {
     try {
@@ -15068,7 +14844,6 @@ class CodeRenderable2 extends TextBufferRenderable2 {
     }
   }
   clearPendingHighlight() {
-    this._highlightSnapshotId++;
     this._isHighlighting = false;
     this._highlightRerun = false;
     this._highlightingPromise = Promise.resolve();
@@ -15177,11 +14952,10 @@ class CodeRenderable2 extends TextBufferRenderable2 {
       this.setShouldRenderTextBuffer(hasContent);
       this.setHighlightsDirty(false);
       this.clearPendingHighlight();
-      if (hasContent) {
-        this.textBuffer.setText(this._content);
-        this.setRenderedLineSources(undefined);
-        this.updateTextInfo();
-      }
+      this.textBuffer.setText(this._content);
+      this._shownVersion = -1;
+      this.setRenderedLineSources(undefined);
+      this.updateTextInfo();
       return;
     }
     this.ensureVisibleTextBeforeHighlight();
@@ -15329,25 +15103,28 @@ class ImageError2 extends Error {
   }
 }
 var FILTER_IDS = {
-  default: 0,
-  area: 1,
-  triangle: 2,
-  "cubic-bspline": 3,
-  "catmull-rom": 4,
-  mitchell: 5,
-  nearest: 6
+  default: nativeConstants.OT_IMAGE_FILTER_DEFAULT,
+  area: nativeConstants.OT_IMAGE_FILTER_AREA,
+  triangle: nativeConstants.OT_IMAGE_FILTER_TRIANGLE,
+  "cubic-bspline": nativeConstants.OT_IMAGE_FILTER_CUBIC_BSPLINE,
+  "catmull-rom": nativeConstants.OT_IMAGE_FILTER_CATMULL_ROM,
+  mitchell: nativeConstants.OT_IMAGE_FILTER_MITCHELL,
+  nearest: nativeConstants.OT_IMAGE_FILTER_NEAREST
 };
 var BLEND_IDS = {
-  "source-over": 0,
-  source: 1,
-  "destination-over": 2
+  "source-over": nativeConstants.OT_IMAGE_BLEND_SOURCE_OVER,
+  source: nativeConstants.OT_IMAGE_BLEND_SOURCE,
+  "destination-over": nativeConstants.OT_IMAGE_BLEND_DESTINATION_OVER
 };
 var PIXEL_FORMAT_BGRA = {
   rgba8: false,
   bgra8: true
 };
-var PIXEL_ALPHA_IDS = { straight: 0, opaque: 1 };
-var MAX_ENCODED_BYTES = 64 * 1024 * 1024;
+var PIXEL_ALPHA_IDS = {
+  straight: nativeConstants.OT_IMAGE_ALPHA_STRAIGHT,
+  opaque: nativeConstants.OT_IMAGE_ALPHA_OPAQUE
+};
+var MAX_ENCODED_BYTES = nativeConstants.OT_IMAGE_ENCODED_BYTES_MAX;
 function imageError(status) {
   return new ImageError2(status);
 }
@@ -17750,6 +17527,14 @@ class NativeScene {
     this.flushStaged();
     return this.driver.renderLib.sceneHasMeasure(this.driver.context, node._getSceneHandle(this));
   }
+  reachesHooks(node) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneReachesHooks(this.driver.context, node._getSceneHandle(this));
+  }
+  painted(node) {
+    this.flushStaged();
+    return this.driver.renderLib.scenePainted(this.driver.context, node._getSceneHandle(this));
+  }
   markDirty(node) {
     this.flushStaged();
     this.driver.renderLib.sceneMarkDirty(this.driver.context, node._getSceneHandle(this));
@@ -17806,6 +17591,13 @@ class NativeScene {
     } else {
       this.driver.renderLib.sceneSetStyledText(this.driver.context, node, content);
     }
+  }
+  textNode(renderable) {
+    this.flushStaged();
+    return renderable._getSceneHandle(this);
+  }
+  textByteAt(renderable, x, y) {
+    return this.driver.renderLib.sceneGetTextByteAt(this.driver.context, this.textNode(renderable), x, y);
   }
   setTextOptions(renderable, options) {
     this.flushStaged();
@@ -18084,9 +17876,9 @@ class NativeScene {
     if (frame)
       this.cancelAttempt(frame);
   }
-  hitTest(x, y) {
+  hitTest(x, y, excluded = 0) {
     this.assertAlive();
-    const id = this.driver.renderLib.sceneHitTest(this.driver.context, this.driver.session, x, y);
+    const id = this.driver.renderLib.sceneHitTest(this.driver.context, this.driver.session, x, y, excluded);
     const renderable = this.nodes.get(id);
     return renderable && !renderable.isDestroyed ? id : 0;
   }
@@ -18121,7 +17913,7 @@ function sameHandle(left, right) {
 }
 
 // src/console.ts
-import { EventEmitter as EventEmitter7 } from "events";
+import { EventEmitter as EventEmitter8 } from "events";
 import { Console } from "console";
 import fs from "fs";
 import path3 from "path";
@@ -18129,9 +17921,9 @@ import util2 from "util";
 
 // src/lib/output.capture.ts
 import { Writable as Writable2 } from "stream";
-import { EventEmitter as EventEmitter6 } from "events";
+import { EventEmitter as EventEmitter7 } from "events";
 
-class Capture extends EventEmitter6 {
+class Capture extends EventEmitter7 {
   output = [];
   constructor() {
     super();
@@ -18328,7 +18120,7 @@ registerEnvVar2({
   default: false
 });
 
-class TerminalConsoleCache extends EventEmitter7 {
+class TerminalConsoleCache extends EventEmitter8 {
   _cachedLogs = [];
   MAX_CACHE_SIZE = 1000;
   _collectCallerInfo = false;
@@ -18496,7 +18288,7 @@ function wrapDisplayCells(text, firstCells, restCells) {
   return segments;
 }
 
-class TerminalConsole2 extends EventEmitter7 {
+class TerminalConsole2 extends EventEmitter8 {
   isVisible = false;
   isFocused = false;
   renderer;
@@ -19268,7 +19060,7 @@ class TerminalConsole2 extends EventEmitter7 {
 }
 
 // src/renderer.ts
-import { EventEmitter as EventEmitter8 } from "events";
+import { EventEmitter as EventEmitter9 } from "events";
 
 // src/lib/objects-in-viewport.ts
 function getObjectsInViewport(viewport, objects, direction = "column", padding = 10, minTriggerSize = 16) {
@@ -19553,9 +19345,17 @@ class EditBufferRenderable2 extends Renderable2 {
     return this.editorView.isDestroyed ? emptyVisualCursor.offset : this.editBuffer.getCursorPosition().offset;
   }
   set cursorOffset(offset) {
-    this.clearSelection();
+    const direction = Math.sign((offset ?? 0) - this.cursorOffset);
+    this.resetSelection();
     this.editorView.setCursorByOffset(offset ?? 0);
+    this.editorView._keepCursorOutside(direction);
     this.requestRender();
+  }
+  selectionSide() {
+    const selection = this.lastLocalSelection;
+    if (!selection?.isActive)
+      return;
+    return Math.sign(selection.anchorY - selection.focusY || selection.anchorX - selection.focusX);
   }
   get cursorCharacterOffset() {
     const len = this.plainText.length;
@@ -19674,7 +19474,8 @@ class EditBufferRenderable2 extends Renderable2 {
   get cursorStyle() {
     return { ...this._cursorStyle, color: this._cursorStyle.color ? RGBA2.clone(this._cursorStyle.color) : undefined };
   }
-  set cursorStyle(style) {
+  set cursorStyle(value) {
+    const style = value ?? this._defaultOptions.cursorStyle;
     const newStyle = { ...style, color: style.color ? RGBA2.clone(style.color) : undefined };
     if (this._cursorStyle.style !== newStyle.style || this._cursorStyle.blinking !== newStyle.blinking || this._cursorStyle.cursor !== newStyle.cursor) {
       this.setNativeEditorOptions({
@@ -19734,10 +19535,14 @@ class EditBufferRenderable2 extends Renderable2 {
     if (event.type === "scroll") {
       scrollOnce(event, this, () => {
         const before = this.editorView.getViewport();
+        const direction = wheelDirection(event);
         this.handleScroll(event);
+        this.editorView._keepCursorOutside(direction === "down" || direction === "right" ? 1 : -1);
         const after = this.editorView.getViewport();
         return after.offsetX !== before.offsetX || after.offsetY !== before.offsetY;
       });
+    } else if (event.type === "down") {
+      this.editorView._keepCursorOutside(0);
     }
   }
   handleScroll(event) {
@@ -19795,6 +19600,7 @@ class EditBufferRenderable2 extends Renderable2 {
   }
   onSelectionChanged(selection) {
     const localSelection = convertGlobalToLocalSelection2(selection, Math.trunc(this.x), Math.trunc(this.y));
+    const side = localSelection?.isActive ? 0 : this.selectionSide();
     this.lastLocalSelection = localSelection;
     const updateCursor = true;
     const followCursor = this._keyboardSelectionActive;
@@ -19841,6 +19647,8 @@ class EditBufferRenderable2 extends Renderable2 {
     if (changed) {
       this.requestRender();
     }
+    if ((!selection?.isDragging || !selection.isStart) && side !== undefined)
+      this.editorView._keepCursorOutside(side);
     return this.hasSelection();
   }
   get _needsAutoScrollUpdate() {
@@ -19880,28 +19688,30 @@ class EditBufferRenderable2 extends Renderable2 {
     this._ctx.clearSelection();
     this.requestRender();
   }
-  setSelection(start, end) {
+  resetSelection() {
     this.lastLocalSelection = null;
     this.editorView.resetLocalSelection();
     this._ctx.clearSelection();
+  }
+  setSelection(start, end) {
+    this.resetSelection();
     this.editorView.setSelection(start, end, this._selectionBg, this._selectionFg);
+    this.editorView._keepCursorOutside(0);
     this.requestRender();
   }
   setSelectionInclusive(start, end) {
-    this.lastLocalSelection = null;
-    this.editorView.resetLocalSelection();
-    this._ctx.clearSelection();
+    this.resetSelection();
     this.editorView.setSelectionInclusive(start, end, this._selectionBg, this._selectionFg);
+    this.editorView._keepCursorOutside(0);
     this.requestRender();
   }
   clearSelection() {
+    const side = this.selectionSide() ?? 0;
     const had = this.hasSelection();
-    this.lastLocalSelection = null;
-    this.editorView.resetLocalSelection();
-    this._ctx.clearSelection();
-    if (had) {
+    this.resetSelection();
+    this.editorView._keepCursorOutside(side);
+    if (had)
       this.requestRender();
-    }
     return had;
   }
   deleteSelection() {
@@ -19971,7 +19781,9 @@ class EditBufferRenderable2 extends Renderable2 {
     if (!selection)
       return false;
     this.editBuffer.setCursorByOffset(edge === "start" ? selection.start : selection.end);
-    this.clearSelection();
+    this.resetSelection();
+    this.editorView._keepCursorOutside(edge === "start" ? -1 : 1);
+    this.requestRender();
     return true;
   }
   moveCursorLeft(options) {
@@ -20344,7 +20156,7 @@ function isCapabilityResponse(sequence) {
   if (/\x1bP>\|[\s\S]*?\x1b\\/.test(sequence)) {
     return true;
   }
-  if (/\x1bP(?:1\+r4d73(?:=[^\x1b]*)?|0\+r(?:4d73)?)\x1b\\/i.test(sequence)) {
+  if (/\x1bP(?:1\+r(?:4d73|524742|5463)(?:=[^\x1b]*)?|0\+r(?:4d73|524742|5463)?)\x1b\\/i.test(sequence)) {
     return true;
   }
   if (/\x1b_G[\s\S]*?\x1b\\/.test(sequence)) {
@@ -20385,496 +20197,6 @@ function parsePixelResolution(sequence) {
   return null;
 }
 
-// src/lib/stdin-parser-native.ts
-import { Buffer as Buffer4 } from "buffer";
-var RECORD_CAPACITY = 64;
-var PAYLOAD_CAPACITY = 16 * 1024;
-var RECORD = nativeLayouts.ot_input_event;
-var FIELD = {
-  kind: RECORD.fields.kind.offset,
-  action: RECORD.fields.action.offset,
-  modifiers: RECORD.fields.modifiers.offset,
-  flags: RECORD.fields.flags.offset,
-  code: RECORD.fields.code.offset / 4,
-  baseCode: RECORD.fields.base_code.offset / 4,
-  x: RECORD.fields.x.offset / 2,
-  y: RECORD.fields.y.offset / 2,
-  rawOffset: RECORD.fields.raw_offset.offset / 4,
-  rawLength: RECORD.fields.raw_len.offset / 4,
-  textOffset: RECORD.fields.text_offset.offset / 4,
-  textLength: RECORD.fields.text_len.offset / 4
-};
-var C = nativeConstants;
-var EMPTY = new Uint8Array(0);
-var UTF8 = new TextDecoder;
-var MOUSE_TYPES = {
-  [C.OT_INPUT_MOUSE_DOWN]: "down",
-  [C.OT_INPUT_MOUSE_UP]: "up",
-  [C.OT_INPUT_MOUSE_MOVE]: "move",
-  [C.OT_INPUT_MOUSE_DRAG]: "drag",
-  [C.OT_INPUT_MOUSE_SCROLL]: "scroll"
-};
-var SCROLL_DIRECTIONS = ["up", "down", "left", "right"];
-var NO_EXPECTATIONS = {
-  kittyKeyboardEnabled: false,
-  privateCapabilityRepliesActive: false,
-  pixelResolutionQueryActive: false,
-  explicitWidthCprActive: false,
-  startupCursorCprActive: false,
-  replySentinelActive: false
-};
-var REPLY_PROTOCOLS = {
-  [C.OT_INPUT_REPLY_CSI]: "csi",
-  [C.OT_INPUT_REPLY_SS3]: "unknown",
-  [C.OT_INPUT_REPLY_OSC]: "osc",
-  [C.OT_INPUT_REPLY_DCS]: "dcs",
-  [C.OT_INPUT_REPLY_APC]: "apc"
-};
-var LEGACY_CODE_RE = /^\x1b+(O|\[\[?)(?:(\d+)(?:;\d+)?([~^$])|(?:1;)?\d*([a-zA-Z]))/;
-var LEGACY_SEQUENCE_RE = /^\x1b\x1b?[[O]./s;
-var KEYPAD_TEXT = new Set(Object.values(printableKeypadText));
-function concat(parts) {
-  let length = 0;
-  for (const part of parts)
-    length += part.length;
-  const bytes = new Uint8Array(length);
-  let offset = 0;
-  for (const part of parts) {
-    bytes.set(part, offset);
-    offset += part.length;
-  }
-  return bytes;
-}
-function latin1(bytes) {
-  return Buffer4.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString("latin1");
-}
-function expectationFlags(context) {
-  const cursorPosition = context.explicitWidthCprActive || context.startupCursorCprActive;
-  const replies = context.privateCapabilityRepliesActive || context.pixelResolutionQueryActive || cursorPosition;
-  return (replies ? C.OT_INPUT_EXPECT_REPLIES : 0) | (context.kittyKeyboardEnabled ? C.OT_INPUT_EXPECT_KITTY_KEYBOARD : 0) | (cursorPosition ? C.OT_INPUT_EXPECT_CURSOR_POSITION : 0) | (context.replySentinelActive ? C.OT_INPUT_EXPECT_SENTINEL : 0);
-}
-
-class NativeStdinParser {
-  lib;
-  context;
-  session;
-  ownsContext;
-  records = new Uint8Array(RECORD_CAPACITY * RECORD.size);
-  words = new Uint32Array(this.records.buffer);
-  halves = new Uint16Array(this.records.buffer);
-  payload = new Uint8Array(PAYLOAD_CAPACITY);
-  events = [];
-  clock;
-  armTimeouts;
-  onTimeoutFlush;
-  protocolContext;
-  appliedExpectations = 0;
-  timeoutId = null;
-  deadlineNs = null;
-  lastNs = 0n;
-  paste = null;
-  suspended = false;
-  sessionGone = false;
-  destroyed = false;
-  constructor(options = {}) {
-    this.clock = options.clock ?? new SystemClock2;
-    this.armTimeouts = options.armTimeouts ?? true;
-    this.onTimeoutFlush = options.onTimeoutFlush ?? null;
-    this.protocolContext = { ...NO_EXPECTATIONS, ...options.protocolContext };
-    if (options.session) {
-      this.lib = options.session.lib;
-      this.context = options.session.context;
-      this.session = options.session.session;
-      this.ownsContext = false;
-    } else {
-      this.lib = resolveRenderLib2();
-      this.context = this.lib.createContext({ objectCapacity: 4, renderCellsMax: 1 });
-      try {
-        this.session = this.lib.createSession(this.context, { chunkSize: 4096, spanCapacity: 2, maxBytes: 8192n });
-      } catch (error) {
-        this.destroyContext();
-        throw error;
-      }
-      this.ownsContext = true;
-    }
-    try {
-      this.applyExpectations();
-    } catch (error) {
-      if (this.ownsContext)
-        this.destroyContext();
-      throw error;
-    }
-  }
-  updateProtocolContext(patch) {
-    this.ensureAlive();
-    this.protocolContext = { ...this.protocolContext, ...patch };
-    this.native(() => {
-      this.applyExpectations();
-      this.feed(EMPTY, this.nowNs());
-    });
-    this.reconcileTimeout(this.events.length > 0);
-  }
-  get pasting() {
-    return this.paste !== null;
-  }
-  push(data) {
-    this.ensureAlive();
-    this.native(() => this.feed(data, this.nowNs()));
-    this.reconcileTimeout();
-  }
-  read() {
-    this.ensureAlive();
-    return this.events.shift() ?? null;
-  }
-  drain(onEvent) {
-    this.ensureAlive();
-    while (!this.destroyed) {
-      const event = this.events.shift();
-      if (!event)
-        return;
-      onEvent(event);
-    }
-  }
-  flushTimeout(nowMsValue = this.clock.now()) {
-    this.ensureAlive();
-    this.native(() => this.feed(EMPTY, this.toNs(nowMsValue)));
-    this.reconcileTimeout();
-  }
-  suspend() {
-    this.ensureAlive();
-    this.suspended = true;
-    this.clearTimeout();
-  }
-  resume() {
-    this.ensureAlive();
-    this.suspended = false;
-    this.native(() => this.lib.sessionInputReset(this.context, this.session, C.OT_INPUT_RESET_KEEP_REPLY));
-    this.paste = null;
-    this.deadlineNs = null;
-  }
-  reset() {
-    if (this.destroyed)
-      return;
-    this.clearTimeout();
-    this.native(() => this.lib.sessionInputReset(this.context, this.session, 0));
-    this.events.length = 0;
-    this.paste = null;
-    this.deadlineNs = null;
-  }
-  destroy() {
-    if (this.destroyed)
-      return;
-    this.clearTimeout();
-    this.destroyed = true;
-    this.events.length = 0;
-    this.paste = null;
-    if (this.ownsContext)
-      this.destroyContext();
-  }
-  ensureAlive() {
-    if (this.destroyed)
-      throw new Error("StdinParser has been destroyed");
-  }
-  native(call) {
-    if (this.sessionGone)
-      return;
-    try {
-      call();
-    } catch (error) {
-      if (!(error instanceof NativeError2) || error.status !== -12 /* SessionClosed */ && error.status !== -15 /* OutputFailed */ && error.status !== -9 /* StaleHandle */ && error.status !== -7 /* WrongContext */) {
-        throw error;
-      }
-      this.sessionGone = true;
-      this.deadlineNs = null;
-      this.paste = null;
-      this.clearTimeout();
-    }
-  }
-  destroyContext() {
-    this.lib.getYogaHost().runMutation(() => this.lib.destroyContext(this.context));
-  }
-  applyExpectations() {
-    const flags = expectationFlags(this.protocolContext);
-    if (flags === this.appliedExpectations)
-      return;
-    this.lib.sessionInputExpect(this.context, this.session, flags);
-    this.appliedExpectations = flags;
-  }
-  toNs(ms) {
-    const ns = BigInt(Math.max(0, Math.round(ms * 1e6)));
-    return ns > this.lastNs ? ns : this.lastNs;
-  }
-  nowNs() {
-    return this.suspended ? this.lastNs : this.toNs(this.clock.now());
-  }
-  feed(bytes, nowNs) {
-    this.lastNs = nowNs;
-    let offset = 0;
-    do {
-      const rest = offset === 0 ? bytes : bytes.subarray(offset);
-      const drain = this.lib.sessionInputFeed(this.context, this.session, rest, nowNs, this.records, this.payload);
-      this.deadlineNs = drain.deadlineNs;
-      for (let index = 0;index < drain.count; index++)
-        this.translate(index);
-      if (drain.consumed === 0 && drain.count === 0 && offset < bytes.length) {
-        throw new Error("native input parser made no progress");
-      }
-      offset += drain.consumed;
-    } while (offset < bytes.length);
-  }
-  reconcileTimeout(flushNow = false) {
-    if (!this.armTimeouts)
-      return;
-    this.clearTimeout();
-    const deadline = flushNow ? null : this.deadlineNs;
-    if (deadline === null && !flushNow || this.suspended || this.sessionGone)
-      return;
-    const delayMs = deadline === null ? 0 : Number((deadline - this.lastNs + 999999n) / 1000000n);
-    this.timeoutId = this.clock.setTimeout(() => {
-      this.timeoutId = null;
-      if (this.destroyed)
-        return;
-      try {
-        const now = this.nowNs();
-        this.native(() => this.feed(EMPTY, deadline !== null && now < deadline ? deadline : now));
-        this.reconcileTimeout();
-        this.onTimeoutFlush?.();
-      } catch (error) {
-        console.error("stdin parser timeout flush failed", error);
-      }
-    }, delayMs);
-  }
-  clearTimeout() {
-    if (this.timeoutId === null)
-      return;
-    this.clock.clearTimeout(this.timeoutId);
-    this.timeoutId = null;
-  }
-  span(offset, length) {
-    return this.payload.subarray(offset, offset + length);
-  }
-  translate(index) {
-    const base = index * RECORD.size;
-    const word = base / 4;
-    const half = base / 2;
-    const kind = this.records[base + FIELD.kind];
-    const action = this.records[base + FIELD.action];
-    const modifiers = this.records[base + FIELD.modifiers];
-    const flags = this.records[base + FIELD.flags];
-    const code = this.words[word + FIELD.code];
-    const raw = this.span(this.words[word + FIELD.rawOffset], this.words[word + FIELD.rawLength]);
-    const text = this.span(this.words[word + FIELD.textOffset], this.words[word + FIELD.textLength]);
-    switch (kind) {
-      case C.OT_INPUT_KEY: {
-        const key = parsedKey(code, this.words[word + FIELD.baseCode], action, modifiers, flags, raw, text);
-        this.events.push({ type: "key", raw: key.raw, key });
-        return;
-      }
-      case C.OT_INPUT_MOUSE: {
-        const sequence = latin1(raw);
-        const encoding = raw[2] === 60 ? "sgr" : "x10";
-        const event = rawMouseEvent(action, code, this.halves[half + FIELD.x], this.halves[half + FIELD.y], modifiers, encoding);
-        this.events.push({ type: "mouse", raw: sequence, encoding, event });
-        return;
-      }
-      case C.OT_INPUT_PASTE: {
-        if (flags & C.OT_INPUT_PASTE_START)
-          this.paste = [];
-        if (text.length > 0)
-          this.paste.push(Uint8Array.from(text));
-        if (flags & C.OT_INPUT_PASTE_END) {
-          const parts = this.paste;
-          this.paste = null;
-          this.events.push({ type: "paste", bytes: parts.length === 1 ? parts[0] : concat(parts) });
-        }
-        return;
-      }
-      case C.OT_INPUT_FOCUS:
-        this.events.push({ type: "response", protocol: "csi", sequence: latin1(raw) });
-        return;
-      case C.OT_INPUT_REPLY: {
-        const protocol = flags & C.OT_INPUT_REPLY_CURSOR_POSITION ? "cpr" : flags & C.OT_INPUT_REPLY_FRAGMENT ? "unknown" : REPLY_PROTOCOLS[code];
-        this.events.push({ type: "response", protocol, sequence: latin1(raw) });
-        return;
-      }
-    }
-    throw new Error(`Unknown native input event kind: ${kind}`);
-  }
-}
-function keyRaw(raw) {
-  if (raw.length === 1 && raw[0] >= 128)
-    return "\x1B" + String.fromCharCode(raw[0] & 127);
-  return UTF8.decode(raw);
-}
-function compatCode(raw, code, kitty) {
-  if (kitty) {
-    if (!raw.endsWith("u") || kittyKeyMap[code] === undefined)
-      return;
-    return `[${/^\x1b+\[(\d+)/.exec(raw)[1]}u`;
-  }
-  if (kittyKeyMap[code] === undefined && !KEYPAD_TEXT.has(String.fromCodePoint(code)))
-    return;
-  const match = LEGACY_CODE_RE.exec(raw);
-  return match ? [match[1], match[2], match[3], match[4]].filter(Boolean).join("") : undefined;
-}
-function parsedKey(code, baseCode, action, modifiers, flags, rawBytes, textBytes) {
-  const kitty = (flags & C.OT_INPUT_KEY_KITTY) !== 0;
-  const raw = keyRaw(rawBytes);
-  const text = textBytes.length === 0 ? "" : UTF8.decode(textBytes);
-  const alt = (modifiers & C.OT_INPUT_MOD_ALT) !== 0;
-  const sequence = kitty || LEGACY_SEQUENCE_RE.test(raw);
-  let shift = (modifiers & C.OT_INPUT_MOD_SHIFT) !== 0;
-  let name;
-  if (code === 0) {
-    name = text;
-  } else if (kittyKeyMap[code] !== undefined) {
-    name = code === C.OT_INPUT_KEY_ENTER && !kitty && raw.endsWith(`
-`) ? "linefeed" : kittyKeyMap[code];
-  } else if (code === 32) {
-    name = "space";
-  } else {
-    name = String.fromCodePoint(code);
-    if (!sequence && code >= 65 && code <= 90) {
-      shift = true;
-      if (!alt)
-        name = name.toLowerCase();
-    }
-  }
-  const key = {
-    name,
-    ctrl: (modifiers & C.OT_INPUT_MOD_CTRL) !== 0,
-    meta: alt || (modifiers & C.OT_INPUT_MOD_META) !== 0,
-    shift,
-    option: alt && sequence,
-    sequence: text || raw,
-    number: /^[0-9]$/.test(name),
-    raw,
-    eventType: action === C.OT_INPUT_KEY_RELEASE ? "release" : "press",
-    source: kitty ? "kitty" : "raw",
-    super: (modifiers & C.OT_INPUT_MOD_SUPER) !== 0,
-    hyper: (modifiers & C.OT_INPUT_MOD_HYPER) !== 0,
-    capsLock: (modifiers & C.OT_INPUT_MOD_CAPS_LOCK) !== 0,
-    numLock: (modifiers & C.OT_INPUT_MOD_NUM_LOCK) !== 0
-  };
-  if (action === C.OT_INPUT_KEY_REPEAT)
-    key.repeated = true;
-  if (baseCode !== 0)
-    key.baseCode = baseCode;
-  const legacy = compatCode(raw, code, kitty);
-  if (legacy !== undefined)
-    key.code = legacy;
-  return key;
-}
-function rawMouseEvent(action, code, x, y, modifiers, encoding) {
-  const type = MOUSE_TYPES[action];
-  if (!type)
-    throw new Error(`Unknown native mouse action: ${action}`);
-  let button = code;
-  if (code === C.OT_INPUT_MOUSE_BUTTON_NONE)
-    button = encoding === "x10" ? -1 : 0;
-  if (type === "scroll")
-    button = encoding === "x10" || code === 3 ? 0 : code;
-  const event = {
-    type,
-    button,
-    x,
-    y,
-    modifiers: {
-      shift: (modifiers & C.OT_INPUT_MOD_SHIFT) !== 0,
-      alt: (modifiers & C.OT_INPUT_MOD_ALT) !== 0,
-      ctrl: (modifiers & C.OT_INPUT_MOD_CTRL) !== 0
-    }
-  };
-  if (type === "scroll")
-    event.scroll = { direction: SCROLL_DIRECTIONS[code & 3], delta: 1 };
-  return event;
-}
-var SHADOW_BACKLOG_MAX = 256;
-var SHADOW_WINDOW = 8;
-function describeEvent(event) {
-  switch (event.type) {
-    case "key": {
-      const { name, ctrl, meta, shift, eventType } = event.key;
-      return JSON.stringify(["key", event.raw, name, ctrl, meta, shift, eventType]);
-    }
-    case "mouse": {
-      const { type, button, x, y, modifiers } = event.event;
-      return JSON.stringify(["mouse", event.raw, type, button, x, y, modifiers.shift, modifiers.alt, modifiers.ctrl]);
-    }
-    case "paste":
-      return JSON.stringify(["paste", event.bytes.length, Buffer4.from(event.bytes).toString("base64")]);
-    case "response":
-      return JSON.stringify(["response", event.protocol, event.sequence]);
-  }
-}
-
-class StdinShadowComparator {
-  primaryName;
-  log;
-  delivered = [];
-  shadowed = [];
-  constructor(primaryName, log) {
-    this.primaryName = primaryName;
-    this.log = log;
-  }
-  primary(event) {
-    this.queue(this.delivered, event);
-  }
-  shadow(event) {
-    this.queue(this.shadowed, event);
-  }
-  flush() {
-    this.pair(true);
-  }
-  queue(events, event) {
-    events.push(describeEvent(event));
-    this.pair(false);
-    if (events.length > SHADOW_BACKLOG_MAX) {
-      const dropped = events.shift();
-      if (events === this.delivered)
-        this.report(dropped, "");
-      else
-        this.report("", dropped);
-    }
-  }
-  pair(final) {
-    const { delivered, shadowed } = this;
-    while (delivered.length > 0 && shadowed.length > 0) {
-      const [i, j] = commonEvent(delivered, shadowed) ?? [-1, -1];
-      if (i >= 0) {
-        for (let k = 0;k < Math.max(i, j); k++)
-          this.report(k < i ? delivered[k] : "", k < j ? shadowed[k] : "");
-        delivered.splice(0, i + 1);
-        shadowed.splice(0, j + 1);
-      } else if (final || Math.min(delivered.length, shadowed.length) >= SHADOW_WINDOW) {
-        this.report(delivered.shift(), shadowed.shift());
-      } else
-        return;
-    }
-    if (final) {
-      for (const event of delivered.splice(0))
-        this.report(event, "");
-      for (const event of shadowed.splice(0))
-        this.report("", event);
-    }
-  }
-  report(delivered, shadowed) {
-    const shadowName = this.primaryName === "native" ? "legacy" : "native";
-    this.log(`[stdin-shadow] ${this.primaryName}=${delivered || "none"} ${shadowName}=${shadowed || "none"}`);
-  }
-}
-function commonEvent(a, b) {
-  const aEnd = Math.min(a.length, SHADOW_WINDOW);
-  const bEnd = Math.min(b.length, SHADOW_WINDOW);
-  for (let sum = 0;sum < aEnd + bEnd - 1; sum++) {
-    for (let i = Math.max(0, sum - bEnd + 1);i <= Math.min(sum, aEnd - 1); i++) {
-      if (a[i] === b[sum - i])
-        return [i, sum - i];
-    }
-  }
-  return null;
-}
-
 // src/renderer-theme-mode.ts
 var OSC_THEME_RESPONSE = /\x1b](10|11);(?:(?:rgb:)([0-9a-fA-F]+)\/([0-9a-fA-F]+)\/([0-9a-fA-F]+)|#([0-9a-fA-F]{6}))(?:\x07|\x1b\\)/g;
 function scaleOscThemeComponent(component) {
@@ -20902,6 +20224,7 @@ class RendererThemeMode {
   clock;
   static QUERY_TIMEOUT_MS = 250;
   _themeMode = null;
+  refreshPending = false;
   themeRefreshTimeoutId = null;
   waiters = new Set;
   constructor(host, clock) {
@@ -20932,6 +20255,9 @@ class RendererThemeMode {
   }
   dispose() {
     this.cancelRefresh();
+    this.resolveWaiters();
+  }
+  resolveWaiters() {
     for (const waiter of this.waiters) {
       if (waiter.timeoutHandle !== null) {
         this.clock.clearTimeout(waiter.timeoutHandle);
@@ -20961,6 +20287,7 @@ class RendererThemeMode {
     return { handled, changedMode: this.applyThemeMode(inferThemeModeFromBackgroundColor(background)) };
   }
   cancelRefresh() {
+    this.refreshPending = false;
     if (this.themeRefreshTimeoutId === null) {
       return;
     }
@@ -20968,12 +20295,16 @@ class RendererThemeMode {
     this.themeRefreshTimeoutId = null;
   }
   requestThemeOscColors() {
-    if (this.themeRefreshTimeoutId !== null) {
+    if (this.refreshPending) {
       return;
     }
-    this.host.queryThemeColors();
+    const batched = this.host.queryThemeColors();
+    this.refreshPending = true;
+    if (batched)
+      return;
     this.themeRefreshTimeoutId = this.clock.setTimeout(() => {
       this.themeRefreshTimeoutId = null;
+      this.refreshPending = false;
     }, RendererThemeMode.QUERY_TIMEOUT_MS);
   }
   applyThemeMode(mode) {
@@ -20982,13 +20313,7 @@ class RendererThemeMode {
     if (!changed) {
       return null;
     }
-    for (const waiter of this.waiters) {
-      if (waiter.timeoutHandle !== null) {
-        this.clock.clearTimeout(waiter.timeoutHandle);
-      }
-      waiter.resolve(mode);
-    }
-    this.waiters.clear();
+    this.resolveWaiters();
     return mode;
   }
 }
@@ -21027,18 +20352,6 @@ registerEnvVar2({
 registerEnvVar2({
   name: "OTUI_SHOW_STATS",
   description: "Show the debug overlay at startup.",
-  type: "boolean",
-  default: false
-});
-registerEnvVar2({
-  name: "OTUI_NATIVE_INPUT_PARSER",
-  description: "Parse stdin with the experimental native input parser unless experimental_nativeInput is set.",
-  type: "boolean",
-  default: false
-});
-registerEnvVar2({
-  name: "OTUI_NATIVE_INPUT_SHADOW",
-  description: "Also run the other stdin parser and log one line for each event that differs.",
   type: "boolean",
   default: false
 });
@@ -21225,9 +20538,11 @@ class ExternalOutputQueue {
       throw new RangeError("ExternalOutputQueue.batch requires a limit of at least 1");
     let count = 0;
     let cells = 0;
+    let writers = 0;
     while (count < Math.min(limit, this.commits.length)) {
       cells += this.commits[count].cells;
-      if (cells > this.maxCells)
+      writers += this.commits[count].bytes === 0 ? 1 : 0;
+      if (cells > this.maxCells || writers > 8)
         break;
       count += 1;
     }
@@ -21257,7 +20572,7 @@ class ExternalOutputQueue {
   }
 }
 
-class ScrollbackSnapshotRenderContext extends EventEmitter8 {
+class ScrollbackSnapshotRenderContext extends EventEmitter9 {
   nativeOwner;
   clock;
   width;
@@ -21403,10 +20718,13 @@ var DEFAULT_FORWARDED_ENV_KEYS = [
   "TERM_PROGRAM_VERSION",
   "TERM_FEATURES",
   "VTE_VERSION",
+  "XTERM_VERSION",
+  "KONSOLE_VERSION",
   "FORCE_HYPERLINK",
   "ALACRITTY_SOCKET",
   "ALACRITTY_LOG",
   "COLORTERM",
+  "OPENTUI_FORCE_TRUECOLOR",
   "TERMUX_VERSION",
   "VHS_RECORD",
   "OPENTUI_FORCE_WCWIDTH",
@@ -21420,16 +20738,17 @@ var DEFAULT_FORWARDED_ENV_KEYS = [
   "WSL_DISTRO_NAME",
   "WSL_INTEROP"
 ];
-var KITTY_FLAG_DISAMBIGUATE = 1;
-var KITTY_FLAG_EVENT_TYPES = 2;
-var KITTY_FLAG_ALTERNATE_KEYS = 4;
-var KITTY_FLAG_ALL_KEYS_AS_ESCAPES = 8;
-var KITTY_FLAG_REPORT_TEXT = 16;
-var DEFAULT_STDIN_PARSER_MAX_BUFFER_BYTES = 64 * 1024 * 1024;
+var KITTY_FLAG_DISAMBIGUATE = nativeConstants.OT_KITTY_KEYBOARD_DISAMBIGUATE;
+var KITTY_FLAG_EVENT_TYPES = nativeConstants.OT_KITTY_KEYBOARD_EVENT_TYPES;
+var KITTY_FLAG_ALTERNATE_KEYS = nativeConstants.OT_KITTY_KEYBOARD_ALTERNATE_KEYS;
+var KITTY_FLAG_ALL_KEYS_AS_ESCAPES = nativeConstants.OT_KITTY_KEYBOARD_ALL_KEYS_AS_ESCAPES;
+var KITTY_FLAG_REPORT_TEXT = nativeConstants.OT_KITTY_KEYBOARD_REPORT_TEXT;
+var KITTY_FLAGS_ALL = nativeConstants.OT_KITTY_KEYBOARD_ALL;
 var NATIVE_PALETTE_QUERY_SIZE = 16;
 var REPLY_BACKSTOP_MS = 5000;
 var PIXEL_QUERIES_MAX = 4;
 var DA1_REPLY = /^\x1b\[\?[\d;]*c$/;
+var KITTY_KEYBOARD_REPLY = /^\x1b\[\?\d+u$/;
 function buildKittyKeyboardFlags2(config) {
   if (!config) {
     return 0;
@@ -21556,7 +20875,7 @@ var RendererControlState2;
 var CLICK_REPEAT_INTERVAL_MS = 500;
 var ANIMATION_TIMER_SLACK_MS = 1;
 
-class CliRenderer2 extends EventEmitter8 {
+class CliRenderer2 extends EventEmitter9 {
   static animationFrameId = 0;
   lib;
   nativeScene;
@@ -21618,7 +20937,7 @@ class CliRenderer2 extends EventEmitter8 {
   pixelResolutionRequeryPending = false;
   unansweredPixelQueries = 0;
   replyBatches = [];
-  replySentinel = false;
+  replySentinel = true;
   clock;
   rendering = false;
   renderingCompletion = null;
@@ -21650,7 +20969,6 @@ class CliRenderer2 extends EventEmitter8 {
   _resolution = null;
   _keyHandler;
   stdinParser = null;
-  stdinShadow = null;
   oscSubscribers = new Set;
   hasLoggedStdinParserError = false;
   animationRequest = new Map;
@@ -21674,6 +20992,7 @@ class CliRenderer2 extends EventEmitter8 {
   _previousControlState = "idle" /* IDLE */;
   capturedRenderable;
   pressedRenderable;
+  lastDrag;
   lastOverRenderableNum = 0;
   lastOverRenderable;
   currentSelection = null;
@@ -21682,11 +21001,11 @@ class CliRenderer2 extends EventEmitter8 {
   _splitHeight = 0;
   renderOffset = 0;
   splitTailColumn = 0;
+  parkedSplitScrollback = false;
   queuedSplitTail = null;
   pendingSplitFooterTransition = null;
   forceFullRepaintRequested = false;
-  maxSplitCommitsPerFrame = 8;
-  splitCommitLimit = this.maxSplitCommitsPerFrame;
+  splitCommitLimit = nativeConstants.OT_SPLIT_SNAPSHOTS_MAX;
   droppedFrames = 0;
   dropRetried = false;
   _terminalWidth = 0;
@@ -21726,6 +21045,7 @@ class CliRenderer2 extends EventEmitter8 {
   _nativePaletteSignature = null;
   _emittedPaletteSignature = null;
   _palettePublishGeneration = 0;
+  paletteReplies = null;
   _onDestroy;
   themeModeState;
   _terminalFocusState = null;
@@ -21873,10 +21193,8 @@ Captured external output:
       this.nativeClosed = this.nativeSession.closed.finally(() => this.nativeDestroyWait.promise).finally(() => {
         if (this.nativeSession.error && !this.nativeSession.disposed)
           this.nativeSession.dispose();
-        this.leaveRawMode();
+        this.leaveRawMode(this.flushTerminalInputOnClose);
         this.removeCleanupListener(process, "exit", this.nativeProcessExitHandler);
-        if (this.flushTerminalInputOnClose)
-          this.lib.terminalFlushInput();
         this.releaseStreamLease();
       });
       this.nativeClosed.catch(() => {});
@@ -21918,7 +21236,14 @@ Captured external output:
       this.clock = config.clock ?? new SystemClock2;
       this.themeModeState = new RendererThemeMode({
         queryThemeColors: () => {
-          this.nativeSession.control({ kind: "query-theme-colors" });
+          this.nativeSession.control({ kind: "query-theme-colors", sentinel: this.replySentinel });
+          if (!this.replySentinel)
+            return false;
+          this.admitReplyBatch("theme", () => {
+            this.themeModeState.cancelRefresh();
+            this.themeModeState.resolveWaiters();
+          });
+          return true;
         }
       }, this.clock);
       this.themeModeHandler = (sequence) => {
@@ -21955,7 +21280,6 @@ Captured external output:
       process.on("warning", this.warningHandler);
       process.on("uncaughtException", this.handleError);
       process.on("unhandledRejection", this.handleError);
-      const useKittyForParsing = kittyConfig !== null;
       this._keyHandler = new InternalKeyHandler2;
       this._keyHandler.on("keypress", (event) => {
         if (this.exitOnCtrlC && matchesKeyBinding(event, { name: "c", ctrl: true })) {
@@ -21964,43 +21288,12 @@ Captured external output:
         }
       });
       this.addExitListeners();
-      const stdinParserMaxBufferBytes = config.stdinParserMaxBufferBytes ?? DEFAULT_STDIN_PARSER_MAX_BUFFER_BYTES;
-      const createStdinParser = (native, onTimeoutFlush) => {
-        const protocolContext = {
-          kittyKeyboardEnabled: useKittyForParsing,
-          privateCapabilityRepliesActive: false,
-          pixelResolutionQueryActive: false,
-          explicitWidthCprActive: false,
-          startupCursorCprActive: false
-        };
-        if (native) {
-          return new NativeStdinParser({
-            armTimeouts: true,
-            onTimeoutFlush,
-            protocolContext,
-            clock: this.clock,
-            session: { lib: this.lib, context: this.nativeSession.context, session: this.nativeSession.session }
-          });
-        }
-        return new StdinParser2({
-          timeoutMs: 20,
-          maxPendingBytes: stdinParserMaxBufferBytes,
-          armTimeouts: true,
-          onTimeoutFlush,
-          useKittyKeyboard: useKittyForParsing,
-          protocolContext,
-          clock: this.clock
-        });
-      };
-      const nativeInput = config.experimental_nativeInput ?? env2.OTUI_NATIVE_INPUT_PARSER;
-      this.stdinParser = createStdinParser(nativeInput, () => this.drainStdinParser());
-      this.replySentinel = this.stdinParser instanceof NativeStdinParser;
-      if (env2.OTUI_NATIVE_INPUT_SHADOW) {
-        this.stdinShadow = {
-          parser: createStdinParser(!nativeInput, () => this.drainStdinShadow()),
-          comparator: new StdinShadowComparator(nativeInput ? "native" : "legacy", (line) => console.warn(line))
-        };
-      }
+      this.stdinParser = new NativeStdinParser({
+        armTimeouts: true,
+        onTimeoutFlush: () => this.drainStdinParser(),
+        clock: this.clock,
+        session: { lib: this.lib, context: this.nativeSession.context, session: this.nativeSession.session }
+      });
       this._console = new TerminalConsole2(this, {
         ...config.consoleOptions ?? {},
         clock: this.clock
@@ -22388,7 +21681,12 @@ Captured external output:
       const previousSurfaceTopLine = this.renderOffset + 1;
       const previousSurfaceHeight = this._splitHeight;
       this.clearPendingSplitFooterTransition();
-      this.resetSplitScrollback(this.getSplitCursorSeedRows());
+      if (this.parkedSplitScrollback) {
+        this.parkedSplitScrollback = false;
+        this.forceFullRepaintRequested = true;
+      } else {
+        this.resetSplitScrollback(this.getSplitCursorSeedRows());
+      }
       if (previousMode === "passthrough" && this._terminalIsSetup) {
         const nextSurfaceTopLine = this.renderOffset + 1;
         if (previousSurfaceTopLine !== nextSurfaceTopLine) {
@@ -22497,7 +21795,8 @@ Captured external output:
     if (!Number.isFinite(timeoutMs) || timeoutMs < 0) {
       throw new Error("timeoutMs must be a non-negative finite number");
     }
-    return this.themeModeState.waitForThemeMode(timeoutMs, this._isDestroyed);
+    const answered = this.replySentinel && this._terminalIsSetup && !this.replyBatches.some((batch) => batch.kind === "startup" || batch.kind === "theme");
+    return this.themeModeState.waitForThemeMode(answered ? 0 : timeoutMs, this._isDestroyed);
   }
   getDebugInputs() {
     return [...this._debugInputs];
@@ -22856,7 +22155,7 @@ Captured external output:
     const bytes = this.lib.encoder.encode(ANSI.resetScrollRegion + ANSI.reset + ANSI.home + ANSI.clearScreen + (options.clearSavedLines ? ANSI.clearSavedLines : "") + ANSI.home);
     if (!this.nativeSession.write(bytes))
       throw new NativeError2("Native terminal output", -11 /* OutputBackpressure */);
-    this.abortSplitStartupCursorSeed();
+    this.clearSplitStartupCursorSeed();
     this.clearPendingSplitFooterTransition();
     this.resetSplitScrollback();
     this.pendingNativeReplay = null;
@@ -22957,6 +22256,8 @@ Captured external output:
     let rowStart = 0;
     let line = "";
     let cells = 0;
+    const widthMethod = this.widthMethod;
+    const widths = new Map;
     for (const { segment } of graphemeSegmenter2.segment(text)) {
       if (segment === "\r") {
         rows.length = rowStart;
@@ -22976,7 +22277,7 @@ Captured external output:
       const column = (rows.length === 0 && tailColumn < width ? tailColumn : 0) + cells;
       const tabCells = Math.min(STDOUT_TAB_WIDTH - column % STDOUT_TAB_WIDTH, Math.max(0, width - 1 - column));
       const grapheme = segment === "\t" ? " ".repeat(tabCells) : segment;
-      const graphemeCells = stringWidth(grapheme);
+      const graphemeCells = /[^\x00-\x9f]/.test(grapheme) ? widths.get(grapheme) ?? widths.set(grapheme, measureEditText2(grapheme, { widthMethod })).get(grapheme) : stringWidth(grapheme);
       if (column > 0 && column + graphemeCells > width) {
         const padding = Math.max(0, width - column);
         rows.push({ line: line + " ".repeat(padding), cells: cells + padding, trailingNewline: false, endsRow: true });
@@ -23113,12 +22414,6 @@ Captured external output:
       this.splitStartupSeedTimeoutId = null;
     }
   }
-  abortSplitStartupCursorSeed() {
-    this.clearSplitStartupCursorSeed();
-    for (const parser of this.legacyStdinParsers())
-      parser.abortPendingStartupCursorCpr();
-    this.updateStdinParserProtocolContext({ startupCursorCprActive: false });
-  }
   resetSplitScrollback(seedRows = 0) {
     this.renderOffset = this.lib.sessionSplitControl(this.nativeSession.context, this.nativeSession.session, {
       kind: "reset",
@@ -23165,11 +22460,12 @@ Captured external output:
     const splitActive = this._screenMode === "split-footer" && this._splitHeight > 0;
     if (!splitActive) {
       this.clearPendingSplitFooterTransition();
-      this.resetSplitScrollback();
+      if (!this.parkedSplitScrollback)
+        this.resetSplitScrollback();
       this.setRenderOffset(0);
       return;
     }
-    if (this._externalOutputMode === "capture-stdout") {
+    if (this._externalOutputMode === "capture-stdout" || this.parkedSplitScrollback) {
       this.syncSplitScrollback();
     } else {
       this.clearPendingSplitFooterTransition();
@@ -23205,7 +22501,7 @@ Captured external output:
       throw new Error("Cannot change native scene screen mode during a terminal transition");
     }
     if (this._screenMode === "split-footer" && screenMode !== "split-footer") {
-      this.abortSplitStartupCursorSeed();
+      this.clearSplitStartupCursorSeed();
     }
     if (this.rendering || this._screenMode === "split-footer" && this.externalOutputQueue.size > 0 || this.nativeTerminalTransition) {
       this.pendingNativeMode = { screenMode, footerHeight };
@@ -23226,6 +22522,11 @@ Captured external output:
     const nextUseAlternateScreen = screenMode === "alternate-screen";
     const terminalScreenModeChanged = this._terminalIsSetup && prevUseAlternateScreen !== nextUseAlternateScreen;
     const leavingSplitFooter = prevSplitHeight > 0 && nextSplitHeight === 0;
+    if (prevScreenMode === "split-footer" && prevSplitHeight > 0 && nextUseAlternateScreen) {
+      this.parkedSplitScrollback = this.getSplitOutputOffset(this._terminalHeight) > 0;
+    } else if (screenMode === "main-screen") {
+      this.parkedSplitScrollback = false;
+    }
     const previousSurfaceTopLine = this.renderOffset + 1;
     const shouldDeferSplitFooterResizeTransition = this._terminalIsSetup && prevScreenMode === "split-footer" && screenMode === "split-footer" && this._externalOutputMode === "capture-stdout" && prevSplitHeight > 0 && nextSplitHeight > 0 && !terminalScreenModeChanged;
     const splitStartupSeedBlocksFirstNativeFrame = this.pendingSplitStartupCursorSeed && this.splitStartupSeedTimeoutId !== null;
@@ -23252,7 +22553,7 @@ Captured external output:
       if (prevSplitHeight === 0 && nextSplitHeight > 0) {
         scrollOutput = ANSI.scrollDown(this._terminalHeight - nextSplitHeight);
       } else if (splitViewportScrollLines > 0) {
-        scrollOutput = ANSI.scrollUp(splitViewportScrollLines);
+        scrollOutput = ANSI.scrollIntoHistory(splitViewportScrollLines);
       }
     }
     const clearOutput = terminalWritable && leavingSplitFooter && !terminalScreenModeChanged ? ANSI.moveCursorAndClear(splitTransitionSourceTopLine, 1) : shouldClearSplitSurfaceRowsImmediately ? this.getStaleSplitSurfaceClear(splitTransitionSourceTopLine, splitTransitionSourceHeight, this._externalOutputMode === "capture-stdout" ? splitTransitionTargetTopLine : nextPinnedRenderOffset + 1, nextSplitHeight) : "";
@@ -23347,19 +22648,16 @@ Captured external output:
     }
     this._useMouse = false;
     this.capturedRenderable = undefined;
-    for (const parser of this.legacyStdinParsers())
-      parser.resetMouseState();
   }
-  enableKittyKeyboard(flags = 3) {
+  enableKittyKeyboard(flags = KITTY_FLAG_DISAMBIGUATE | KITTY_FLAG_EVENT_TYPES) {
     if (this.nativeTerminalTransition || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
       throw new Error("Cannot change native scene Kitty modes during a terminal transition or suspension");
     }
-    if (!Number.isInteger(flags) || flags < 0 || flags > 31)
-      throw new RangeError("Native scene Kitty flags must be in 0..31");
+    if (!Number.isInteger(flags) || flags < 0 || flags > KITTY_FLAGS_ALL)
+      throw new RangeError(`Native scene Kitty flags must be in 0..${KITTY_FLAGS_ALL}`);
     if (this._terminalIsSetup)
       this.nativeSession.control({ kind: "kitty-keyboard-flags", flags });
     this.nativeKittyKeyboardFlags = flags;
-    this.updateStdinParserProtocolContext({ kittyKeyboardEnabled: flags !== 0 });
   }
   disableKittyKeyboard() {
     if (this.nativeTerminalTransition || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
@@ -23368,17 +22666,16 @@ Captured external output:
     if (this._terminalIsSetup)
       this.nativeSession.control({ kind: "kitty-keyboard-flags", flags: 0 });
     this.nativeKittyKeyboardFlags = 0;
-    this.updateStdinParserProtocolContext({ kittyKeyboardEnabled: false }, true);
+    this.stdinParser?.flushTimeout();
+    this.drainStdinParser();
   }
   async setupTerminal() {
     if (this._terminalIsSetup)
       return;
     if (this.nativeTerminalTransition)
       return this.nativeTerminalTransition;
-    const startupCursorCprActive = this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout";
-    this.pendingSplitStartupCursorSeed = startupCursorCprActive;
-    this.updateStdinParserProtocolContext({ startupCursorCprActive });
-    const startup = this.admitReplyBatch("startup");
+    this.pendingSplitStartupCursorSeed = this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout";
+    const startup = this.admitReplyBatch("startup", () => this.replySentinel && this.themeModeState.resolveWaiters());
     try {
       await this.trackNativeTerminalTransition(this.nativeSession.setupTerminal({
         useAlternateScreen: this._screenMode === "alternate-screen",
@@ -23398,7 +22695,7 @@ Captured external output:
         this.nativeSession.startKittyFileProbe();
       });
     } catch (error) {
-      this.abortSplitStartupCursorSeed();
+      this.clearSplitStartupCursorSeed();
       this.endReplyBatch(startup);
       throw error;
     }
@@ -23422,7 +22719,6 @@ Captured external output:
         if (!this.pendingSplitStartupCursorSeed) {
           return;
         }
-        this.updateStdinParserProtocolContext({ startupCursorCprActive: false });
         if (this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout") {
           this.requestRender();
         }
@@ -23438,10 +22734,13 @@ Captured external output:
   get startupRepliesPending() {
     return this.replyBatches.some((batch) => batch.kind === "startup");
   }
-  admitReplyBatch(kind) {
-    const batch = { kind, backstop: null, excused: this.replyBatches.some((earlier) => earlier.excused) };
+  admitReplyBatch(kind, end) {
+    const batch = { kind, backstop: null, excused: this.replyBatches.some((earlier) => earlier.excused), end };
     this.replyBatches.push(batch);
     this.syncReplyContext(false);
+    if (kind !== "startup") {
+      this.nativeSession.idle().then(() => this.armReplyBackstop(batch), () => {});
+    }
     return batch;
   }
   armReplyBackstop(batch) {
@@ -23451,8 +22750,11 @@ Captured external output:
       return;
     batch.backstop = this.clock.setTimeout(() => {
       batch.backstop = null;
-      const pasting = this.stdinParser instanceof NativeStdinParser && this.stdinParser.pasting;
-      this.replySentinel &&= batch.excused || pasting;
+      if (this.replySentinel && !batch.excused && !this.stdinParser?.pasting) {
+        this.replySentinel = false;
+        if (this.nativeSession.open)
+          this.nativeSession.control({ kind: "end-reply-sentinel" });
+      }
       this.endReplyBatch(batch);
     }, REPLY_BACKSTOP_MS);
   }
@@ -23471,6 +22773,7 @@ Captured external output:
     } else if (!this.replyBatches.some((other) => other.kind === "pixel")) {
       this.waitingForPixelResolution = false;
     }
+    batch.end?.();
     this.syncReplyContext(true);
   }
   syncReplyContext(drain) {
@@ -23478,7 +22781,6 @@ Captured external output:
     this.updateStdinParserProtocolContext({
       privateCapabilityRepliesActive: startup,
       explicitWidthCprActive: startup,
-      ...startup ? {} : { startupCursorCprActive: false },
       pixelResolutionQueryActive: this.waitingForPixelResolution,
       replySentinelActive: this.replySentinel && this.replyBatches.length > 0
     }, drain);
@@ -23512,12 +22814,6 @@ Captured external output:
     } catch (error) {
       this.handleStdinParserFailure(error);
     }
-    try {
-      this.stdinShadow?.parser.push(data);
-      this.drainStdinShadow();
-    } catch (error) {
-      console.warn("[stdin-shadow] parser failure", error);
-    }
   }).bind(this);
   addInputHandler(handler) {
     this.sequenceHandlers.push(handler);
@@ -23532,13 +22828,8 @@ Captured external output:
     if (!this.stdinParser)
       return;
     this.stdinParser.updateProtocolContext(patch);
-    this.stdinShadow?.parser.updateProtocolContext(patch);
     if (drain)
       this.drainStdinParser();
-    this.drainStdinShadow();
-  }
-  legacyStdinParsers() {
-    return [this.stdinParser, this.stdinShadow?.parser].filter((parser) => parser instanceof StdinParser2);
   }
   subscribeOsc(handler) {
     this.oscSubscribers.add(handler);
@@ -23574,7 +22865,6 @@ Captured external output:
       this.resetSplitScrollback(this.getSplitCursorSeedRows());
       this.clearPendingSplitFooterTransition();
       this.clearSplitStartupCursorSeed();
-      this.updateStdinParserProtocolContext({ startupCursorCprActive: false });
       this.requestRender();
     }
     const consumeStartupCursorReport = hadPendingSplitStartupCursorSeed && hasCursorReport && this.splitStartupSeedTimeoutId !== null;
@@ -23622,14 +22912,7 @@ Captured external output:
   drainStdinParser() {
     if (!this.stdinParser)
       return;
-    this.stdinParser.drain((event) => {
-      this.stdinShadow?.comparator.primary(event);
-      this.handleStdinEvent(event);
-    });
-  }
-  drainStdinShadow() {
-    const shadow = this.stdinShadow;
-    shadow?.parser.drain((event) => shadow.comparator.shadow(event));
+    this.stdinParser.drain((event) => this.handleStdinEvent(event));
   }
   handleStdinEvent(event) {
     if (event.type === "response" && event.sequence.startsWith("\x1B_G")) {
@@ -23654,7 +22937,7 @@ Captured external output:
       return;
     }
     if (this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
-      if (event.type === "response" && isPixelResolutionResponse(event.sequence)) {
+      if (event.type === "response" && (isPixelResolutionResponse(event.sequence) || KITTY_KEYBOARD_REPLY.test(event.sequence))) {
         this.dispatchSequenceHandlers(event.sequence);
       }
       return;
@@ -23675,7 +22958,7 @@ Captured external output:
       case "paste":
         for (const batch of this.replyBatches)
           batch.excused = true;
-        this._keyHandler.processPaste(event.bytes, event.metadata);
+        this._keyHandler.processPaste(event.bytes);
         return;
       case "response":
         if (event.protocol === "osc") {
@@ -23687,6 +22970,8 @@ Captured external output:
           return;
         }
         this.dispatchSequenceHandlers(event.sequence);
+        if (event.protocol === "osc")
+          this.applyPaletteReply(event.sequence);
         return;
     }
   }
@@ -23699,7 +22984,6 @@ Captured external output:
     }
     try {
       this.stdinParser?.reset();
-      this.stdinShadow?.parser.reset();
     } catch (resetError) {
       console.error("stdin parser reset failed after parser error", resetError);
     }
@@ -23774,13 +23058,27 @@ Captured external output:
   processSingleMouseEvent(mouseEvent) {
     const pressed = this.pressedRenderable;
     const left = mouseEvent.button === 0 /* LEFT */;
-    if (left && (mouseEvent.type === "down" || mouseEvent.type === "up"))
+    const press = left && mouseEvent.type === "down";
+    if (press || left && mouseEvent.type === "up")
       this.pressedRenderable = undefined;
     if (this._splitHeight > 0) {
       if (mouseEvent.y < this.renderOffset) {
         return false;
       }
       mouseEvent.y -= this.renderOffset;
+    }
+    if (left && mouseEvent.type === "drag")
+      this.lastDrag = { ...mouseEvent };
+    const lost = press ? this.capturedRenderable : undefined;
+    if (press && this.currentSelection)
+      this.currentSelection.isDragging = false;
+    if (lost) {
+      this.capturedRenderable = undefined;
+      this.sendMouseEvent(lost, new MouseEvent2(lost, { ...this.lastDrag, type: "drag-end" }));
+      this.sendMouseEvent(lost, new MouseEvent2(lost, { ...this.lastDrag, type: "up" }));
+      if (this._isDestroyed)
+        return true;
+      this.requestRender();
     }
     this._latestPointer.x = mouseEvent.x;
     this._latestPointer.y = mouseEvent.y;
@@ -23806,11 +23104,11 @@ Captured external output:
       }
       return true;
     }
-    const maybeRenderableId = this.hitTest(mouseEvent.x, mouseEvent.y);
+    const maybeRenderableId = this.nativeScene.hitTest(mouseEvent.x, mouseEvent.y, this.capturedRenderable?.num ?? 0);
     const sameElement = maybeRenderableId === this.lastOverRenderableNum;
     this.lastOverRenderableNum = maybeRenderableId;
     const maybeRenderable = Renderable2.renderablesByNumber.get(maybeRenderableId);
-    if (mouseEvent.type === "down" && mouseEvent.button === 0 /* LEFT */ && !this.currentSelection?.isDragging && !mouseEvent.modifiers.ctrl) {
+    if (press && !mouseEvent.modifiers.ctrl) {
       const canStartSelection = Boolean(maybeRenderable && maybeRenderable.selectable && !maybeRenderable.isDestroyed && maybeRenderable.shouldStartSelection(mouseEvent.x, mouseEvent.y));
       if (canStartSelection && maybeRenderable) {
         this.startSelection(maybeRenderable, mouseEvent.x, mouseEvent.y, this.nextClickBehavior(maybeRenderable, mouseEvent.x, mouseEvent.y));
@@ -23840,12 +23138,10 @@ Captured external output:
       this.finishSelection();
       return true;
     }
-    if (mouseEvent.type === "down" && mouseEvent.button === 0 /* LEFT */ && this.currentSelection) {
-      if (mouseEvent.modifiers.ctrl) {
-        this.currentSelection.isDragging = true;
-        this.updateSelection(maybeRenderable, mouseEvent.x, mouseEvent.y);
-        return true;
-      }
+    if (press && this.currentSelection && mouseEvent.modifiers.ctrl) {
+      this.currentSelection.isDragging = true;
+      this.updateSelection(maybeRenderable, mouseEvent.x, mouseEvent.y);
+      return true;
     }
     if (!sameElement && (mouseEvent.type === "drag" || mouseEvent.type === "move")) {
       if (this.lastOverRenderable && this.lastOverRenderable !== this.capturedRenderable && !this.lastOverRenderable.isDestroyed) {
@@ -23890,15 +23186,14 @@ Captured external output:
     if (target) {
       if (isLeftDrag)
         this.capturedRenderable = target;
-      else if (left && mouseEvent.type === "down")
+      else if (press)
         this.pressedRenderable = target;
       event = this.dispatchMouseEvent(target, mouseEvent);
     } else {
       this.lastOverRenderable = undefined;
     }
-    if (!event?.defaultPrevented && mouseEvent.type === "down" && mouseEvent.button === 0 /* LEFT */ && this.currentSelection) {
+    if (press && this.currentSelection && !event?.defaultPrevented)
       this.clearSelection();
-    }
     return true;
   }
   recheckHoverState() {
@@ -24049,8 +23344,7 @@ Captured external output:
       this.pixelResolutionRequeryPending = false;
       this.waitingForPixelResolution = true;
       this.unansweredPixelQueries++;
-      const batch = this.admitReplyBatch("pixel");
-      this.nativeSession.idle().then(() => this.armReplyBackstop(batch), () => {});
+      this.admitReplyBatch("pixel");
     } catch (error) {
       if (!(error instanceof NativeError2))
         throw error;
@@ -24094,6 +23388,8 @@ Captured external output:
     }
     const pendingSplitFooterTransition = this.pendingSplitFooterTransition;
     const previousGeometry = calculateRenderGeometry(this._screenMode, this._terminalWidth, this._terminalHeight, this._footerHeight);
+    if (this._screenMode === "alternate-screen")
+      this.parkedSplitScrollback = false;
     const prevWidth = this._terminalWidth;
     const previousTerminalHeight = this._terminalHeight;
     const visiblePreviousSplitHeight = pendingSplitFooterTransition?.sourceHeight ?? previousGeometry.effectiveFooterHeight;
@@ -24121,8 +23417,6 @@ Captured external output:
     this._resolution = null;
     this.lib.sessionSetImageResolution(this.nativeSession.context, this.nativeSession.session, 0, 0, 0, 0);
     this.capturedRenderable = undefined;
-    for (const parser of this.legacyStdinParsers())
-      parser.resetMouseState();
     if (splitFooterActive) {
       this.forceFullRepaintRequested = true;
     }
@@ -24420,6 +23714,8 @@ Captured external output:
       throw new Error("Native scene suspension requires completed terminal setup and no pending transition");
     }
     this.flushStdoutDecoder();
+    const { context, session } = this.nativeSession;
+    const restored = this.lib.sessionGetTerminalState(context, session) === 4 /* Suspended */;
     const flushNativeSplit = this.externalOutputQueue.size > 0 || this.pendingNativeReplay;
     if (flushNativeSplit)
       this.lib.getYogaHost().assertMutable();
@@ -24440,7 +23736,12 @@ Captured external output:
     } else {
       nativeTransition = this.nativeSession.suspend();
     }
-    nativeTransition = this.trackNativeTerminalTransition(nativeTransition);
+    const settled = nativeTransition.finally(() => {
+      this.removeExitListeners();
+      if (!this._isDestroyed && !restored)
+        this.leaveRawMode(true);
+    });
+    nativeTransition = this.trackNativeTerminalTransition(settled);
     if (this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
       this._previousControlState = this._controlState;
       this._suspendedMouseEnabled = this._useMouse;
@@ -24451,23 +23752,16 @@ Captured external output:
     this.halt(false);
     this.clearSplitStartupCursorSeed();
     this.disableMouse();
-    this.removeExitListeners();
     for (const batch of [...this.replyBatches]) {
       if (batch.backstop !== null)
         this.clock.clearTimeout(batch.backstop);
       batch.backstop = null;
       batch.excused = true;
-      if (!this.replySentinel && batch.kind === "startup")
-        this.endReplyBatch(batch);
     }
-    this.updateStdinParserProtocolContext({ startupCursorCprActive: false }, true);
-    this.pauseStdinParsers(false);
+    this.pauseStdinParser(false);
     this.stdin.removeListener("data", this.stdinListener);
     this.stopTerminalKeepAlive();
     this.themeModeState?.cancelRefresh();
-    if (this.stdin.setRawMode) {
-      this.stdin.setRawMode(false);
-    }
     this.stdin.pause();
     return nativeTransition;
   }
@@ -24501,15 +23795,11 @@ Captured external output:
     resumed.catch(() => {});
     return resumed;
   }
-  pauseStdinParsers(resuming) {
-    for (const parser of [this.stdinParser, this.stdinShadow?.parser]) {
-      if (parser instanceof NativeStdinParser)
-        resuming ? parser.resume() : parser.suspend();
-      else if (parser?.hasPendingPixelResolutionResponse())
-        parser.pausePendingTimeout();
-      else
-        parser?.reset();
-    }
+  pauseStdinParser(resuming) {
+    if (resuming)
+      this.stdinParser?.resume();
+    else
+      this.stdinParser?.suspend();
   }
   finishResume() {
     let drained;
@@ -24520,7 +23810,7 @@ Captured external output:
       explicitWidthCprActive: false,
       replySentinelActive: false
     }, true);
-    this.pauseStdinParsers(true);
+    this.pauseStdinParser(true);
     this.stdin.on("data", this.stdinListener);
     this.stdin.resume();
     this.startTerminalKeepAlive();
@@ -24537,8 +23827,6 @@ Captured external output:
     this.syncReplyContext(false);
     if (this.pixelResolutionRequeryPending)
       this.queryPixelResolution();
-    for (const parser of this.legacyStdinParsers())
-      parser.resumePendingTimeout();
     this.applyPendingNativeResize();
     if (this._previousControlState === "auto_started" /* AUTO_STARTED */ || this._previousControlState === "explicit_started" /* EXPLICIT_STARTED */) {
       this.internalStart();
@@ -24707,9 +23995,6 @@ Captured external output:
     }
     this.stdinParser?.destroy();
     this.stdinParser = null;
-    this.stdinShadow?.parser.destroy();
-    this.stdinShadow?.comparator.flush();
-    this.stdinShadow = null;
     this.oscSubscribers.clear();
     try {
       this._console?.destroy();
@@ -24724,7 +24009,7 @@ Captured external output:
     this._externalOutputMode = "passthrough";
     this.pendingExternalOutputMode = null;
     this.stdout.write = this.realStdoutWrite;
-    const discardInput = this._terminalIsSetup && this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */;
+    const discardInput = this._terminalIsSetup && (this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */ || this.nativeTerminalTransition !== null);
     if (discardInput) {
       const bufferedInput = this.stdin.readableLength;
       if (bufferedInput > 0)
@@ -24747,12 +24032,14 @@ Captured external output:
     this.nativeDestroyWait?.resolve();
     this.resolveIdleIfNeeded();
   }
-  leaveRawMode() {
+  leaveRawMode(flushInput = false) {
     try {
       this.stdin.setRawMode?.(false);
     } catch (e) {
       console.error("Error disabling raw mode:", e);
     }
+    if (flushInput && this.stdin === process.stdin)
+      this.lib.terminalFlushInput();
   }
   releaseStreamLease() {
     if (!this._streamLeaseAcquired)
@@ -24852,7 +24139,7 @@ Captured external output:
         this.nativeScene.paint(deltaTime, () => ({
           background: this.backgroundColor,
           useMouse: this._useMouse,
-          excludedHitNum: this.capturedRenderable?.num ?? 0
+          excludedHitNum: 0
         }));
       } catch (error) {
         this.immediateRerenderRequested = requestedBeforeScene;
@@ -25064,7 +24351,7 @@ Captured external output:
     this.externalOutputQueue.drop(commits.length);
     if (this.pendingNativeReplay)
       this.pendingNativeReplay.remaining -= commits.length;
-    this.splitCommitLimit = this.maxSplitCommitsPerFrame;
+    this.splitCommitLimit = nativeConstants.OT_SPLIT_SNAPSHOTS_MAX;
     this.nativeSplitAcceptedCount = 0;
     this.pendingSplitFooterTransition = null;
   }
@@ -25299,10 +24586,17 @@ Captured external output:
     this._paletteCache.set(size, projected);
     return projected;
   }
+  paletteTmux() {
+    const name = this.capabilities?.terminal?.name?.toLowerCase();
+    const version = this.capabilities?.terminal?.version;
+    return {
+      isTmux: Boolean(this.capabilities?.multiplexer === "tmux" || name?.includes("tmux")),
+      isLegacyTmux: Boolean(name?.includes("tmux") && version !== undefined && version.localeCompare("3.6") < 0)
+    };
+  }
   ensurePaletteDetector() {
     if (!this._paletteDetector) {
-      const isTmux = Boolean(this.capabilities?.multiplexer === "tmux" || this.capabilities?.terminal?.name?.toLowerCase()?.includes("tmux"));
-      const isLegacyTmux = this.capabilities?.terminal?.name?.toLowerCase()?.includes("tmux") && this.capabilities?.terminal?.version?.localeCompare("3.6") < 0;
+      const { isTmux, isLegacyTmux } = this.paletteTmux();
       const detector = createTerminalPalette2({
         stdin: this.stdin,
         stdout: this.stdout,
@@ -25324,6 +24618,54 @@ Captured external output:
     }
     return this._paletteDetector;
   }
+  queryPaletteBatch(size, timeoutMs, isTmux, cancelled) {
+    const specials = isTmux ? [10, 11, 12] : [10, 11, 12, 13, 14, 15, 16, 17, 19];
+    const queries = [...Array(size).keys()].map((index) => `\x1B]4;${index};?\x07`).concat(specials.map((osc) => `\x1B]${osc};?\x07`));
+    const replies = { colors: emptyTerminalColors(size), generation: this._palettePublishGeneration, delivered: false };
+    const done = new Promise((resolve) => {
+      this.nativeSession.control({ kind: "palette-query", bytes: Buffer.from(queries.join("")), sentinel: true });
+      this.paletteReplies = replies;
+      const cap = timeoutMs === undefined ? null : this.clock.setTimeout(() => resolve(replies.colors), timeoutMs);
+      cancelled.catch(() => cap !== null && this.clock.clearTimeout(cap));
+      this.admitReplyBatch("palette", () => {
+        if (cap !== null)
+          this.clock.clearTimeout(cap);
+        resolve(replies.colors);
+      }).palette = replies;
+    });
+    return { replies, done };
+  }
+  applyPaletteReply(sequence) {
+    const waiting = this.replyBatches.filter((batch) => !batch.excused);
+    const index = waiting.findIndex((batch) => batch.kind === "palette");
+    const ahead = index < 0 ? waiting : waiting.slice(0, index);
+    if (/^\x1b\]1[01];/.test(sequence) && ahead.some((batch) => batch.kind === "startup" || batch.kind === "theme")) {
+      return;
+    }
+    const replies = index < 0 ? this.paletteReplies : waiting[index].palette;
+    if (!replies)
+      return;
+    if (!replies.delivered) {
+      applyPaletteReplies(replies.colors, sequence);
+      return;
+    }
+    if (replies.generation !== this._palettePublishGeneration)
+      return;
+    const colors = { ...replies.colors, palette: [...replies.colors.palette] };
+    if (!applyPaletteReplies(colors, sequence))
+      return;
+    replies.colors = colors;
+    this.publishPalette(colors);
+    this.requestRender();
+  }
+  publishPalette(colors) {
+    this._paletteCache.clear();
+    if (this.shouldSyncNativePaletteState() && colors.palette.length >= NATIVE_PALETTE_QUERY_SIZE) {
+      this.syncNativePaletteState(colors);
+    }
+    this._paletteCache.set(colors.palette.length, colors);
+    this.emitPaletteChange(colors);
+  }
   syncNativePaletteState(colors) {
     const signature = buildTerminalPaletteSignature2(colors);
     const epoch = this._nativePaletteSignature !== signature ? this._paletteEpoch + 1 >>> 0 : this._paletteEpoch;
@@ -25335,7 +24677,7 @@ Captured external output:
   emitPaletteChange(colors) {
     if (this.listenerCount("palette" /* PALETTE */) === 0)
       return;
-    const signature = buildTerminalPaletteSignature2(colors);
+    const signature = JSON.stringify(colors);
     if (this._emittedPaletteSignature === signature)
       return;
     this._emittedPaletteSignature = signature;
@@ -25429,39 +24771,41 @@ Captured external output:
         return afterWait;
       }
     }
-    const detector = this.ensurePaletteDetector();
+    const { isTmux, isLegacyTmux } = this.paletteTmux();
+    const batched = this.replySentinel && !isLegacyTmux && this.stdin.isTTY && this.stdout.isTTY;
+    const detector = batched ? null : this.ensurePaletteDetector();
+    const release = () => {
+      detector?.cleanup();
+      if (detector && this._paletteDetector === detector)
+        this._paletteDetector = null;
+    };
     const publishGeneration = this._palettePublishGeneration;
     this._paletteDetectionSize = requestedSize;
     this._paletteDetectionGeneration = publishGeneration;
     let cancel = null;
     const cancelled = new Promise((_resolve, reject) => {
       cancel = (reason) => {
-        detector.cleanup();
-        if (this._paletteDetector === detector)
-          this._paletteDetector = null;
+        release();
         reject(reason);
       };
     });
     this._cancelPaletteDetection = cancel;
-    const detection = detector.detect({ ...options, timeout: detectionTimeout });
-    detection.catch(() => detector.cleanup());
+    if (!batched)
+      this.paletteReplies = null;
+    const batch = batched ? this.queryPaletteBatch(requestedSize, detectionTimeout, isTmux, cancelled) : null;
+    const detection = batch?.done ?? detector.detect({ ...options, timeout: detectionTimeout });
+    detection.catch(release);
     const completion = Promise.race([detection, cancelled]).then((result) => {
-      detector.cleanup();
-      if (this._paletteDetector === detector)
-        this._paletteDetector = null;
+      release();
+      if (batch)
+        batch.replies.delivered = true;
       if (this._paletteDetectionPromise === pending) {
         this._paletteDetectionPromise = null;
         this._paletteDetectionSize = 0;
         this._paletteDetectionGeneration = 0;
       }
-      const publish = !this._isDestroyed && this._palettePublishGeneration === publishGeneration;
-      if (publish && this.shouldSyncNativePaletteState() && result.palette.length >= NATIVE_PALETTE_QUERY_SIZE) {
-        this.syncNativePaletteState(result);
-      }
-      if (publish)
-        this._paletteCache.set(result.palette.length, result);
-      if (publish) {
-        this.emitPaletteChange(result);
+      if (!this._isDestroyed && this._palettePublishGeneration === publishGeneration) {
+        this.publishPalette(result);
         if (this.shouldSyncNativePaletteState() && !this._paletteCache.has(NATIVE_PALETTE_QUERY_SIZE)) {
           this.refreshPalette();
         }
@@ -25473,9 +24817,7 @@ Captured external output:
         this._paletteDetectionSize = 0;
         this._paletteDetectionGeneration = 0;
       }
-      detector.cleanup();
-      if (this._paletteDetector === detector)
-        this._paletteDetector = null;
+      release();
       throw error;
     });
     const pending = completion.finally(() => {
@@ -25489,7 +24831,7 @@ Captured external output:
   }
 }
 
-export { isValidBorderStyle2, parseBorderStyle2, BorderChars2, getBorderFromSides2, getBorderSides2, borderCharsToArray2, BorderCharArrays2, KeyEvent2, PasteEvent2, KeyHandler2, InternalKeyHandler2, fonts2, measureText2, getCharacterPositions2, coordinateToCharacterIndex2, renderFontToFrameBuffer2, hastToStyledText2, SystemClock2, nonAlphanumericKeys2, terminalNamedSingleStrokeKeys2, parseKeypress2, LinearScrollAccel2, MacOSScrollAccel2, parseAlign2, parseAlignItems2, parseBoxSizing2, parseDimension2, parseDirection2, parseDisplay2, parseEdge2, parseFlexDirection2, parseGutter2, parseJustify2, parseLogLevel2, parseMeasureMode2, parseOverflow2, parsePositionType2, parseUnit2, parseWrap2, MouseParser2, Selection2, convertGlobalToLocalSelection2, ASCIIFontSelectionHelper2, StdinParser2, treeSitterToTextChunks2, treeSitterToStyledText2, addDefaultParsers2, TreeSitterClient2, DataPathsManager2, getDataPaths2, extensionToFiletype2, basenameToFiletype2, extToFiletype2, pathToFiletype2, infoStringToFiletype2, getTreeSitterClient2, destroyTreeSitterClient2, ExtmarksController2, createExtmarksController2, TerminalPalette2, createTerminalPalette2, normalizeTerminalPalette2, buildTerminalPaletteSignature2, decodePasteBytes2, stripAnsiSequences2, createHostClipboard2, createClipboard2, ClipboardTarget2, createRendererClipboardAdapter2, normalizeMarkdownLinkTarget, detectLinks2, acquireSessionBufferLease2, ResourceContext2, OptimizedBuffer2, h2, isVNode2, maybeMakeRenderable2, wrapWithDelegates2, instantiate2, delegate2, LayoutEvents2, RenderableEvents2, isRenderable2, BaseRenderable2, Renderable2, RootRenderable2, TextBuffer2, TextBufferView2, EditBuffer2, measureEditText2, EditorView2, Timeline2, engine2, getTimelineEngine2, createTimeline2, ANSI, BoxRenderable2, wheelDirection, scrollOnce, TextBufferRenderable2, CodeRenderable2, ImageLoadError2, ImageError2, imageInfo2, NativeImage2, NativeImagePool2, resolveImageRenderProtocol2, checkCrop2, sameCrop2, ImageRenderable2, isTextNodeRenderable2, TextNodeRenderable2, RootTextNodeRenderable2, TextRenderable2, NativeSession2, defaultKeyAliases, mergeKeyAliases, mergeKeyBindings, getKeyBindingAction, buildKeyBindingsMap, capture2, ConsolePosition2, TerminalConsole2, EditBufferRenderableEvents2, isEditBufferRenderable2, EditBufferRenderable2, buildKittyKeyboardFlags2, MouseEvent2, MouseButton2, createCliRenderer2, CliRenderEvents2, RendererControlState2, CliRenderer2 };
+export { isValidBorderStyle2, parseBorderStyle2, BorderChars2, getBorderFromSides2, getBorderSides2, borderCharsToArray2, BorderCharArrays2, KeyEvent2, PasteEvent2, KeyHandler2, InternalKeyHandler2, fonts2, measureText2, getCharacterPositions2, coordinateToCharacterIndex2, renderFontToFrameBuffer2, hastToStyledText2, SystemClock2, kittyKeyMap, terminalNamedSingleStrokeKeys2, parseKeypress2, LinearScrollAccel2, MacOSScrollAccel2, parseAlign2, parseAlignItems2, parseBoxSizing2, parseDimension2, parseDirection2, parseDisplay2, parseEdge2, parseFlexDirection2, parseGutter2, parseJustify2, parseLayoutMode2, parseLogLevel2, parseMeasureMode2, parseOverflow2, parsePositionType2, parseUnit2, parseWrap2, Selection2, convertGlobalToLocalSelection2, ASCIIFontSelectionHelper2, treeSitterToTextChunks2, treeSitterToStyledText2, addDefaultParsers2, TreeSitterClient2, DataPathsManager2, getDataPaths2, extensionToFiletype2, basenameToFiletype2, extToFiletype2, pathToFiletype2, infoStringToFiletype2, getTreeSitterClient2, destroyTreeSitterClient2, ExtmarksController2, createExtmarksController2, TerminalPalette2, createTerminalPalette2, normalizeTerminalPalette2, buildTerminalPaletteSignature2, decodePasteBytes2, stripAnsiSequences2, createHostClipboard2, createClipboard2, ClipboardTarget2, createRendererClipboardAdapter2, detectLinks2, acquireSessionBufferLease2, ResourceContext2, OptimizedBuffer2, LayoutEvents2, RenderableEvents2, isRenderable2, BaseRenderable2, Renderable2, RootRenderable2, TextBuffer2, TextBufferView2, EditBuffer2, measureEditText2, EditorView2, Timeline2, engine2, getTimelineEngine2, createTimeline2, ANSI, BoxRenderable2, TextBufferRenderable2, SliderRenderable2, ScrollBarRenderable2, ArrowRenderable2, scrollUnitSize2, ScrollBoxWrapper2, ScrollBoxViewport2, ScrollBoxContent2, ScrollBoxBar2, ScrollBoxRenderable2, CodeRenderable2, ImageLoadError2, ImageError2, imageInfo2, NativeImage2, NativeImagePool2, resolveImageRenderProtocol2, checkCrop2, sameCrop2, ImageRenderable2, isTextNodeRenderable2, TextNodeRenderable2, RootTextNodeRenderable2, TextRenderable2, NativeSession2, defaultKeyAliases, mergeKeyAliases, mergeKeyBindings, getKeyBindingAction, buildKeyBindingsMap, capture2, ConsolePosition2, TerminalConsole2, EditBufferRenderableEvents2, isEditBufferRenderable2, EditBufferRenderable2, buildKittyKeyboardFlags2, MouseEvent2, MouseButton2, createCliRenderer2, CliRenderEvents2, RendererControlState2, CliRenderer2 };
 
-//# debugId=9450D3A33F80B47264756E2164756E21
-//# sourceMappingURL=chunk-bun-8bzb6mxt.js.map
+//# debugId=C2DA632091DBEF3864756E2164756E21
+//# sourceMappingURL=chunk-bun-rcry6xvz.js.map

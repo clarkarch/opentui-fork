@@ -2,12 +2,12 @@ import type { RenderContext } from "../types.js";
 import { TextareaRenderable, type TextareaOptions, type TextareaAction, type KeyBinding as TextareaKeyBinding } from "./Textarea.js";
 export type InputAction = TextareaAction;
 export type InputKeyBinding = TextareaKeyBinding;
-export interface InputRenderableOptions extends Omit<TextareaOptions, "height" | "minHeight" | "maxHeight" | "initialValue"> {
+export interface InputRenderableOptions extends Omit<TextareaOptions, "height" | "minHeight" | "maxHeight" | "initialValue" | "onSubmit"> {
     /** Initial text value (newlines are stripped) */
     value?: string;
-    /** Minimum number of characters allowed */
+    /** Minimum length in UTF-16 code units required for submit */
     minLength?: number;
-    /** Maximum number of characters allowed */
+    /** Maximum length in UTF-16 code units */
     maxLength?: number;
     /** Placeholder text (Input only supports string, not StyledText) */
     placeholder?: string;

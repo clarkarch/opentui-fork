@@ -89,6 +89,13 @@ export declare class NativeScene {
     hasMeasureFunc(node: {
         _getSceneHandle(owner: NativeScene): SceneNodeHandle;
     }): boolean;
+    reachesHooks(node: {
+        _getSceneHandle(owner: NativeScene): SceneNodeHandle;
+    }): boolean;
+    /** Whether the latest paint list held the node (see `ot_scene_painted`). */
+    painted(node: {
+        _getSceneHandle(owner: NativeScene): SceneNodeHandle;
+    }): boolean;
     markDirty(node: {
         _getSceneHandle(owner: NativeScene): SceneNodeHandle;
     }): void;
@@ -110,6 +117,10 @@ export declare class NativeScene {
     setBoxBorderStyle(renderable: Renderable, style: NativeScenePaint["borderStyle"], sides: number): void;
     /** @internal Native copies bytes and styles before the wrapper publishes caller identity. */
     setText(renderable: Renderable, content: string | StyledText): void;
+    /** @internal A Markdown document binds the text node after its staged writes. */
+    textNode(renderable: Renderable): SceneNodeHandle;
+    /** @internal The byte of the text the latest finished frame drew at a cell, or undefined. */
+    textByteAt(renderable: Renderable, x: number, y: number): number | undefined;
     /** @internal Text options commit together without exposing the node-owned buffer or view. */
     setTextOptions(renderable: Renderable, options: NativeSceneTextOptions): void;
     /** @internal Native owns slider drawing and thumb geometry; the host retains input callbacks. */
@@ -159,7 +170,7 @@ export declare class NativeScene {
      * Native owns callback-time projections and composes accepted ancestor translations. */
     getLayout(node: {
         _getSceneHandle(owner: NativeScene): SceneNodeHandle;
-    }, rawYoga?: boolean | "paint"): NativeSceneLayout;
+    }, rawYoga?: boolean | "paint" | "content"): NativeSceneLayout;
     /** @internal Measure a snapshot using its existing scene root, without preparing a frame. */
     measureSnapshot(root: Renderable): number;
     paint(deltaTime: number, getPaintOptions: PaintOptions): void;
@@ -175,7 +186,7 @@ export declare class NativeScene {
     commitSplit(commits: Parameters<NativeSession["renderSplit"]>[1], pinnedRenderOffset: number, force: boolean): ReturnType<NativeSession["renderSplit"]>;
     /** @internal Called after active effects and captures unwind, never during synchronous node destruction. */
     cancelFrame(): void;
-    hitTest(x: number, y: number): number;
+    hitTest(x: number, y: number, excluded?: number): number;
     destroy(): void;
 }
 export {};

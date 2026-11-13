@@ -4,8 +4,7 @@ import type { NativeScene } from "./NativeScene.js";
 import { OptimizedBuffer } from "./buffer.js";
 import type { KeyEvent, PasteEvent } from "./lib/KeyHandler.js";
 import type { Selection } from "./lib/selection.js";
-import { type AlignString, type FlexDirectionString, type JustifyString, type OverflowString, type PositionTypeString, type WrapString } from "./lib/yoga.options.js";
-import { type VNode } from "./renderables/composition/vnode.js";
+import { type AlignString, type FlexDirectionString, type JustifyString, type LayoutModeString, type OverflowString, type PositionTypeString, type WrapString } from "./lib/yoga.options.js";
 import type { MouseEvent } from "./renderer.js";
 import type { RenderContext } from "./types.js";
 import { type NativePaintRecorder, type NativeSceneFrameRequest, type NativeSceneLayout, type NativeScenePaint, type NativeScenePaintSlot, type SceneNodeHandle } from "./zig.js";
@@ -34,6 +33,8 @@ export interface LayoutOptions extends BaseRenderableOptions {
     flexShrink?: number;
     flexDirection?: FlexDirectionString;
     flexWrap?: WrapString;
+    /** `"list"` stacks children as a column with `overflow: "scroll"` does, without a flex pass over them. */
+    layoutMode?: LayoutModeString;
     alignItems?: AlignString;
     justifyContent?: JustifyString;
     alignSelf?: AlignString;
@@ -128,9 +129,9 @@ export declare abstract class BaseRenderable extends EventEmitter {
     parent: BaseRenderable | null;
     protected _visible: boolean;
     constructor(options: BaseRenderableOptions);
-    abstract add(obj: BaseRenderable | unknown, index?: number): number;
+    abstract add(obj: unknown, index?: number): number;
     abstract remove(child: BaseRenderable): void;
-    abstract insertBefore(obj: BaseRenderable | unknown, anchor: BaseRenderable | unknown): void;
+    abstract insertBefore(obj: unknown, anchor: unknown): void;
     abstract getChildren(): BaseRenderable[];
     abstract getChildrenCount(): number;
     abstract getRenderable(id: string): BaseRenderable | undefined;
@@ -353,6 +354,7 @@ export declare abstract class Renderable extends BaseRenderable {
     set flexShrink(shrink: number | null | undefined);
     set flexDirection(direction: FlexDirectionString | null | undefined);
     set flexWrap(wrap: WrapString | null | undefined);
+    set layoutMode(mode: LayoutModeString | null | undefined);
     set alignItems(alignItems: AlignString | null | undefined);
     set justifyContent(justifyContent: JustifyString | null | undefined);
     set alignSelf(alignSelf: AlignString | null | undefined);
@@ -390,8 +392,8 @@ export declare abstract class Renderable extends BaseRenderable {
      */
     protected onResize(width: number, height: number): void;
     private placeChild;
-    add(obj: Renderable | VNode<any, any[]> | unknown, index?: number): number;
-    insertBefore(obj: Renderable | VNode<any, any[]> | unknown, anchor?: Renderable | unknown): number;
+    add(obj: Renderable, index?: number): number;
+    insertBefore(obj: Renderable, anchor?: Renderable): number;
     getRenderable(id: string): Renderable | undefined;
     remove(child: BaseRenderable): void;
     protected onRemove(): void;
@@ -430,6 +432,7 @@ export declare abstract class Renderable extends BaseRenderable {
     protected destroySelf(): void;
     private destroyLayoutBacking;
     private completeCleanup;
+    private layoutIndexOf;
     private removeLayoutChildAt;
     private detachFromParent;
     processMouseEvent(event: MouseEvent): void;

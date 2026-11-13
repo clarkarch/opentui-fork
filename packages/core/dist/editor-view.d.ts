@@ -71,6 +71,8 @@ export declare class EditorView {
     gotoVisualLineEnd(): void;
     getLineInfo(): LineInfo;
     getLogicalLineInfo(): LineInfo;
+    /** @internal Moves a cursor left inside virtual extmarks to an edge, when the view has an extmark controller. */
+    _keepCursorOutside(direction: number): void;
     get extmarks(): any;
     setPlaceholderStyledText(chunks: {
         text: string;

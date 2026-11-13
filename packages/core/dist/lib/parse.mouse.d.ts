@@ -15,16 +15,3 @@ export type RawMouseEvent = {
     };
     scroll?: ScrollInfo;
 };
-export declare class MouseParser {
-    private mouseButtonsPressed;
-    private static readonly SCROLL_DIRECTIONS;
-    reset(): void;
-    private decodeInput;
-    parseMouseEvent(data: Buffer | Uint8Array): RawMouseEvent | null;
-    parseAllMouseEvents(data: Buffer | Uint8Array): RawMouseEvent[];
-    private parseMouseSequenceAt;
-    private parseSgrSequence;
-    private parseBasicSequence;
-    private decodeSgrEvent;
-    private decodeBasicEvent;
-}

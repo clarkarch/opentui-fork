@@ -15,6 +15,7 @@ export declare const YogaEnumKind: {
     readonly Overflow: 8;
     readonly Display: 9;
     readonly BoxSizing: 10;
+    readonly LayoutMode: 11;
 };
 export declare const YogaFloatKind: {
     readonly Flex: 0;

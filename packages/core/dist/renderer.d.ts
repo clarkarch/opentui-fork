@@ -58,8 +58,6 @@ export interface CliRendererConfig {
     backgroundColor?: ColorInput;
     openConsoleOnError?: boolean;
     prependInputHandlers?: ((sequence: string) => boolean)[];
-    stdinParserMaxBufferBytes?: number;
-    experimental_nativeInput?: boolean;
     clock?: Clock;
     onDestroy?: () => void;
 }
@@ -316,7 +314,6 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private _resolution;
     private _keyHandler;
     private stdinParser;
-    private stdinShadow;
     private readonly oscSubscribers;
     private hasLoggedStdinParserError;
     private animationRequest;
@@ -340,6 +337,7 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private _previousControlState;
     private capturedRenderable?;
     private pressedRenderable?;
+    private lastDrag?;
     private lastOverRenderableNum;
     private lastOverRenderable?;
     private currentSelection;
@@ -348,10 +346,10 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private _splitHeight;
     private renderOffset;
     private splitTailColumn;
+    private parkedSplitScrollback;
     private queuedSplitTail;
     private pendingSplitFooterTransition;
     private forceFullRepaintRequested;
-    private readonly maxSplitCommitsPerFrame;
     private splitCommitLimit;
     private droppedFrames;
     private dropRetried;
@@ -383,6 +381,7 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private _nativePaletteSignature;
     private _emittedPaletteSignature;
     private _palettePublishGeneration;
+    private paletteReplies;
     private _onDestroy?;
     private themeModeState;
     private _terminalFocusState;
@@ -523,7 +522,6 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private getSplitCursorSeedRows;
     private isSplitCursorSeedFrameBlocked;
     private clearSplitStartupCursorSeed;
-    private abortSplitStartupCursorSeed;
     private resetSplitScrollback;
     private syncSplitScrollback;
     private getSplitOutputOffset;
@@ -541,7 +539,7 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     disableKittyKeyboard(): void;
     setupTerminal(): Promise<void>;
     private get startupRepliesPending();
-    /** Call when the Session has accepted the batch's packet. */
+    /** Call when the Session has accepted the batch's packet; `end` runs when the batch ends. */
     private admitReplyBatch;
     /** Call once the batch's output has drained, so output backpressure cannot cause a miss. */
     private armReplyBackstop;
@@ -553,14 +551,12 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     prependInputHandler(handler: (sequence: string) => boolean): void;
     removeInputHandler(handler: (sequence: string) => boolean): void;
     private updateStdinParserProtocolContext;
-    private legacyStdinParsers;
     subscribeOsc(handler: (sequence: string) => void): () => void;
     private processCapabilitySequence;
     private capabilityHandler;
     private focusHandler;
     private dispatchSequenceHandlers;
     private drainStdinParser;
-    private drainStdinShadow;
     private handleStdinEvent;
     private handleStdinParserFailure;
     private setupInput;
@@ -650,7 +646,7 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     pause(): void;
     suspend(): Promise<void>;
     resume(): Promise<void>;
-    private pauseStdinParsers;
+    private pauseStdinParser;
     private finishResume;
     stop(): void;
     private halt;
@@ -700,7 +696,20 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private walkSelectableRenderables;
     get paletteDetectionStatus(): "idle" | "detecting" | "cached";
     private getCachedPaletteBySize;
+    private paletteTmux;
     private ensurePaletteDetector;
+    /**
+     * Sentinel mode: one packet asks every color, and its DA1 reply ends the detection, capped by the caller's
+     * timeout. Legacy tmux (< 3.6) keeps the detector's timers: its wrapped replies trail tmux's own DA1.
+     */
+    private queryPaletteBatch;
+    /**
+     * An OSC reply belongs to the oldest batch still waiting for its DA1 reply; with none, it is a late reply to the newest
+     * palette batch. A result not yet delivered takes every reply. A delivered one is revised in a copy, published on a
+     * change, unless the cache was cleared since its batch began.
+     */
+    private applyPaletteReply;
+    private publishPalette;
     private syncNativePaletteState;
     private emitPaletteChange;
     private resolveXtVersionWaiters;

@@ -1,13 +1,14 @@
 // @bun
 import {
   SystemClock2,
+  kittyKeyMap,
   TreeSitterClient2,
   ANSI,
   CliRenderer2
-} from "./chunk-bun-8bzb6mxt.js";
+} from "./chunk-bun-rcry6xvz.js";
 import {
   nativeConstants
-} from "./chunk-bun-5y8y95v3.js";
+} from "./chunk-bun-3tbfth66.js";
 
 // src/testing/mock-keys.ts
 import { Buffer as Buffer2 } from "buffer";
@@ -41,34 +42,7 @@ var KeyCodes = {
   F11: "\x1B[23~",
   F12: "\x1B[24~"
 };
-var kittyKeyCodeMap = {
-  escape: 27,
-  tab: 9,
-  return: 13,
-  backspace: 127,
-  insert: 57348,
-  delete: 57349,
-  left: 57350,
-  right: 57351,
-  up: 57352,
-  down: 57353,
-  pageup: 57354,
-  pagedown: 57355,
-  home: 57356,
-  end: 57357,
-  f1: 57364,
-  f2: 57365,
-  f3: 57366,
-  f4: 57367,
-  f5: 57368,
-  f6: 57369,
-  f7: 57370,
-  f8: 57371,
-  f9: 57372,
-  f10: 57373,
-  f11: 57374,
-  f12: 57375
-};
+var kittyKeyCodeMap = Object.fromEntries(Object.entries(kittyKeyMap).reverse().map(([code, name]) => [name, Number(code)]));
 function encodeKittySequence(codepoint, modifiers) {
   let modMask = 0;
   if (modifiers?.shift)
@@ -1022,5 +996,5 @@ export {
   setRendererCapabilities
 };
 
-//# debugId=B9DEB437B63DC16764756E2164756E21
+//# debugId=EBF6FAF1F3F2D27464756E2164756E21
 //# sourceMappingURL=testing.bun.js.map

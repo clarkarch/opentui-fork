@@ -42,7 +42,8 @@ export declare class CodeRenderable extends TextBufferRenderable {
     private _isHighlighting;
     private _treeSitterClient;
     private _highlightsDirty;
-    private _highlightSnapshotId;
+    private _version;
+    private _shownVersion;
     private _highlightLoopActive;
     private _highlightPromise?;
     private _highlightRerun;
@@ -51,7 +52,7 @@ export declare class CodeRenderable extends TextBufferRenderable {
     private _shouldRenderTextBuffer;
     private _streaming;
     private _initialStyledText?;
-    private _hadInitialContent;
+    private _checkPainted;
     private _baseHighlight?;
     private _onHighlight?;
     private _onChunks?;
@@ -67,9 +68,15 @@ export declare class CodeRenderable extends TextBufferRenderable {
     constructor(ctx: RenderContext, options: CodeOptions);
     get content(): string;
     private invalidateHighlights;
+    private showPlainText;
+    private readonly checkPainted;
+    private belowView;
+    _needsLifecyclePass(): boolean;
+    private changeStyle;
     private setHighlightsDirty;
     private setShouldRenderTextBuffer;
     set content(value: string);
+    private writeContent;
     updateStreamingPreview(content: string, initialStyledText: StyledText): void;
     get lineInfo(): LineInfo;
     getLineSources(startLine: number, lineCount: number): number[];
@@ -100,7 +107,9 @@ export declare class CodeRenderable extends TextBufferRenderable {
     get highlightingDone(): Promise<void>;
     protected transformChunks(chunks: TextChunk[], context: ChunkRenderContext): Promise<TextChunk[]>;
     private ensureVisibleTextBeforeHighlight;
+    private paintHighlightsOnly;
     private startHighlight;
+    private settle;
     private runHighlights;
     private clearPendingHighlight;
     private setRenderedLineSources;

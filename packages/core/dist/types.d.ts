@@ -17,8 +17,8 @@ export declare const TextAttributes: {
     HIDDEN: number;
     STRIKETHROUGH: number;
 };
-export declare const ATTRIBUTE_BASE_BITS = 8;
-export declare const ATTRIBUTE_BASE_MASK = 255;
+export declare const ATTRIBUTE_BASE_BITS: 8;
+export declare const ATTRIBUTE_BASE_MASK: 255;
 /**
  * Extract the base 8 bits of attributes from a u32 attribute value.
  * Currently we only use the first 8 bits for standard text attributes.

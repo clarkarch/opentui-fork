@@ -1,5 +1,5 @@
 import { type RenderableOptions, Renderable, type NativeRenderableIntegration } from "../Renderable.js";
-import type { KeyEvent, PasteEvent } from "../lib/KeyHandler.js";
+import { KeyEvent, type PasteEvent } from "../lib/KeyHandler.js";
 import type { RenderContext } from "../types.js";
 import type { OptimizedBuffer } from "../buffer.js";
 import { type Selection } from "../lib/selection.js";
@@ -52,6 +52,12 @@ export declare class EmbeddedTerminalRenderable extends Renderable {
     get transparentBackground(): boolean;
     set transparentBackground(value: boolean);
     screen(): EmbeddedTerminalScreen;
+    /** Rows from the live screen (0 there), total rows including the visible ones, and visible rows. */
+    getScroll(): {
+        offset: number;
+        total: number;
+        visible: number;
+    };
     write(data: string | Uint8Array): void;
     invalidate(): void;
     encodeKey(key: KeyEvent): Uint8Array;

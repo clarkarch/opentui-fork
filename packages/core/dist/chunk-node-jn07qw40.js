@@ -153,6 +153,24 @@ __export(exports_yoga, {
 });
 
 // src/native-abi.generated.ts
+var OT_DISPLAY_FLEX = 0;
+var OT_DISPLAY_NONE = 1;
+var OT_DISPLAY_CONTENTS = 2;
+var OT_YOGA_ERRATA_NONE = 0;
+var OT_YOGA_ERRATA_STRETCH_FLEX_BASIS = 1;
+var OT_YOGA_ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING = 2;
+var OT_YOGA_ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE = 4;
+var OT_YOGA_ERRATA_ALL = 2147483647;
+var OT_YOGA_ERRATA_CLASSIC = 2147483646;
+var OT_YOGA_EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS = 0;
+var OT_YOGA_LOG_LEVEL_ERROR = 0;
+var OT_YOGA_LOG_LEVEL_WARN = 1;
+var OT_YOGA_LOG_LEVEL_INFO = 2;
+var OT_YOGA_LOG_LEVEL_DEBUG = 3;
+var OT_YOGA_LOG_LEVEL_VERBOSE = 4;
+var OT_YOGA_LOG_LEVEL_FATAL = 5;
+var OT_YOGA_NODE_TYPE_DEFAULT = 0;
+var OT_YOGA_NODE_TYPE_TEXT = 1;
 var nativeSymbols = {
   ot_scene_set_hooks: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_scene_frame_step_with_geometry: {
@@ -164,8 +182,11 @@ var nativeSymbols = {
   ot_scene_create_node: { args: ["ptr", "buffer", "u32", "u32", "buffer"], returns: "i32" },
   ot_scene_destroy_node: { args: ["ptr", "buffer"], returns: "i32" },
   ot_scene_move_node: { args: ["ptr", "buffer", "ptr", "u32"], returns: "i32" },
+  ot_scene_clear_children: { args: ["ptr", "buffer"], returns: "i32" },
   ot_scene_set_measure: { args: ["ptr", "buffer", "ptr"], returns: "i32" },
   ot_scene_has_measure: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
+  ot_scene_reaches_hooks: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
+  ot_scene_painted: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_scene_mark_dirty: { args: ["ptr", "buffer"], returns: "i32" },
   ot_scene_set_style: { args: ["ptr", "buffer", "u32", "u32", "u32", "u32", "f32", "u32"], returns: "i32" },
   ot_scene_get_style: { args: ["ptr", "buffer", "u32", "u32", "u32", "buffer"], returns: "i32" },
@@ -193,9 +214,11 @@ var nativeSymbols = {
   ot_scene_get_text: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
   ot_scene_get_text_info: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_scene_get_text_lines: { args: ["ptr", "buffer", "u32", "ptr", "u32", "buffer"], returns: "i32" },
+  ot_scene_get_text_byte_at: { args: ["ptr", "buffer", "i32", "i32", "buffer"], returns: "i32" },
   ot_scene_get_layout: { args: ["ptr", "buffer", "u32", "buffer"], returns: "i32" },
   ot_scene_paint: { args: ["ptr", "buffer", "buffer", "u32", "u32", "buffer"], returns: "i32" },
   ot_scene_hit_test: { args: ["ptr", "buffer", "i32", "i32", "buffer"], returns: "i32" },
+  ot_scene_hit_test_excluding: { args: ["ptr", "buffer", "i32", "i32", "u32", "buffer"], returns: "i32" },
   ot_scene_get_stats: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_scene_set_debug_flags: { args: ["ptr", "buffer", "u32"], returns: "i32" },
   ot_scene_get_cursor_state: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
@@ -222,6 +245,7 @@ var nativeSymbols = {
   ot_embedded_terminal_get_selected_text: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
   ot_embedded_terminal_compose: { args: ["ptr", "buffer", "buffer", "ptr", "i32", "i32"], returns: "i32" },
   ot_embedded_terminal_cursor_get: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
+  ot_embedded_terminal_scrollbar_get: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_embedded_terminal_encode_key: {
     args: ["ptr", "buffer", "buffer", "ptr", "u32", "ptr", "u32", "ptr", "u32", "buffer"],
     returns: "i32"
@@ -259,6 +283,22 @@ var nativeSymbols = {
   ot_syntax_style_get_count: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_edit_buffer_highlight: { args: ["ptr", "buffer", "u32", "u32", "ptr"], returns: "i32" },
   ot_edit_buffer_get_highlights: { args: ["ptr", "buffer", "u32", "ptr", "u32", "buffer"], returns: "i32" },
+  ot_context_group_set: { args: ["ptr", "buffer", "u32", "buffer", "u32", "buffer"], returns: "i32" },
+  ot_edit_buffer_set_layer: { args: ["ptr", "buffer", "u32", "u32", "u32", "ptr", "u32"], returns: "i32" },
+  ot_markdown_create: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
+  ot_markdown_destroy: { args: ["ptr", "buffer"], returns: "i32" },
+  ot_markdown_set_options: { args: ["ptr", "buffer", "buffer", "buffer"], returns: "i32" },
+  ot_markdown_append: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
+  ot_markdown_set: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
+  ot_markdown_finish: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
+  ot_markdown_get_source: { args: ["ptr", "buffer", "buffer", "buffer"], returns: "i32" },
+  ot_markdown_read_changes: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
+  ot_markdown_read_source: { args: ["ptr", "buffer", "u32", "ptr", "u32", "buffer"], returns: "i32" },
+  ot_markdown_read_leaf: {
+    args: ["ptr", "buffer", "u32", "ptr", "u32", "buffer", "ptr", "ptr", "u32", "buffer", "ptr", "u32", "buffer"],
+    returns: "i32"
+  },
+  ot_markdown_bind: { args: ["ptr", "buffer", "u32", "buffer"], returns: "i32" },
   ot_editor_view_set_viewport: { args: ["ptr", "buffer", "buffer", "u32", "u32"], returns: "i32" },
   ot_editor_view_get_viewport: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_editor_view_set_scroll_margin: { args: ["ptr", "buffer", "f32"], returns: "i32" },
@@ -310,6 +350,15 @@ var nativeSymbols = {
   ot_video_set_max_fps: { args: ["ptr", "buffer", "u32"], returns: "i32" },
   ot_video_get_state: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_video_get_error: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
+  ot_audio_create: { args: ["ptr", "buffer"], returns: "i32" },
+  ot_audio_destroy: { args: ["ptr", "buffer"], returns: "i32" },
+  ot_audio_start: { args: ["ptr", "buffer", "u32"], returns: "i32" },
+  ot_audio_stop: { args: ["ptr", "buffer"], returns: "i32" },
+  ot_audio_load: { args: ["ptr", "buffer", "buffer", "u64", "buffer"], returns: "i32" },
+  ot_audio_play: { args: ["ptr", "buffer", "u32", "f32", "buffer"], returns: "i32" },
+  ot_audio_stop_voice: { args: ["ptr", "buffer", "u32"], returns: "i32" },
+  ot_audio_set_volume: { args: ["ptr", "buffer", "f32"], returns: "i32" },
+  ot_audio_mix: { args: ["ptr", "buffer", "buffer", "u32", "u32"], returns: "i32" },
   ot_buffer_draw_image: { args: ["ptr", "buffer", "ptr", "buffer", "buffer", "buffer"], returns: "i32" },
   ot_session_set_image_resolution: { args: ["ptr", "buffer", "u32", "u32", "u32", "u32"], returns: "i32" },
   ot_session_set_kitty_image_transport: { args: ["ptr", "buffer", "u32"], returns: "i32" },
@@ -999,6 +1048,18 @@ var nativeLayouts = {
       reserved: { offset: 52, size: 4, alignment: 4, type: "u32" }
     }
   },
+  ot_embedded_terminal_scrollbar: {
+    size: 24,
+    alignment: 4,
+    fields: {
+      struct_size: { offset: 0, size: 4, alignment: 4, type: "u32" },
+      abi_version: { offset: 4, size: 4, alignment: 4, type: "u32" },
+      offset: { offset: 8, size: 4, alignment: 4, type: "u32" },
+      total: { offset: 12, size: 4, alignment: 4, type: "u32" },
+      visible: { offset: 16, size: 4, alignment: 4, type: "u32" },
+      reserved: { offset: 20, size: 4, alignment: 4, type: "u32" }
+    }
+  },
   ot_embedded_terminal_key: {
     size: 32,
     alignment: 4,
@@ -1102,6 +1163,53 @@ var nativeLayouts = {
       style_id: { offset: 8, size: 4, alignment: 4, type: "u32" },
       priority: { offset: 12, size: 4, alignment: 4, type: "u32" },
       ref: { offset: 16, size: 4, alignment: 4, type: "u32" }
+    }
+  },
+  ot_highlight_run: {
+    size: 12,
+    alignment: 4,
+    fields: {
+      start_byte: { offset: 0, size: 4, alignment: 4, type: "u32" },
+      end_byte: { offset: 4, size: 4, alignment: 4, type: "u32" },
+      group_set: { offset: 8, size: 4, alignment: 4, type: "u32" }
+    }
+  },
+  ot_markdown_options: {
+    size: 296,
+    alignment: 8,
+    fields: {
+      struct_size: { offset: 0, size: 4, alignment: 4, type: "u32" },
+      abi_version: { offset: 4, size: 4, alignment: 4, type: "u32" },
+      flags: { offset: 8, size: 4, alignment: 4, type: "u32" },
+      source_byte_limit: { offset: 12, size: 4, alignment: 4, type: "u32" },
+      syntax_style: { offset: 16, size: 16, alignment: 8, type: "ot_handle" },
+      hook_filter_byte_count: { offset: 32, size: 4, alignment: 4, type: "u32" },
+      reserved: { offset: 36, size: 4, alignment: 4, type: "u32" },
+      hook_filter: { offset: 40, size: 256, alignment: 1, type: "[256]u8" }
+    }
+  },
+  ot_markdown_result: {
+    size: 12,
+    alignment: 4,
+    fields: {
+      changed_block_count: { offset: 0, size: 4, alignment: 4, type: "u32" },
+      committed_top_level_count: { offset: 4, size: 4, alignment: 4, type: "u32" },
+      removed_from_index: { offset: 8, size: 4, alignment: 4, type: "u32" }
+    }
+  },
+  ot_markdown_block: {
+    size: 32,
+    alignment: 4,
+    fields: {
+      index: { offset: 0, size: 4, alignment: 4, type: "u32" },
+      parent_index: { offset: 4, size: 4, alignment: 4, type: "u32" },
+      kind: { offset: 8, size: 2, alignment: 2, type: "u16" },
+      flags: { offset: 10, size: 2, alignment: 2, type: "u16" },
+      source_start_byte: { offset: 12, size: 4, alignment: 4, type: "u32" },
+      source_end_byte: { offset: 16, size: 4, alignment: 4, type: "u32" },
+      info_start_byte: { offset: 20, size: 4, alignment: 4, type: "u32" },
+      info_end_byte: { offset: 24, size: 4, alignment: 4, type: "u32" },
+      number: { offset: 28, size: 4, alignment: 4, type: "u32" }
     }
   },
   ot_editor_viewport: {
@@ -1749,6 +1857,8 @@ var nativeConstants = {
   OT_IMAGE_UNSUPPORTED_FEATURE: -46,
   OT_IMAGE_BUSY: -47,
   OT_VIDEO_FAILED: -60,
+  OT_AUDIO_DECODE_FAILED: -61,
+  OT_AUDIO_DEVICE_FAILED: -62,
   OT_SCENE_ROOT: 0,
   OT_SCENE_BOX: 1,
   OT_SCENE_TEXT: 2,
@@ -1785,6 +1895,7 @@ var nativeConstants = {
   OT_STYLE_ENUM_OVERFLOW: 8,
   OT_STYLE_ENUM_DISPLAY: 9,
   OT_STYLE_ENUM_BOX_SIZING: 10,
+  OT_STYLE_ENUM_LAYOUT_MODE: 11,
   OT_STYLE_FLOAT_FLEX: 0,
   OT_STYLE_FLOAT_FLEX_GROW: 1,
   OT_STYLE_FLOAT_FLEX_SHRINK: 2,
@@ -1854,6 +1965,24 @@ var nativeConstants = {
   OT_DISPLAY_NONE: 1,
   OT_BOX_SIZING_BORDER_BOX: 0,
   OT_BOX_SIZING_CONTENT_BOX: 1,
+  OT_LAYOUT_MODE_FLEX: 0,
+  OT_LAYOUT_MODE_LIST: 1,
+  OT_DISPLAY_CONTENTS: 2,
+  OT_YOGA_ERRATA_NONE: 0,
+  OT_YOGA_ERRATA_STRETCH_FLEX_BASIS: 1,
+  OT_YOGA_ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING: 2,
+  OT_YOGA_ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE: 4,
+  OT_YOGA_ERRATA_ALL: 2147483647,
+  OT_YOGA_ERRATA_CLASSIC: 2147483646,
+  OT_YOGA_EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS: 0,
+  OT_YOGA_LOG_LEVEL_ERROR: 0,
+  OT_YOGA_LOG_LEVEL_WARN: 1,
+  OT_YOGA_LOG_LEVEL_INFO: 2,
+  OT_YOGA_LOG_LEVEL_DEBUG: 3,
+  OT_YOGA_LOG_LEVEL_VERBOSE: 4,
+  OT_YOGA_LOG_LEVEL_FATAL: 5,
+  OT_YOGA_NODE_TYPE_DEFAULT: 0,
+  OT_YOGA_NODE_TYPE_TEXT: 1,
   OT_STYLE_ENUM_DIRECTION_MAX: 2,
   OT_STYLE_ENUM_FLEX_DIRECTION_MAX: 3,
   OT_STYLE_ENUM_JUSTIFY_CONTENT_MAX: 5,
@@ -1865,12 +1994,14 @@ var nativeConstants = {
   OT_STYLE_ENUM_OVERFLOW_MAX: 2,
   OT_STYLE_ENUM_DISPLAY_MAX: 1,
   OT_STYLE_ENUM_BOX_SIZING_MAX: 1,
+  OT_STYLE_ENUM_LAYOUT_MODE_MAX: 1,
   OT_MEASURE_UNDEFINED: 0,
   OT_MEASURE_EXACTLY: 1,
   OT_MEASURE_AT_MOST: 2,
   OT_LAYOUT_PUBLIC: 0,
   OT_LAYOUT_YOGA: 1,
   OT_LAYOUT_PAINT: 2,
+  OT_LAYOUT_CONTENT: 3,
   OT_BORDER_NONE: 0,
   OT_BORDER_LEFT: 1,
   OT_BORDER_BOTTOM: 2,
@@ -1886,6 +2017,37 @@ var nativeConstants = {
   OT_COLOR_DEFAULT: 2,
   OT_COLOR_CHANNEL_MASK: 255,
   OT_COLOR_META_SHIFT: 8,
+  OT_COLOR_ANSI_0: 0,
+  OT_COLOR_ANSI_1: 8388608,
+  OT_COLOR_ANSI_2: 32768,
+  OT_COLOR_ANSI_3: 8421376,
+  OT_COLOR_ANSI_4: 128,
+  OT_COLOR_ANSI_5: 8388736,
+  OT_COLOR_ANSI_6: 32896,
+  OT_COLOR_ANSI_7: 12632256,
+  OT_COLOR_ANSI_8: 8421504,
+  OT_COLOR_ANSI_9: 16711680,
+  OT_COLOR_ANSI_10: 65280,
+  OT_COLOR_ANSI_11: 16776960,
+  OT_COLOR_ANSI_12: 255,
+  OT_COLOR_ANSI_13: 16711935,
+  OT_COLOR_ANSI_14: 65535,
+  OT_COLOR_ANSI_15: 16777215,
+  OT_COLOR_CUBE_BASE: 55,
+  OT_COLOR_CUBE_STEP: 40,
+  OT_COLOR_GRAY_BASE: 8,
+  OT_COLOR_GRAY_STEP: 10,
+  OT_ATTR_BOLD: 1,
+  OT_ATTR_DIM: 2,
+  OT_ATTR_ITALIC: 4,
+  OT_ATTR_UNDERLINE: 8,
+  OT_ATTR_BLINK: 16,
+  OT_ATTR_INVERSE: 32,
+  OT_ATTR_HIDDEN: 64,
+  OT_ATTR_STRIKETHROUGH: 128,
+  OT_ATTR_BASE_MASK: 255,
+  OT_ATTR_LINK_SHIFT: 8,
+  OT_ATTR_LINK_MASK: 16777215,
   OT_SCENE_TEXT_SELECTION_RESET: 0,
   OT_SCENE_TEXT_SELECTION_SET: 1,
   OT_SCENE_TEXT_SELECTION_UPDATE: 2,
@@ -1905,6 +2067,10 @@ var nativeConstants = {
   OT_SCENE_FULL_PATH_UNRETAINED: 16,
   OT_SCENE_FULL_PATH_OPTIONS: 32,
   OT_SCENE_FULL_PATH_NON_LOCAL: 64,
+  OT_CURSOR_STYLE_BLOCK: 0,
+  OT_CURSOR_STYLE_LINE: 1,
+  OT_CURSOR_STYLE_UNDERLINE: 2,
+  OT_CURSOR_STYLE_DEFAULT: 3,
   OT_SCENE_HOOK_UPDATE: 1,
   OT_SCENE_HOOK_RESIZE: 2,
   OT_SCENE_HOOK_LAYOUT_CHANGED: 4,
@@ -1960,6 +2126,7 @@ var nativeConstants = {
   OT_SCENE_SCROLL_ALIGN_NEAREST: 0,
   OT_SCENE_SCROLL_ALIGN_START: 1,
   OT_SCENE_SCROLL_ALIGN_END: 2,
+  OT_SCENE_SCROLL_PADDING_MAX: 65535,
   OT_SCENE_SCROLL_CHANGED_OFFSET_X: 1,
   OT_SCENE_SCROLL_CHANGED_OFFSET_Y: 2,
   OT_SCENE_SCROLL_CHANGED_CONTENT: 4,
@@ -1981,6 +2148,7 @@ var nativeConstants = {
   OT_RENDER_PENDING: 1,
   OT_RENDER_SKIPPED: 2,
   OT_RENDER_FAILED: 3,
+  OT_SPLIT_SNAPSHOTS_MAX: 64,
   OT_SESSION_BUFFER_CURRENT: 0,
   OT_SESSION_BUFFER_NEXT: 1,
   OT_WIDTH_METHOD_WCWIDTH: 0,
@@ -1988,10 +2156,37 @@ var nativeConstants = {
   OT_WIDTH_METHOD_NO_ZWJ: 2,
   OT_WIDTH_METHOD_UNICODE_WIDE: 3,
   OT_BUFFER_RESPECT_ALPHA: 1,
+  OT_EMBEDDED_TERMINAL_CURSOR_BAR: 0,
+  OT_EMBEDDED_TERMINAL_CURSOR_BLOCK: 1,
+  OT_EMBEDDED_TERMINAL_CURSOR_UNDERLINE: 2,
+  OT_EMBEDDED_TERMINAL_CURSOR_BLOCK_HOLLOW: 3,
+  OT_EMBEDDED_TERMINAL_MOD_SHIFT: 1,
+  OT_EMBEDDED_TERMINAL_MOD_CTRL: 2,
+  OT_EMBEDDED_TERMINAL_MOD_ALT: 4,
+  OT_EMBEDDED_TERMINAL_MOD_SUPER: 8,
+  OT_EMBEDDED_TERMINAL_MOD_CAPS_LOCK: 16,
+  OT_EMBEDDED_TERMINAL_MOD_NUM_LOCK: 32,
+  OT_EMBEDDED_TERMINAL_KEY_RELEASE: 0,
+  OT_EMBEDDED_TERMINAL_KEY_PRESS: 1,
+  OT_EMBEDDED_TERMINAL_KEY_REPEAT: 2,
+  OT_EMBEDDED_TERMINAL_MOUSE_PRESS: 0,
+  OT_EMBEDDED_TERMINAL_MOUSE_RELEASE: 1,
+  OT_EMBEDDED_TERMINAL_MOUSE_MOTION: 2,
+  OT_EMBEDDED_TERMINAL_BUTTON_NONE: -1,
+  OT_EMBEDDED_TERMINAL_BUTTON_UNKNOWN: 0,
+  OT_EMBEDDED_TERMINAL_BUTTON_LEFT: 1,
+  OT_EMBEDDED_TERMINAL_BUTTON_RIGHT: 2,
+  OT_EMBEDDED_TERMINAL_BUTTON_MIDDLE: 3,
+  OT_EMBEDDED_TERMINAL_BUTTON_FOUR: 4,
+  OT_EMBEDDED_TERMINAL_BUTTON_FIVE: 5,
+  OT_EMBEDDED_TERMINAL_BUTTON_SIX: 6,
+  OT_EMBEDDED_TERMINAL_BUTTON_SEVEN: 7,
+  OT_EMBEDDED_TERMINAL_INPUT_BYTES_MAX: 1048576,
   OT_EMBEDDED_TERMINAL_INVALIDATE: 0,
   OT_EMBEDDED_TERMINAL_SCROLL: 1,
   OT_EMBEDDED_TERMINAL_CLEAR_SELECTION: 2,
   OT_EMBEDDED_TERMINAL_SET_TRANSPARENT_BACKGROUND: 3,
+  OT_EMBEDDED_TERMINAL_RESPONSE_BYTES_MAX: 1048576,
   OT_EDIT_CURSOR_CHANGED: 1,
   OT_EDIT_CONTENT_CHANGED: 2,
   OT_EDIT_HISTORY_CURSOR_CHANGED: 4,
@@ -2058,12 +2253,45 @@ var nativeConstants = {
   OT_EDITOR_STYLE_FOREGROUND: 1,
   OT_EDITOR_STYLE_BACKGROUND: 2,
   OT_EDITOR_STYLE_ATTRIBUTES: 4,
+  OT_EDITOR_STYLE_ATTRIBUTE_MASK: 8,
   OT_EDIT_HIGHLIGHT_ADD_LINE: 0,
   OT_EDIT_HIGHLIGHT_ADD_RANGE: 1,
   OT_EDIT_HIGHLIGHT_REMOVE_REF: 2,
   OT_EDIT_HIGHLIGHT_CLEAR_LINE: 3,
   OT_EDIT_HIGHLIGHT_CLEAR_ALL: 4,
   OT_STYLE_RUN_FLAG: 2147483648,
+  OT_GROUP_SET_NAME_COUNT_MAX: 16,
+  OT_GROUP_SET_NAME_BYTE_COUNT_MAX: 64,
+  OT_MD_CONCEAL: 1,
+  OT_MD_HYPERLINKS: 2,
+  OT_MD_MATH: 4,
+  OT_MD_HOOK: 8,
+  OT_MD_HOOK_FILTER_BYTE_COUNT_MAX: 256,
+  OT_MD_PARAGRAPH: 0,
+  OT_MD_HEADING: 1,
+  OT_MD_CODE: 2,
+  OT_MD_HTML: 3,
+  OT_MD_RULE: 4,
+  OT_MD_TABLE: 5,
+  OT_MD_TABLE_ROW: 6,
+  OT_MD_TABLE_CELL: 7,
+  OT_MD_QUOTE: 8,
+  OT_MD_LIST: 9,
+  OT_MD_ITEM: 10,
+  OT_MD_BLOCK_CLOSED: 1,
+  OT_MD_BLOCK_SETEXT: 2,
+  OT_MD_BLOCK_ORDERED: 4,
+  OT_MD_BLOCK_TIGHT: 8,
+  OT_MD_BLOCK_TASK: 16,
+  OT_MD_BLOCK_CHECKED: 32,
+  OT_MD_BLOCK_BLANK_AFTER: 64,
+  OT_MD_BLOCK_FENCED: 128,
+  OT_MD_BLOCK_HOOKED: 256,
+  OT_MD_BLOCK_MATH: 512,
+  OT_MD_BLOCK_HEADER: 1024,
+  OT_MD_BLOCK_OPEN: 2048,
+  OT_MD_SPAN_CODE: 1,
+  OT_MD_SPAN_MATH: 2,
   OT_EDITOR_MOVE_UP: 0,
   OT_EDITOR_MOVE_DOWN: 1,
   OT_EDITOR_GOTO_LINE_END: 2,
@@ -2109,6 +2337,7 @@ var nativeConstants = {
   OT_IMAGE_DRAW_SOURCE_HEIGHT: 2,
   OT_IMAGE_DRAW_OPACITY_OVERRIDE: 4,
   OT_IMAGE_DRAW_PRESERVE_ASPECT: 8,
+  OT_IMAGE_ENCODED_BYTES_MAX: 67108864,
   OT_IMAGE_FORMAT_UNKNOWN: 0,
   OT_IMAGE_FORMAT_PNG: 1,
   OT_IMAGE_FORMAT_RGBA: 2,
@@ -2143,6 +2372,7 @@ var nativeConstants = {
   OT_VIDEO_AUDIO: 8,
   OT_VIDEO_HAS_FRAME: 16,
   OT_VIDEO_ERROR: 32,
+  OT_AUDIO_START_NO_DEVICE: 1,
   OT_TEXT_VIEW_WRAP_WIDTH: 0,
   OT_TEXT_VIEW_WRAP_MODE: 1,
   OT_TEXT_VIEW_FIRST_LINE_OFFSET: 2,
@@ -2177,6 +2407,10 @@ var nativeConstants = {
   OT_BUFFER_STACK_CLEAR_OPACITY: 6,
   OT_BUFFER_GRID_INNER: 1,
   OT_BUFFER_GRID_OUTER: 2,
+  OT_CELL_CHAR_KIND_MASK: 3221225472,
+  OT_CELL_CHAR_IMAGE: 1073741824,
+  OT_CELL_CHAR_GRAPHEME: 2147483648,
+  OT_CELL_CHAR_CONTINUATION: 3221225472,
   OT_SESSION_CONTROL_PACKET_BYTES: 4096,
   OT_TERMINAL_ALTERNATE_SCREEN: 1,
   OT_TERMINAL_MOUSE: 2,
@@ -2186,6 +2420,12 @@ var nativeConstants = {
   OT_TERMINAL_SYNC_ALWAYS: 32,
   OT_TERMINAL_SYNC_NEVER: 64,
   OT_TERMINAL_HOST_MULTIPLEXER: 128,
+  OT_KITTY_KEYBOARD_DISAMBIGUATE: 1,
+  OT_KITTY_KEYBOARD_EVENT_TYPES: 2,
+  OT_KITTY_KEYBOARD_ALTERNATE_KEYS: 4,
+  OT_KITTY_KEYBOARD_ALL_KEYS_AS_ESCAPES: 8,
+  OT_KITTY_KEYBOARD_REPORT_TEXT: 16,
+  OT_KITTY_KEYBOARD_ALL: 31,
   OT_CONTROL_CAPABILITY_RESPONSE: 1,
   OT_CONTROL_TITLE: 2,
   OT_CONTROL_MOUSE: 3,
@@ -2197,6 +2437,7 @@ var nativeConstants = {
   OT_CONTROL_RESET_BACKGROUND: 9,
   OT_CONTROL_PALETTE_QUERY: 10,
   OT_CONTROL_PROGRAM_STATUS: 11,
+  OT_CONTROL_END_REPLY_SENTINEL: 12,
   OT_CURSOR_POSITION: 1,
   OT_CURSOR_STYLE: 2,
   OT_CURSOR_BLINKING: 4,
@@ -2273,6 +2514,7 @@ var nativeConstants = {
   OT_INPUT_MOD_NUM_LOCK: 128,
   OT_INPUT_KEY_KITTY: 1,
   OT_INPUT_KEY_TEXT_TRUNCATED: 2,
+  OT_INPUT_KEY_TYPED: 4,
   OT_INPUT_PASTE_START: 1,
   OT_INPUT_PASTE_END: 2,
   OT_INPUT_REPLY_FRAGMENT: 1,
@@ -2356,11 +2598,13 @@ var nativeConstants = {
   OT_INPUT_EXPECT_KITTY_KEYBOARD: 2,
   OT_INPUT_EXPECT_CURSOR_POSITION: 4,
   OT_INPUT_EXPECT_SENTINEL: 8,
+  OT_INPUT_EXPECT_ESCAPE_PREFIX: 16,
   OT_INPUT_EVENTS_MIN: 4,
   OT_INPUT_PAYLOAD_BYTES_MIN: 4384,
   OT_INPUT_TIMEOUT_NS: 20000000,
   OT_DIAGNOSTIC_MESSAGE_BYTES: 4096,
   OT_DIAGNOSTIC_TRUNCATED: 1,
+  OT_DIAGNOSTIC_QUEUE_MAX: 64,
   OT_SCENE_RECORD_BYTES_MAX: 67108864,
   OT_SCENE_RECORD_PHASE_BEFORE: 0,
   OT_SCENE_RECORD_PHASE_SELF: 1,
@@ -3567,19 +3811,20 @@ function setGlobalWorkerMessageHandler(handler) {
 import { existsSync as existsSync2, writeFileSync } from "fs";
 
 // src/types.ts
+var attributeBits = nativeConstants;
 var TextAttributes2 = {
   NONE: 0,
-  BOLD: 1 << 0,
-  DIM: 1 << 1,
-  ITALIC: 1 << 2,
-  UNDERLINE: 1 << 3,
-  BLINK: 1 << 4,
-  INVERSE: 1 << 5,
-  HIDDEN: 1 << 6,
-  STRIKETHROUGH: 1 << 7
+  BOLD: attributeBits.OT_ATTR_BOLD,
+  DIM: attributeBits.OT_ATTR_DIM,
+  ITALIC: attributeBits.OT_ATTR_ITALIC,
+  UNDERLINE: attributeBits.OT_ATTR_UNDERLINE,
+  BLINK: attributeBits.OT_ATTR_BLINK,
+  INVERSE: attributeBits.OT_ATTR_INVERSE,
+  HIDDEN: attributeBits.OT_ATTR_HIDDEN,
+  STRIKETHROUGH: attributeBits.OT_ATTR_STRIKETHROUGH
 };
-var ATTRIBUTE_BASE_BITS2 = 8;
-var ATTRIBUTE_BASE_MASK2 = 255;
+var ATTRIBUTE_BASE_BITS2 = nativeConstants.OT_ATTR_LINK_SHIFT;
+var ATTRIBUTE_BASE_MASK2 = nativeConstants.OT_ATTR_BASE_MASK;
 function getBaseAttributes2(attr) {
   return attr & ATTRIBUTE_BASE_MASK2;
 }
@@ -3600,29 +3845,15 @@ var TargetChannel2;
 // src/lib/RGBA.ts
 var DEFAULT_FOREGROUND_RGB2 = [255, 255, 255];
 var DEFAULT_BACKGROUND_RGB2 = [0, 0, 0];
-var INTENT_RGB = 0;
-var INTENT_INDEXED = 1;
-var INTENT_DEFAULT = 2;
+var INTENT_RGB = nativeConstants.OT_COLOR_RGB;
+var INTENT_INDEXED = nativeConstants.OT_COLOR_INDEXED;
+var INTENT_DEFAULT = nativeConstants.OT_COLOR_DEFAULT;
 var ZERO_RGBA_BUFFER = new Uint16Array(4);
-var ANSI16_RGB = [
-  [0, 0, 0],
-  [128, 0, 0],
-  [0, 128, 0],
-  [128, 128, 0],
-  [0, 0, 128],
-  [128, 0, 128],
-  [0, 128, 128],
-  [192, 192, 192],
-  [128, 128, 128],
-  [255, 0, 0],
-  [0, 255, 0],
-  [255, 255, 0],
-  [0, 0, 255],
-  [255, 0, 255],
-  [0, 255, 255],
-  [255, 255, 255]
-];
-var ANSI_256_CUBE_LEVELS = [0, 95, 135, 175, 215, 255];
+var ANSI16_RGB = Array.from({ length: 16 }, (_, slot) => {
+  const rgb = nativeConstants[`OT_COLOR_ANSI_${slot}`];
+  return [rgb >>> 16, rgb >>> 8 & 255, rgb & 255];
+});
+var ANSI_256_CUBE_LEVELS = [0, 1, 2, 3, 4, 5].map((level) => level === 0 ? 0 : nativeConstants.OT_COLOR_CUBE_BASE + nativeConstants.OT_COLOR_CUBE_STEP * level);
 function packMeta(intent, slot = 0) {
   return (slot & 255 | (intent & 255) << 8) >>> 0;
 }
@@ -3662,7 +3893,7 @@ function ansi256IndexToRgb2(index) {
     const b = cubeIndex % 6;
     return [ANSI_256_CUBE_LEVELS[r], ANSI_256_CUBE_LEVELS[g], ANSI_256_CUBE_LEVELS[b]];
   }
-  const value = 8 + (normalizedIndex - 232) * 10;
+  const value = nativeConstants.OT_COLOR_GRAY_BASE + (normalizedIndex - 232) * nativeConstants.OT_COLOR_GRAY_STEP;
   return [value, value, value];
 }
 
@@ -3909,9 +4140,9 @@ function createTextAttributes2({
     attributes |= TextAttributes2.STRIKETHROUGH;
   return attributes;
 }
-var ATTRIBUTE_BASE_MASK = 255;
-var LINK_ID_SHIFT = 8;
-var LINK_ID_PAYLOAD_MASK = 16777215;
+var ATTRIBUTE_BASE_MASK = nativeConstants.OT_ATTR_BASE_MASK;
+var LINK_ID_SHIFT = nativeConstants.OT_ATTR_LINK_SHIFT;
+var LINK_ID_PAYLOAD_MASK = nativeConstants.OT_ATTR_LINK_MASK;
 function attributesWithLink2(baseAttributes, linkId) {
   const base = baseAttributes & ATTRIBUTE_BASE_MASK;
   const linkBits = (linkId & LINK_ID_PAYLOAD_MASK) << LINK_ID_SHIFT;
@@ -4076,7 +4307,8 @@ var YogaEnumKind = {
   FlexWrap: nativeConstants.OT_STYLE_ENUM_FLEX_WRAP,
   Overflow: nativeConstants.OT_STYLE_ENUM_OVERFLOW,
   Display: nativeConstants.OT_STYLE_ENUM_DISPLAY,
-  BoxSizing: nativeConstants.OT_STYLE_ENUM_BOX_SIZING
+  BoxSizing: nativeConstants.OT_STYLE_ENUM_BOX_SIZING,
+  LayoutMode: nativeConstants.OT_STYLE_ENUM_LAYOUT_MODE
 };
 var YogaFloatKind = {
   Flex: nativeConstants.OT_STYLE_FLOAT_FLEX,
@@ -5695,6 +5927,9 @@ function normalizeBunfsPath(fileName) {
   return join2(getBunfsRootPath(), basename(fileName));
 }
 
+// src/platform/runtime-assets.node.ts
+import { resolve as resolve2 } from "node:path";
+
 // src/published-package.ts
 var PUBLISHED_CORE_NAME = "@clarkarch/opentui-fork";
 function publishedPlatformPackageName(target) {
@@ -5753,6 +5988,9 @@ function resolveTreeSitterWasm() {
 }
 async function resolveNativeLibraryPath() {
   const asset = getNativeAssetDescriptor(getCurrentNodeAssetTarget());
+  if (process.env.OPENTUI_LIB_PATH) {
+    return resolve2(process.env.OPENTUI_LIB_PATH);
+  }
   const configuredPath = resolveAssetRootPath(asset.key);
   if (configuredPath !== undefined) {
     return configuredPath;
@@ -5768,6 +6006,12 @@ var NativeAudioStreamFormat3 = NativeAudioStreamFormat2;
 registerEnvVar2({
   name: "OPENTUI_LIBC",
   description: "Select Linux native libc package. Supported values: glibc, musl.",
+  type: "string",
+  default: ""
+});
+registerEnvVar2({
+  name: "OPENTUI_LIB_PATH",
+  description: "Load the native library from this file instead of the platform package.",
   type: "string",
   default: ""
 });
@@ -6107,6 +6351,7 @@ var NativeClipboardShutdownStatus2;
 })(NativeClipboardShutdownStatus2 ||= {});
 var targetLibPath;
 var targetLibError;
+var targetLibSource = process.env.OPENTUI_LIB_PATH ? " (set by OPENTUI_LIB_PATH)" : "";
 try {
   targetLibPath = await resolveNativeLibraryPath();
   if (isBunfsPath(targetLibPath)) {
@@ -6116,6 +6361,7 @@ try {
     throw new Error(`OpenTUI native library does not exist at ${JSON.stringify(targetLibPath)}`);
   }
 } catch (error) {
+  targetLibPath = undefined;
   targetLibError = error instanceof Error ? error : new Error(String(error));
 }
 registerEnvVar2({
@@ -6166,8 +6412,15 @@ registerEnvVar2({
   type: "string",
   required: false
 });
-var CURSOR_STYLE_TO_ID = { block: 0, line: 1, underline: 2, default: 3 };
-var CURSOR_ID_TO_STYLE = ["block", "line", "underline", "default"];
+var CURSOR_STYLE_TO_ID = {
+  block: nativeConstants.OT_CURSOR_STYLE_BLOCK,
+  line: nativeConstants.OT_CURSOR_STYLE_LINE,
+  underline: nativeConstants.OT_CURSOR_STYLE_UNDERLINE,
+  default: nativeConstants.OT_CURSOR_STYLE_DEFAULT
+};
+var CURSOR_ID_TO_STYLE = [];
+for (const [style, id] of Object.entries(CURSOR_STYLE_TO_ID))
+  CURSOR_ID_TO_STYLE[id] = style;
 var PROGRAM_STATE_TO_ID = {
   idle: nativeConstants.OT_PROGRAM_STATE_IDLE,
   working: nativeConstants.OT_PROGRAM_STATE_WORKING,
@@ -6508,7 +6761,7 @@ function encodeDrawColors(colors, fields, options, base = 0) {
     contextBufferColor(background, colors, (base + fields.background.offset) / 2);
   return background !== undefined;
 }
-var DIAGNOSTIC_QUEUE_MAX = 64;
+var DIAGNOSTIC_QUEUE_MAX = nativeConstants.OT_DIAGNOSTIC_QUEUE_MAX;
 var DIAGNOSTIC_BATCH = 8;
 function createDiagnosticDrainRecord() {
   const layout = nativeLayouts.ot_diagnostic_drain;
@@ -6697,7 +6950,28 @@ function encodeImageDrawOptions(options, words, signed, base) {
 function viewOrNull(value) {
   return value.byteLength === 0 ? null : value;
 }
-var EMBEDDED_TERMINAL_IO_BYTES_MAX = 1024 * 1024;
+var EMBEDDED_TERMINAL_IO_BYTES_MAX = nativeConstants.OT_EMBEDDED_TERMINAL_INPUT_BYTES_MAX;
+var EMBEDDED_TERMINAL_KEY_ACTIONS = new Map([
+  ["release", nativeConstants.OT_EMBEDDED_TERMINAL_KEY_RELEASE],
+  ["press", nativeConstants.OT_EMBEDDED_TERMINAL_KEY_PRESS],
+  ["repeat", nativeConstants.OT_EMBEDDED_TERMINAL_KEY_REPEAT]
+]);
+var EMBEDDED_TERMINAL_MOUSE_ACTIONS = new Map([
+  ["press", nativeConstants.OT_EMBEDDED_TERMINAL_MOUSE_PRESS],
+  ["release", nativeConstants.OT_EMBEDDED_TERMINAL_MOUSE_RELEASE],
+  ["motion", nativeConstants.OT_EMBEDDED_TERMINAL_MOUSE_MOTION]
+]);
+var EMBEDDED_TERMINAL_BUTTONS = new Map([
+  [undefined, nativeConstants.OT_EMBEDDED_TERMINAL_BUTTON_NONE],
+  ["unknown", nativeConstants.OT_EMBEDDED_TERMINAL_BUTTON_UNKNOWN],
+  ["left", nativeConstants.OT_EMBEDDED_TERMINAL_BUTTON_LEFT],
+  ["right", nativeConstants.OT_EMBEDDED_TERMINAL_BUTTON_RIGHT],
+  ["middle", nativeConstants.OT_EMBEDDED_TERMINAL_BUTTON_MIDDLE],
+  ["four", nativeConstants.OT_EMBEDDED_TERMINAL_BUTTON_FOUR],
+  ["five", nativeConstants.OT_EMBEDDED_TERMINAL_BUTTON_FIVE],
+  ["six", nativeConstants.OT_EMBEDDED_TERMINAL_BUTTON_SIX],
+  ["seven", nativeConstants.OT_EMBEDDED_TERMINAL_BUTTON_SEVEN]
+]);
 function embeddedTerminalDimension(value, name) {
   if (!Number.isInteger(value) || value < 1 || value > 65535) {
     throw new RangeError(`Embedded terminal ${name} must be an integer between 1 and 65535`);
@@ -6723,7 +6997,9 @@ function contextBufferColor(value, color = new Uint16Array(4), offset = 0) {
     color[offset + index] = channel;
   }
   const intent = color[offset + 1] >>> 8;
-  if (color[offset + 2] > 255 || color[offset + 3] > 255 || intent > 2 || intent !== 1 && color[offset] > 255) {
+  const indexed = intent === nativeConstants.OT_COLOR_INDEXED;
+  const known = indexed || intent === nativeConstants.OT_COLOR_RGB || intent === nativeConstants.OT_COLOR_DEFAULT;
+  if (color[offset + 2] > 255 || color[offset + 3] > 255 || !known || !indexed && color[offset] > 255) {
     throw new RangeError("Invalid terminal color intent");
   }
   return color;
@@ -7564,11 +7840,14 @@ function recordedPixels(data, length) {
     throw new RangeError("Pixel byte count exceeds the supplied view");
   return input.subarray(0, count);
 }
+function isAttributeByte(value) {
+  return Number.isInteger(value) && value >= 0 && value <= 255;
+}
 function encodeEditorStyle(style) {
   const layout = nativeLayouts.ot_editor_style;
   const record = new Uint32Array(layout.size / 4);
   const colors = new Uint16Array(record.buffer);
-  const { fg, bg, attributes } = style;
+  const { fg, bg, attributes, suppliedAttributes } = style;
   record[layout.fields.struct_size.offset / 4] = layout.size;
   record[layout.fields.abi_version.offset / 4] = nativeConstants.OT_CONTEXT_ABI_VERSION;
   if (fg != null) {
@@ -7582,6 +7861,13 @@ function encodeEditorStyle(style) {
   if (attributes != null) {
     record[layout.fields.flags.offset / 4] |= 4 /* Attributes */;
     record[layout.fields.attributes.offset / 4] = toSafeFFIU32Length(attributes, "Editor style attributes");
+  }
+  if (suppliedAttributes != null) {
+    if (!isAttributeByte(attributes) || !isAttributeByte(suppliedAttributes)) {
+      throw new RangeError("Masked editor style attributes must be integers from 0 to 255");
+    }
+    record[layout.fields.flags.offset / 4] |= nativeConstants.OT_EDITOR_STYLE_ATTRIBUTE_MASK;
+    record[layout.fields.attributes.offset / 4] |= suppliedAttributes << 16;
   }
   return record;
 }
@@ -7597,6 +7883,7 @@ function drawRecordBottomTitle(options) {
   return options.operation === "box" && options.bottomTitle ? drawTextString(options.bottomTitle) : "";
 }
 var drawTextEncoder = new TextEncoder;
+var markdownDecoder = new TextDecoder("utf-8", { ignoreBOM: true });
 function encodeDrawText(text, output) {
   if (text === "")
     return 0;
@@ -7695,9 +7982,9 @@ function widthMethodId(widthMethod, label) {
   return id;
 }
 function widthMethodFromCode(code) {
-  if (code === 0)
+  if (code === nativeConstants.OT_WIDTH_METHOD_WCWIDTH)
     return "wcwidth";
-  return code === 3 ? "unicode-wide" : "unicode";
+  return code === nativeConstants.OT_WIDTH_METHOD_UNICODE_WIDE ? "unicode-wide" : "unicode";
 }
 var yogaSymbols = {
   yogaConfigCreateChecked: { args: ["buffer"], returns: "u32" },
@@ -7994,6 +8281,11 @@ function getOpenTUILib(libPath) {
       returns: "void"
     }
   });
+  const abiVersion = rawSymbols.symbols.ot_context_abi_version();
+  if (abiVersion !== nativeConstants.OT_CONTEXT_ABI_VERSION) {
+    rawSymbols.close();
+    throw new Error(`OpenTUI native library at ${JSON.stringify(resolvedLibPath)} has context ABI version ${abiVersion}, expected ${nativeConstants.OT_CONTEXT_ABI_VERSION}`);
+  }
   if (env2.OTUI_DEBUG_FFI || env2.OTUI_TRACE_FFI) {
     return {
       ...rawSymbols,
@@ -8211,6 +8503,7 @@ class FFIRenderLib2 {
   encoder = new TextEncoder;
   emptyBytes = new Uint8Array(0);
   decoder = new TextDecoder;
+  textDecoder = new TextDecoder("utf-8", { ignoreBOM: true });
   logCallbackWrapper = null;
   diagnosticDrain;
   nativeSpanFeedCallbackWrapper = null;
@@ -8325,8 +8618,9 @@ class FFIRenderLib2 {
     const handle = encodeContextHandle(context, session);
     const ticket = frame ? encodeSceneFrameRequest(context, frame) : null;
     const count = toSafeFFIU32Length(snapshots.length, "Split snapshot count");
-    if (count > 64)
-      throw new RangeError("At most 64 split snapshots can be submitted together");
+    const max = nativeConstants.OT_SPLIT_SNAPSHOTS_MAX;
+    if (count > max)
+      throw new RangeError(`At most ${max} split snapshots can be submitted together`);
     const records = new BigUint64Array(count * (layout.size / 8));
     const fields = new Uint32Array(records.buffer);
     for (let index = 0;index < count; index++) {
@@ -8557,13 +8851,24 @@ class FFIRenderLib2 {
       } : {}
     };
   }
+  contextEmbeddedTerminalScrollbar(context, terminal) {
+    const layout = nativeLayouts.ot_embedded_terminal_scrollbar;
+    const handle = encodeContextHandle(context, terminal);
+    const record = createContextRecord(layout);
+    const pointer = this.nativeContextPointer(context, "ot_embedded_terminal_scrollbar_get");
+    nativeResult("ot_embedded_terminal_scrollbar_get", this.opentui.symbols.ot_embedded_terminal_scrollbar_get(pointer, handle, record));
+    return {
+      offset: record[layout.fields.offset.offset / 4],
+      total: record[layout.fields.total.offset / 4],
+      visible: record[layout.fields.visible.offset / 4]
+    };
+  }
   contextEmbeddedTerminalEncodeKey(context, terminal, key) {
     const layout = nativeLayouts.ot_embedded_terminal_key;
     this.getYogaHost().assertMutable();
     const handle = encodeContextHandle(context, terminal);
-    const action = key.action ?? "press";
-    const actionCode = ["release", "press", "repeat"].indexOf(action);
-    if (actionCode < 0)
+    const actionCode = EMBEDDED_TERMINAL_KEY_ACTIONS.get(key.action ?? "press");
+    if (actionCode === undefined)
       throw new TypeError("Unknown embedded terminal key action");
     const record = createContextRecord(layout);
     record[layout.fields.action.offset / 4] = actionCode;
@@ -8582,10 +8887,9 @@ class FFIRenderLib2 {
     const layout = nativeLayouts.ot_embedded_terminal_mouse;
     this.getYogaHost().assertMutable();
     const handle = encodeContextHandle(context, terminal);
-    const action = ["press", "release", "motion"].indexOf(mouse.action);
-    const buttonName = mouse.button;
-    const button = buttonName === undefined ? -1 : ["unknown", "left", "right", "middle", "four", "five", "six", "seven"].indexOf(buttonName);
-    if (action < 0 || buttonName !== undefined && button < 0)
+    const action = EMBEDDED_TERMINAL_MOUSE_ACTIONS.get(mouse.action);
+    const button = EMBEDDED_TERMINAL_BUTTONS.get(mouse.button);
+    if (action === undefined || button === undefined)
       throw new TypeError("Unknown embedded terminal mouse action or button");
     const record = createContextRecord(layout);
     record[layout.fields.action.offset / 4] = action;
@@ -8619,7 +8923,7 @@ class FFIRenderLib2 {
   contextEmbeddedTerminalDrainResponses(context, terminal) {
     this.getYogaHost().assertMutable();
     const handle = encodeContextHandle(context, terminal);
-    const output = this.embeddedTerminalResponses ??= new Uint8Array(EMBEDDED_TERMINAL_IO_BYTES_MAX);
+    const output = this.embeddedTerminalResponses ??= new Uint8Array(nativeConstants.OT_EMBEDDED_TERMINAL_RESPONSE_BYTES_MAX);
     const count = new Uint32Array(1);
     const pointer = this.nativeContextPointer(context, "ot_embedded_terminal_drain_responses");
     let status = this.opentui.symbols.ot_embedded_terminal_drain_responses(pointer, handle, output, output.length, count);
@@ -8779,7 +9083,7 @@ class FFIRenderLib2 {
     if (count[0] !== bytes.length) {
       throw new NativeError2(operation, -5 /* InternalError */);
     }
-    return this.decoder.decode(bytes);
+    return this.textDecoder.decode(bytes);
   }
   contextTextBufferGetText(context, text) {
     const handle = encodeContextHandle(context, text);
@@ -10086,7 +10390,7 @@ class FFIRenderLib2 {
     const flags = flag(options.useAlternateScreen, "useAlternateScreen", nativeConstants.OT_TERMINAL_ALTERNATE_SCREEN) | flag(options.mouse, "mouse", nativeConstants.OT_TERMINAL_MOUSE) | flag(options.mouseMovement, "mouseMovement", nativeConstants.OT_TERMINAL_MOUSE_MOVEMENT) | flag(options.clearOnClose, "clearOnClose", nativeConstants.OT_TERMINAL_CLEAR_ON_CLOSE) | (options.replySentinel ? nativeConstants.OT_TERMINAL_REPLY_SENTINEL : 0) | SYNCHRONIZED_OUTPUT_FLAGS[synchronizedOutput] | (options.hostMultiplexer ? nativeConstants.OT_TERMINAL_HOST_MULTIPLEXER : 0);
     const record = createContextRecord(layout);
     record[layout.fields.flags.offset / 4] = flags;
-    record[layout.fields.kitty_keyboard_flags.offset / 4] = toSafeFFIU32Length(options.kittyKeyboardFlags ?? 5, "Session kittyKeyboardFlags");
+    record[layout.fields.kitty_keyboard_flags.offset / 4] = toSafeFFIU32Length(options.kittyKeyboardFlags ?? nativeConstants.OT_KITTY_KEYBOARD_DISAMBIGUATE | nativeConstants.OT_KITTY_KEYBOARD_ALTERNATE_KEYS, "Session kittyKeyboardFlags");
     const pointer = this.nativeContextPointer(context, "ot_session_setup_terminal");
     nativeResult("ot_session_setup_terminal", this.opentui.symbols.ot_session_setup_terminal(pointer, handle, record));
   }
@@ -10182,6 +10486,7 @@ class FFIRenderLib2 {
         break;
       case "palette-query":
         record[kind] = nativeConstants.OT_CONTROL_PALETTE_QUERY;
+        record[layout.fields.argument.offset / 4] = command.sentinel ? 1 : 0;
         bytes = sessionBytes(command.bytes, "Session palette query length");
         break;
       case "title": {
@@ -10221,9 +10526,13 @@ class FFIRenderLib2 {
         break;
       case "query-theme-colors":
         record[kind] = nativeConstants.OT_CONTROL_QUERY_THEME_COLORS;
+        record[layout.fields.argument.offset / 4] = command.sentinel ? 1 : 0;
         break;
       case "reset-background":
         record[kind] = nativeConstants.OT_CONTROL_RESET_BACKGROUND;
+        break;
+      case "end-reply-sentinel":
+        record[kind] = nativeConstants.OT_CONTROL_END_REPLY_SENTINEL;
         break;
       default:
         throw new TypeError("Unknown Session control kind");
@@ -10523,6 +10832,20 @@ class FFIRenderLib2 {
     nativeResult("ot_scene_has_measure", this.opentui.symbols.ot_scene_has_measure(pointer, handle, output));
     return output[0] !== 0;
   }
+  sceneReachesHooks(context, node) {
+    const handle = encodeContextHandle(context, node);
+    const output = new Uint32Array(1);
+    const pointer = this.nativeContextPointer(context, "ot_scene_reaches_hooks");
+    nativeResult("ot_scene_reaches_hooks", this.opentui.symbols.ot_scene_reaches_hooks(pointer, handle, output));
+    return output[0] !== 0;
+  }
+  scenePainted(context, node) {
+    const handle = encodeContextHandle(context, node);
+    const output = new Uint32Array(1);
+    const pointer = this.nativeContextPointer(context, "ot_scene_painted");
+    nativeResult("ot_scene_painted", this.opentui.symbols.ot_scene_painted(pointer, handle, output));
+    return output[0] !== 0;
+  }
   sceneMarkDirty(context, node) {
     this.getYogaHost().assertMutable();
     const handle = encodeContextHandle(context, node);
@@ -10662,6 +10985,155 @@ class FFIRenderLib2 {
     const { bytes, records, count, urlBytes } = this.encodeStyledText(content);
     const pointer = this.nativeContextPointer(context, "ot_scene_set_styled_text");
     nativeResult("ot_scene_set_styled_text", this.opentui.symbols.ot_scene_set_styled_text(pointer, handle, viewOrNull(bytes), bytes.length, count === 0 ? null : records, count, viewOrNull(urlBytes), urlBytes.length));
+  }
+  sceneGetTextByteAt(context, node, x, y) {
+    const output = new Uint32Array(1);
+    const pointer = this.nativeContextPointer(context, "ot_scene_get_text_byte_at");
+    nativeResult("ot_scene_get_text_byte_at", this.opentui.symbols.ot_scene_get_text_byte_at(pointer, encodeContextHandle(context, node), x, y, output));
+    return output[0] === 4294967295 ? undefined : output[0];
+  }
+  markdownOptions(context, options) {
+    const { fields } = nativeLayouts.ot_markdown_options;
+    const record = createContextRecord(nativeLayouts.ot_markdown_options);
+    record[fields.flags.offset / 4] = options.flags;
+    record[fields.source_byte_limit.offset / 4] = options.sourceByteLimit ?? 0;
+    if (options.syntaxStyle)
+      record.set(encodeContextHandle(context, options.syntaxStyle), fields.syntax_style.offset / 4);
+    const filter = this.encoder.encode((options.hookFilter ?? []).join("\x00"));
+    if (filter.length > fields.hook_filter.size)
+      throw new RangeError("Markdown hook filter is too long");
+    new Uint8Array(record.buffer, fields.hook_filter.offset).set(filter);
+    record[fields.hook_filter_byte_count.offset / 4] = filter.length;
+    return record;
+  }
+  markdownCall(context, operation, call) {
+    const output = new Uint32Array(3);
+    this.getYogaHost().runMutation(() => nativeResult(operation, call(this.nativeContextPointer(context, operation), output)));
+    const removed = output[2];
+    return { changed: output[0], committed: output[1], removedFrom: removed === 4294967295 ? undefined : removed };
+  }
+  markdownCreate(context, options) {
+    const record = this.markdownOptions(context, options);
+    const output = new Uint32Array(handleWords);
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_markdown_create");
+      nativeResult("ot_markdown_create", this.opentui.symbols.ot_markdown_create(pointer, record, output));
+    });
+    return decodeContextHandle(context, output);
+  }
+  markdownDestroy(context, doc) {
+    this.destroyContextObject(context, doc, "ot_markdown_destroy");
+  }
+  markdownSetOptions(context, doc, options) {
+    const record = this.markdownOptions(context, options);
+    const handle = encodeContextHandle(context, doc);
+    return this.markdownCall(context, "ot_markdown_set_options", (pointer, output) => this.opentui.symbols.ot_markdown_set_options(pointer, handle, record, output));
+  }
+  markdownWrite(context, doc, bytes, replace) {
+    const handle = encodeContextHandle(context, doc);
+    const input = sessionBytes(bytes, "Markdown byte count");
+    const operation = replace ? "ot_markdown_set" : "ot_markdown_append";
+    return this.markdownCall(context, operation, (pointer, output) => this.opentui.symbols[operation](pointer, handle, viewOrNull(input), input.length, output));
+  }
+  markdownFinish(context, doc) {
+    const handle = encodeContextHandle(context, doc);
+    return this.markdownCall(context, "ot_markdown_finish", (pointer, output) => this.opentui.symbols.ot_markdown_finish(pointer, handle, output));
+  }
+  markdownGetSource(context, doc, start = 0, end) {
+    const bytes = new BigUint64Array(1);
+    const count = new Uint32Array(1);
+    const pointer = this.nativeContextPointer(context, "ot_markdown_get_source");
+    nativeResult("ot_markdown_get_source", this.opentui.symbols.ot_markdown_get_source(pointer, encodeContextHandle(context, doc), bytes, count));
+    const to = Math.min(end ?? count[0], count[0]);
+    if (to <= start)
+      return "";
+    return markdownDecoder.decode(new Uint8Array(toArrayBuffer(Number(bytes[0]), start, to - start)));
+  }
+  markdownReadChanges(context, doc, count) {
+    const layout = nativeLayouts.ot_markdown_block;
+    const words = new Uint32Array(count * layout.size / 4);
+    const halves = new Uint16Array(words.buffer);
+    const output = new Uint32Array(1);
+    const handle = encodeContextHandle(context, doc);
+    const pointer = this.nativeContextPointer(context, "ot_markdown_read_changes");
+    nativeResult("ot_markdown_read_changes", this.opentui.symbols.ot_markdown_read_changes(pointer, handle, viewOrNull(words), count, output));
+    if (output[0] > count)
+      throw new NativeError2("ot_markdown_read_changes", -1 /* InvalidArgument */);
+    const { fields: f } = layout;
+    const blocks = [];
+    for (let at = 0;at < output[0] * (layout.size / 4); at += layout.size / 4) {
+      const parent = words[at + f.parent_index.offset / 4];
+      blocks.push({
+        index: words[at + f.index.offset / 4],
+        parent: parent === 4294967295 ? undefined : parent,
+        kind: halves[at * 2 + f.kind.offset / 2],
+        flags: halves[at * 2 + f.flags.offset / 2],
+        sourceStart: words[at + f.source_start_byte.offset / 4],
+        sourceEnd: words[at + f.source_end_byte.offset / 4],
+        infoStart: words[at + f.info_start_byte.offset / 4],
+        infoEnd: words[at + f.info_end_byte.offset / 4],
+        number: words[at + f.number.offset / 4]
+      });
+    }
+    return blocks;
+  }
+  markdownReadSource(context, doc, block) {
+    const handle = encodeContextHandle(context, doc);
+    const count = new Uint32Array(1);
+    const pointer = this.nativeContextPointer(context, "ot_markdown_read_source");
+    nativeResult("ot_markdown_read_source", this.opentui.symbols.ot_markdown_read_source(pointer, handle, block, null, 0, count));
+    if (count[0] === 0)
+      return "";
+    const bytes = new Uint8Array(count[0]);
+    nativeResult("ot_markdown_read_source", this.opentui.symbols.ot_markdown_read_source(pointer, handle, block, bytes, bytes.length, count));
+    return markdownDecoder.decode(bytes);
+  }
+  markdownReadLeaf(context, doc, block) {
+    const handle = encodeContextHandle(context, doc);
+    const counts = new Uint32Array(3);
+    const [byteCount, chunkCount, urlCount] = [counts.subarray(0, 1), counts.subarray(1, 2), counts.subarray(2, 3)];
+    const pointer = this.nativeContextPointer(context, "ot_markdown_read_leaf");
+    const read = (bytes, chunks, spans, urls) => nativeResult("ot_markdown_read_leaf", this.opentui.symbols.ot_markdown_read_leaf(pointer, handle, block, bytes, bytes?.length ?? 0, byteCount, chunks, spans, spans?.length ?? 0, chunkCount, urls, urls?.length ?? 0, urlCount));
+    read(null, null, null, null);
+    const layout = nativeLayouts.ot_styled_text_chunk;
+    const stride = layout.size / 4;
+    const bytes = new Uint8Array(byteCount[0]);
+    const records = new Uint32Array(chunkCount[0] * stride);
+    const spans = new Uint32Array(chunkCount[0]);
+    const urls = new Uint8Array(urlCount[0]);
+    if (chunkCount[0] > 0)
+      read(viewOrNull(bytes), records, spans, viewOrNull(urls));
+    const colors = new Uint16Array(records.buffer);
+    const chunks = [];
+    let at = 0;
+    for (let index = 0;index < chunkCount[0]; index++) {
+      const base = index * stride;
+      const flags = records[base + layout.fields.flags.offset / 4];
+      const end = at + records[base + layout.fields.byte_count.offset / 4];
+      const color = (offset) => RGBA2.fromArray(colors.slice(base * 2 + offset / 2, base * 2 + offset / 2 + 4));
+      const chunk = { __isChunk: true, text: markdownDecoder.decode(bytes.subarray(at, end)) };
+      if (flags & nativeConstants.OT_SCENE_TEXT_FOREGROUND)
+        chunk.fg = color(layout.fields.foreground.offset);
+      if (flags & nativeConstants.OT_SCENE_TEXT_BACKGROUND)
+        chunk.bg = color(layout.fields.background.offset);
+      chunk.attributes = records[base + layout.fields.attributes.offset / 4];
+      if (flags & nativeConstants.OT_SCENE_TEXT_LINK) {
+        const offset = records[base + layout.fields.link_offset.offset / 4];
+        const url = urls.subarray(offset, offset + records[base + layout.fields.link_byte_count.offset / 4]);
+        chunk.link = { url: markdownDecoder.decode(url) };
+      }
+      chunks.push(chunk);
+      at = end;
+    }
+    return { chunks, spans };
+  }
+  markdownBind(context, doc, block, node) {
+    const handle = encodeContextHandle(context, doc);
+    const target = encodeContextHandle(context, node);
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_markdown_bind");
+      nativeResult("ot_markdown_bind", this.opentui.symbols.ot_markdown_bind(pointer, handle, block, target));
+    });
   }
   encodeStyledText(content, allowLinks = true, preserveChunkOrdinals = false) {
     if (typeof content !== "object" || content === null || isStyledText2(content) !== true) {
@@ -11011,7 +11483,7 @@ class FFIRenderLib2 {
     this.sceneLayoutRecord = undefined;
     try {
       const handle = encodeContextHandle(context, node, scratch.handle.record, scratch.handle.words);
-      const mode = observation === "paint" ? nativeConstants.OT_LAYOUT_PAINT : toFFIBool(observation, "Scene Yoga layout observation") ? nativeConstants.OT_LAYOUT_YOGA : nativeConstants.OT_LAYOUT_PUBLIC;
+      const mode = observation === "paint" ? nativeConstants.OT_LAYOUT_PAINT : observation === "content" ? nativeConstants.OT_LAYOUT_CONTENT : toFFIBool(observation, "Scene Yoga layout observation") ? nativeConstants.OT_LAYOUT_YOGA : nativeConstants.OT_LAYOUT_PUBLIC;
       const { output, values, coordinates } = scratch;
       output[layout.fields.struct_size.offset / 4] = layout.size;
       output[layout.fields.abi_version.offset / 4] = nativeConstants.OT_CONTEXT_ABI_VERSION;
@@ -11189,13 +11661,14 @@ class FFIRenderLib2 {
     const pointer = this.nativeContextPointer(context, "ot_scene_frame_cancel");
     nativeResult("ot_scene_frame_cancel", this.opentui.symbols.ot_scene_frame_cancel(pointer, handle, id));
   }
-  sceneHitTest(context, session, x, y) {
+  sceneHitTest(context, session, x, y, excluded = 0) {
     const handle = encodeContextHandle(context, session);
     toFFII32(x, "Scene hit x");
     toFFII32(y, "Scene hit y");
+    toSafeFFIU32Length(excluded, "Scene hit exclusion");
     const output = this.hitTestOutput;
-    const pointer = this.nativeContextPointer(context, "ot_scene_hit_test");
-    nativeResult("ot_scene_hit_test", this.opentui.symbols.ot_scene_hit_test(pointer, handle, x, y, output));
+    const pointer = this.nativeContextPointer(context, "ot_scene_hit_test_excluding");
+    nativeResult("ot_scene_hit_test_excluding", this.opentui.symbols.ot_scene_hit_test_excluding(pointer, handle, x, y, excluded, output));
     return output[0];
   }
   sceneSetDebugFlags(context, session, flags) {
@@ -12326,7 +12799,8 @@ function resolveRenderLib2() {
     try {
       opentuiLib = new FFIRenderLib2(opentuiLibPath);
     } catch (error) {
-      throw new Error(`Failed to initialize OpenTUI render library: ${error instanceof Error ? error.message : "Unknown error"}`);
+      const source = opentuiLibPath ? "" : targetLibSource;
+      throw new Error(`Failed to initialize OpenTUI render library${source}: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
   renderLibResolved = true;
@@ -12367,9 +12841,9 @@ var Direction2;
 })(Direction2 ||= {});
 var Display2;
 ((Display) => {
-  Display[Display["Flex"] = 0] = "Flex";
-  Display[Display["None"] = 1] = "None";
-  Display[Display["Contents"] = 2] = "Contents";
+  Display[Display["Flex"] = OT_DISPLAY_FLEX] = "Flex";
+  Display[Display["None"] = OT_DISPLAY_NONE] = "None";
+  Display[Display["Contents"] = OT_DISPLAY_CONTENTS] = "Contents";
 })(Display2 ||= {});
 var Edge2;
 ((Edge) => {
@@ -12385,16 +12859,16 @@ var Edge2;
 })(Edge2 ||= {});
 var Errata2;
 ((Errata) => {
-  Errata[Errata["None"] = 0] = "None";
-  Errata[Errata["StretchFlexBasis"] = 1] = "StretchFlexBasis";
-  Errata[Errata["AbsolutePositionWithoutInsetsExcludesPadding"] = 2] = "AbsolutePositionWithoutInsetsExcludesPadding";
-  Errata[Errata["AbsolutePercentAgainstInnerSize"] = 4] = "AbsolutePercentAgainstInnerSize";
-  Errata[Errata["All"] = 2147483647] = "All";
-  Errata[Errata["Classic"] = 2147483646] = "Classic";
+  Errata[Errata["None"] = OT_YOGA_ERRATA_NONE] = "None";
+  Errata[Errata["StretchFlexBasis"] = OT_YOGA_ERRATA_STRETCH_FLEX_BASIS] = "StretchFlexBasis";
+  Errata[Errata["AbsolutePositionWithoutInsetsExcludesPadding"] = OT_YOGA_ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING] = "AbsolutePositionWithoutInsetsExcludesPadding";
+  Errata[Errata["AbsolutePercentAgainstInnerSize"] = OT_YOGA_ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE] = "AbsolutePercentAgainstInnerSize";
+  Errata[Errata["All"] = OT_YOGA_ERRATA_ALL] = "All";
+  Errata[Errata["Classic"] = OT_YOGA_ERRATA_CLASSIC] = "Classic";
 })(Errata2 ||= {});
 var ExperimentalFeature2;
 ((ExperimentalFeature) => {
-  ExperimentalFeature[ExperimentalFeature["WebFlexBasis"] = 0] = "WebFlexBasis";
+  ExperimentalFeature[ExperimentalFeature["WebFlexBasis"] = OT_YOGA_EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS] = "WebFlexBasis";
 })(ExperimentalFeature2 ||= {});
 var FlexDirection2;
 ((FlexDirection) => {
@@ -12420,12 +12894,12 @@ var Justify2;
 })(Justify2 ||= {});
 var LogLevel3;
 ((LogLevel) => {
-  LogLevel[LogLevel["Error"] = 0] = "Error";
-  LogLevel[LogLevel["Warn"] = 1] = "Warn";
-  LogLevel[LogLevel["Info"] = 2] = "Info";
-  LogLevel[LogLevel["Debug"] = 3] = "Debug";
-  LogLevel[LogLevel["Verbose"] = 4] = "Verbose";
-  LogLevel[LogLevel["Fatal"] = 5] = "Fatal";
+  LogLevel[LogLevel["Error"] = OT_YOGA_LOG_LEVEL_ERROR] = "Error";
+  LogLevel[LogLevel["Warn"] = OT_YOGA_LOG_LEVEL_WARN] = "Warn";
+  LogLevel[LogLevel["Info"] = OT_YOGA_LOG_LEVEL_INFO] = "Info";
+  LogLevel[LogLevel["Debug"] = OT_YOGA_LOG_LEVEL_DEBUG] = "Debug";
+  LogLevel[LogLevel["Verbose"] = OT_YOGA_LOG_LEVEL_VERBOSE] = "Verbose";
+  LogLevel[LogLevel["Fatal"] = OT_YOGA_LOG_LEVEL_FATAL] = "Fatal";
 })(LogLevel3 ||= {});
 var MeasureMode2;
 ((MeasureMode) => {
@@ -12435,8 +12909,8 @@ var MeasureMode2;
 })(MeasureMode2 ||= {});
 var NodeType2;
 ((NodeType) => {
-  NodeType[NodeType["Default"] = 0] = "Default";
-  NodeType[NodeType["Text"] = 1] = "Text";
+  NodeType[NodeType["Default"] = OT_YOGA_NODE_TYPE_DEFAULT] = "Default";
+  NodeType[NodeType["Text"] = OT_YOGA_NODE_TYPE_TEXT] = "Text";
 })(NodeType2 ||= {});
 var Overflow2;
 ((Overflow) => {
@@ -12479,9 +12953,9 @@ var DIMENSION_HEIGHT2 = Dimension2.Height;
 var DIRECTION_INHERIT2 = Direction2.Inherit;
 var DIRECTION_LTR2 = Direction2.LTR;
 var DIRECTION_RTL2 = Direction2.RTL;
-var DISPLAY_FLEX2 = 0 /* Flex */;
-var DISPLAY_NONE2 = 1 /* None */;
-var DISPLAY_CONTENTS2 = 2 /* Contents */;
+var DISPLAY_FLEX2 = Display2.Flex;
+var DISPLAY_NONE2 = Display2.None;
+var DISPLAY_CONTENTS2 = Display2.Contents;
 var EDGE_LEFT2 = Edge2.Left;
 var EDGE_TOP2 = Edge2.Top;
 var EDGE_RIGHT2 = Edge2.Right;
@@ -12491,13 +12965,13 @@ var EDGE_END2 = Edge2.End;
 var EDGE_HORIZONTAL2 = Edge2.Horizontal;
 var EDGE_VERTICAL2 = Edge2.Vertical;
 var EDGE_ALL2 = Edge2.All;
-var ERRATA_NONE2 = 0 /* None */;
-var ERRATA_STRETCH_FLEX_BASIS2 = 1 /* StretchFlexBasis */;
-var ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2 = 2 /* AbsolutePositionWithoutInsetsExcludesPadding */;
-var ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2 = 4 /* AbsolutePercentAgainstInnerSize */;
-var ERRATA_ALL2 = 2147483647 /* All */;
-var ERRATA_CLASSIC2 = 2147483646 /* Classic */;
-var EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2 = 0 /* WebFlexBasis */;
+var ERRATA_NONE2 = Errata2.None;
+var ERRATA_STRETCH_FLEX_BASIS2 = Errata2.StretchFlexBasis;
+var ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2 = Errata2.AbsolutePositionWithoutInsetsExcludesPadding;
+var ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2 = Errata2.AbsolutePercentAgainstInnerSize;
+var ERRATA_ALL2 = Errata2.All;
+var ERRATA_CLASSIC2 = Errata2.Classic;
+var EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2 = ExperimentalFeature2.WebFlexBasis;
 var FLEX_DIRECTION_COLUMN2 = FlexDirection2.Column;
 var FLEX_DIRECTION_COLUMN_REVERSE2 = FlexDirection2.ColumnReverse;
 var FLEX_DIRECTION_ROW2 = FlexDirection2.Row;
@@ -12511,17 +12985,17 @@ var JUSTIFY_FLEX_END2 = Justify2.FlexEnd;
 var JUSTIFY_SPACE_BETWEEN2 = Justify2.SpaceBetween;
 var JUSTIFY_SPACE_AROUND2 = Justify2.SpaceAround;
 var JUSTIFY_SPACE_EVENLY2 = Justify2.SpaceEvenly;
-var LOG_LEVEL_ERROR2 = 0 /* Error */;
-var LOG_LEVEL_WARN2 = 1 /* Warn */;
-var LOG_LEVEL_INFO2 = 2 /* Info */;
-var LOG_LEVEL_DEBUG2 = 3 /* Debug */;
-var LOG_LEVEL_VERBOSE2 = 4 /* Verbose */;
-var LOG_LEVEL_FATAL2 = 5 /* Fatal */;
+var LOG_LEVEL_ERROR2 = LogLevel3.Error;
+var LOG_LEVEL_WARN2 = LogLevel3.Warn;
+var LOG_LEVEL_INFO2 = LogLevel3.Info;
+var LOG_LEVEL_DEBUG2 = LogLevel3.Debug;
+var LOG_LEVEL_VERBOSE2 = LogLevel3.Verbose;
+var LOG_LEVEL_FATAL2 = LogLevel3.Fatal;
 var MEASURE_MODE_UNDEFINED2 = MeasureMode2.Undefined;
 var MEASURE_MODE_EXACTLY2 = MeasureMode2.Exactly;
 var MEASURE_MODE_AT_MOST2 = MeasureMode2.AtMost;
-var NODE_TYPE_DEFAULT2 = 0 /* Default */;
-var NODE_TYPE_TEXT2 = 1 /* Text */;
+var NODE_TYPE_DEFAULT2 = NodeType2.Default;
+var NODE_TYPE_TEXT2 = NodeType2.Text;
 var OVERFLOW_VISIBLE2 = Overflow2.Visible;
 var OVERFLOW_HIDDEN2 = Overflow2.Hidden;
 var OVERFLOW_SCROLL2 = Overflow2.Scroll;
@@ -12678,7 +13152,7 @@ class Config2 {
   }
   getErrata() {
     if (this.freed)
-      return 0 /* None */;
+      return Errata2.None;
     return this.renderLib.yogaConfigGetErrata(this.ptr);
   }
   setExperimentalFeatureEnabled(feature, enabled) {
@@ -12928,7 +13402,7 @@ class Node2 {
     this.setEnum(YogaEnumKind.Display, display);
   }
   getDisplay() {
-    return this.getEnum(YogaEnumKind.Display, 0 /* Flex */);
+    return this.getEnum(YogaEnumKind.Display, Display2.Flex);
   }
   setBoxSizing(boxSizing) {
     this.setEnum(YogaEnumKind.BoxSizing, boxSizing);
@@ -13299,5 +13773,5 @@ var yoga_default = Yoga;
 
 export { nativeLayouts, nativeConstants, toArrayBuffer, singleton, getSingleton, destroySingleton, envRegistry2, registerEnvVar2, clearEnvCache2, generateEnvMarkdown2, generateEnvColored2, env2, stringWidth, resolveBundledFilePath2, Worker, TextAttributes2, ATTRIBUTE_BASE_BITS2, ATTRIBUTE_BASE_MASK2, getBaseAttributes2, DebugOverlayCorner2, TargetChannel2, DEFAULT_FOREGROUND_RGB2, DEFAULT_BACKGROUND_RGB2, normalizeIndexedColorIndex2, ansi256IndexToRgb2, RGBA2, normalizeColorValue2, hexToRgb2, rgbToHex2, hsvToRgb2, parseColor2, createTextAttributes2, attributesWithLink2, getLinkId2, visualizeRenderableTree2, isStyledText2, StyledText2, stringToStyledText2, black2, red2, green2, yellow2, blue2, magenta2, cyan2, white2, brightBlack2, brightRed2, brightGreen2, brightYellow2, brightBlue2, brightMagenta2, brightCyan2, brightWhite2, bgBlack2, bgRed2, bgGreen2, bgYellow2, bgBlue2, bgMagenta2, bgCyan2, bgWhite2, bold2, italic2, underline2, strikethrough2, dim2, reverse2, blink2, fg2, bg2, link2, t2, YogaEnumKind, YogaFloatKind, YogaValueKind, sceneSetEnum, sceneGetEnum, sceneSetFloat, sceneGetFloat, sceneSetValue, sceneGetValue, sceneSetDimension, UNDEFINED_VALUE, parseYogaValue, SpanInfoStruct, NativeAudioStreamFormat2, NativeAudioStreamState2, NativeAudioStreamStateNames, NativeAudioStreamCloseReason2, isBunfsPath, normalizeBunfsPath, resolveDefaultParserAsset, resolveDefaultTreeSitterWorkerPath, resolveTreeSitterWasm, NativeAudioStreamState3, NativeAudioStreamCloseReason3, NativeAudioStreamFormat3, MAX_LINK_URL_BYTES2, NativeTextViewCommand2, NativeEditCommand2, NativeEditPositionQuery2, NativeEditorStyleMask2, NativeEditHighlightOperation2, NativeEditorCommand2, NativeEditorSelectionOperation2, NativeEditorPositionQuery2, NativeEditEvent2, NativeStyleGroup, NativeStyleFlags, NATIVE_EDGE_NONE2, NativeBorder2, NativeSceneHook2, NativeSceneFrame2, NativeScenePaintPhase2, emptySceneScrollState, NATIVE_BUFFER_TEXT_BYTES_MAX2, NativeSessionState2, NativeSessionRenderStatus2, NATIVE_SESSION_CONTROL_PACKET_BYTES2, NativeSessionTerminalPhase2, NativeSessionPumpStatus2, NativeStatus2, NativeError2, NativeClipboardOperationStatus2, NativeClipboardStartStatus2, NativeClipboardCancelStatus2, NativeClipboardCopyStatus2, NativeClipboardDestroyStatus2, NativeClipboardShutdownStatus2, SceneStaging, NativePaintRecorder, LogLevel2, FFIRenderLib2, setRenderLibPath2, resolveRenderLib2, Align2, BoxSizing2, Dimension2, Direction2, Display2, Edge2, Errata2, ExperimentalFeature2, FlexDirection2, Gutter2, Justify2, LogLevel3, MeasureMode2, NodeType2, Overflow2, PositionType2, Unit2, Wrap2, ALIGN_AUTO2, ALIGN_FLEX_START2, ALIGN_CENTER2, ALIGN_FLEX_END2, ALIGN_STRETCH2, ALIGN_BASELINE2, ALIGN_SPACE_BETWEEN2, ALIGN_SPACE_AROUND2, ALIGN_SPACE_EVENLY2, BOX_SIZING_BORDER_BOX2, BOX_SIZING_CONTENT_BOX2, DIMENSION_WIDTH2, DIMENSION_HEIGHT2, DIRECTION_INHERIT2, DIRECTION_LTR2, DIRECTION_RTL2, DISPLAY_FLEX2, DISPLAY_NONE2, DISPLAY_CONTENTS2, EDGE_LEFT2, EDGE_TOP2, EDGE_RIGHT2, EDGE_BOTTOM2, EDGE_START2, EDGE_END2, EDGE_HORIZONTAL2, EDGE_VERTICAL2, EDGE_ALL2, ERRATA_NONE2, ERRATA_STRETCH_FLEX_BASIS2, ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2, ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2, ERRATA_ALL2, ERRATA_CLASSIC2, EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2, FLEX_DIRECTION_COLUMN2, FLEX_DIRECTION_COLUMN_REVERSE2, FLEX_DIRECTION_ROW2, FLEX_DIRECTION_ROW_REVERSE2, GUTTER_COLUMN2, GUTTER_ROW2, GUTTER_ALL2, JUSTIFY_FLEX_START2, JUSTIFY_CENTER2, JUSTIFY_FLEX_END2, JUSTIFY_SPACE_BETWEEN2, JUSTIFY_SPACE_AROUND2, JUSTIFY_SPACE_EVENLY2, LOG_LEVEL_ERROR2, LOG_LEVEL_WARN2, LOG_LEVEL_INFO2, LOG_LEVEL_DEBUG2, LOG_LEVEL_VERBOSE2, LOG_LEVEL_FATAL2, MEASURE_MODE_UNDEFINED2, MEASURE_MODE_EXACTLY2, MEASURE_MODE_AT_MOST2, NODE_TYPE_DEFAULT2, NODE_TYPE_TEXT2, OVERFLOW_VISIBLE2, OVERFLOW_HIDDEN2, OVERFLOW_SCROLL2, POSITION_TYPE_STATIC2, POSITION_TYPE_RELATIVE2, POSITION_TYPE_ABSOLUTE2, UNIT_UNDEFINED2, UNIT_POINT2, UNIT_PERCENT2, UNIT_AUTO2, WRAP_NO_WRAP2, WRAP_WRAP2, WRAP_WRAP_REVERSE2, YogaStatus2, YogaError2, Config2, Node2, exports_yoga, yoga_default };
 
-//# debugId=263DA5C452AA6E4B64756E2164756E21
-//# sourceMappingURL=chunk-node-wp4ndmj5.js.map
+//# debugId=C2F5DA711972842B64756E2164756E21
+//# sourceMappingURL=chunk-node-jn07qw40.js.map

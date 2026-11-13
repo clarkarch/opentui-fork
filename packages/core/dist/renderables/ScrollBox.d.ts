@@ -36,6 +36,7 @@ export declare class ScrollBoxRenderable extends BoxRenderable {
     readonly verticalScrollBar: ScrollBoxBar;
     protected static readonly defaultFocusable = true;
     private readonly selectionListener;
+    private autoScrollOwner?;
     private autoScrollMouseX;
     private autoScrollMouseY;
     private readonly autoScrollThresholdVertical;
@@ -43,7 +44,6 @@ export declare class ScrollBoxRenderable extends BoxRenderable {
     private readonly autoScrollSpeedSlow;
     private readonly autoScrollSpeedMedium;
     private readonly autoScrollSpeedFast;
-    private isAutoScrolling;
     private cachedAutoScrollSpeed;
     private autoScrollAccumulatorX;
     private autoScrollAccumulatorY;
@@ -104,7 +104,9 @@ export declare class ScrollBoxRenderable extends BoxRenderable {
     private notifyScroll;
     /** Runs `callback` once in the next frame, after its layout and before it paints: layout reads in it are current,
      * and a scroll it makes shows in that frame. Asked during a frame, it runs in the frame after. It waits while the box
-     * is hidden; destroying the box drops it. */
+     * is hidden; destroying the box drops it. A `Code` block that the frame before painted keeps its last highlight's
+     * height through the frame that moves it out of view: a growth hold here reads that height, and for a block that ends
+     * above the view the rows in view move in the next frame. `anchor` and sticky bottom hold them. */
     afterLayout(callback: () => void): void;
     /** Keeps `node`, a descendant, at its place in the viewport through layout changes, over sticky follow, until the
      * returned function runs or the node leaves the box. A scroll moves the place it keeps; a scroll to the end or a later
@@ -140,12 +142,15 @@ export declare class ScrollBoxRenderable extends BoxRenderable {
     /** Thumb geometry is in half cells along the track, as the native slider's. */
     private thumbPointer;
     private pressTrack;
+    /** A pointer at the position the offset already reflects has nothing to apply: recomputing the offset could move
+     * it, by a rounding error or by the clamp on a press before the thumb's exact start. */
     private dragThumb;
     private endBarPress;
     handleKeyPress(key: KeyEvent): boolean;
     private resetScrollAccumulators;
     startAutoScroll(mouseX: number, mouseY: number): void;
     updateAutoScroll(mouseX: number, mouseY: number): void;
+    private draggingSelection;
     stopAutoScroll(): void;
     private handleAutoScroll;
     private getAutoScrollDirectionX;

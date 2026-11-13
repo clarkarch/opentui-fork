@@ -8,6 +8,7 @@ export type EdgeString = "left" | "top" | "right" | "bottom" | "start" | "end" |
 export type FlexDirectionString = "column" | "column-reverse" | "row" | "row-reverse";
 export type GutterString = "column" | "row" | "all";
 export type JustifyString = "flex-start" | "center" | "flex-end" | "space-between" | "space-around" | "space-evenly";
+export type LayoutModeString = "flex" | "list";
 export type LogLevelString = "error" | "warn" | "info" | "debug" | "verbose" | "fatal";
 export type MeasureModeString = "undefined" | "exactly" | "at-most";
 export type OverflowString = "visible" | "hidden" | "scroll";
@@ -24,6 +25,7 @@ export declare function parseEdge(value: string): Edge;
 export declare function parseFlexDirection(value: string | null | undefined): FlexDirection;
 export declare function parseGutter(value: string): Gutter;
 export declare function parseJustify(value: string | null | undefined): Justify;
+export declare function parseLayoutMode(value: string | null | undefined): number;
 export declare function parseLogLevel(value: string): LogLevel;
 export declare function parseMeasureMode(value: string): MeasureMode;
 export declare function parseOverflow(value: string | null | undefined): Overflow;

@@ -73,7 +73,7 @@ export declare class TabSelectRenderable extends Renderable {
     getTabWidth(): number;
     handleKeyPress(key: KeyEvent): boolean;
     get options(): TabSelectOption[];
-    set options(options: TabSelectOption[]);
+    set options(options: TabSelectOption[] | null | undefined);
     set backgroundColor(color: ColorInput);
     set textColor(color: ColorInput);
     set focusedBackgroundColor(color: ColorInput);
@@ -91,7 +91,7 @@ export declare class TabSelectRenderable extends Renderable {
     set wrapSelection(wrap: boolean);
     get tabWidth(): number;
     set tabWidth(tabWidth: number);
-    set keyBindings(bindings: TabSelectKeyBinding[]);
+    set keyBindings(bindings: TabSelectKeyBinding[] | null | undefined);
     set keyAliasMap(aliases: KeyAliasMap);
 }
 export {};

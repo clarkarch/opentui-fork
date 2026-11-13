@@ -8,6 +8,7 @@ export interface StyleDefinition {
     italic?: boolean;
     underline?: boolean;
     dim?: boolean;
+    strikethrough?: boolean;
 }
 export interface StyleDefinitionInput {
     fg?: ColorInput;
@@ -16,6 +17,7 @@ export interface StyleDefinitionInput {
     italic?: boolean;
     underline?: boolean;
     dim?: boolean;
+    strikethrough?: boolean;
 }
 export interface MergedStyle {
     fg?: RGBA;
@@ -31,6 +33,7 @@ export interface ThemeTokenStyle {
         italic?: boolean;
         underline?: boolean;
         dim?: boolean;
+        strikethrough?: boolean;
     };
 }
 export declare function convertThemeToStyles(theme: ThemeTokenStyle[]): Record<string, StyleDefinition>;
@@ -46,6 +49,8 @@ export declare class SyntaxStyle {
     static fromTheme(theme: ThemeTokenStyle[], owner: NativeResourceOwner): SyntaxStyle;
     static fromStyles(styles: Record<string, StyleDefinitionInput> | Map<string, StyleDefinitionInput>, owner: NativeResourceOwner): SyntaxStyle;
     private guard;
+    /** @internal Whether the style lives in the Context of `scene`, so it can bind there. */
+    _ownedBy(scene: NativeResourceOwner): boolean;
     /** @internal Attachment borrows the Context-owned style; it never allocates a copy. */
     _getSceneHandle(scene: NativeResourceOwner): ContextSyntaxStyleHandle;
     registerStyle(name: string, style: StyleDefinitionInput): number;

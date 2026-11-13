@@ -99,6 +99,7 @@ export declare abstract class EditBufferRenderable extends Renderable implements
     get visualCursor(): VisualCursor;
     get cursorOffset(): number;
     set cursorOffset(offset: number);
+    private selectionSide;
     get cursorCharacterOffset(): number | undefined;
     get textColor(): RGBA;
     set textColor(value: RGBA | string | undefined);
@@ -119,7 +120,7 @@ export declare abstract class EditBufferRenderable extends Renderable implements
     get cursorColor(): RGBA;
     set cursorColor(value: RGBA | string);
     get cursorStyle(): CursorStyleOptions;
-    set cursorStyle(style: CursorStyleOptions);
+    set cursorStyle(value: CursorStyleOptions | null | undefined);
     get selectionOccupancy(): SelectionOccupancy;
     set selectionOccupancy(value: SelectionOccupancy | null | undefined);
     get tabIndicator(): string | number | undefined;
@@ -145,6 +146,7 @@ export declare abstract class EditBufferRenderable extends Renderable implements
         end: number;
     } | null;
     private deleteSelectedText;
+    private resetSelection;
     setSelection(start: number, end: number): void;
     setSelectionInclusive(start: number, end: number): void;
     clearSelection(): boolean;

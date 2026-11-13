@@ -15,8 +15,7 @@ export declare class TreeSitterClient extends EventEmitter<TreeSitterClientEvent
     private initializeResolvers;
     private messageCallbacks;
     private messageIdCounter;
-    private editQueues;
-    private debouncer;
+    private resetVersions;
     private options;
     private destroyCallbacks;
     private lifecycleGeneration;
@@ -52,7 +51,6 @@ export declare class TreeSitterClient extends EventEmitter<TreeSitterClientEvent
     preloadParser(filetype: string): Promise<boolean>;
     createBuffer(id: number, content: string, filetype: string, version?: number, autoInitialize?: boolean): Promise<boolean>;
     updateBuffer(id: number, edits: Edit[], newContent: string, version: number): Promise<void>;
-    private processEdit;
     removeBuffer(bufferId: number): Promise<void>;
     destroy(): Promise<void>;
     resetBuffer(bufferId: number, version: number, content: string): Promise<void>;

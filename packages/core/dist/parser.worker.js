@@ -3959,7 +3959,12 @@ class ParserWorker {
       return;
     }
     const parser = new Parser;
-    parser.setLanguage(filetypeParser.language);
+    try {
+      parser.setLanguage(filetypeParser.language);
+    } catch (error) {
+      parser.delete();
+      throw error;
+    }
     const reusableState = {
       parser,
       filetypeParser,
@@ -3980,8 +3985,14 @@ class ParserWorker {
       return;
     }
     const parser = new Parser;
-    parser.setLanguage(filetypeParser.language);
-    const tree = parser.parse(content);
+    let tree = null;
+    try {
+      parser.setLanguage(filetypeParser.language);
+      tree = parser.parse(content);
+    } finally {
+      if (!tree)
+        parser.delete();
+    }
     if (!tree) {
       postWorkerMessage({
         type: "PARSER_INIT_RESPONSE",
@@ -4157,6 +4168,7 @@ class ParserWorker {
       return { error: "Failed to parse buffer" };
     }
     const changedRanges = parserState.tree.getChangedRanges(newTree);
+    parserState.tree.delete();
     parserState.tree = newTree;
     const startQuery = performance.now();
     const matches = [];
@@ -4308,6 +4320,7 @@ class ParserWorker {
     if (!newTree) {
       return { error: "Failed to parse buffer during reset" };
     }
+    parserState.tree.delete();
     parserState.tree = newTree;
     const matches = parserState.queries.highlights.captures(parserState.tree.rootNode);
     let injectionRanges = new Map;
@@ -4399,6 +4412,8 @@ class ParserWorker {
       await mkdir2(path2.join(treeSitterPath, "queries"), { recursive: true });
       this.filetypeParsers.clear();
       this.filetypeParserPromises.clear();
+      for (const { parser } of this.reusableParsers.values())
+        parser.delete();
       this.reusableParsers.clear();
       this.reusableParserPromises.clear();
     } catch (error) {
@@ -4426,7 +4441,7 @@ if (isWorkerRuntime) {
   console.log = (...args2) => logMessage("log", ...args2);
   console.error = (...args2) => logMessage("error", ...args2);
   console.warn = (...args2) => logMessage("warn", ...args2);
-  setWorkerMessageHandler(async (event) => {
+  const handleMessage = async (event) => {
     const message = event.data;
     const messageType = String(event.data.type ?? "unknown");
     try {
@@ -4566,8 +4581,17 @@ if (isWorkerRuntime) {
         postWorkerError(undefined, messageId, error);
       }
     }
+  };
+  const bufferQueues = new Map;
+  setWorkerMessageHandler((event) => {
+    if (!("bufferId" in event.data))
+      return handleMessage(event);
+    const { bufferId } = event.data;
+    const queued = (bufferQueues.get(bufferId) ?? Promise.resolve()).then(() => handleMessage(event));
+    bufferQueues.set(bufferId, queued);
+    queued.then(() => bufferQueues.get(bufferId) === queued && bufferQueues.delete(bufferId));
   });
 }
 
-//# debugId=C84A64624AD7862C64756E2164756E21
+//# debugId=8D67B8A10DFB079E64756E2164756E21
 //# sourceMappingURL=parser.worker.js.map

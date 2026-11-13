@@ -59,6 +59,15 @@ export declare class ExtmarksController {
     private readonly contentChangeListener;
     constructor(editBuffer: EditBuffer, editorView: EditorView);
     private wrapCursorMovement;
+    private moveBefore;
+    private leaveVirtualExtmark;
+    /**
+     * @internal A cursor that a wheel step, a pointer or the offset setter left inside virtual extmarks goes to the
+     * outer edge of the marks around it: toward the end for a positive `direction`, the start for a negative one, or the
+     * nearer edge, as the Rust editor's. Not while a selection is left: it holds the cursor at its focus.
+     */
+    _keepCursorOutside(direction: number): void;
+    private outside;
     private wrapDeletion;
     private wrapInsertion;
     private wrapEditorViewDeleteSelectedText;

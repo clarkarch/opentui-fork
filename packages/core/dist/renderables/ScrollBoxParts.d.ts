@@ -5,7 +5,6 @@ import type { BaseRenderable, Renderable } from "../Renderable.js";
 import type { NativeScene } from "../NativeScene.js";
 import { type NativeSceneRect, type NativeSceneScrollBarOptions, type SceneNodeHandle } from "../zig.js";
 import type { BoxOptions } from "./Box.js";
-import type { VNode } from "./composition/vnode.js";
 import { type ArrowOptions, type ScrollUnit } from "./ScrollBar.js";
 import type { ScrollBoxRenderable } from "./ScrollBox.js";
 export type SceneStyleNode = {
@@ -85,12 +84,12 @@ export declare class ScrollBoxContent extends ScrollBoxSizedPart {
     constructor(box: ScrollBoxRenderable);
     protected rect(): NativeSceneRect;
     private setStyle;
-    /** @internal Whether children lay out in a row, by the direction native was given. */
+    /** @internal Whether children lay out in a row, by the direction and mode native was given. */
     get _row(): boolean;
     get viewportCulling(): boolean;
     set viewportCulling(value: boolean);
-    add(obj: Renderable | VNode<any, any[]>, index?: number): number;
-    insertBefore(obj: Renderable | VNode<any, any[]> | unknown, anchor?: Renderable | unknown): number;
+    add(obj: Renderable, index?: number): number;
+    insertBefore(obj: Renderable, anchor?: Renderable): number;
     remove(child: BaseRenderable): void;
     getChildren(): Renderable[];
     getChildrenCount(): number;
@@ -156,7 +155,7 @@ export declare class ScrollBoxBar extends ScrollBoxPart {
     handleKeyPress(key: KeyEvent): boolean;
 }
 type Edges = "" | "X" | "Y" | "Top" | "Right" | "Bottom" | "Left";
-type ContentLayoutKey = "flexDirection" | "flexWrap" | "alignItems" | "justifyContent" | "alignSelf" | "flexGrow" | "flexShrink" | "flexBasis" | `${"min" | "max"}${"Width" | "Height"}` | `${"padding" | "margin"}${Edges}` | "gap" | "rowGap" | "columnGap";
+type ContentLayoutKey = "flexDirection" | "flexWrap" | "layoutMode" | "alignItems" | "justifyContent" | "alignSelf" | "flexGrow" | "flexShrink" | "flexBasis" | `${"min" | "max"}${"Width" | "Height"}` | `${"padding" | "margin"}${Edges}` | "gap" | "rowGap" | "columnGap";
 export interface ScrollBoxContent extends ContentLayout {
 }
 type ContentLayout = {

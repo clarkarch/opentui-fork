@@ -1,4 +1,4 @@
-import { BaseRenderable, Renderable, type RenderableOptions } from "../Renderable.js";
+import { type BaseRenderable, Renderable, type RenderableOptions } from "../Renderable.js";
 import type { CliRenderer } from "../renderer.js";
 import type { RenderContext } from "../types.js";
 import { SlotRegistry, type SlotRegistryOptions } from "./registry.js";

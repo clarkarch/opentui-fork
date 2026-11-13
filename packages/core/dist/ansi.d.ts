@@ -7,7 +7,7 @@ export declare const ANSI: {
     clearScreen: string;
     clearSavedLines: string;
     scrollDown: (lines: number) => string;
-    scrollUp: (lines: number) => string;
+    scrollIntoHistory: (lines: number) => string;
     moveCursor: (row: number, col: number) => string;
     moveCursorAndClear: (row: number, col: number) => string;
     setRgbBackground: (r: number, g: number, b: number) => string;

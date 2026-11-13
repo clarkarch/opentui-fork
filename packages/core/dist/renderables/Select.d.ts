@@ -84,7 +84,7 @@ export declare class SelectRenderable extends Renderable {
     constructor(ctx: RenderContext, options: SelectRenderableOptions);
     protected renderSelf(buffer: OptimizedBuffer, deltaTime: number): void;
     get options(): SelectOption[];
-    set options(options: SelectOption[]);
+    set options(options: SelectOption[] | null | undefined);
     getSelectedOption(): SelectOption | null;
     getSelectedIndex(): number;
     moveUp(steps?: number): void;
@@ -114,7 +114,7 @@ export declare class SelectRenderable extends Renderable {
     set font(font: keyof typeof fonts);
     set itemSpacing(spacing: number);
     set fastScrollStep(step: number);
-    set keyBindings(bindings: SelectKeyBinding[]);
+    set keyBindings(bindings: SelectKeyBinding[] | null | undefined);
     set keyAliasMap(aliases: KeyAliasMap);
     set selectedIndex(value: number);
 }
