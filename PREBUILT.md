@@ -44,7 +44,8 @@ toolchain can use the fork as-is:
    done
    npm pack @clarkarch/opentui-fork@0.8.4-fork.3 --pack-destination /tmp
    tar -xzf /tmp/clarkarch-opentui-fork-0.8.4-fork.3.tgz -C /tmp
-   rm -rf packages/core/dist && cp -R /tmp/package/dist packages/core/dist
+   rm -rf packages/core/dist && mkdir -p packages/core/dist
+   cp -R /tmp/package/. packages/core/dist/
    # `dist` and `lib` are gitignored, so a plain `git add` skips the artifacts — hence -f.
    git add -f packages/core/dist packages/native/lib
    git commit -m "build: refresh the prebuilt artifacts"

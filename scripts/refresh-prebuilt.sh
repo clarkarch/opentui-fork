@@ -50,14 +50,16 @@ for target in $TARGETS; do
     done
 done
 
-# The core package: its published tarball carries the built dist.
+# The core package: its published tarball carries the built dist, at the
+# package root.
 echo "core: @clarkarch/opentui-fork@$version"
 npm pack "@clarkarch/opentui-fork@$version" --pack-destination "$work" >/dev/null
 tarball=$(ls "$work"/*.tgz)
 mkdir -p "$work/package"
 tar -xzf "$tarball" -C "$work/package"
 rm -rf packages/core/dist
-cp -R "$work/package/package/dist" packages/core/dist
+mkdir -p packages/core/dist
+cp -R "$work/package/package/." packages/core/dist/
 
 # The header and the bindings must agree: the crates compare this hash when
 # they link, and a mismatch is a broken consumer, not a warning.
