@@ -74,6 +74,11 @@ with [`scripts/build-ffmpeg.ts`](scripts/build-ffmpeg.ts); the fork skips that
 target), and nothing calls the script. The vendored sources under
 `src/vendor/ffmpeg/` are kept for reference only.
 
+The fork's release (`native-latest`) publishes the stripped library for every
+target, plus the header and, where the platform has one, the static archive.
+Windows publishes its DLL, its import library (`opentui.lib`), and the header;
+the Rust crates link the DLL there, so they need no archive.
+
 ```sh
 zig build test-abi --summary all
 ```
