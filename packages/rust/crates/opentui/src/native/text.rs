@@ -457,9 +457,33 @@ impl Image {
     }
 }
 
+/// The placement opacity that inherits the render-tree opacity (tfm fork).
+///
+/// Pass it to [`Node::set_image_with_opacity`] to keep the default behaviour.
+pub const IMAGE_OPACITY_INHERIT: f32 = -1.0;
+
 impl Node {
     /// Shows an image in an [`NodeKind::Image`](super::NodeKind::Image) node, or clears it with `None`.
+    ///
+    /// The placement inherits the render-tree opacity. Use
+    /// [`Node::set_image_with_opacity`] to override it.
     pub fn set_image(&self, image: Option<&Image>, fit: ImageFit, protocol: ImageProtocol) -> Result<()> {
+        self.set_image_with_opacity(image, fit, protocol, IMAGE_OPACITY_INHERIT)
+    }
+
+    /// Shows an image and overrides the opacity of its placements.
+    ///
+    /// `opacity_override` is a tfm fork addition: a negative value (including
+    /// NaN) inherits the render-tree opacity, while `0.0..=1.0` replaces it
+    /// for this node's placements — so an image can stay opaque (or fade
+    /// independently) under a node-opacity dim.
+    pub fn set_image_with_opacity(
+        &self,
+        image: Option<&Image>,
+        fit: ImageFit,
+        protocol: ImageProtocol,
+        opacity_override: f32,
+    ) -> Result<()> {
         let image = image.map(Image::handle);
         let protocol = match protocol {
             ImageProtocol::Auto => sys::OT_IMAGE_PROTOCOL_AUTO,
@@ -475,6 +499,7 @@ impl Node {
                 fit.raw(),
                 protocol,
                 std::ptr::null(),
+                opacity_override,
             )
         })
     }

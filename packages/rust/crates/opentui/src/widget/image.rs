@@ -1,7 +1,7 @@
 use super::{Behavior, Element, build, handle};
 use crate::app::App;
 use crate::error::Result;
-use crate::native::{Image, ImageFit, ImageProtocol, NodeKind};
+use crate::native::{IMAGE_OPACITY_INHERIT, Image, ImageFit, ImageProtocol, NodeKind};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
@@ -10,13 +10,17 @@ pub(crate) struct ImageInner {
     image: RefCell<Option<Image>>,
     fit: Cell<ImageFit>,
     protocol: Cell<ImageProtocol>,
+    placement_opacity: Cell<Option<f32>>,
 }
 
 impl ImageInner {
     fn publish(&self) {
         let image = self.image.borrow().clone();
         let (fit, protocol) = (self.fit.get(), self.protocol.get());
-        self.element.apply(|node| node.set_image(image.as_ref(), fit, protocol));
+        let opacity = self.placement_opacity.get();
+        self.element.apply(|node| {
+            node.set_image_with_opacity(image.as_ref(), fit, protocol, opacity.unwrap_or(IMAGE_OPACITY_INHERIT))
+        });
     }
 }
 
@@ -50,6 +54,7 @@ impl ImageView {
             image: RefCell::new(None),
             fit: Cell::new(ImageFit::Contain),
             protocol: Cell::new(ImageProtocol::Auto),
+            placement_opacity: Cell::new(None),
         }))
     }
 
@@ -77,6 +82,24 @@ impl ImageView {
     /// Forces a protocol, for example [`ImageProtocol::Blocks`] for terminals that misreport graphics support.
     pub fn protocol(&self, protocol: ImageProtocol) -> Self {
         self.0.protocol.set(protocol);
+        self.0.publish();
+        self.clone()
+    }
+
+    /// Overrides the opacity of this image's placements (tfm fork).
+    ///
+    /// `None` inherits the render-tree opacity — the default. `Some(value)`
+    /// replaces it with `value` (`0.0..=1.0`), so the image can stay opaque
+    /// (or fade independently) under a node-opacity dim.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `value` is outside `0.0..=1.0`.
+    pub fn placement_opacity(&self, value: Option<f32>) -> Self {
+        if let Some(value) = value {
+            assert!((0.0..=1.0).contains(&value), "placement opacity must be within 0..1");
+        }
+        self.0.placement_opacity.set(value);
         self.0.publish();
         self.clone()
     }

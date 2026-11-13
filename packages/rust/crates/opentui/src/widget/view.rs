@@ -108,6 +108,17 @@ impl View {
         self.clone()
     }
 
+    /// Keeps the image placements this box's translucent fill covers instead of
+    /// deleting them, dimming them in place (tfm fork).
+    ///
+    /// The fill records the covered rectangle and its alpha as a dimming region
+    /// and blends the backdrop under the images, so an image under a scrim stays
+    /// visible and dimmed.
+    pub fn fill_dims_images(&self, on: bool) -> Self {
+        self.0.element.apply(|node| node.set_fill_dims_images(on));
+        self.clone()
+    }
+
     /// A single-row title on the top border.
     pub fn title(&self, title: impl Into<String>) -> Self {
         let title = title.into();

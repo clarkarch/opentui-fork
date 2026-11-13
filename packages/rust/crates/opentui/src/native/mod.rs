@@ -62,7 +62,8 @@ pub use terminal::{
     TerminalKey, TerminalMouse, TerminalMouseAction, TerminalMouseButton, TerminalViewport,
 };
 pub use text::{
-    Image, ImageFit, ImageInfo, ImageProtocol, TextBuffer, TextBufferInfo, TextMeasure, TextView, VisualLine,
+    IMAGE_OPACITY_INHERIT, Image, ImageFit, ImageInfo, ImageProtocol, TextBuffer, TextBufferInfo, TextMeasure,
+    TextView, VisualLine,
 };
 pub(crate) use video::video_path;
 pub use video::{VideoInfo, VideoState};

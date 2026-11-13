@@ -52,6 +52,23 @@ terminal or platform is unavailable locally.
 - A change to `opentui.h` also runs `sh packages/rust/test.sh shared` and fixes the crates in the same pull request.
 - The crates carry `@opentui/core`'s version; `prepare-release` sets it.
 
+### The fork's image ABI in Rust
+
+The fork's `opentui.h` adds an `opacity_override` parameter to `ot_scene_set_image`, so upstream's Rust
+call site does not compile against the regenerated bindings. The safe layer carries it:
+
+- `Node::set_image_with_opacity(image, fit, protocol, opacity_override)` and `IMAGE_OPACITY_INHERIT` (a negative
+  value inherits the render-tree opacity; `0.0..=1.0` replaces it). `Node::set_image` keeps upstream's behaviour.
+- `ImageView::placement_opacity(Option<f32>)` is the widget-level spelling, with the same range check as the JS side.
+- `Node::set_fill_dims_images(bool)` and `View::fill_dims_images(bool)` carry the fork's box flag: a translucent fill
+  keeps the image placements it covers and dims them in place instead of deleting them.
+- `ImageFit::Contain` needs no Rust-side flag. The fork's scene turns the node's fit into the native
+  `OT_IMAGE_DRAW_PRESERVE_ASPECT` placement, so a Rust app gets the letterboxed, undistorted placement for free.
+
+Regenerating the bindings (`bun run generate:abi` in `packages/core`) changes `generated.rs` and the header hash in
+it; `opentui-sys`'s build script refuses a native library whose header does not match that hash, so a native rebuild
+has to follow an ABI change.
+
 ## Fork publishing (the `tfm` branch)
 
 This branch is a fork that carries patches upstream does not have. It is published to npm under its own scope,
