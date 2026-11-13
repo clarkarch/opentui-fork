@@ -3,7 +3,7 @@ import type { RenderContext } from "../types.js";
 import { type LineColorConfig } from "./LineNumberRenderable.js";
 import { RGBA } from "../lib/RGBA.js";
 import { SyntaxStyle } from "../syntax-style.js";
-import type { TreeSitterClient } from "../lib/tree-sitter/index.js";
+import { type TreeSitterClient } from "../lib/tree-sitter/index.js";
 import type { MouseEvent } from "../renderer.js";
 export interface DiffGutterOptions {
     /** Columns before the line numbers, painted in each row's gutter color. Defaults to 1. */
@@ -115,6 +115,8 @@ export declare class DiffRenderable extends Renderable {
     set view(value: "unified" | "split");
     get filetype(): string | undefined;
     set filetype(value: string | undefined);
+    get treeSitterClient(): TreeSitterClient | undefined;
+    set treeSitterClient(value: TreeSitterClient | undefined);
     get syntaxStyle(): SyntaxStyle | undefined;
     set syntaxStyle(value: SyntaxStyle | undefined);
     get wrapMode(): "word" | "char" | "none" | undefined;

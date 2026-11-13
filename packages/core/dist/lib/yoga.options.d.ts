@@ -17,6 +17,7 @@ export type UnitString = "undefined" | "point" | "percent" | "auto";
 export type WrapString = "no-wrap" | "wrap" | "wrap-reverse";
 export declare function parseAlign(value: string | null | undefined): Align;
 export declare function parseAlignItems(value: string | null | undefined): Align;
+export declare function parseAlignContent(value: string | null | undefined): Align;
 export declare function parseBoxSizing(value: string): BoxSizing;
 export declare function parseDimension(value: string): Dimension;
 export declare function parseDirection(value: string): Direction;

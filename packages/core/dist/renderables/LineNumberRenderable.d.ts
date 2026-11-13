@@ -68,6 +68,7 @@ export declare class LineNumberRenderable extends Renderable {
     setLineColor(line: number, color: string | RGBA | LineColorConfig): void;
     clearLineColor(line: number): void;
     clearAllLineColors(): void;
+    set lineColors(value: LineNumberOptions["lineColors"]);
     setLineColors(lineColors: Map<number, string | RGBA | LineColorConfig>): void;
     getLineColors(): {
         gutter: Map<number, RGBA>;
@@ -77,6 +78,7 @@ export declare class LineNumberRenderable extends Renderable {
     clearLineSign(line: number): void;
     clearAllLineSigns(): void;
     setLineSigns(lineSigns: Map<number, LineSign>): void;
+    set lineSigns(value: LineNumberOptions["lineSigns"]);
     getLineSigns(): Map<number, LineSign>;
     getGutterLayout(): GutterLayout;
     setGutterLayout(layout: GutterLayout): void;
@@ -84,8 +86,10 @@ export declare class LineNumberRenderable extends Renderable {
     get lineNumberOffset(): number;
     setHideLineNumbers(hideLineNumbers: Set<number>): void;
     getHideLineNumbers(): Set<number>;
+    set hideLineNumbers(value: LineNumberOptions["hideLineNumbers"]);
     setLineNumbers(lineNumbers: Map<number, number>): void;
     getLineNumbers(): Map<number, number>;
+    set lineNumbers(value: LineNumberOptions["lineNumbers"]);
     highlightLines(startLine: number, endLine: number, color: string | RGBA | LineColorConfig): void;
     clearHighlightLines(startLine: number, endLine: number): void;
 }

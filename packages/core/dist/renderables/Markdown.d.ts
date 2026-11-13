@@ -4,7 +4,7 @@ import { SyntaxStyle } from "../syntax-style.js";
 import type { BorderStyle } from "../lib/border.js";
 import { RGBA, type ColorInput } from "../lib/RGBA.js";
 import { type TextTableColumnFitter, type TextTableColumnWidthMode } from "./TextTable.js";
-import type { TreeSitterClient } from "../lib/tree-sitter/index.js";
+import { type TreeSitterClient } from "../lib/tree-sitter/index.js";
 export type MarkdownTableStyle = "grid" | "columns";
 export interface MarkdownTableOptions {
     /**
@@ -207,6 +207,8 @@ export declare class MarkdownRenderable extends Renderable {
     set content(value: string);
     get syntaxStyle(): SyntaxStyle;
     set syntaxStyle(value: SyntaxStyle);
+    get treeSitterClient(): TreeSitterClient | undefined;
+    set treeSitterClient(value: TreeSitterClient | undefined);
     get fg(): RGBA | undefined;
     set fg(value: ColorInput | undefined);
     get bg(): RGBA | undefined;

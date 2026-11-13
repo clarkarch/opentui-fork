@@ -285,6 +285,8 @@ var nativeSymbols = {
   ot_edit_buffer_get_highlights: { args: ["ptr", "buffer", "u32", "ptr", "u32", "buffer"], returns: "i32" },
   ot_context_group_set: { args: ["ptr", "buffer", "u32", "buffer", "u32", "buffer"], returns: "i32" },
   ot_edit_buffer_set_layer: { args: ["ptr", "buffer", "u32", "u32", "u32", "ptr", "u32"], returns: "i32" },
+  ot_edit_buffer_mark: { args: ["ptr", "buffer", "u32", "ptr", "ptr"], returns: "i32" },
+  ot_edit_buffer_get_marks: { args: ["ptr", "buffer", "u32", "u32", "ptr", "u32", "buffer"], returns: "i32" },
   ot_markdown_create: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_markdown_destroy: { args: ["ptr", "buffer"], returns: "i32" },
   ot_markdown_set_options: { args: ["ptr", "buffer", "buffer", "buffer"], returns: "i32" },
@@ -387,6 +389,7 @@ var nativeSymbols = {
   ot_text_buffer_set_tab_width: { args: ["ptr", "buffer", "u32"], returns: "i32" },
   ot_text_buffer_highlight: { args: ["ptr", "buffer", "u32", "u32", "ptr"], returns: "i32" },
   ot_text_buffer_get_highlights: { args: ["ptr", "buffer", "u32", "ptr", "u32", "buffer"], returns: "i32" },
+  ot_text_buffer_set_layer: { args: ["ptr", "buffer", "u32", "u32", "u32", "ptr", "u32"], returns: "i32" },
   ot_text_buffer_view_set_viewport: { args: ["ptr", "buffer", "buffer", "u32"], returns: "i32" },
   ot_text_buffer_view_command: { args: ["ptr", "buffer", "u32", "u32"], returns: "i32" },
   ot_text_buffer_view_set_tab_color: { args: ["ptr", "buffer", "ptr"], returns: "i32" },
@@ -1172,6 +1175,24 @@ var nativeLayouts = {
       start_byte: { offset: 0, size: 4, alignment: 4, type: "u32" },
       end_byte: { offset: 4, size: 4, alignment: 4, type: "u32" },
       group_set: { offset: 8, size: 4, alignment: 4, type: "u32" }
+    }
+  },
+  ot_edit_mark: {
+    size: 76,
+    alignment: 4,
+    fields: {
+      struct_size: { offset: 0, size: 4, alignment: 4, type: "u32" },
+      abi_version: { offset: 4, size: 4, alignment: 4, type: "u32" },
+      id: { offset: 8, size: 4, alignment: 4, type: "u32" },
+      kind: { offset: 12, size: 4, alignment: 4, type: "u32" },
+      flags: { offset: 16, size: 4, alignment: 4, type: "u32" },
+      style: { offset: 20, size: 4, alignment: 4, type: "u32" },
+      value: { offset: 24, size: 32, alignment: 4, type: "ot_editor_style" },
+      priority: { offset: 56, size: 4, alignment: 4, type: "u32" },
+      start: { offset: 60, size: 4, alignment: 4, type: "u32" },
+      end: { offset: 64, size: 4, alignment: 4, type: "u32" },
+      start_byte: { offset: 68, size: 4, alignment: 4, type: "u32" },
+      end_byte: { offset: 72, size: 4, alignment: 4, type: "u32" }
     }
   },
   ot_markdown_options: {
@@ -2262,6 +2283,12 @@ var nativeConstants = {
   OT_STYLE_RUN_FLAG: 2147483648,
   OT_GROUP_SET_NAME_COUNT_MAX: 16,
   OT_GROUP_SET_NAME_BYTE_COUNT_MAX: 64,
+  OT_EDIT_MARK_ADD: 0,
+  OT_EDIT_MARK_REMOVE: 1,
+  OT_EDIT_MARK_CLEAR: 2,
+  OT_EDIT_MARK_ATOMIC: 1,
+  OT_EDIT_MARK_STYLE_VALUE: 2,
+  OT_EDIT_MARK_ANY_KIND: 4294967295,
   OT_MD_CONCEAL: 1,
   OT_MD_HYPERLINKS: 2,
   OT_MD_MATH: 4,
@@ -13773,5 +13800,5 @@ var yoga_default = Yoga;
 
 export { nativeLayouts, nativeConstants, toArrayBuffer, singleton, getSingleton, destroySingleton, envRegistry2, registerEnvVar2, clearEnvCache2, generateEnvMarkdown2, generateEnvColored2, env2, stringWidth, resolveBundledFilePath2, Worker, TextAttributes2, ATTRIBUTE_BASE_BITS2, ATTRIBUTE_BASE_MASK2, getBaseAttributes2, DebugOverlayCorner2, TargetChannel2, DEFAULT_FOREGROUND_RGB2, DEFAULT_BACKGROUND_RGB2, normalizeIndexedColorIndex2, ansi256IndexToRgb2, RGBA2, normalizeColorValue2, hexToRgb2, rgbToHex2, hsvToRgb2, parseColor2, createTextAttributes2, attributesWithLink2, getLinkId2, visualizeRenderableTree2, isStyledText2, StyledText2, stringToStyledText2, black2, red2, green2, yellow2, blue2, magenta2, cyan2, white2, brightBlack2, brightRed2, brightGreen2, brightYellow2, brightBlue2, brightMagenta2, brightCyan2, brightWhite2, bgBlack2, bgRed2, bgGreen2, bgYellow2, bgBlue2, bgMagenta2, bgCyan2, bgWhite2, bold2, italic2, underline2, strikethrough2, dim2, reverse2, blink2, fg2, bg2, link2, t2, YogaEnumKind, YogaFloatKind, YogaValueKind, sceneSetEnum, sceneGetEnum, sceneSetFloat, sceneGetFloat, sceneSetValue, sceneGetValue, sceneSetDimension, UNDEFINED_VALUE, parseYogaValue, SpanInfoStruct, NativeAudioStreamFormat2, NativeAudioStreamState2, NativeAudioStreamStateNames, NativeAudioStreamCloseReason2, isBunfsPath, normalizeBunfsPath, resolveDefaultParserAsset, resolveDefaultTreeSitterWorkerPath, resolveTreeSitterWasm, NativeAudioStreamState3, NativeAudioStreamCloseReason3, NativeAudioStreamFormat3, MAX_LINK_URL_BYTES2, NativeTextViewCommand2, NativeEditCommand2, NativeEditPositionQuery2, NativeEditorStyleMask2, NativeEditHighlightOperation2, NativeEditorCommand2, NativeEditorSelectionOperation2, NativeEditorPositionQuery2, NativeEditEvent2, NativeStyleGroup, NativeStyleFlags, NATIVE_EDGE_NONE2, NativeBorder2, NativeSceneHook2, NativeSceneFrame2, NativeScenePaintPhase2, emptySceneScrollState, NATIVE_BUFFER_TEXT_BYTES_MAX2, NativeSessionState2, NativeSessionRenderStatus2, NATIVE_SESSION_CONTROL_PACKET_BYTES2, NativeSessionTerminalPhase2, NativeSessionPumpStatus2, NativeStatus2, NativeError2, NativeClipboardOperationStatus2, NativeClipboardStartStatus2, NativeClipboardCancelStatus2, NativeClipboardCopyStatus2, NativeClipboardDestroyStatus2, NativeClipboardShutdownStatus2, SceneStaging, NativePaintRecorder, LogLevel2, FFIRenderLib2, setRenderLibPath2, resolveRenderLib2, Align2, BoxSizing2, Dimension2, Direction2, Display2, Edge2, Errata2, ExperimentalFeature2, FlexDirection2, Gutter2, Justify2, LogLevel3, MeasureMode2, NodeType2, Overflow2, PositionType2, Unit2, Wrap2, ALIGN_AUTO2, ALIGN_FLEX_START2, ALIGN_CENTER2, ALIGN_FLEX_END2, ALIGN_STRETCH2, ALIGN_BASELINE2, ALIGN_SPACE_BETWEEN2, ALIGN_SPACE_AROUND2, ALIGN_SPACE_EVENLY2, BOX_SIZING_BORDER_BOX2, BOX_SIZING_CONTENT_BOX2, DIMENSION_WIDTH2, DIMENSION_HEIGHT2, DIRECTION_INHERIT2, DIRECTION_LTR2, DIRECTION_RTL2, DISPLAY_FLEX2, DISPLAY_NONE2, DISPLAY_CONTENTS2, EDGE_LEFT2, EDGE_TOP2, EDGE_RIGHT2, EDGE_BOTTOM2, EDGE_START2, EDGE_END2, EDGE_HORIZONTAL2, EDGE_VERTICAL2, EDGE_ALL2, ERRATA_NONE2, ERRATA_STRETCH_FLEX_BASIS2, ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2, ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2, ERRATA_ALL2, ERRATA_CLASSIC2, EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2, FLEX_DIRECTION_COLUMN2, FLEX_DIRECTION_COLUMN_REVERSE2, FLEX_DIRECTION_ROW2, FLEX_DIRECTION_ROW_REVERSE2, GUTTER_COLUMN2, GUTTER_ROW2, GUTTER_ALL2, JUSTIFY_FLEX_START2, JUSTIFY_CENTER2, JUSTIFY_FLEX_END2, JUSTIFY_SPACE_BETWEEN2, JUSTIFY_SPACE_AROUND2, JUSTIFY_SPACE_EVENLY2, LOG_LEVEL_ERROR2, LOG_LEVEL_WARN2, LOG_LEVEL_INFO2, LOG_LEVEL_DEBUG2, LOG_LEVEL_VERBOSE2, LOG_LEVEL_FATAL2, MEASURE_MODE_UNDEFINED2, MEASURE_MODE_EXACTLY2, MEASURE_MODE_AT_MOST2, NODE_TYPE_DEFAULT2, NODE_TYPE_TEXT2, OVERFLOW_VISIBLE2, OVERFLOW_HIDDEN2, OVERFLOW_SCROLL2, POSITION_TYPE_STATIC2, POSITION_TYPE_RELATIVE2, POSITION_TYPE_ABSOLUTE2, UNIT_UNDEFINED2, UNIT_POINT2, UNIT_PERCENT2, UNIT_AUTO2, WRAP_NO_WRAP2, WRAP_WRAP2, WRAP_WRAP_REVERSE2, YogaStatus2, YogaError2, Config2, Node2, exports_yoga, yoga_default };
 
-//# debugId=C2F5DA711972842B64756E2164756E21
-//# sourceMappingURL=chunk-node-jn07qw40.js.map
+//# debugId=FBE3D72390CB6B5464756E2164756E21
+//# sourceMappingURL=chunk-node-pyb9qqc6.js.map

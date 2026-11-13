@@ -442,6 +442,12 @@ export declare const OT_EDIT_HIGHLIGHT_CLEAR_ALL = 4;
 export declare const OT_STYLE_RUN_FLAG = 2147483648;
 export declare const OT_GROUP_SET_NAME_COUNT_MAX = 16;
 export declare const OT_GROUP_SET_NAME_BYTE_COUNT_MAX = 64;
+export declare const OT_EDIT_MARK_ADD = 0;
+export declare const OT_EDIT_MARK_REMOVE = 1;
+export declare const OT_EDIT_MARK_CLEAR = 2;
+export declare const OT_EDIT_MARK_ATOMIC = 1;
+export declare const OT_EDIT_MARK_STYLE_VALUE = 2;
+export declare const OT_EDIT_MARK_ANY_KIND = 4294967295;
 export declare const OT_MD_CONCEAL = 1;
 export declare const OT_MD_HYPERLINKS = 2;
 export declare const OT_MD_MATH = 4;
@@ -1242,6 +1248,14 @@ export declare const nativeSymbols: {
         readonly args: readonly ["ptr", "buffer", "u32", "u32", "u32", "ptr", "u32"];
         readonly returns: "i32";
     };
+    readonly ot_edit_buffer_mark: {
+        readonly args: readonly ["ptr", "buffer", "u32", "ptr", "ptr"];
+        readonly returns: "i32";
+    };
+    readonly ot_edit_buffer_get_marks: {
+        readonly args: readonly ["ptr", "buffer", "u32", "u32", "ptr", "u32", "buffer"];
+        readonly returns: "i32";
+    };
     readonly ot_markdown_create: {
         readonly args: readonly ["ptr", "buffer", "buffer"];
         readonly returns: "i32";
@@ -1612,6 +1626,10 @@ export declare const nativeSymbols: {
     };
     readonly ot_text_buffer_get_highlights: {
         readonly args: readonly ["ptr", "buffer", "u32", "ptr", "u32", "buffer"];
+        readonly returns: "i32";
+    };
+    readonly ot_text_buffer_set_layer: {
+        readonly args: readonly ["ptr", "buffer", "u32", "u32", "u32", "ptr", "u32"];
         readonly returns: "i32";
     };
     readonly ot_text_buffer_view_set_viewport: {
@@ -4584,6 +4602,84 @@ export declare const nativeLayouts: {
             };
         };
     };
+    readonly ot_edit_mark: {
+        readonly size: 76;
+        readonly alignment: 4;
+        readonly fields: {
+            readonly struct_size: {
+                readonly offset: 0;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly abi_version: {
+                readonly offset: 4;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly id: {
+                readonly offset: 8;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly kind: {
+                readonly offset: 12;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly flags: {
+                readonly offset: 16;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly style: {
+                readonly offset: 20;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly value: {
+                readonly offset: 24;
+                readonly size: 32;
+                readonly alignment: 4;
+                readonly type: "ot_editor_style";
+            };
+            readonly priority: {
+                readonly offset: 56;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly start: {
+                readonly offset: 60;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly end: {
+                readonly offset: 64;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly start_byte: {
+                readonly offset: 68;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly end_byte: {
+                readonly offset: 72;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+        };
+    };
     readonly ot_markdown_options: {
         readonly size: 296;
         readonly alignment: 8;
@@ -7352,6 +7448,12 @@ export declare const nativeConstants: {
     readonly OT_STYLE_RUN_FLAG: 2147483648;
     readonly OT_GROUP_SET_NAME_COUNT_MAX: 16;
     readonly OT_GROUP_SET_NAME_BYTE_COUNT_MAX: 64;
+    readonly OT_EDIT_MARK_ADD: 0;
+    readonly OT_EDIT_MARK_REMOVE: 1;
+    readonly OT_EDIT_MARK_CLEAR: 2;
+    readonly OT_EDIT_MARK_ATOMIC: 1;
+    readonly OT_EDIT_MARK_STYLE_VALUE: 2;
+    readonly OT_EDIT_MARK_ANY_KIND: 4294967295;
     readonly OT_MD_CONCEAL: 1;
     readonly OT_MD_HYPERLINKS: 2;
     readonly OT_MD_MATH: 4;

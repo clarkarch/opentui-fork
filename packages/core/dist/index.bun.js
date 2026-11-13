@@ -111,7 +111,7 @@ import {
   Gutter2,
   MeasureMode2,
   exports_yoga
-} from "./chunk-bun-3tbfth66.js";
+} from "./chunk-bun-babe5jf6.js";
 import {
   isValidBorderStyle2,
   parseBorderStyle2,
@@ -137,6 +137,7 @@ import {
   MacOSScrollAccel2,
   parseAlign2,
   parseAlignItems2,
+  parseAlignContent2,
   parseBoxSizing2,
   parseDimension2,
   parseDirection2,
@@ -243,7 +244,7 @@ import {
   CliRenderEvents2,
   RendererControlState2,
   CliRenderer2
-} from "./chunk-bun-rcry6xvz.js";
+} from "./chunk-bun-wj93w8tk.js";
 // src/syntax-style.ts
 var attributeNames = ["bold", "italic", "underline", "dim", "strikethrough"];
 function cloneStyle(style) {
@@ -5860,8 +5861,8 @@ class ASCIIFontRenderable extends FrameBufferRenderable {
       const color = options.color || defaultOptions.color;
       this._color = Array.isArray(color) ? color.map((value) => RGBA2.clone(parseColor2(value))) : RGBA2.clone(parseColor2(color));
       this._backgroundColor = RGBA2.clone(parseColor2(options.backgroundColor || defaultOptions.backgroundColor));
-      this._selectionBg = options.selectionBg ? RGBA2.clone(parseColor2(options.selectionBg)) : undefined;
-      this._selectionFg = options.selectionFg ? RGBA2.clone(parseColor2(options.selectionFg)) : undefined;
+      this.selectionBg = options.selectionBg;
+      this.selectionFg = options.selectionFg;
       this.selectable = options.selectable ?? true;
       this.selectionHelper = new ASCIIFontSelectionHelper2(() => this._text, () => this._font);
       this.renderFontToBuffer();
@@ -5909,6 +5910,26 @@ class ASCIIFontRenderable extends FrameBufferRenderable {
     this._backgroundColor = RGBA2.clone(parseColor2(value ?? ASCIIFontRenderable._defaultOptions.backgroundColor));
     this.renderFontToBuffer();
     this.requestRender();
+  }
+  get selectionBg() {
+    return this._selectionBg && RGBA2.clone(this._selectionBg);
+  }
+  set selectionBg(value) {
+    this._selectionBg = value ? RGBA2.clone(parseColor2(value)) : undefined;
+    this.repaintSelection();
+  }
+  get selectionFg() {
+    return this._selectionFg && RGBA2.clone(this._selectionFg);
+  }
+  set selectionFg(value) {
+    this._selectionFg = value ? RGBA2.clone(parseColor2(value)) : undefined;
+    this.repaintSelection();
+  }
+  repaintSelection() {
+    if (this.lastLocalSelection) {
+      this.renderFontToBuffer();
+      this.requestRender();
+    }
   }
   defaultDimension(kind) {
     return measureText2({ text: this._text, font: this._font })[kind] || 1;
@@ -5964,8 +5985,6 @@ class ASCIIFontRenderable extends FrameBufferRenderable {
     }
   }
   renderSelectionHighlight(selection) {
-    if (!this._selectionBg && !this._selectionFg)
-      return;
     const selectedText = this._text.slice(selection.start, selection.end);
     if (!selectedText)
       return;
@@ -5975,16 +5994,14 @@ class ASCIIFontRenderable extends FrameBufferRenderable {
     if (this._selectionBg) {
       this.frameBuffer.fillRect(startX, 0, endX - startX, this.height, parseColor2(this._selectionBg));
     }
-    if (this._selectionFg || this._selectionBg) {
-      renderFontToFrameBuffer2(this.frameBuffer, {
-        text: selectedText,
-        x: startX,
-        y: 0,
-        color: this._selectionFg ? this._selectionFg : this._color,
-        backgroundColor: this._selectionBg ? this._selectionBg : this._backgroundColor,
-        font: this._font
-      });
-    }
+    renderFontToFrameBuffer2(this.frameBuffer, {
+      text: selectedText,
+      x: startX,
+      y: 0,
+      color: this._selectionFg ?? this._color,
+      backgroundColor: this._selectionBg ?? this._backgroundColor,
+      font: this._font
+    });
   }
 }
 // src/renderables/LineNumberRenderable.ts
@@ -6289,11 +6306,8 @@ class LineNumberRenderable extends Renderable2 {
       this._lineNumbers = options.lineNumbers ?? new Map;
       this._lineColorsGutter = new Map;
       this._lineColorsContent = new Map;
-      if (options.lineColors) {
-        for (const [line, color] of options.lineColors) {
-          this.parseLineColor(line, color);
-        }
-      }
+      if (options.lineColors)
+        this.setLineColors(options.lineColors);
       this._lineSigns = new Map;
       if (options.lineSigns) {
         for (const [line, sign] of options.lineSigns) {
@@ -6478,6 +6492,12 @@ class LineNumberRenderable extends Renderable2 {
       this.gutter.setLineColors(this._lineColorsGutter, this._lineColorsContent);
     }
   }
+  set lineColors(value) {
+    if (value)
+      this.setLineColors(value);
+    else
+      this.clearAllLineColors();
+  }
   setLineColors(lineColors) {
     this._lineColorsGutter.clear();
     this._lineColorsContent.clear();
@@ -6522,6 +6542,12 @@ class LineNumberRenderable extends Renderable2 {
       this.gutter.setLineSigns(this._lineSigns);
     }
   }
+  set lineSigns(value) {
+    if (value)
+      this.setLineSigns(value);
+    else
+      this.clearAllLineSigns();
+  }
   getLineSigns() {
     return new Map(Array.from(this._lineSigns, ([line, sign]) => [line, cloneLineSign(sign)]));
   }
@@ -6554,6 +6580,9 @@ class LineNumberRenderable extends Renderable2 {
   getHideLineNumbers() {
     return this._hideLineNumbers;
   }
+  set hideLineNumbers(value) {
+    this.setHideLineNumbers(value ?? new Set);
+  }
   setLineNumbers(lineNumbers) {
     this._lineNumbers = lineNumbers;
     if (this.gutter) {
@@ -6562,6 +6591,9 @@ class LineNumberRenderable extends Renderable2 {
   }
   getLineNumbers() {
     return this._lineNumbers;
+  }
+  set lineNumbers(value) {
+    this.setLineNumbers(value ?? new Map);
   }
   highlightLines(startLine, endLine, color) {
     for (let i = startLine;i <= endLine; i++) {
@@ -7208,7 +7240,7 @@ class DiffRenderable extends Renderable2 {
         width: "100%",
         flexGrow: 1,
         flexShrink: 1,
-        ...this._treeSitterClient !== undefined && { treeSitterClient: this._treeSitterClient }
+        treeSitterClient: this._treeSitterClient
       });
       super.add(this.errorCodeRenderable);
     } else {
@@ -7239,7 +7271,7 @@ class DiffRenderable extends Renderable2 {
         ...drawUnstyledText !== undefined && { drawUnstyledText },
         ...this._selectionBg !== undefined && { selectionBg: this._selectionBg },
         ...this._selectionFg !== undefined && { selectionFg: this._selectionFg },
-        ...this._treeSitterClient !== undefined && { treeSitterClient: this._treeSitterClient }
+        treeSitterClient: this._treeSitterClient
       };
       const newRenderable = new CodeRenderable2(this.ctx, codeOptions);
       if (side === "left") {
@@ -7731,6 +7763,18 @@ class DiffRenderable extends Renderable2 {
     if (this._filetype !== value) {
       this._filetype = value;
       this.rebuildView();
+    }
+  }
+  get treeSitterClient() {
+    return this._treeSitterClient;
+  }
+  set treeSitterClient(value) {
+    if (this._treeSitterClient === value)
+      return;
+    this._treeSitterClient = value ?? undefined;
+    for (const code of [this.leftCodeRenderable, this.rightCodeRenderable, this.errorCodeRenderable]) {
+      if (code && !code.isDestroyed)
+        code.treeSitterClient = value ?? getTreeSitterClient2();
     }
   }
   get syntaxStyle() {
@@ -10719,6 +10763,18 @@ class MarkdownRenderable extends Renderable2 {
       this.markStyleDirty();
     }
   }
+  get treeSitterClient() {
+    return this._treeSitterClient;
+  }
+  set treeSitterClient(value) {
+    if (this._treeSitterClient === value)
+      return;
+    this._treeSitterClient = value ?? undefined;
+    for (const shown of this._shown) {
+      if (shown.default instanceof CodeRenderable2)
+        shown.default.treeSitterClient = value ?? getTreeSitterClient2();
+    }
+  }
   get fg() {
     return this._fg ? RGBA2.clone(this._fg) : undefined;
   }
@@ -12681,6 +12737,7 @@ export {
   normalizeIndexedColorIndex2 as normalizeIndexedColorIndex,
   normalizeTerminalPalette2 as normalizeTerminalPalette,
   parseAlign2 as parseAlign,
+  parseAlignContent2 as parseAlignContent,
   parseAlignItems2 as parseAlignItems,
   parseBorderStyle2 as parseBorderStyle,
   parseBoxSizing2 as parseBoxSizing,
@@ -12729,5 +12786,5 @@ export {
   yellow2 as yellow
 };
 
-//# debugId=09B11551EF0E88F364756E2164756E21
+//# debugId=C7A885B93A9C226F64756E2164756E21
 //# sourceMappingURL=index.bun.js.map

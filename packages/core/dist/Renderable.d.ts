@@ -36,6 +36,8 @@ export interface LayoutOptions extends BaseRenderableOptions {
     /** `"list"` stacks children as a column with `overflow: "scroll"` does, without a flex pass over them. */
     layoutMode?: LayoutModeString;
     alignItems?: AlignString;
+    alignContent?: AlignString;
+    aspectRatio?: number;
     justifyContent?: JustifyString;
     alignSelf?: AlignString;
     flexBasis?: number | "auto" | undefined;
@@ -327,6 +329,8 @@ export declare abstract class Renderable extends BaseRenderable {
     getWidth(): Value;
     getFlexWrap(): Wrap;
     getAlignItems(): Align;
+    getAlignContent(): Align;
+    getAspectRatio(): number;
     getJustifyContent(): Justify;
     getAlignSelf(): Align;
     getPositionType(): PositionType;
@@ -356,6 +360,8 @@ export declare abstract class Renderable extends BaseRenderable {
     set flexWrap(wrap: WrapString | null | undefined);
     set layoutMode(mode: LayoutModeString | null | undefined);
     set alignItems(alignItems: AlignString | null | undefined);
+    set alignContent(alignContent: AlignString | null | undefined);
+    set aspectRatio(aspectRatio: number | null | undefined);
     set justifyContent(justifyContent: JustifyString | null | undefined);
     set alignSelf(alignSelf: AlignString | null | undefined);
     set flexBasis(basis: number | "auto" | null | undefined);

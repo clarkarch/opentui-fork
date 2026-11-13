@@ -41,6 +41,11 @@ export declare class ASCIIFontRenderable extends FrameBufferRenderable {
     set color(value: ColorInput | ColorInput[]);
     get backgroundColor(): ColorInput;
     set backgroundColor(value: ColorInput);
+    get selectionBg(): RGBA | undefined;
+    set selectionBg(value: ColorInput | undefined);
+    get selectionFg(): RGBA | undefined;
+    set selectionFg(value: ColorInput | undefined);
+    private repaintSelection;
     protected defaultDimension(kind: "width" | "height"): number;
     private updateDimensions;
     shouldStartSelection(x: number, y: number): boolean;

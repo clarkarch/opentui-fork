@@ -288,6 +288,8 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private unansweredPixelQueries;
     private replyBatches;
     private replySentinel;
+    /** The first cursor report of a setup answers its position query; later ones are probe replies or keys. */
+    private startupCursorReportPending;
     readonly clock: Clock;
     private rendering;
     private renderingCompletion;
@@ -359,6 +361,7 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private externalOutputQueue;
     private pendingExternalOutputMode;
     private readonly stdoutDecoder;
+    private stdoutRow;
     private stdoutEscape;
     private realStdoutWrite;
     private _useConsole;
@@ -517,6 +520,8 @@ export declare class CliRenderer extends EventEmitter implements RenderContext {
     private createStdoutSnapshotCommits;
     private flushStdoutDecoder;
     private interceptStdoutWrite;
+    /** With `hold`, an unfinished last row waits for the frame: a later write may still extend its last grapheme. */
+    private captureStdout;
     private createDroppedRowCommit;
     private getSplitPinnedRenderOffset;
     private getSplitCursorSeedRows;

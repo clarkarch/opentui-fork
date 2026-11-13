@@ -94,7 +94,7 @@ import {
   Config2,
   Node2,
   yoga_default
-} from "./chunk-node-jn07qw40.js";
+} from "./chunk-node-pyb9qqc6.js";
 export {
   ALIGN_AUTO2 as ALIGN_AUTO,
   ALIGN_BASELINE2 as ALIGN_BASELINE,

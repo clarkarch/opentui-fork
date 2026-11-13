@@ -155,7 +155,7 @@ export declare class ScrollBoxBar extends ScrollBoxPart {
     handleKeyPress(key: KeyEvent): boolean;
 }
 type Edges = "" | "X" | "Y" | "Top" | "Right" | "Bottom" | "Left";
-type ContentLayoutKey = "flexDirection" | "flexWrap" | "layoutMode" | "alignItems" | "justifyContent" | "alignSelf" | "flexGrow" | "flexShrink" | "flexBasis" | `${"min" | "max"}${"Width" | "Height"}` | `${"padding" | "margin"}${Edges}` | "gap" | "rowGap" | "columnGap";
+type ContentLayoutKey = "flexDirection" | "flexWrap" | "layoutMode" | "alignItems" | "alignContent" | "aspectRatio" | "justifyContent" | "alignSelf" | "flexGrow" | "flexShrink" | "flexBasis" | `${"min" | "max"}${"Width" | "Height"}` | `${"padding" | "margin"}${Edges}` | "gap" | "rowGap" | "columnGap";
 export interface ScrollBoxContent extends ContentLayout {
 }
 type ContentLayout = {

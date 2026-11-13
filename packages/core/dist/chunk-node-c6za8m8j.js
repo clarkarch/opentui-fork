@@ -68,7 +68,7 @@ import {
   PositionType2,
   Unit2,
   Wrap2
-} from "./chunk-node-jn07qw40.js";
+} from "./chunk-node-pyb9qqc6.js";
 
 // src/Renderable.ts
 import { EventEmitter as EventEmitter4 } from "events";
@@ -3933,11 +3933,8 @@ class MacOSScrollAccel2 {
   }
 }
 // src/lib/yoga.options.ts
-function parseAlign2(value) {
-  if (value == null) {
-    return Align2.Auto;
-  }
-  switch (value.toLowerCase()) {
+function parseAlignment(value, fallback) {
+  switch (value?.toLowerCase()) {
     case "auto":
       return Align2.Auto;
     case "flex-start":
@@ -3957,35 +3954,17 @@ function parseAlign2(value) {
     case "space-evenly":
       return Align2.SpaceEvenly;
     default:
-      return Align2.Auto;
+      return fallback;
   }
 }
+function parseAlign2(value) {
+  return parseAlignment(value, Align2.Auto);
+}
 function parseAlignItems2(value) {
-  if (value == null) {
-    return Align2.Stretch;
-  }
-  switch (value.toLowerCase()) {
-    case "auto":
-      return Align2.Auto;
-    case "flex-start":
-      return Align2.FlexStart;
-    case "center":
-      return Align2.Center;
-    case "flex-end":
-      return Align2.FlexEnd;
-    case "stretch":
-      return Align2.Stretch;
-    case "baseline":
-      return Align2.Baseline;
-    case "space-between":
-      return Align2.SpaceBetween;
-    case "space-around":
-      return Align2.SpaceAround;
-    case "space-evenly":
-      return Align2.SpaceEvenly;
-    default:
-      return Align2.Stretch;
-  }
+  return parseAlignment(value, Align2.Stretch);
+}
+function parseAlignContent2(value) {
+  return parseAlignment(value, Align2.FlexStart);
 }
 function parseBoxSizing2(value) {
   if (value == null) {
@@ -9123,6 +9102,12 @@ class Renderable2 extends BaseRenderable2 {
   getAlignItems() {
     return this.yogaGetEnum(YogaEnumKind.AlignItems, Align2.Stretch);
   }
+  getAlignContent() {
+    return this.yogaGetEnum(YogaEnumKind.AlignContent, Align2.FlexStart);
+  }
+  getAspectRatio() {
+    return this.yogaGetFloat(YogaFloatKind.AspectRatio);
+  }
   getJustifyContent() {
     return this.yogaGetEnum(YogaEnumKind.JustifyContent, Justify2.FlexStart);
   }
@@ -9202,6 +9187,10 @@ class Renderable2 extends BaseRenderable2 {
     node.setFlexWrap(parseWrap2(options.flexWrap));
     if (options.layoutMode !== undefined)
       node.layoutMode = options.layoutMode;
+    if (options.alignContent !== undefined)
+      node.alignContent = options.alignContent;
+    if (options.aspectRatio !== undefined)
+      node.aspectRatio = options.aspectRatio;
     node.setAlignItems(parseAlignItems2(options.alignItems));
     node.setJustifyContent(parseJustify2(options.justifyContent));
     node.setAlignSelf(parseAlign2(options.alignSelf));
@@ -9361,6 +9350,14 @@ class Renderable2 extends BaseRenderable2 {
   }
   set alignItems(alignItems) {
     this.setAlignItems(parseAlignItems2(alignItems));
+    this.requestRender();
+  }
+  set alignContent(alignContent) {
+    this.yogaSetEnum(YogaEnumKind.AlignContent, parseAlignContent2(alignContent));
+    this.requestRender();
+  }
+  set aspectRatio(aspectRatio) {
+    this.yogaSetFloat(YogaFloatKind.AspectRatio, aspectRatio ?? undefined);
     this.requestRender();
   }
   set justifyContent(justifyContent) {
@@ -13445,6 +13442,7 @@ var contentStyles = {};
     ["flexWrap", YogaEnumKind.FlexWrap, parseWrap2],
     ["layoutMode", YogaEnumKind.LayoutMode, parseLayoutMode2],
     ["alignItems", YogaEnumKind.AlignItems, parseAlignItems2],
+    ["alignContent", YogaEnumKind.AlignContent, parseAlignContent2],
     ["justifyContent", YogaEnumKind.JustifyContent, parseJustify2],
     ["alignSelf", YogaEnumKind.AlignSelf, parseAlign2]
   ];
@@ -13453,6 +13451,7 @@ var contentStyles = {};
   }
   contentStyles.flexGrow = (scene, node, input) => sceneSetFloat(scene, node, YogaFloatKind.FlexGrow, input ?? 0, content);
   contentStyles.flexShrink = (scene, node, input) => sceneSetFloat(scene, node, YogaFloatKind.FlexShrink, input ?? 0, content);
+  contentStyles.aspectRatio = (scene, node, input) => sceneSetFloat(scene, node, YogaFloatKind.AspectRatio, input, content);
   for (const [key, kind] of [
     ["width", YogaValueKind.Width],
     ["height", YogaValueKind.Height],
@@ -19211,7 +19210,7 @@ class EditBufferRenderable2 extends Renderable2 {
   _selectionBg;
   _selectionFg;
   _wrapMode = "word";
-  _scrollMargin = 0.2;
+  _scrollMargin;
   _showCursor = true;
   _cursorColor;
   _cursorStyle;
@@ -19257,7 +19256,6 @@ class EditBufferRenderable2 extends Renderable2 {
       this._selectionFg = options.selectionFg ? RGBA2.clone(parseColor2(options.selectionFg)) : undefined;
       this.selectable = options.selectable ?? this._defaultOptions.selectable;
       this._wrapMode = options.wrapMode ?? this._defaultOptions.wrapMode;
-      this._scrollMargin = options.scrollMargin ?? this._defaultOptions.scrollMargin;
       this._scrollSpeed = options.scrollSpeed ?? this._defaultOptions.scrollSpeed;
       this._showCursor = options.showCursor ?? this._defaultOptions.showCursor;
       this._cursorColor = RGBA2.clone(parseColor2(options.cursorColor ?? this._defaultOptions.cursorColor));
@@ -19271,7 +19269,7 @@ class EditBufferRenderable2 extends Renderable2 {
       editorView = EditorView2.create(editBuffer, Math.max(1, Math.trunc(this.width || 80)), Math.max(1, Math.trunc(this.height || 24)));
       this.editorView = editorView;
       this.editorView.setWrapMode(this._wrapMode);
-      this.editorView.setScrollMargin(this._scrollMargin);
+      this.scrollMargin = options.scrollMargin;
       if (options.selectionOccupancy === "boundary") {
         this.editorView.setSelectionOccupancy("boundary");
       }
@@ -19328,6 +19326,16 @@ class EditBufferRenderable2 extends Renderable2 {
   }
   get scrollY() {
     return this.editorView.getViewport().offsetY;
+  }
+  get scrollMargin() {
+    return this._scrollMargin;
+  }
+  set scrollMargin(value) {
+    if (this.isDestroyed)
+      return;
+    const margin = value ?? this._defaultOptions.scrollMargin;
+    this.editorView.setScrollMargin(margin);
+    this._scrollMargin = margin;
   }
   get plainText() {
     return this.editBuffer.getText();
@@ -20179,7 +20187,7 @@ function isCapabilityResponse(sequence) {
   return false;
 }
 function isExplicitWidthReport(sequence) {
-  return /\x1b\[1;(?!1R)\d+R/.test(sequence);
+  return /\x1b\[2;[23]R/.test(sequence);
 }
 function isPixelResolutionResponse(sequence) {
   return /\x1b\[4;\d+;\d+t/.test(sequence);
@@ -20937,6 +20945,7 @@ class CliRenderer2 extends EventEmitter9 {
   unansweredPixelQueries = 0;
   replyBatches = [];
   replySentinel = true;
+  startupCursorReportPending = false;
   clock;
   rendering = false;
   renderingCompletion = null;
@@ -21013,6 +21022,7 @@ class CliRenderer2 extends EventEmitter9 {
   externalOutputQueue;
   pendingExternalOutputMode = null;
   stdoutDecoder = new StringDecoder("utf8");
+  stdoutRow = "";
   stdoutEscape = "";
   realStdoutWrite;
   _useConsole = true;
@@ -21652,6 +21662,8 @@ Captured external output:
         this.applyExternalOutputMode(mode);
       return;
     }
+    if (mode === "passthrough" && this.stdoutRow)
+      this.captureStdout("", false);
     if (mode === "passthrough" && !this.rendering && !this.pendingNativeMode && this.externalOutputQueue.size === 0) {
       this.flushStdoutDecoder();
     }
@@ -21712,6 +21724,8 @@ Captured external output:
   applyPendingExternalOutputModeIfReady() {
     if (this.rendering)
       return;
+    if (this.stdoutRow && this.pendingExternalOutputMode !== null)
+      this.captureStdout("", false);
     const pendingMode = this.pendingExternalOutputMode;
     if (pendingMode === null || this.externalOutputQueue.size > 0 && !(pendingMode === "capture-stdout" && this._screenMode === "split-footer")) {
       return;
@@ -22205,6 +22219,8 @@ Captured external output:
     this.splitTailColumn = this.getSplitTailColumnAfterCommit(commit, this.splitTailColumn, Math.max(this.width, 1));
   }
   getPendingSplitTailColumn() {
+    while (this.stdoutRow)
+      this.captureStdout("", false);
     const width = Math.max(this.width, 1);
     const skipped = this.pendingNativeReplay?.remaining ?? 0;
     const cached = this.queuedSplitTail;
@@ -22249,19 +22265,21 @@ Captured external output:
         this.emit("external_output" /* EXTERNAL_OUTPUT */, commit);
     }
   }
-  splitStdoutRows(text, tailColumn) {
+  splitStdoutRows(text, tailColumn, hold = false) {
     const width = Math.max(1, this.width);
     const rows = [];
     let rowStart = 0;
     let line = "";
     let cells = 0;
+    let start = 0;
     const widthMethod = this.widthMethod;
     const widths = new Map;
-    for (const { segment } of graphemeSegmenter2.segment(text)) {
+    for (const { segment, index } of graphemeSegmenter2.segment(text)) {
       if (segment === "\r") {
         rows.length = rowStart;
         line = "";
         cells = 0;
+        start = index + 1;
         continue;
       }
       if (segment === `
@@ -22271,6 +22289,7 @@ Captured external output:
         rowStart = rows.length;
         line = "";
         cells = 0;
+        start = index + segment.length;
         continue;
       }
       const column = (rows.length === 0 && tailColumn < width ? tailColumn : 0) + cells;
@@ -22282,15 +22301,18 @@ Captured external output:
         rows.push({ line: line + " ".repeat(padding), cells: cells + padding, trailingNewline: false, endsRow: true });
         line = "";
         cells = 0;
+        start = index;
       }
       line += grapheme;
       cells += graphemeCells;
     }
+    if (hold && line.length > 0 && text.length - start <= 8 * width)
+      return { rows, held: text.slice(start) };
     if (line.length > 0) {
       const column = (rows.length === 0 && tailColumn < width ? tailColumn : 0) + cells;
       rows.push({ line, cells, trailingNewline: false, endsRow: column >= width });
     }
-    return rows;
+    return { rows, held: "" };
   }
   createStdoutSnapshotCommits(rows) {
     if (rows.length === 0) {
@@ -22335,63 +22357,71 @@ Captured external output:
     const text = this.stdoutDecoder.end();
     if (text && this.nativeSession.open)
       this.interceptStdoutWrite(text);
-    this.stdoutEscape = "";
+    while (this.stdoutRow && this.nativeSession.open)
+      this.captureStdout("", false);
+    this.stdoutRow = this.stdoutEscape = "";
   }
   interceptStdoutWrite = (chunk, encoding, callback) => {
     const resolvedCallback = typeof encoding === "function" ? encoding : callback;
     let writable = true;
     if (this._externalOutputMode === "capture-stdout" && this._screenMode === "split-footer" && this._splitHeight > 0) {
       const bytes = ArrayBuffer.isView(chunk) ? new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength) : Buffer.from(String(chunk ?? ""), Buffer.isEncoding(encoding) ? encoding : undefined);
-      const decoded = this.stdoutEscape + this.stdoutDecoder.write(bytes);
-      this.stdoutEscape = "";
-      const text = decoded.replace(STDOUT_ESCAPE, (match, csi, bel, esc, offset) => {
-        if (offset + match.length === decoded.length && (csi ?? bel ?? esc) === undefined) {
-          this.stdoutEscape = match.slice(0, 2);
-        }
-        return "";
-      });
-      const queue = this.externalOutputQueue;
-      const rows = this.splitStdoutRows(text, this.getPendingSplitTailColumn());
-      let added = rows.reduce((sum, row) => sum + capturedRowBytes(Math.max(1, row.cells)), 0);
-      let trimmed = 0;
-      if (queue.capturedBytes + added > CAPTURED_STDOUT_MAX_BYTES) {
-        while (added > CAPTURED_STDOUT_HIGH_WATER_BYTES)
-          added -= capturedRowBytes(Math.max(1, rows[trimmed++].cells));
-      }
-      const commits = this.createStdoutSnapshotCommits(rows.slice(trimmed));
-      try {
-        this.enqueueSplitCommits(commits, true);
-      } catch (error) {
-        for (const commit of commits) {
-          if (!queue.owns(commit.snapshot))
-            commit.snapshot.destroy();
-        }
-        throw error;
-      }
-      const limits = {
-        start: this.nativeSplitAcceptedCount,
-        boundary: this.pendingNativeReplay?.remaining ?? Infinity,
-        incoming: queue.size - commits.length,
-        trimmed
-      };
-      const collapsed = queue.collapse(limits, (rows2) => this.createDroppedRowCommit(rows2));
-      if (collapsed) {
-        this.queuedSplitTail = null;
-        if (this.pendingNativeReplay)
-          this.pendingNativeReplay.remaining = collapsed.boundary;
-      }
-      this.emitExternalOutput(collapsed?.markers ?? []);
-      this.emitExternalOutput(commits.filter((commit) => !collapsed?.removed.has(commit.snapshot)));
-      writable = queue.writable();
+      writable = this.captureStdout(this.stdoutDecoder.write(bytes), true);
     }
     if (typeof resolvedCallback === "function") {
       process.nextTick(resolvedCallback);
     }
     return writable;
   };
+  captureStdout(input, hold) {
+    if (this.stdoutRow && /^\r(?!\n)/.test(input))
+      this.captureStdout("", false);
+    const decoded = this.stdoutRow + this.stdoutEscape + input;
+    this.stdoutRow = this.stdoutEscape = "";
+    const text = decoded.replace(STDOUT_ESCAPE, (match, csi, bel, esc, offset) => {
+      if (offset + match.length === decoded.length && (csi ?? bel ?? esc) === undefined) {
+        this.stdoutEscape = match.slice(0, 2);
+      }
+      return "";
+    });
+    const queue = this.externalOutputQueue;
+    const { rows, held } = this.splitStdoutRows(text, this.getPendingSplitTailColumn(), hold);
+    let added = rows.reduce((sum, row) => sum + capturedRowBytes(Math.max(1, row.cells)), 0);
+    let trimmed = 0;
+    if (queue.capturedBytes + added > CAPTURED_STDOUT_MAX_BYTES) {
+      while (added > CAPTURED_STDOUT_HIGH_WATER_BYTES)
+        added -= capturedRowBytes(Math.max(1, rows[trimmed++].cells));
+    }
+    const commits = this.createStdoutSnapshotCommits(rows.slice(trimmed));
+    try {
+      this.enqueueSplitCommits(commits, true);
+    } catch (error) {
+      for (const commit of commits) {
+        if (!queue.owns(commit.snapshot))
+          commit.snapshot.destroy();
+      }
+      throw error;
+    }
+    const limits = {
+      start: this.nativeSplitAcceptedCount,
+      boundary: this.pendingNativeReplay?.remaining ?? Infinity,
+      incoming: queue.size - commits.length,
+      trimmed
+    };
+    const collapsed = queue.collapse(limits, (rows) => this.createDroppedRowCommit(rows));
+    if (collapsed) {
+      this.queuedSplitTail = null;
+      if (this.pendingNativeReplay)
+        this.pendingNativeReplay.remaining = collapsed.boundary;
+    }
+    this.stdoutRow = held;
+    this.emitExternalOutput(collapsed?.markers ?? []);
+    this.emitExternalOutput(commits.filter((commit) => !collapsed?.removed.has(commit.snapshot)));
+    return queue.writable();
+  }
   createDroppedRowCommit(rows) {
     const text = `[${rows} lines dropped]`.slice(0, Math.max(1, this.width));
-    const [commit] = this.createStdoutSnapshotCommits(this.splitStdoutRows(text, 0));
+    const [commit] = this.createStdoutSnapshotCommits(this.splitStdoutRows(text, 0).rows);
     commit.nativeSnapshot = commit.snapshot._getSceneHandle(this.nativeScene);
     return { ...commit, startOnNewLine: true, trailingNewline: true, endsRow: true };
   }
@@ -22674,6 +22704,7 @@ Captured external output:
     if (this.nativeTerminalTransition)
       return this.nativeTerminalTransition;
     this.pendingSplitStartupCursorSeed = this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout";
+    this.startupCursorReportPending = true;
     const startup = this.admitReplyBatch("startup", () => this.replySentinel && this.themeModeState.resolveWaiters());
     try {
       await this.trackNativeTerminalTransition(this.nativeSession.setupTerminal({
@@ -22965,8 +22996,13 @@ Captured external output:
             subscriber(event.sequence);
           }
         }
-        if (event.protocol === "cpr" && this.processCapabilitySequence(event.sequence, true)) {
-          return;
+        if (event.protocol === "cpr") {
+          const key = this.startupCursorReportPending ? null : parseKeypress2(event.sequence);
+          this.startupCursorReportPending = false;
+          if (key)
+            return this.handleStdinEvent({ type: "key", raw: event.sequence, key });
+          if (this.processCapabilitySequence(event.sequence, true))
+            return;
         }
         this.dispatchSequenceHandlers(event.sequence);
         if (event.protocol === "osc")
@@ -23379,6 +23415,8 @@ Captured external output:
       }
       return;
     }
+    if (this.stdoutRow)
+      this.captureStdout("", false);
     const terminalWritable = this._terminalIsSetup && this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */;
     if (terminalWritable && !this.isSplitCursorSeedFrameBlocked() && this.externalOutputQueue.size > 0) {
       this.pendingNativeResize = { width, height };
@@ -24132,6 +24170,10 @@ Captured external output:
         return;
       if (!this.canRender || this.currentControlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
         return;
+      const requestedBeforeRow = this.immediateRerenderRequested;
+      if (this.stdoutRow)
+        this.captureStdout("", false);
+      this.immediateRerenderRequested = requestedBeforeRow || this.stdoutRow !== "";
       const sceneStart = performance.now();
       const requestedBeforeScene = this.immediateRerenderRequested;
       try {
@@ -24299,6 +24341,8 @@ Captured external output:
   async presentNativeScene() {
     if (this.isSplitCursorSeedFrameBlocked())
       return "blocked";
+    if (this.stdoutRow)
+      this.captureStdout("", false);
     const commits = this._splitHeight > 0 && this._externalOutputMode === "capture-stdout" ? this.pendingNativeReplay?.remaining === 0 ? [] : this.externalOutputQueue.batch(Math.min(this.splitCommitLimit, this.pendingNativeReplay?.remaining ?? Infinity)) : null;
     const split = commits === null ? null : this.nativeScene.commitSplit(commits.map((commit) => ({ ...commit, snapshot: commit.nativeSnapshot })), this.getSplitPinnedRenderOffset(), this.forceFullRepaintRequested);
     const status = split?.status ?? this.nativeScene.commit(this.forceFullRepaintRequested);
@@ -24830,7 +24874,7 @@ Captured external output:
   }
 }
 
-export { isValidBorderStyle2, parseBorderStyle2, BorderChars2, getBorderFromSides2, getBorderSides2, borderCharsToArray2, BorderCharArrays2, KeyEvent2, PasteEvent2, KeyHandler2, InternalKeyHandler2, fonts2, measureText2, getCharacterPositions2, coordinateToCharacterIndex2, renderFontToFrameBuffer2, hastToStyledText2, SystemClock2, kittyKeyMap, terminalNamedSingleStrokeKeys2, parseKeypress2, LinearScrollAccel2, MacOSScrollAccel2, parseAlign2, parseAlignItems2, parseBoxSizing2, parseDimension2, parseDirection2, parseDisplay2, parseEdge2, parseFlexDirection2, parseGutter2, parseJustify2, parseLayoutMode2, parseLogLevel2, parseMeasureMode2, parseOverflow2, parsePositionType2, parseUnit2, parseWrap2, Selection2, convertGlobalToLocalSelection2, ASCIIFontSelectionHelper2, treeSitterToTextChunks2, treeSitterToStyledText2, addDefaultParsers2, TreeSitterClient2, DataPathsManager2, getDataPaths2, extensionToFiletype2, basenameToFiletype2, extToFiletype2, pathToFiletype2, infoStringToFiletype2, getTreeSitterClient2, destroyTreeSitterClient2, ExtmarksController2, createExtmarksController2, TerminalPalette2, createTerminalPalette2, normalizeTerminalPalette2, buildTerminalPaletteSignature2, decodePasteBytes2, stripAnsiSequences2, createHostClipboard2, createClipboard2, ClipboardTarget2, createRendererClipboardAdapter2, detectLinks2, acquireSessionBufferLease2, ResourceContext2, OptimizedBuffer2, LayoutEvents2, RenderableEvents2, isRenderable2, BaseRenderable2, Renderable2, RootRenderable2, TextBuffer2, TextBufferView2, EditBuffer2, measureEditText2, EditorView2, Timeline2, engine2, getTimelineEngine2, createTimeline2, ANSI, BoxRenderable2, TextBufferRenderable2, SliderRenderable2, ScrollBarRenderable2, ArrowRenderable2, scrollUnitSize2, ScrollBoxWrapper2, ScrollBoxViewport2, ScrollBoxContent2, ScrollBoxBar2, ScrollBoxRenderable2, CodeRenderable2, ImageLoadError2, ImageError2, imageInfo2, NativeImage2, NativeImagePool2, resolveImageRenderProtocol2, checkCrop2, sameCrop2, ImageRenderable2, isTextNodeRenderable2, TextNodeRenderable2, RootTextNodeRenderable2, TextRenderable2, NativeSession2, defaultKeyAliases, mergeKeyAliases, mergeKeyBindings, getKeyBindingAction, buildKeyBindingsMap, capture2, ConsolePosition2, TerminalConsole2, EditBufferRenderableEvents2, isEditBufferRenderable2, EditBufferRenderable2, buildKittyKeyboardFlags2, MouseEvent2, MouseButton2, createCliRenderer2, CliRenderEvents2, RendererControlState2, CliRenderer2 };
+export { isValidBorderStyle2, parseBorderStyle2, BorderChars2, getBorderFromSides2, getBorderSides2, borderCharsToArray2, BorderCharArrays2, KeyEvent2, PasteEvent2, KeyHandler2, InternalKeyHandler2, fonts2, measureText2, getCharacterPositions2, coordinateToCharacterIndex2, renderFontToFrameBuffer2, hastToStyledText2, SystemClock2, kittyKeyMap, terminalNamedSingleStrokeKeys2, parseKeypress2, LinearScrollAccel2, MacOSScrollAccel2, parseAlign2, parseAlignItems2, parseAlignContent2, parseBoxSizing2, parseDimension2, parseDirection2, parseDisplay2, parseEdge2, parseFlexDirection2, parseGutter2, parseJustify2, parseLayoutMode2, parseLogLevel2, parseMeasureMode2, parseOverflow2, parsePositionType2, parseUnit2, parseWrap2, Selection2, convertGlobalToLocalSelection2, ASCIIFontSelectionHelper2, treeSitterToTextChunks2, treeSitterToStyledText2, addDefaultParsers2, TreeSitterClient2, DataPathsManager2, getDataPaths2, extensionToFiletype2, basenameToFiletype2, extToFiletype2, pathToFiletype2, infoStringToFiletype2, getTreeSitterClient2, destroyTreeSitterClient2, ExtmarksController2, createExtmarksController2, TerminalPalette2, createTerminalPalette2, normalizeTerminalPalette2, buildTerminalPaletteSignature2, decodePasteBytes2, stripAnsiSequences2, createHostClipboard2, createClipboard2, ClipboardTarget2, createRendererClipboardAdapter2, detectLinks2, acquireSessionBufferLease2, ResourceContext2, OptimizedBuffer2, LayoutEvents2, RenderableEvents2, isRenderable2, BaseRenderable2, Renderable2, RootRenderable2, TextBuffer2, TextBufferView2, EditBuffer2, measureEditText2, EditorView2, Timeline2, engine2, getTimelineEngine2, createTimeline2, ANSI, BoxRenderable2, TextBufferRenderable2, SliderRenderable2, ScrollBarRenderable2, ArrowRenderable2, scrollUnitSize2, ScrollBoxWrapper2, ScrollBoxViewport2, ScrollBoxContent2, ScrollBoxBar2, ScrollBoxRenderable2, CodeRenderable2, ImageLoadError2, ImageError2, imageInfo2, NativeImage2, NativeImagePool2, resolveImageRenderProtocol2, checkCrop2, sameCrop2, ImageRenderable2, isTextNodeRenderable2, TextNodeRenderable2, RootTextNodeRenderable2, TextRenderable2, NativeSession2, defaultKeyAliases, mergeKeyAliases, mergeKeyBindings, getKeyBindingAction, buildKeyBindingsMap, capture2, ConsolePosition2, TerminalConsole2, EditBufferRenderableEvents2, isEditBufferRenderable2, EditBufferRenderable2, buildKittyKeyboardFlags2, MouseEvent2, MouseButton2, createCliRenderer2, CliRenderEvents2, RendererControlState2, CliRenderer2 };
 
-//# debugId=F756DEC36326C78964756E2164756E21
-//# sourceMappingURL=chunk-node-4zw56w3z.js.map
+//# debugId=442FF61F977DA05564756E2164756E21
+//# sourceMappingURL=chunk-node-c6za8m8j.js.map

@@ -94,6 +94,8 @@ export declare abstract class EditBufferRenderable extends Renderable implements
     get lineCount(): number;
     get virtualLineCount(): number;
     get scrollY(): number;
+    get scrollMargin(): number;
+    set scrollMargin(value: number | undefined);
     get plainText(): string;
     get logicalCursor(): LogicalCursor;
     get visualCursor(): VisualCursor;
