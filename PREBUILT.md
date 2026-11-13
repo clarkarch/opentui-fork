@@ -8,7 +8,7 @@ toolchain can use the fork as-is:
   once per sibling package — six redundant passes).
 - `packages/native/lib/{x86_64-linux,aarch64-linux}/` — the patched native
   library, the static archive, and the header (`zig build -Doptimize=ReleaseFast`, zig
-  0.17.0). The Rust crates need all three: the archive (or the shared library) to link,
+  0.17.1). The Rust crates need all three: the archive (or the shared library) to link,
   and the header, which they check against the bindings they were generated from.
 
 **CI builds these. Nothing is built by hand.** After a change under
@@ -18,11 +18,22 @@ toolchain can use the fork as-is:
    publishes the stripped libraries, the static archives, and the headers as
    the GitHub release `native-latest`; the `publish-npm` workflow publishes the
    npm packages.
-2. Download the release assets for the two committed Linux targets and commit
-   them, with the published npm package's `dist/`:
+2. Copy that output into the tree and commit it:
 
    ```sh
-   # The native artifacts: the library, the static archive, and the header.
+   sh scripts/refresh-prebuilt.sh
+   git add -f packages/core/dist packages/native/lib
+   git commit -m "build: refresh the prebuilt artifacts"
+   ```
+
+   The script downloads the release assets for the two committed Linux targets
+   and the published npm package's `dist/`, and it refuses to finish when the
+   header does not hash to what the Rust bindings were generated from — that
+   mismatch breaks every Rust consumer, so it is an error, not a warning.
+
+   The manual equivalent, if the script cannot run:
+
+   ```sh
    for target in x86_64-linux aarch64-linux; do
      gh release download native-latest --repo clarkarch/opentui-fork \
        --pattern "native-${target}-*" --dir /tmp/native-$target
@@ -31,9 +42,8 @@ toolchain can use the fork as-is:
      cp /tmp/native-$target/native-$target-libopentui.a "packages/native/lib/$target/"
      cp /tmp/native-$target/native-$target-opentui.h "packages/native/lib/$target/"
    done
-   # The core package: its published tarball carries the built dist.
-   npm pack @clarkarch/opentui-fork@0.8.4-fork.2 --pack-destination /tmp
-   tar -xzf /tmp/clarkarch-opentui-fork-0.8.4-fork.2.tgz -C /tmp
+   npm pack @clarkarch/opentui-fork@0.8.4-fork.3 --pack-destination /tmp
+   tar -xzf /tmp/clarkarch-opentui-fork-0.8.4-fork.3.tgz -C /tmp
    rm -rf packages/core/dist && cp -R /tmp/package/dist packages/core/dist
    # `dist` and `lib` are gitignored, so a plain `git add` skips the artifacts — hence -f.
    git add -f packages/core/dist packages/native/lib
