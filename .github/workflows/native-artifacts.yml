@@ -114,8 +114,13 @@ jobs:
             [ -f "$archive" ] && llvm-strip --strip-unneeded "$archive"
           else
             strip -x "$lib"
-            # BSD strip reads no archives; llvm-strip does.
-            [ -f "$archive" ] && xcrun llvm-strip --strip-unneeded "$archive"
+            # BSD strip reads no archives; llvm-strip does. The runner's Xcode
+            # ships no llvm-strip (xcrun cannot find it), so take the one
+            # Homebrew installs.
+            if [ -f "$archive" ]; then
+              brew install llvm
+              "$(brew --prefix llvm)/bin/llvm-strip" --strip-unneeded "$archive"
+            fi
           fi
           # The header travels with the library: the Rust crates check it
           # against the bindings they were generated from, so a consumer needs
@@ -155,7 +160,14 @@ jobs:
             # Every file of the artifact directory travels: the library, the
             # static archive, and the header.
             for file in "$dir"/*; do
-              cp "$file" "release/native-${target}-$(basename "$file")"
+              name=$(basename "$file")
+              # Windows' static archive is not usable by the Rust crates:
+              # they link the DLL there, through its import library. It is
+              # 50 MB unstripped, so it stays out of the release.
+              case "$target/$name" in
+                *-windows/opentui-static.lib) continue ;;
+              esac
+              cp "$file" "release/native-${target}-${name}"
             done
           done
           ls -l release

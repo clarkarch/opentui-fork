@@ -41,6 +41,23 @@ jobs:
         working-directory: packages/native
         run: zig build -Doptimize=ReleaseFast
 
+      - name: Strip a copy the way the release does
+        # The release ships stripped libraries, and the committed artifacts are
+        # copied from it. A strip that breaks the static archive would break
+        # every Rust consumer, so the checks below run against the stripped
+        # copy, not the build.
+        run: |
+          dir="$GITHUB_WORKSPACE/packages/native/lib/x86_64-linux"
+          stripped="$RUNNER_TEMP/stripped"
+          mkdir -p "$stripped"
+          cp "$dir/libopentui.so" "$dir/libopentui.a" "$dir/opentui.h" "$stripped/"
+          if ! command -v llvm-strip >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq llvm
+          fi
+          llvm-strip --strip-unneeded "$stripped/libopentui.so" "$stripped/libopentui.a"
+          ls -l "$stripped"
+
       - name: Install the pinned Rust toolchain
         working-directory: packages/rust
         run: |
@@ -51,8 +68,9 @@ jobs:
         working-directory: packages/rust
         env:
           CI: "true"
-        # The crates link the library this job just built, in the checkout's
-        # packages/native/lib/x86_64-linux, with the header beside it.
+          # The stripped copy: the same files the release and the committed
+          # artifacts carry, with the header beside them.
+          OPENTUI_LIB_DIR: ${{ runner.temp }}/stripped
         run: sh test.sh all
 
       - name: Build a project that depends on this repository
