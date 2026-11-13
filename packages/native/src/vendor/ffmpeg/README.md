@@ -1,7 +1,13 @@
 # FFmpeg
 
-Native video statically links a minimal decode-only FFmpeg 9.0.2 build: MOV/MP4 demuxing, H.264 video decoding,
-AAC audio decoding, file I/O, libswscale, and libswresample. On macOS it also enables VideoToolbox H.264 hardware
+**Not linked into the fork's libraries.** The fork's native build has no FFmpeg
+prefix, so the video shim compiles in its "unavailable" mode: `VideoRenderable`
+exists, but every open fails. The files below are upstream's, kept for
+reference; nothing in the fork's build or CI uses them.
+
+Upstream links a minimal decode-only FFmpeg 9.0.2 build into the native video
+renderable: MOV/MP4 demuxing, H.264 video decoding, AAC audio decoding, file
+I/O, libswscale, and libswresample. On macOS it also enables VideoToolbox H.264 hardware
 decoding, which playback uses only when the experimental `OPENTUI_EXPERIMENTAL_VIDEO_HWACCEL=1` is set. GPL and nonfree
 components are disabled.
 

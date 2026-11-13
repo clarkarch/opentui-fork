@@ -11,6 +11,11 @@ toolchain can use the fork as-is:
   0.17.1). The Rust crates need all three: the archive (or the shared library) to link,
   and the header, which they check against the bindings they were generated from.
 
+A Rust consumer on Linux needs neither download nor a native toolchain: a Cargo
+`git` dependency on this repository carries the artifacts in its clone, and the
+crates' build script finds them there. The release exists for the platforms a
+committed Linux binary cannot serve.
+
 **CI builds these. Nothing is built by hand.** After a change under
 `packages/core/src` or `packages/native/src`:
 
@@ -116,6 +121,13 @@ The release copies are stripped. They are the ones the committed artifacts are
 copied from, so a Rust consumer that depends on this repository links the same
 library a release download gives.
 
+The native build is not byte-reproducible — a rebuild carries a fresh ELF
+build-id — so the committed library's bytes differ from a later release's. The
+code does not: the `.text` segment hashes the same. What a consumer can rely
+on is the header, and the header is byte-identical: it is the file the crates
+hash-check against their bindings, so a header that differs breaks every
+consumer, and the release's header is the committed one.
+
 Each target publishes its static archive (`native-<target>-libopentui.a`, the
 platforms that have one) and its header (`native-<target>-opentui.h`) beside
 the library. The Rust crates need the header: they check it against the
@@ -167,6 +179,16 @@ Versions are `0.8.4-fork.N`: the upstream version the fork is based on, plus
 the fork's own release counter. They are prereleases of the upstream version,
 so a consumer has to ask for them explicitly (`^0.8.4-fork.1`), which is what
 `package.json` pins.
+
+The git tag `v0.8.4-fork.N` marks the same release in the repository, so a
+Cargo dependency can pin it by tag instead of tracking the branch:
+
+```toml
+opentui = { git = "https://github.com/clarkarch/opentui-fork", tag = "v0.8.4-fork.3" }
+```
+
+A tag's tree carries the committed artifacts, so a consumer that pins a tag
+gets the same native library a consumer that tracks the branch does.
 
 To publish:
 
