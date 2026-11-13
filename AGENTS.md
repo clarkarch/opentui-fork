@@ -51,6 +51,13 @@ terminal or platform is unavailable locally.
   `opentui-ssh`) so a consumer moves between the fork and upstream by changing the dependency's source, and a
   future upstream merge is a small diff instead of a rename. `packages/rust/scripts/consumer-smoke.sh` builds a
   throwaway project against the repository, which is what the `fork-ci` workflow runs.
+- A Cargo git dependency with no `branch`/`rev`/`tag` resolves to the repository's DEFAULT branch, so the fork's
+  default branch must be `tfm` (the patched one); `main` stays the upstream mirror. The release tags
+  (`v<upstream>-fork.N`) pin the same tree, and a tag's tree carries the committed artifacts, so a consumer that pins a
+  tag links the same library a consumer that tracks the branch does.
+- The crates are NOT published to crates.io: eleven crates would need a version bump per fork release, the static
+  archive is far over crates.io's size cap, and the versions are permanent. A project that must be publishable can wrap
+  the git dependency in one crate of its own.
 - **Nothing is built by hand.** CI builds the native library for every target (`native-artifacts`) and the npm
   packages (`publish-npm`); the committed artifacts under `packages/core/dist` and `packages/native/lib` are
   copied from that CI output, stripped, and committed. See PREBUILT.md. The committed native directory holds the
@@ -93,6 +100,25 @@ This branch is a fork that carries patches upstream does not have. It is publish
 
 - The in-repo package name stays `@opentui/core`. The monorepo's internal imports and the upstream rebase depend on it;
   only the PUBLISHED artifacts carry the fork's name. `packages/core/src/published-package.ts` is the single source for it.
+- A BUILD JOB MUST PUBLISH ONLY WHAT IT BUILT. The checkout carries the committed Linux artifacts, and the native build
+  writes to the same paths, so uploading the whole `packages/native/lib/` tree lets a job's artifact carry the OTHER
+  target's committed library — and the publish job copies the artifacts into one directory, last-wins. The committed
+  library then overwrites the fresh one, and the release ships a stale binary that no test catches (a consumer that
+  links it still works: it is the same ABI, just old code). Both workflows stage what the job built into `out/<target>/`
+  with a `manifest.txt` of sha256s, and the publish job copies exactly the manifest's files and fails when the artifact
+  holds an unlisted one.
+- The COMMITTED ARTIFACTS ARE THE OUTPUT, so they must not trigger a rebuild: `packages/native/lib/**` is excluded from
+  the `packages/native/**` path filter of `native-artifacts.yml` and `publish-npm.yml`. `fork-ci.yml` keeps it — that
+  workflow is the gate that proves the committed artifacts link and run.
+- A native build is NOT byte-reproducible (a fresh ELF build-id), so the committed library's bytes differ from a later
+  release's. The CODE does not: the `.text` segment hashes the same. What a consumer can rely on is the header, and the
+  header is byte-identical — it is the file the crates hash-check.
+- `packages/core/dist` and `packages/native/lib` are gitignored, so a refresh needs `git add -f`. The committed native
+  directory holds the library, the static archive, AND `opentui.h`: the crates check the header against the bindings
+  they were generated from, so a consumer needs it beside the library it links, and a commit without it fails every
+  downstream build.
+- The Rust crates' build script refuses a native artifact whose header does not hash to what `generated.rs` was
+  generated from. That check is the gate that catches a stale or mismatched artifact BEFORE a consumer sees it.
 - The loader imports the platform packages with LITERAL specifiers, because `bun build --compile` has to see the
   `import("./libopentui.so", { type: "file" })` inside them to embed the library in a binary. A computed specifier is
   invisible to the bundler and the compiled binary silently loses its library. Keep the literals literal.
@@ -110,6 +136,8 @@ This branch is a fork that carries patches upstream does not have. It is publish
   minutes of build time per target. So the native build runs without an FFmpeg prefix: `packages/native`'s
   `prepare:zig` prepares the vendored sources only, the build compiles the video shim in its "unavailable" mode, and
   `VideoRenderable` exists but every open fails as unavailable. Keep it that way until a consumer needs real video.
+  `packages/native/scripts/build-ffmpeg.ts` and the vendored FFmpeg sources are upstream's and are kept for reference
+  only — nothing in the fork's build or CI calls them, and the docs must not claim the shipped library decodes video.
 - The native packages carry the vendored licenses (Ghostty, wuffs, stb, libwebp, lcms2). The list lives in
   `packages/core/scripts/native-package.ts`; the build and the publish path stage through it, so a new vendored
   dependency has to be added there — a published package missing a license is a legal problem, not a style one.
