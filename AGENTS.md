@@ -110,6 +110,11 @@ This branch is a fork that carries patches upstream does not have. It is publish
 - The COMMITTED ARTIFACTS ARE THE OUTPUT, so they must not trigger a rebuild: `packages/native/lib/**` is excluded from
   the `packages/native/**` path filter of `native-artifacts.yml` and `publish-npm.yml`. `fork-ci.yml` keeps it — that
   workflow is the gate that proves the committed artifacts link and run.
+- PROSE IS NOT A BUILD INPUT. A markdown edit under `packages/native/` or `packages/rust/` matched the path filter and
+  burned a full rebuild of every target (21 min) plus an npm publish (19 min) plus the consumer build (9 min) — for a
+  README. Those trees exclude `**.md`. The pattern is `packages/native/**.md`, not `packages/native/**/*.md`: the
+  filter's `**` spans the `/`, so `**.md` matches a markdown file at any depth, while `**/*.md` needs two slashes and
+  misses the top-level README. A workflow file's own path stays in the filter — a changed workflow has to be validated.
 - A native build is NOT byte-reproducible (a fresh ELF build-id), so the committed library's bytes differ from a later
   release's. The CODE does not: the `.text` segment hashes the same. What a consumer can rely on is the header, and the
   header is byte-identical — it is the file the crates hash-check.
