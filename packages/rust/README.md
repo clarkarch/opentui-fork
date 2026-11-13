@@ -21,7 +21,16 @@ A terminal UI framework for Rust built on
 > pins the commit a build uses. The native library comes with the repository:
 > the fork commits it for Linux, so a build needs no native toolchain and no
 > separate download. Other platforms fetch the library from the release
-> `native-latest` and point `OPENTUI_LIB_DIR` at it.
+> `native-latest` and point `OPENTUI_LIB_DIR` at it:
+>
+> ```sh
+> export OPENTUI_LIB_DIR=$(sh packages/rust/scripts/fetch-native.sh x86_64-macos)
+> ```
+>
+> The script prints the directory it filled; the crates' build script finds
+> the library, the static archive, and the header there. On Linux the same
+> script works, but it is not needed: the committed artifacts are in the
+> dependency's clone.
 >
 > `sh packages/rust/scripts/consumer-smoke.sh` builds a throwaway project that
 > depends on the repository this way, which is what the fork's CI runs.
@@ -76,10 +85,16 @@ cargo test --manifest-path packages/rust/Cargo.toml
 To link other artifacts, such as an npm platform package or a native archive
 of a release, set `OPENTUI_LIB_DIR` to their directory. It wins over the
 checkout's build. Give an absolute path: Cargo reads a relative one from
-`crates/opentui-sys`. A Cargo `git` dependency on this repository has no native
-build, so it needs `OPENTUI_LIB_DIR`. An npm platform package ships only the
-shared library, so on Linux and macOS it needs the default features off (see
-below).
+`crates/opentui-sys`. A Cargo `git` dependency on this repository carries the
+Linux artifacts in its clone, so it needs nothing; on the other platforms it
+needs `OPENTUI_LIB_DIR`, which `scripts/fetch-native.sh` fills:
+
+```sh
+export OPENTUI_LIB_DIR=$(sh packages/rust/scripts/fetch-native.sh aarch64-macos)
+```
+
+An npm platform package ships only the shared library, so on Linux and macOS
+it needs the default features off (see below).
 
 These platforms are supported:
 
