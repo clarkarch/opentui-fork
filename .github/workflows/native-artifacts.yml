@@ -126,18 +126,11 @@ jobs:
               llvm-strip --strip-unneeded "$lib"
               [ -f "$archive" ] && llvm-strip --strip-unneeded "$archive"
             else
+              # BSD strip reads no archive, and llvm-strip rejects Mach-O
+              # archives with "option is not supported for MachO", so the
+              # archive ships as it was built. It is the big file; the library
+              # is the one every consumer downloads.
               strip -x "$lib"
-              # BSD strip reads no archives; llvm-strip does. The runner's
-              # Xcode ships no llvm-strip (xcrun cannot find it), so take the
-              # one Homebrew installs.
-              #
-              # --strip-debug, not --strip-unneeded: the latter is ELF-only
-              # and llvm-strip rejects it for Mach-O. The archive's symbol
-              # table has to survive: a static library links by it.
-              if [ -f "$archive" ]; then
-                brew install llvm
-                "$(brew --prefix llvm)/bin/llvm-strip" --strip-debug "$archive"
-              fi
             fi
             # The header travels with the library: the Rust crates check it
             # against the bindings they were generated from, so a consumer needs
