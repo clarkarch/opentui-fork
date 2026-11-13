@@ -76,6 +76,12 @@ call site does not compile against the regenerated bindings. The safe layer carr
 - `ImageFit::Contain` needs no Rust-side flag. The fork's scene turns the node's fit into the native
   `OT_IMAGE_DRAW_PRESERVE_ASPECT` placement, so a Rust app gets the letterboxed, undistorted placement for free.
 
+The terminal's size in pixels is part of the same story: an image sizes its pixels and cells with it. Core keeps it in
+`renderer.resolution`; the Rust crate had no way to read it, so a Rust app that drew an image at the terminal's real
+size had to ask the terminal itself. `Host::pixel_resolution()` and `App::pixel_resolution()` now carry it, and
+`App::on_pixel_resolution(...)` reports it when it arrives. A resize forgets it: the cell size may have changed with
+it, and the terminal answers the next query.
+
 Regenerating the bindings (`bun run generate:abi` in `packages/core`) changes `generated.rs` and the header hash in
 it; `opentui-sys`'s build script refuses a native library whose header does not match that hash, so a native rebuild
 has to follow an ABI change.
