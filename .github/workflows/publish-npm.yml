@@ -148,12 +148,36 @@ jobs:
             ls -l "$lib"
           done
 
+      - name: Stage what this job built
+        # Only the library this job built, with a manifest of it.
+        #
+        # The checkout carries the committed Linux libraries, and the build
+        # writes to the same paths, so uploading the whole tree would mix
+        # them in: the x86_64 job's artifact would carry the committed
+        # aarch64 library, and the publish job copies the artifacts into one
+        # directory — so the committed library could land over the fresh one.
+        # The manifest says what this job produced, so the publish job can
+        # copy that and nothing else.
+        working-directory: packages/native
+        run: |
+          rm -rf out
+          for dir in ${{ matrix.dirs }}; do
+            mkdir -p "out/$dir"
+            cp "lib/$dir/${{ matrix.file }}" "out/$dir/"
+          done
+          cd out
+          : > manifest.txt
+          for file in */*; do
+            printf '%s %s %s\n' "${file%%/*}" "${file##*/}" "$(sha256sum "$file" | cut -d' ' -f1)" >> manifest.txt
+          done
+          cat manifest.txt
+
       - uses: actions/upload-artifact@v4
         with:
           # One directory per target, so the publish job reads the target from
           # the directory.
           name: native-${{ matrix.output }}
-          path: packages/native/lib/
+          path: packages/native/out/
           if-no-files-found: error
 
   publish:
@@ -178,13 +202,20 @@ jobs:
         run: |
           mkdir -p native
           for artifact in artifacts/native-*; do
-            # An artifact holds one directory per target the job built.
-            for dir in "$artifact"/*/; do
-              [ -d "$dir" ] || continue
-              target=$(basename "$dir")
-              mkdir -p "native/$target"
-              cp "$dir"* "native/$target/"
-            done
+            # Each artifact carries a manifest of what its job built, and the
+            # publish job copies exactly those files. The checkout holds
+            # committed Linux libraries, so an artifact can carry a file its
+            # job never built: copying the manifest's files only keeps a
+            # committed library from overwriting another target's fresh one,
+            # and the check below fails on the extra rather than shipping it.
+            while read -r dir file sha; do
+              source="$artifact/$dir/$file"
+              [ -f "$source" ] || { echo "the artifact is missing $source"; exit 1; }
+              actual=$(sha256sum "$source" | cut -d' ' -f1)
+              [ "$actual" = "$sha" ] || { echo "the checksum of $source does not match its manifest"; exit 1; }
+              mkdir -p "native/$dir"
+              cp "$source" "native/$dir/"
+            done < "$artifact/manifest.txt"
           done
           ls -lR native
 
