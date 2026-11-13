@@ -58,6 +58,17 @@ jobs:
           llvm-strip --strip-unneeded "$stripped/libopentui.so" "$stripped/libopentui.a"
           ls -l "$stripped"
 
+      - name: Restore the committed artifacts
+        # The build wrote over the committed library, so the checkout now
+        # holds this job's build where a consumer's clone would hold the
+        # committed one. The consumer step below needs the committed files:
+        # it proves that what the branch carries is what a downstream project
+        # links and runs.
+        run: |
+          git checkout -- packages/native/lib
+          git clean -fdx -- packages/native/lib
+          ls -l packages/native/lib/x86_64-linux
+
       - name: Install the pinned Rust toolchain
         working-directory: packages/rust
         run: |
@@ -76,8 +87,6 @@ jobs:
       - name: Build a project that depends on this repository
         # The consumer clones this repository and builds the crates from the
         # clone, so it finds the committed artifacts, not this job's build.
-        # Until the artifacts are committed, the library comes from this
-        # job's build.
-        env:
-          OPENTUI_LIB_DIR: ${{ github.workspace }}/packages/native/lib/x86_64-linux
+        # No OPENTUI_LIB_DIR: the crates look in the clone, which is what a
+        # downstream project does.
         run: sh packages/rust/scripts/consumer-smoke.sh
