@@ -53,5 +53,9 @@ EOF
 
 printf '%s\n' "consumer: building against $repo ($platform)"
 cd "$work"
+# Both linkages: the default feature links the static archive, and turning it
+# off links the shared library. A consumer on a platform without the archive
+# needs the second one to work.
 cargo build --quiet
+cargo build --quiet --no-default-features
 printf '%s\n' 'PASS: a project that depends on this repository builds'
