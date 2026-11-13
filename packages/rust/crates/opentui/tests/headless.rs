@@ -180,6 +180,34 @@ fn removed_handlers_stop_and_terminal_apps_have_no_capture() {
     assert!(test.last_frame().is_none());
 }
 
+#[test]
+fn the_pixel_resolution_reaches_the_app_and_a_resize_forgets_it() {
+    let app = headless(4, 1);
+    watchdog(&app);
+    let reported = Rc::new(RefCell::new(Vec::new()));
+    app.on_pixel_resolution({
+        let reported = reported.clone();
+        move |_cx, resolution| reported.borrow_mut().push(resolution)
+    });
+
+    // A terminal that has not answered has no size in pixels.
+    assert_eq!(app.pixel_resolution(), None);
+
+    app.dispatch(Event::PixelResolution { width: 800, height: 400 });
+    assert_eq!(app.pixel_resolution(), Some(PixelResolution { width: 800, height: 400 }));
+    assert_eq!(*reported.borrow(), vec![PixelResolution { width: 800, height: 400 }]);
+
+    // A resize changes the cell size, so the old pixel size describes cells that are gone.
+    app.dispatch(Event::Resize { width: 8, height: 2 });
+    assert_eq!(app.pixel_resolution(), None);
+    // The handler does not run for the forgotten size: a terminal that answers again reports it anew.
+    assert_eq!(reported.borrow().len(), 1);
+
+    app.dispatch(Event::PixelResolution { width: 1600, height: 400 });
+    assert_eq!(app.pixel_resolution(), Some(PixelResolution { width: 1600, height: 400 }));
+    assert_eq!(reported.borrow().len(), 2);
+}
+
 #[cfg(feature = "tokio")]
 #[test]
 fn spawned_tasks_wake_the_loop() {

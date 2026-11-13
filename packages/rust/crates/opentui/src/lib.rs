@@ -95,6 +95,7 @@ pub mod prelude {
     pub use crate::native::{MousePointer, SelectionColors, WrapMode};
     pub use crate::post::{Channels, ColorMatrix, Filter, Surface};
     pub use crate::style::{Alignment, Attributes, BorderStyle, Color, Sides, Span, Style, Stylize};
+    pub use crate::term::PixelResolution;
     pub use crate::theme::{Theme, ThemeMode};
     pub use crate::widget::{
         AnyWidget, Code, Column, ColumnWidth, Component, Container, Content, Custom, Diff, DiffView, EditorAction,
