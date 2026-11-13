@@ -36,7 +36,7 @@ upstream core, without changing a single import:
 
 ```jsonc
 "dependencies": {
-  "@opentui/core": "npm:@clarkarch/opentui-fork@0.8.1-fork.1"
+  "@opentui/core": "npm:@clarkarch/opentui-fork@0.8.4-fork.3"
 }
 ```
 
@@ -45,16 +45,29 @@ Or install it under its own name, when the import name does not have to stay
 
 ```jsonc
 "dependencies": {
-  "@clarkarch/opentui-fork": "0.8.1-fork.1"
+  "@clarkarch/opentui-fork": "0.8.4-fork.3"
 }
 ```
 
 The published package is self-contained: it never imports itself by the
 upstream name, so both spellings work.
 
-The versions are `0.8.1-fork.N` — the upstream version the fork tracks, plus
+The versions are `0.8.4-fork.N` — the upstream version the fork tracks, plus
 the fork's release counter. They are prereleases, so ask for them explicitly
-(`^0.8.1-fork.1`); a plain `^0.8.1` does not match them.
+(`^0.8.4-fork.3`); a plain `^0.8.4` does not match them.
+
+For Rust, depend on this repository. The fork's default branch is the branch
+with the patches, so no branch, tag, or revision is needed, and the crate
+names stay upstream's:
+
+```toml
+[dependencies]
+opentui = { git = "https://github.com/clarkarch/opentui-fork", features = ["tokio", "tree-sitter"] }
+```
+
+`cargo update` moves it; `Cargo.lock` pins the commit. The native library
+travels with the repository, so a build needs no native toolchain. See
+[packages/rust/README.md](packages/rust/README.md).
 
 See [PREBUILT.md](PREBUILT.md) for what the branch carries and how to publish
 it.
