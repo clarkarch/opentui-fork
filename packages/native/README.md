@@ -63,7 +63,8 @@ From `packages/native`, `bun run build` installs the header and libraries under
 the shared library. Windows produces `opentui-static.lib`, `opentui.lib` for DLL
 imports, and `opentui.dll`. Static linkage also needs the platform libraries, and
 on macOS and Windows the C++ runtime; the Linux archive carries its own, private
-libc++. `zig build -Dall` builds all supported targets.
+libc++. `zig build -Dall` builds all supported targets, and
+`zig build -Dlibrary-target=<target>` builds one target.
 
 The fork's libraries have **no video decoder**: the video shim compiles in its
 "unavailable" mode, so `VideoRenderable` exists but every open fails. Upstream
@@ -72,7 +73,6 @@ with [`scripts/build-ffmpeg.ts`](scripts/build-ffmpeg.ts); the fork skips that
 (the decoder costs ~3 MB per published library plus minutes of build time per
 target), and nothing calls the script. The vendored sources under
 `src/vendor/ffmpeg/` are kept for reference only.
-`zig build -Dlibrary-target=<target>` builds one target.
 
 ```sh
 zig build test-abi --summary all

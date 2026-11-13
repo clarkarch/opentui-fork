@@ -20,6 +20,10 @@ on:
       # would not match the committed bytes, so the tree would drift from the
       # release on every refresh.
       - "!packages/native/lib/**"
+      # Prose cannot change a binary. A README edit under packages/native
+      # matched the filter above and burned a full rebuild of every target.
+      # "**.md" matches a markdown file at any depth.
+      - "!packages/native/**.md"
       - "scripts/build-native-manifest.ts"
       - ".github/workflows/native-artifacts.yml"
 

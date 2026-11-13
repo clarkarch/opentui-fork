@@ -15,6 +15,10 @@ on:
     paths:
       - "packages/native/**"
       - "packages/rust/**"
+      # Prose cannot change a binary or a crate. A README edit under either
+      # matched the filters above and burned a full consumer build.
+      - "!packages/native/**.md"
+      - "!packages/rust/**.md"
       - ".github/workflows/fork-ci.yml"
 
 permissions:

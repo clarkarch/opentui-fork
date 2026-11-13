@@ -118,6 +118,26 @@ These platforms are supported:
 | Windows 10 1809 or later, Arm  | `aarch64-pc-windows-msvc`, `aarch64-pc-windows-gnullvm` | `aarch64-windows`    |
 
 The build picks the directory for the target it builds.
+
+A consumer on Linux needs no download: the repository's committed artifacts are
+in the dependency's clone. A consumer on another platform fetches them from the
+release `native-latest`:
+
+```sh
+export OPENTUI_LIB_DIR=$(sh packages/rust/scripts/fetch-native.sh aarch64-macos)
+cargo build
+```
+
+The script prints the directory it filled, so the export is the whole recipe.
+It downloads the library, the static archive, and the header by their exact
+names, and checks each against the checksum the release reports. The header is
+what the crates check against their bindings, so a consumer that fetched a
+stale one would fail to build rather than link the wrong ABI.
+
+The targets it accepts are the artifact directory names in the table above.
+Windows gets the DLL and its import library; every other target gets the
+shared library and the static archive.
+
 Rust's musl targets build static executables (`crt-static`), which cannot load
 `libopentui.so`, so the build refuses the shared library there: keep the
 default `static` feature, or turn the default features off and build with

@@ -30,6 +30,9 @@ on:
       # output, copied back into the tree. Publishing on them would try to
       # publish the same npm version again.
       - "!packages/native/lib/**"
+      # Prose cannot change a binary or a package.
+      - "!packages/native/**.md"
+      - "!packages/core/src/**.md"
       - "scripts/publish-fork.ts"
       - "scripts/npm-publish.ts"
       - "scripts/*.test.ts"
