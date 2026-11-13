@@ -87,9 +87,9 @@ jobs:
         with:
           bun-version: "1.4.4"
 
-      - uses: mlugg/setup-zig@v2
-        with:
-          version: "0.17.0"
+      # The repository's own action: the Zig version comes from
+      # packages/native/build.zig.zon.
+      - uses: ./.github/actions/setup-zig
 
       - name: Prepare zig dependencies
         working-directory: packages/native
@@ -145,9 +145,9 @@ jobs:
         with:
           bun-version: "1.4.4"
 
-      - uses: mlugg/setup-zig@v2
-        with:
-          version: "0.17.0"
+      # The repository's own action: the Zig version comes from
+      # packages/native/build.zig.zon.
+      - uses: ./.github/actions/setup-zig
 
       - uses: actions/download-artifact@v4
         with:

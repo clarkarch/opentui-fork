@@ -14,7 +14,7 @@ import { MarkdownRenderable } from "../renderables/Markdown.js"
 import { TextRenderable } from "../renderables/Text.js"
 import { link, t } from "../lib/styled-text.js"
 import { SyntaxStyle } from "../syntax-style.js"
-import { forceRenderStatus, holdOutputIdle, settle, settleUntil } from "../testing/harness.js"
+import { forceRenderStatus, holdOutputIdle, serviceReadyFrames, settleUntil } from "../testing/harness.js"
 import { ManualClock } from "../testing/manual-clock.js"
 import { createTestStdin, RecordingWriteStream } from "../testing/test-streams.js"
 import { NativeSessionRenderStatus } from "../zig.js"
@@ -1627,15 +1627,15 @@ test("raw output pressure delays a running renderer until the Session drains", a
   renderer.root.add(new TextRenderable(renderer, { content: `${"x".repeat(40)}\n${"y".repeat(40)}` }))
   renderer.start()
   clock.advance(40)
-  await settle(16)
+  await finishRender(renderer)
   expect(frames).toBe(0)
 
   stdout.release()
   for (let frame = 0; frame < 4; frame++) {
-    await settle(16)
+    await serviceReadyFrames(renderer)
     clock.advance(40)
   }
-  await settle(16)
+  await serviceReadyFrames(renderer)
   expect(frames).toBeGreaterThanOrEqual(3)
   expect(renderer.isRunning).toBe(true)
   expect(renderer.getSchedulerState().hasScheduledRender).toBe(true)
@@ -1757,7 +1757,7 @@ test.each(
 
     // A skip retries after Session idle; a failure waits for a later render request.
     await renderer.nativeScene.driver.idle()
-    await settle()
+    await serviceReadyFrames(renderer)
     clock.advance(1000)
     await finishRender(renderer)
     if (status === "Failed") {
@@ -1941,6 +1941,8 @@ const processExit = (renderer: CliRenderer) => {
   renderer.nativeScene.driver.dispose()
   expect(flushed).toBe(0)
 }
+const listenerWrites = (renderer: CliRenderer, stdout: CollectingStdout) =>
+  renderer.once(CliRenderEvents.EXTERNAL_OUTPUT, () => stdout.write("B"))
 const sessionClose = async (renderer: CliRenderer) => {
   const closing = renderer.nativeScene.driver.close()
   renderer.destroy()
@@ -1959,6 +1961,13 @@ test.each<[string, StdoutStep[], string]>([
   ["2-byte split across a frame", splitBytes("caf\u00e9", 4, (renderer) => renderer.idle()), "caf\u00e9"],
   ["3-byte split", splitBytes("\u4e00", 1), "\u4e00"],
   ["4-byte split", splitBytes("\u{10437}", 1), "\u{10437}"],
+  ["a combining mark in a later write", ["xe", "\u0301y\n"], "xe\u0301y"],
+  ["VS16 in a later write", ["\u2764", "\ufe0f\n"], "\u2764\ufe0f"],
+  ["a combining mark after the last column", ["x".repeat(79) + "e", "\u0301\n"], `${"x".repeat(79)}e\u0301`],
+  ["capture set again before a combining mark", ["e", capture, "\u0301\n"], "e\u0301"],
+  ["a CR between a row and its LF", ["OK", "\r", "\n"], "OK"],
+  ["a listener write during a frame", [listenerWrites, "A"], "AB"],
+  ["a listener write during destroy", [listenerWrites, "A", destroy], "AB|"],
   ["empty writes inside a split", splitBytes("\u00e9", 1, "", null as never, ["", ""], ["", "bogus"]), "\u00e9"],
   ["string inside a split", splitBytes("\u00e9", 1, "x"), "\ufffdx\ufffd"],
   ["capture set again inside a split", splitBytes("\u00e9", 1, capture), "\u00e9"],
@@ -1978,7 +1987,7 @@ test.each<[string, StdoutStep[], string]>([
   ["split across suspend during a deferred passthrough", ["a", passthrough, suspendInSplit], "a|caf\u00e9"],
   ["passthrough during a pending native mode", [pendingModeInSplit], "|\u00e9"],
   ["exit after a lead byte", [lead, processExit], ""],
-  ["destroy after the session closes", ["a", lead, sessionClose], ""],
+  ["destroy after the session closes", ["a\n", lead, sessionClose], ""],
   ["output failure after a lead byte", ["a", lead, outputFailure], ""],
   ["SGR", ["\x1b[31mred\x1b[0m [1m]\x1b[m\x1b[38;2;1;2;3mx\x1b[2@\x1b[?25h\x1b[ q\x1b[3~~\n"], "red [1m]x~"],
   ["SGR across a newline", ["\x1b[1mbold\nnext\x1b[22m\n"], "bold\r\nnext"],
@@ -2203,7 +2212,6 @@ test.each<{ action: string; sync: string[]; settled: string[] }>([
     }
     const done = rawModeActions[action]!(renderer).catch((error: Error) => error.message)
     const log = [...rawMode]
-    await settle(4)
     stdout.release()
     await done
     await renderer.idle()
