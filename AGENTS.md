@@ -46,6 +46,17 @@ terminal or platform is unavailable locally.
 - `crates/opentui-sys/src/generated.rs` is generated: `bun run generate:abi` in `packages/core` writes it and `check:abi`
   checks it. Do not edit it.
 - The crates link `packages/native/lib/<target>`, so build native first. `OPENTUI_LIB_DIR` overrides the path.
+- **The fork's Rust crates are consumed as a git dependency on the default branch**
+  (`https://github.com/clarkarch/opentui-fork`): the crate names stay upstream's (`opentui`, `opentui-sys`,
+  `opentui-ssh`) so a consumer moves between the fork and upstream by changing the dependency's source, and a
+  future upstream merge is a small diff instead of a rename. `packages/rust/scripts/consumer-smoke.sh` builds a
+  throwaway project against the repository, which is what the `fork-ci` workflow runs.
+- **Nothing is built by hand.** CI builds the native library for every target (`native-artifacts`) and the npm
+  packages (`publish-npm`); the committed artifacts under `packages/core/dist` and `packages/native/lib` are
+  copied from that CI output, stripped, and committed. See PREBUILT.md. The committed native directory holds the
+  library, the static archive, AND `opentui.h`: the crates check the header against the bindings they were
+  generated from, so a consumer needs it beside the library it links, and a commit without it fails every
+  downstream build.
 - Run the narrowest test first (`cargo test -p opentui --test <file>`; `tests/lifecycle.rs` also needs the examples
   built), then `sh packages/rust/test.sh shared`, and `static` on Linux and macOS when linking changes. `rustfmt.toml`
   is the Rust formatting source of truth.

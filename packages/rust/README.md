@@ -3,6 +3,29 @@
 A terminal UI framework for Rust built on
 [OpenTUI](https://github.com/anomalyco/opentui)'s native renderer.
 
+> **This is the tfm fork.** It carries patches upstream does not: image
+> placements that keep their aspect ratio, a per-placement opacity, and fills
+> that dim the images they cover. The crates keep upstream's names
+> (`opentui`, `opentui-sys`, `opentui-ssh`), so a project can move between the
+> fork and upstream by changing the dependency's source.
+>
+> Depend on it with a git dependency. The fork's default branch is the branch
+> with the patches, so no branch, tag, or revision is needed:
+>
+> ```toml
+> [dependencies]
+> opentui = { git = "https://github.com/clarkarch/opentui-fork", features = ["tokio", "tree-sitter"] }
+> ```
+>
+> `cargo update` moves the dependency to the fork's latest commit; `Cargo.lock`
+> pins the commit a build uses. The native library comes with the repository:
+> the fork commits it for Linux, so a build needs no native toolchain and no
+> separate download. Other platforms fetch the library from the release
+> `native-latest` and point `OPENTUI_LIB_DIR` at it.
+>
+> `sh packages/rust/scripts/consumer-smoke.sh` builds a throwaway project that
+> depends on the repository this way, which is what the fork's CI runs.
+
 OpenTUI's native library keeps a retained scene of nodes, lays it out with
 Yoga, paints cells, and encodes terminal output. This workspace drives it from
 Rust, without JavaScript:

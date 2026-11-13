@@ -6,27 +6,44 @@ toolchain can use the fork as-is:
 - `packages/core/dist/` — the built `@opentui/core` package (`bun run build:lib` in
   `packages/core`; the workspace-wide `bun run build` also works, but it re-bundles core
   once per sibling package — six redundant passes).
-- `packages/native/lib/{x86_64-linux,aarch64-linux}/libopentui.so` — the patched native
-  library (`zig build -Doptimize=ReleaseFast`, zig 0.17.0).
+- `packages/native/lib/{x86_64-linux,aarch64-linux}/` — the patched native
+  library, the static archive, and the header (`zig build -Doptimize=ReleaseFast`, zig
+  0.17.0). The Rust crates need all three: the archive (or the shared library) to link,
+  and the header, which they check against the bindings they were generated from.
 
-They are the build outputs this branch carries. Downstream projects do NOT
-point at them: they install the published npm packages (see below), whose
-platform packages carry the stripped library for every target. **Rebuild and
-commit both after any change under `packages/core/src` or `packages/native/src`:**
+**CI builds these. Nothing is built by hand.** After a change under
+`packages/core/src` or `packages/native/src`:
 
-```sh
-cd packages/native
-zig build -Doptimize=ReleaseFast                                          # host target
-zig build -Doptimize=ReleaseFast -Dlibrary-target=aarch64-linux-gnu.2.17  # cross, no SDK needed
-cd ../core && bun run build:lib
-# `dist` and `lib` are gitignored, so a plain `git add` skips the artifacts — hence -f.
-# Name the two .so files individually: `git add -f packages/native/lib` would also
-# commit the ignored libopentui.a (~43 MB) and opentui.h.
-git add -f packages/core/dist \
-  packages/native/lib/x86_64-linux/libopentui.so \
-  packages/native/lib/aarch64-linux/libopentui.so
-git commit -m "build: refresh prebuilt dist and libopentui"
-```
+1. Push the change. The `native-artifacts` workflow builds every target and
+   publishes the stripped libraries, the static archives, and the headers as
+   the GitHub release `native-latest`; the `publish-npm` workflow publishes the
+   npm packages.
+2. Download the release assets for the two committed Linux targets and commit
+   them, with the published npm package's `dist/`:
+
+   ```sh
+   # The native artifacts: the library, the static archive, and the header.
+   for target in x86_64-linux aarch64-linux; do
+     gh release download native-latest --repo clarkarch/opentui-fork \
+       --pattern "native-${target}-*" --dir /tmp/native-$target
+     mkdir -p "packages/native/lib/$target"
+     cp /tmp/native-$target/native-$target-libopentui.so "packages/native/lib/$target/"
+     cp /tmp/native-$target/native-$target-libopentui.a "packages/native/lib/$target/"
+     cp /tmp/native-$target/native-$target-opentui.h "packages/native/lib/$target/"
+   done
+   # The core package: its published tarball carries the built dist.
+   npm pack @clarkarch/opentui-fork@0.8.4-fork.2 --pack-destination /tmp
+   tar -xzf /tmp/clarkarch-opentui-fork-0.8.4-fork.2.tgz -C /tmp
+   rm -rf packages/core/dist && cp -R /tmp/package/dist packages/core/dist
+   # `dist` and `lib` are gitignored, so a plain `git add` skips the artifacts — hence -f.
+   git add -f packages/core/dist packages/native/lib
+   git commit -m "build: refresh the prebuilt artifacts"
+   ```
+
+The committed copies are the CI's **stripped** output: 5.9 MB for the shared
+library, 8.5 MB for the static archive, 209 KB for the header. Unstripped, the
+same files are 33 MB and 51 MB, and the repository carries every version it ever
+committed, so stripping keeps the history small.
 
 Committed targets: `x86_64-linux` + `aarch64-linux` (the two Linux release
 arches; `dist/` is architecture-independent JS). Add the \*-musl triples if a
@@ -57,8 +74,18 @@ follow `native-<target>-<file>`, where `<target>` is the directory name under
 `packages/native/lib` and `<file>` is `libopentui.so`, `libopentui.dylib` or
 `opentui.dll`.
 
-The release copies are stripped; the committed Linux copies keep their debug
-symbols. Build them locally with:
+The release copies are stripped. They are the ones the committed artifacts are
+copied from, so a Rust consumer that depends on this repository links the same
+library a release download gives.
+
+Each target publishes its static archive (`native-<target>-libopentui.a`, the
+platforms that have one) and its header (`native-<target>-opentui.h`) beside
+the library. The Rust crates need the header: they check it against the
+bindings they were generated from, so a consumer needs it beside the library
+it links.
+
+The native library is built in CI only. To build one locally for a target the
+workflow does not cover:
 
 ```sh
 cd packages/native
@@ -98,9 +125,9 @@ literal (the asset updater writes the consumer's parser file with one) is left
 alone, and the build fails if a self-import survives. `bun run test:dist`
 asserts both.
 
-Versions are `0.8.1-fork.N`: the upstream version the fork is based on, plus
+Versions are `0.8.4-fork.N`: the upstream version the fork is based on, plus
 the fork's own release counter. They are prereleases of the upstream version,
-so a consumer has to ask for them explicitly (`^0.8.1-fork.1`), which is what
+so a consumer has to ask for them explicitly (`^0.8.4-fork.1`), which is what
 `package.json` pins.
 
 To publish:
