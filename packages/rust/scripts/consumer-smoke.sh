@@ -13,6 +13,16 @@
 # OPENTUI_LIB_DIR when it is set, otherwise the repository's committed
 # artifacts under packages/native/lib/<platform>. A commit that carries no
 # artifacts therefore fails here, which is the point.
+#
+# Both linkages are built: one with the crate's default features (the static
+# archive) and one with the defaults off (the shared library). A consumer on a
+# platform without the archive needs the second one to work, so both have to
+# build. The two builds share one project and one target directory, so the
+# second one only rebuilds the crates whose features changed.
+#
+# "It built" does not say which library it linked, so the binary says: on
+# Linux the dynamic section is read, and the program is run, which proves the
+# library loads and that its ABI version matches the bindings.
 
 set -eu
 
@@ -31,7 +41,38 @@ esac
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-cat > "$work/Cargo.toml" <<EOF
+project="$work/consumer"
+mkdir -p "$project/src"
+# The same toolchain the crates are tested with, so a consumer does not build
+# them with whatever the machine's default happens to be.
+[ -f "$repo/packages/rust/rust-toolchain.toml" ] &&
+    cp "$repo/packages/rust/rust-toolchain.toml" "$project/rust-toolchain.toml"
+cat > "$project/src/main.rs" <<'EOF'
+fn main() {
+    // The dependency has to build and link; the API call only proves the
+    // crate's public surface is reachable.
+    let _ = opentui::style::Color::TRANSPARENT;
+    // Create a native context, so the link pulls the library in: a consumer
+    // that never calls into it would build against any archive, and the
+    // context checks the ABI version against the bindings.
+    let context = opentui::native::Context::new(opentui::native::ContextOptions::default());
+    assert!(context.is_ok(), "the native context could not be created");
+}
+EOF
+
+libdir=${OPENTUI_LIB_DIR:-$repo/packages/native/lib/$platform}
+case $(uname -s) in
+    Linux) LD_LIBRARY_PATH="$libdir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" ;;
+    Darwin) DYLD_LIBRARY_PATH="$libdir${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" ;;
+esac
+export LD_LIBRARY_PATH DYLD_LIBRARY_PATH
+
+# build <linkage> <dependency features>
+build() {
+    linkage=$1
+    features=$2
+
+    cat > "$project/Cargo.toml" <<EOF
 [package]
 name = "opentui-consumer-smoke"
 version = "0.0.0"
@@ -39,23 +80,37 @@ edition = "2021"
 publish = false
 
 [dependencies]
-opentui = { git = "file://$repo" }
+opentui = { git = "file://$repo"$features }
 EOF
 
-mkdir -p "$work/src"
-cat > "$work/src/main.rs" <<'EOF'
-fn main() {
-    // The dependency has to build and link; the API call only proves the
-    // crate's public surface is reachable.
-    let _ = opentui::style::Color::TRANSPARENT;
+    printf '%s\n' "consumer: building the $linkage linkage against $repo ($platform)"
+    (cd "$project" && cargo build --quiet)
+
+    binary="$project/target/debug/opentui-consumer-smoke"
+    if [ "$platform" = x86_64-linux ]; then
+        dynamic=$(readelf -d "$binary" 2>/dev/null || true)
+        case $dynamic in
+            *libopentui.so*) linked=shared ;;
+            *) linked=static ;;
+        esac
+        [ "$linked" = "$linkage" ] || {
+            printf 'FAIL: the %s build linked %s\n' "$linkage" "$linked" >&2
+            exit 1
+        }
+    fi
+
+    # Run it: the shared library has to load, and the context has to accept
+    # the ABI version the bindings were generated from. A stale library
+    # fails here, which is the whole point of carrying the artifacts.
+    "$binary" || {
+        printf 'FAIL: the %s build does not run against %s\n' "$linkage" "$libdir" >&2
+        exit 1
+    }
 }
-EOF
 
-printf '%s\n' "consumer: building against $repo ($platform)"
-cd "$work"
-# Both linkages: the default feature links the static archive, and turning it
-# off links the shared library. A consumer on a platform without the archive
-# needs the second one to work.
-cargo build --quiet
-cargo build --quiet --no-default-features
+# The static archive is the crate's default; turning the defaults off leaves
+# the shared library as the only one to link.
+build shared ', default-features = false'
+build static ''
+
 printf '%s\n' 'PASS: a project that depends on this repository builds'
