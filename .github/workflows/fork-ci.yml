@@ -1,0 +1,65 @@
+name: fork-ci
+
+# The fork's own gate. It proves the two things a downstream Rust project
+# depends on: the crates build and link against the patched native library,
+# and a project that depends on this repository builds the way a downstream
+# project does.
+#
+# The release artifacts are built by native-artifacts.yml; this workflow builds
+# the host library only, because the Rust checks need one target.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tfm]
+    paths:
+      - "packages/native/**"
+      - "packages/rust/**"
+      - ".github/workflows/fork-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    name: rust crates and a git dependency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: "0.17.0"
+
+      - name: Prepare zig dependencies
+        working-directory: packages/native
+        # Only the vendored sources: the fork ships no FFmpeg, so the native
+        # video decoder stays unavailable and no decoder prefix is built.
+        run: sh scripts/prepare-zig-deps.sh
+
+      - name: Build the native library
+        working-directory: packages/native
+        run: zig build -Doptimize=ReleaseFast
+
+      - name: Install the pinned Rust toolchain
+        working-directory: packages/rust
+        run: |
+          rustup toolchain install
+          cargo fetch --locked
+
+      - name: Run the Rust workspace checks
+        working-directory: packages/rust
+        env:
+          CI: "true"
+        # The crates link the library this job just built, in the checkout's
+        # packages/native/lib/x86_64-linux, with the header beside it.
+        run: sh test.sh all
+
+      - name: Build a project that depends on this repository
+        # The consumer clones this repository and builds the crates from the
+        # clone, so it finds the committed artifacts, not this job's build.
+        # Until the artifacts are committed, the library comes from this
+        # job's build.
+        env:
+          OPENTUI_LIB_DIR: ${{ github.workspace }}/packages/native/lib/x86_64-linux
+        run: sh packages/rust/scripts/consumer-smoke.sh

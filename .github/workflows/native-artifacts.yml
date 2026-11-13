@@ -87,35 +87,47 @@ jobs:
       - name: Verify and strip
         working-directory: packages/native
         run: |
-          lib="lib/${{ matrix.output }}/${{ matrix.file }}"
+          dir="lib/${{ matrix.output }}"
+          lib="$dir/${{ matrix.file }}"
           if [ ! -f "$lib" ]; then
             echo "expected $lib to exist after the build"
             ls -R lib || true
             exit 1
           fi
-          # The fork keeps debug symbols in its committed artifacts; the release
-          # copies are stripped so downloads stay small.
+          # The release copies are stripped so downloads stay small. The static
+          # archive is stripped too: it is what the Rust crates link by default,
+          # and unstripped it is 51 MB against 8 MB stripped.
           #
           # llvm-strip, not strip: the host's strip only understands the host
           # architecture, so the aarch64 libraries kept every symbol (29 MB
           # instead of 5 MB) — and the failure was swallowed, so nobody saw
           # it. llvm-strip is multi-target, and a failed strip now fails the
           # build instead of shipping a fat library.
+          archive="$dir/libopentui.a"
           if [ "${{ runner.os }}" = "Linux" ]; then
             if ! command -v llvm-strip >/dev/null; then
               sudo apt-get update -qq
               sudo apt-get install -y -qq llvm
             fi
             llvm-strip --strip-unneeded "$lib"
+            [ -f "$archive" ] && llvm-strip --strip-unneeded "$archive"
           else
             strip -x "$lib"
+            # BSD strip reads no archives; llvm-strip does.
+            [ -f "$archive" ] && xcrun llvm-strip --strip-unneeded "$archive"
           fi
-          ls -l "$lib"
+          # The header travels with the library: the Rust crates check it
+          # against the bindings they were generated from, so a consumer needs
+          # it beside the library it links.
+          [ -f "$dir/opentui.h" ] || { echo "expected $dir/opentui.h to exist after the build"; exit 1; }
+          ls -l "$dir"
 
       - uses: actions/upload-artifact@v4
         with:
           name: native-${{ matrix.output }}
-          path: packages/native/lib/${{ matrix.output }}/${{ matrix.file }}
+          # The whole directory: the library, the static archive, and the
+          # header the crates check their bindings against.
+          path: packages/native/lib/${{ matrix.output }}/
           if-no-files-found: error
 
   publish:
@@ -139,8 +151,11 @@ jobs:
           mkdir -p release
           for dir in artifacts/native-*; do
             target=$(basename "$dir" | sed 's/^native-//')
-            file=$(ls "$dir")
-            cp "$dir/$file" "release/native-${target}-${file}"
+            # Every file of the artifact directory travels: the library, the
+            # static archive, and the header.
+            for file in "$dir"/*; do
+              cp "$file" "release/native-${target}-$(basename "$file")"
+            done
           done
           ls -l release
 
