@@ -148,6 +148,7 @@ jobs:
         # aarch64 library, and the publish job would copy it over the fresh
         # one. The manifest says what this job produced, so the publish job
         # can copy that and nothing else.
+        working-directory: packages/native
         run: |
           rm -rf out
           mkdir -p out
@@ -171,7 +172,7 @@ jobs:
           # of what this job built. One directory per target, so the publish
           # job reads the target from the directory.
           name: native-${{ matrix.output }}
-          path: out/
+          path: packages/native/out/
           if-no-files-found: error
 
   publish:
