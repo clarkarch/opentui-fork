@@ -139,13 +139,39 @@ jobs:
             ls -l "lib/$dir"
           done
 
+      - name: Stage what this job built
+        # Only what this job built, with a manifest of it.
+        #
+        # The checkout carries the committed Linux libraries, and the build
+        # writes to the same paths, so uploading the whole tree would mix
+        # them in: the x86_64 job's artifact would carry the committed
+        # aarch64 library, and the publish job would copy it over the fresh
+        # one. The manifest says what this job produced, so the publish job
+        # can copy that and nothing else.
+        run: |
+          rm -rf out
+          mkdir -p out
+          for dir in ${{ matrix.dirs }}; do
+            mkdir -p "out/$dir"
+            for file in lib/$dir/*; do
+              cp "$file" "out/$dir/"
+            done
+          done
+          cd out
+          : > manifest.txt
+          for file in */*; do
+            printf '%s %s %s\n' "${file%%/*}" "${file##*/}" "$(sha256sum "$file" | cut -d' ' -f1)" >> manifest.txt
+          done
+          cat manifest.txt
+
       - uses: actions/upload-artifact@v4
         with:
-          # The whole directory: the library, the static archive, and the
-          # header the crates check their bindings against. One directory per
-          # target, so the publish job reads the target from the directory.
+          # The staged directory: the library, the static archive, and the
+          # header the crates check their bindings against, plus the manifest
+          # of what this job built. One directory per target, so the publish
+          # job reads the target from the directory.
           name: native-${{ matrix.output }}
-          path: packages/native/lib/
+          path: out/
           if-no-files-found: error
 
   publish:
@@ -168,23 +194,32 @@ jobs:
         run: |
           mkdir -p release
           for artifact in artifacts/native-*; do
-            # An artifact holds one directory per target the job built.
-            for dir in "$artifact"/*/; do
-              [ -d "$dir" ] || continue
-              target=$(basename "$dir")
-              # Every file of the target directory travels: the library, the
-              # static archive, and the header.
-              for file in "$dir"*; do
-                name=$(basename "$file")
-                # Windows' static archive is not usable by the Rust crates:
-                # they link the DLL there, through its import library. It is
-                # 50 MB unstripped, so it stays out of the release.
-                case "$target/$name" in
-                  *-windows/opentui-static.lib) continue ;;
-                esac
-                cp "$file" "release/native-${target}-${name}"
-              done
-            done
+            # Each artifact carries a manifest of what its job built, and the
+            # publish job copies exactly those files. The checkout holds
+            # committed Linux libraries, so an artifact can carry a file its
+            # job never built: copying the manifest's files only keeps a
+            # committed library from overwriting another target's fresh one,
+            # and the check below fails on the extra rather than shipping it.
+            while read -r dir file sha; do
+              source="$artifact/$dir/$file"
+              [ -f "$source" ] || { echo "the artifact is missing $source"; exit 1; }
+              actual=$(sha256sum "$source" | cut -d' ' -f1)
+              [ "$actual" = "$sha" ] || { echo "the checksum of $source does not match its manifest"; exit 1; }
+              # Windows' static archive is not usable by the Rust crates:
+              # they link the DLL there, through its import library. It is
+              # 50 MB unstripped, so it stays out of the release.
+              case "$dir/$file" in
+                *-windows/opentui-static.lib) continue ;;
+              esac
+              cp "$source" "release/native-${dir}-${file}"
+            done < "$artifact/manifest.txt"
+            # Every file the artifact holds has to be in its manifest.
+            held=$(find "$artifact" -type f ! -name manifest.txt | wc -l)
+            listed=$(wc -l < "$artifact/manifest.txt")
+            [ "$held" -eq "$listed" ] || {
+              echo "the artifact $artifact holds $held files, its manifest lists $listed"
+              exit 1
+            }
           done
           ls -l release
 
@@ -202,3 +237,26 @@ jobs:
               --title "native artifacts" \
               --notes "Patched libopentui for every supported target. Fetch the asset for your host via native-artifacts.json."
           fi
+
+      - name: Install the pinned Rust toolchain
+        # The consumer project carries this toolchain file, so it builds the
+        # crates with the version they are tested with.
+        working-directory: packages/rust
+        run: rustup toolchain install
+
+      - name: Build a consumer against the published release
+        # The path a consumer on a platform the repository does not carry
+        # takes: fetch the artifacts from the release, point OPENTUI_LIB_DIR
+        # at them, build and run. The script is the one the README tells
+        # consumers to use, so the CI uses it too.
+        #
+        # This check lives here, after the publish, because the release it
+        # reads has to be the one this run wrote: a check that ran while the
+        # release was still the previous one would test the wrong artifacts.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          dir=$(sh packages/rust/scripts/fetch-native.sh x86_64-linux)
+          ls -l "$dir"
+          OPENTUI_LIB_DIR="$dir" sh packages/rust/scripts/consumer-smoke.sh
+

@@ -81,15 +81,3 @@ jobs:
         env:
           OPENTUI_LIB_DIR: ${{ github.workspace }}/packages/native/lib/x86_64-linux
         run: sh packages/rust/scripts/consumer-smoke.sh
-
-      - name: Build a project against the release artifacts
-        # The path a consumer on a platform the repository does not carry
-        # takes: fetch the artifacts from the release, point OPENTUI_LIB_DIR
-        # at them, build. The script is the one the README tells consumers to
-        # use, so the CI uses it too.
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          dir=$(sh packages/rust/scripts/fetch-native.sh x86_64-linux)
-          ls -l "$dir"
-          OPENTUI_LIB_DIR="$dir" sh packages/rust/scripts/consumer-smoke.sh
