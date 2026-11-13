@@ -309,6 +309,9 @@ pub struct Host {
     pixel_queries: u8,
     /// Whether the parser was last told to expect that reply.
     expecting_pixel_reply: bool,
+    /// The terminal's size in pixels, once it reported it. A resize forgets it: the cell size may have changed with
+    /// it, and the terminal answers the next query.
+    pixel_resolution: Cell<Option<term::PixelResolution>>,
 }
 
 /// A deadline that moves on whenever output reaches the terminal, within a cap of ten times its timeout.
@@ -450,6 +453,7 @@ impl Host {
             pixel_reply_until: None,
             pixel_queries: 0,
             expecting_pixel_reply: false,
+            pixel_resolution: Cell::new(None),
         };
         host.session.setup_terminal(options.terminal)?;
         let now = Instant::now();
@@ -476,6 +480,12 @@ impl Host {
     /// footer's.
     pub fn size(&self) -> (u16, u16) {
         self.split.as_ref().map_or(self.size, SplitFooter::renderer_size)
+    }
+
+    /// The terminal's size in pixels, once it reported it. A terminal that does not answer the query for it has none,
+    /// and a resize forgets it: the cell size may have changed with it, and the terminal answers the next query.
+    pub fn pixel_resolution(&self) -> Option<term::PixelResolution> {
+        self.pixel_resolution.get()
     }
 
     /// The split footer, when [`HostOptions::split_footer`] is set.
@@ -777,6 +787,10 @@ impl Host {
                 && width > 0
                 && self.session.set_image_resolution(columns.into(), rows.into(), width, height).is_ok()
             {
+                // The terminal's size in pixels, for the images that size their pixels and cells with it. Core keeps
+                // the same value in `renderer.resolution`.
+                self.pixel_resolution.set(Some(term::PixelResolution { width, height }));
+                events.push(Event::PixelResolution { width, height });
                 self.force_next_frame = true;
             }
             return;
@@ -859,6 +873,8 @@ impl Host {
                 self.size = (width, height);
                 // As Core: the cell size may have changed too, so images go without one until the terminal answers.
                 self.session.set_image_resolution(0, 0, 0, 0)?;
+                // The size in pixels described the old cells, so it is forgotten until the terminal answers again.
+                self.pixel_resolution.set(None);
                 self.pixel_query_wanted = true;
                 self.force_next_frame = true;
                 events.push(Event::Resize { width: renderer_width, height: renderer_height });
@@ -1060,6 +1076,7 @@ mod tests {
     use super::{Host, HostOptions, fit, install_panic_hook};
     use crate::input::{ESCAPE_TIMEOUT, Event, KeyCode, KeyEvent, Modifiers};
     use crate::remote::{RemoteLink, RemoteOptions, RemoteTerminal};
+    use crate::term::PixelResolution;
     use crate::term::StderrCapture;
     use crate::term::tests::{STDERR_LOCK, write_stderr};
     use std::sync::mpsc;
@@ -1146,6 +1163,27 @@ mod tests {
             host.poll(Some(Instant::now() + Duration::from_millis(50)), &mut events).expect("poll the resize");
             assert_eq!(queried(), query, "{unanswered} unanswered");
         }
+    }
+
+    // Expected: the terminal's size in pixels reaches the host and the app, and a resize forgets it: the cell size
+    // may have changed with it, and the terminal answers the next query.
+    #[test]
+    fn the_pixel_size_reaches_the_host_and_a_resize_forgets_it() {
+        let (terminal, link) = RemoteTerminal::new(RemoteOptions::default(), || {}).expect("create a terminal");
+        let mut host = Host::start_remote(terminal, HostOptions::default()).expect("start the host");
+        let mut events = Vec::new();
+        // The reply names the height first: ESC [ 4 ; height ; width t.
+        link.send_input(b"\x1b[4;20;100t");
+        host.poll(Some(Instant::now() + Duration::from_secs(1)), &mut events).expect("read the reply");
+        assert_eq!(host.pixel_resolution(), Some(PixelResolution { width: 100, height: 20 }));
+        assert!(events.contains(&Event::PixelResolution { width: 100, height: 20 }), "{events:?}");
+        // A resize forgets it: the cell size may have changed with it. The remote terminal is 80 by 24, so this is a
+        // change.
+        link.resize(100, 30);
+        let mut events = Vec::new();
+        host.poll(Some(Instant::now() + Duration::from_secs(1)), &mut events).expect("poll the resize");
+        assert_eq!(host.pixel_resolution(), None);
+        assert!(events.iter().any(|event| matches!(event, Event::Resize { .. })), "{events:?}");
     }
 
     // Expected: with `AppOptions::capture_stderr`, a panic on a worker thread leaves the capture in place: the UI

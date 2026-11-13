@@ -49,7 +49,7 @@ use crate::native::{
 };
 use crate::post::{Area, PostState};
 use crate::remote::RemoteTerminal;
-use crate::term::{QueryPort, TerminalPalette};
+use crate::term::{PixelResolution, QueryPort, TerminalPalette};
 use crate::theme::{Theme, ThemeMode};
 use crate::widget::{AnyWidget, Behavior, Callbacks, Element, Painter, View, Widget};
 use std::any::{Any, TypeId};
@@ -257,6 +257,7 @@ struct AppHandlers {
     paste: Callbacks<str>,
     mouse: Callbacks<MouseEvent>,
     resize: Callbacks<(u16, u16)>,
+    pixel_resolution: Callbacks<PixelResolution>,
     terminal_focus: Callbacks<bool>,
     selection: Callbacks<str>,
     theme_mode: Callbacks<ThemeMode>,
@@ -316,6 +317,9 @@ pub(crate) struct AppInner {
     messages: RefCell<HashMap<TypeId, MessageHandlers>>,
     proxy: Arc<proxy::Shared>,
     size: Cell<(u16, u16)>,
+    /// The terminal's size in pixels, once it reported it. A resize forgets it: the cell size may have changed with
+    /// it, and the terminal answers the next query.
+    pixel_resolution: Cell<Option<PixelResolution>>,
     title: RefCell<Option<String>>,
     terminal_active: Cell<bool>,
     theme_mode: Cell<Option<ThemeMode>>,
@@ -547,6 +551,7 @@ impl App {
             messages: RefCell::new(HashMap::new()),
             proxy: Arc::new(proxy::Shared::default()),
             size: Cell::new((renderer.width as u16, renderer.height as u16)),
+            pixel_resolution: Cell::new(None),
             title: RefCell::new(title),
             terminal_active: Cell::new(false),
             theme_mode: Cell::new(None),
@@ -645,6 +650,16 @@ impl App {
     /// The terminal size in cells.
     pub fn size(&self) -> (u16, u16) {
         self.0.size.get()
+    }
+
+    /// The terminal's size in pixels, once it reported it. A terminal that does not answer the query for it has none,
+    /// and a resize forgets it until the terminal answers again.
+    ///
+    /// The size of a cell follows from this and [`Self::size`]: the pixel width of a cell is the width here divided by
+    /// the number of columns. Images size their pixels with it, so an image that waits for the answer is drawn at the
+    /// size the terminal really has.
+    pub fn pixel_resolution(&self) -> Option<PixelResolution> {
+        self.0.pixel_resolution.get()
     }
 
     /// How the terminal measures text, detected from its environment and, once the app runs, its replies. Pass it to
@@ -836,6 +851,13 @@ impl App {
         self.0.handlers.resize.add(move |cx, &(width, height): &(u16, u16)| handler(cx, width, height))
     }
 
+    /// Called when the terminal reports its size in pixels. A terminal that answers late reports it after the first
+    /// frames, so an image that waits for the answer is drawn at the size the terminal really has. A resize forgets
+    /// the size until the terminal answers again, and this handler does not run for that.
+    pub fn on_pixel_resolution(&self, mut handler: impl FnMut(&mut Cx<'_>, PixelResolution) + 'static) -> HandlerId {
+        self.0.handlers.pixel_resolution.add(move |cx, resolution: &PixelResolution| handler(cx, *resolution))
+    }
+
     /// Called when the terminal window gains or loses focus, if the terminal reports it.
     pub fn on_terminal_focus(&self, mut handler: impl FnMut(&mut Cx<'_>, bool) + 'static) -> HandlerId {
         self.0.handlers.terminal_focus.add(move |cx, focused: &bool| handler(cx, *focused))
@@ -874,6 +896,7 @@ impl App {
             || handlers.paste.remove(id)
             || handlers.mouse.remove(id)
             || handlers.resize.remove(id)
+            || handlers.pixel_resolution.remove(id)
             || handlers.terminal_focus.remove(id)
             || handlers.selection.remove(id)
             || handlers.theme_mode.remove(id)
@@ -1079,8 +1102,15 @@ impl App {
             Event::Focus(focused) => self.0.handlers.terminal_focus.emit(&mut Cx::new(self), &focused),
             Event::Resize { width, height } => {
                 self.0.size.set((width, height));
+                // The size in pixels described the old cells, so it is forgotten until the terminal answers again.
+                self.0.pixel_resolution.set(None);
                 self.request_redraw();
                 self.0.handlers.resize.emit(&mut Cx::new(self), &(width, height));
+            }
+            Event::PixelResolution { width, height } => {
+                let resolution = PixelResolution { width, height };
+                self.0.pixel_resolution.set(Some(resolution));
+                self.0.handlers.pixel_resolution.emit(&mut Cx::new(self), &resolution);
             }
             Event::Resumed => self.request_redraw(),
             Event::ThemeMode(mode) => {

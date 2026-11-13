@@ -23,6 +23,14 @@ pub enum Event {
     Resumed,
     /// The terminal reported a background color of a new brightness: at setup, or after its color scheme changed.
     ThemeMode(crate::theme::ThemeMode),
+    /// The terminal reported its size in pixels. Images size their pixels and cells with it, and a terminal that
+    /// answers late gets it after the first frames.
+    PixelResolution {
+        /// The terminal's width in pixels.
+        width: u32,
+        /// The terminal's height in pixels.
+        height: u32,
+    },
     /// The terminal said its color scheme changed (`CSI ? 997 ; 1 n` or `; 2 n`, while mode 2031 is on). Its palette
     /// may have changed too, even when the brightness did not.
     ColorScheme,

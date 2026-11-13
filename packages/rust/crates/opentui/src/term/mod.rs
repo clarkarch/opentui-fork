@@ -98,6 +98,19 @@ impl TerminalPalette {
     }
 }
 
+/// The terminal's size in pixels, as it reported it. A terminal that does not answer the query for it has none, and
+/// images stay on their fallback until it does.
+///
+/// The size of a cell follows from this and the terminal's size in cells: [`crate::App::pixel_resolution`] gives
+/// both.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PixelResolution {
+    /// The terminal's width in pixels.
+    pub width: u32,
+    /// The terminal's height in pixels.
+    pub height: u32,
+}
+
 /// Asks the terminal for its first `size` palette colors (OSC 4, at most 256) and its default and cursor colors
 /// (OSC 10, 11, 12), with the same rules as [`query_colors`]. Core asks the same questions with `getPalette`.
 pub fn query_palette(size: u16, timeout: Duration) -> io::Result<Option<TerminalPalette>> {
