@@ -748,6 +748,7 @@ ot_status ot_scene_create_node(ot_context *, const ot_handle *session, uint32_t 
  * OT_INTERNAL_ERROR until its nodes are destroyed. Destroy, detach, blur, clearing a measure provider, and selection
  * RESET still succeed. */
 ot_status ot_scene_destroy_node(ot_context *, const ot_handle *node);
+/* Siblings with equal z_index paint in child order. At an overlap, the later child wins the hit test. */
 ot_status ot_scene_move_node(ot_context *, const ot_handle *node, const ot_handle *parent, uint32_t index);
 /* Detaches every child of node, as moving each to NULL from first to last would, in
  * time linear in the child count. On error no child is detached. */
@@ -1655,7 +1656,21 @@ ot_status ot_edit_buffer_set_tab_width(ot_context *, const ot_handle *edit_buffe
 #define OT_EDIT_CLEAR UINT32_C(10)
 #define OT_EDIT_CLEAR_HISTORY UINT32_C(11)
 #define OT_EDIT_DEBUG_ROPE UINT32_C(12)
-/* argument is a line/offset for GOTO_LINE/CURSOR_OFFSET, zero otherwise. */
+#define OT_EDIT_CURSOR_OFFSET_ATOMIC UINT32_C(13)
+#define OT_EDIT_KEEP_OUTSIDE UINT32_C(14)
+#define OT_EDIT_ATOMIC UINT32_C(1)
+/* argument is a line/offset for GOTO_LINE/CURSOR_OFFSET/CURSOR_OFFSET_ATOMIC, zero or OT_EDIT_ATOMIC
+ * for DELETE_FORWARD, BACKSPACE, MOVE_LEFT and MOVE_RIGHT, the edge for KEEP_OUTSIDE (0 the nearer,
+ * ties to the end; 1 the end; 2 the start), zero otherwise.
+ * OT_EDIT_ATOMIC applies the cursor rules around atomic edit marks; of overlapping marks the oldest
+ * counts first. Each move steps over one mark: Left from a mark's end goes one unit before its
+ * start, or to the start when another mark ends there; Right from its start, or from one cell before
+ * it, goes to its end. Backspace at a mark's end or Delete at its start deletes the whole mark as
+ * one edit (of marks with that edge there, the oldest). CURSOR_OFFSET_ATOMIC moves to the offset as
+ * Left (toward the start) or Right (toward the end) would, past a mark it lands in. KEEP_OUTSIDE
+ * moves the cursor to the start of its unit, then out of the atomic marks that surround it to the
+ * outer edge of all of them. A move under these rules ends on a unit start outside every atomic
+ * mark. */
 ot_status ot_edit_buffer_command(ot_context *, const ot_handle *, uint32_t command, uint32_t argument);
 /* redo is 0/1. Capacity must be at least 64, the native cursor-metadata bound,
  * before history is changed. No history returns zero bytes. */
@@ -1692,6 +1707,16 @@ ot_status ot_edit_buffer_get_position(ot_context *, const ot_handle *, uint32_t 
 ot_status ot_edit_buffer_get_range(ot_context *, const ot_handle *, uint32_t by_coords,
     uint32_t start_row, uint32_t start_col, uint32_t end_row, uint32_t end_col,
     uint8_t *bytes, uint32_t capacity, uint32_t *out_count);
+#define OT_EDIT_BYTE_TO_CELL UINT32_C(0)
+#define OT_EDIT_CELL_TO_BYTE UINT32_C(1)
+#define OT_EDIT_UTF16_TO_CELL UINT32_C(2)
+#define OT_EDIT_CELL_TO_UTF16 UINT32_C(3)
+/* Converts an index in get_text (UTF-8 bytes or UTF-16 code units) to or from document
+ * display cells, one per LF. Interior positions round down to the buffer grapheme's start;
+ * a cell shared by zero-width text maps after it. Past the end clamps to the end.
+ * Read-only. Unknown conversions fail and failures preserve out_value. */
+ot_status ot_edit_buffer_convert_offset(ot_context *, const ot_handle *edit_buffer,
+    uint32_t conversion, uint32_t value, uint32_t *out_value);
 /* Lays UTF-8 bytes out as set_text would, without storing them, and reports the offset at
  * their end: display cells under the buffer's width method, tab width, and control notation,
  * plus one per line break (LF, CR, or CRLF). bytes may be NULL only for zero length; the
@@ -1800,11 +1825,12 @@ ot_status ot_edit_buffer_set_layer(ot_context *, const ot_handle *, uint32_t lay
     uint32_t start_byte, uint32_t end_byte, const ot_highlight_run *runs, uint32_t run_count);
 
 /* Edit marks: ranges of the text that move with edits. Text inserted at a mark's start shifts it,
- * at its end leaves it, and strictly inside grows it. A delete clips a mark and drops it once
- * none of its text is left. An OT_EDIT_MARK_ATOMIC mark is one unit: an edit that changes part
- * of its text drops it, and the edit changes exactly the text it asked for. set_text and clear
- * drop every mark. Undo and redo restore the marks of the text they restore. Ids start at 1 and
- * are never reused, undo included. At most 65,536 marks per buffer (OT_OBJECT_LIMIT).
+ * at its end leaves it (so an empty mark stays), and strictly inside grows it. A delete clips a
+ * mark and drops it once none of its text is left. An OT_EDIT_MARK_ATOMIC mark is one unit: an
+ * edit that changes part of its text drops it, and the edit changes exactly the text it asked
+ * for. set_text and clear drop every mark. Undo and redo restore the marks of the text they
+ * restore. Ids start at 1 and are never reused, undo included. At most 65,536 marks per buffer
+ * (OT_OBJECT_LIMIT).
  * start and end are cursor offsets, start <= end; past the text they mean its end. On output a
  * start rounds down and an end up to a cursor stop, and start_byte/end_byte give the mark in
  * UTF-8 bytes of get_text; on input both are zero.
@@ -1833,9 +1859,9 @@ typedef struct ot_edit_mark {
     uint32_t start_byte;
     uint32_t end_byte;
 } ot_edit_mark;
-/* ADD takes mark (id 0, priority <= 255) and writes the new id. REMOVE takes mark->id (the rest
- * zero) and writes it back, or 0 when there was no such mark. CLEAR drops every mark; mark and
- * out_id are NULL. */
+/* ADD takes mark (id 0, priority <= 255 when styled) and writes the new id. REMOVE takes
+ * mark->id (the rest zero) and writes it back, or 0 when there was no such mark. CLEAR drops
+ * every mark; mark and out_id are NULL. */
 ot_status ot_edit_buffer_mark(ot_context *, const ot_handle *, uint32_t operation,
     const ot_edit_mark *mark, uint32_t *out_id);
 /* Copies the marks in (start, id) order: mark id, or all for id 0, of kind kind, or any for
@@ -1926,6 +1952,9 @@ ot_status ot_markdown_get_source(ot_context *, const ot_handle *doc, const uint8
 #define OT_MD_BLOCK_MATH UINT32_C(512)       /* display math: a code block of the language math */
 #define OT_MD_BLOCK_HEADER UINT32_C(1024)    /* a table's header row */
 #define OT_MD_BLOCK_OPEN UINT32_C(2048)      /* later lines may still extend the block */
+/* A table cell's column alignment from the delimiter row: both = centred, neither = none. */
+#define OT_MD_BLOCK_ALIGN_LEFT UINT32_C(4096)
+#define OT_MD_BLOCK_ALIGN_RIGHT UINT32_C(8192)
 typedef struct ot_markdown_block {
     uint32_t index;           /* preorder index = block id */
     uint32_t parent_index;    /* UINT32_MAX at top level */
@@ -1993,7 +2022,10 @@ ot_status ot_editor_view_set_scroll_margin(ot_context *, const ot_handle *, floa
 #define OT_EDITOR_WRAP_MODE UINT32_C(5)
 #define OT_EDITOR_TAB_INDICATOR UINT32_C(6)
 /* argument is offset, OT_SCENE_WRAP_*, or Unicode scalar (0 disables) for the
- * last three commands, and zero otherwise. */
+ * last three commands, zero or OT_EDIT_ATOMIC for MOVE_UP/MOVE_DOWN, and zero otherwise. With
+ * OT_EDIT_ATOMIC a move that lands in an atomic edit mark leaves it: nearer its start, one unit
+ * before it (outside the marks there); nearer its end, past it and the marks that surround that
+ * end. Down never ends at or before where it started, nor Up at or after it. */
 ot_status ot_editor_view_command(ot_context *, const ot_handle *, uint32_t command, uint32_t argument);
 /* Atomic selected delete-then-insert using native editor history and event order.
  * Without a selection inserts at the primary cursor. Input bytes are copied. */
