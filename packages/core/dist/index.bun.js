@@ -111,7 +111,7 @@ import {
   Gutter2,
   MeasureMode2,
   exports_yoga
-} from "./chunk-bun-dg1wb94g.js";
+} from "./chunk-bun-1t92tam8.js";
 import {
   isValidBorderStyle2,
   parseBorderStyle2,
@@ -244,7 +244,7 @@ import {
   CliRenderEvents2,
   RendererControlState2,
   CliRenderer2
-} from "./chunk-bun-apbxttxp.js";
+} from "./chunk-bun-x33dcn8s.js";
 // src/syntax-style.ts
 var attributeNames = ["bold", "italic", "underline", "dim", "strikethrough"];
 function cloneStyle(style) {
@@ -9452,7 +9452,7 @@ class VideoRenderable extends Renderable2 {
       return;
     let active = false;
     try {
-      active = this._metadata !== null && (this._playRequested || this.readState().playing);
+      active = this._metadata !== null && !this._playRequested && this.readState().playing;
     } catch (error) {
       if (report)
         this.reportError(error);
@@ -12806,5 +12806,5 @@ export {
   yellow2 as yellow
 };
 
-//# debugId=A567DA55F11B8CAB64756E2164756E21
+//# debugId=4D589DA87510ECEA64756E2164756E21
 //# sourceMappingURL=index.bun.js.map

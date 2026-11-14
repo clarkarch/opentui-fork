@@ -817,6 +817,7 @@ export declare const OT_SCENE_RECORD_EDITOR_VIEW = 9;
 export declare const OT_SCENE_RECORD_SCENE_BODY = 10;
 export declare const OT_SCENE_RECORD_IMAGE = 11;
 export declare const OT_SCENE_RECORD_UNICODE = 12;
+export declare const OT_SCENE_RECORD_CELLS = 13;
 export declare const OT_SCENE_RECORD_GRAYSCALE_FOREGROUND = 1;
 export declare const OT_SCENE_RECORD_GRAYSCALE_BACKGROUND = 2;
 export declare const OT_SCENE_RECORD_GRAYSCALE_SUPERSAMPLED = 4;
@@ -7015,6 +7016,72 @@ export declare const nativeLayouts: {
             };
         };
     };
+    readonly ot_scene_cell: {
+        readonly size: 24;
+        readonly alignment: 4;
+        readonly fields: {
+            readonly character: {
+                readonly offset: 0;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly attributes: {
+                readonly offset: 4;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly foreground: {
+                readonly offset: 8;
+                readonly size: 8;
+                readonly alignment: 2;
+                readonly type: "[4]u16";
+            };
+            readonly background: {
+                readonly offset: 16;
+                readonly size: 8;
+                readonly alignment: 2;
+                readonly type: "[4]u16";
+            };
+        };
+    };
+    readonly ot_scene_record_cells: {
+        readonly size: 24;
+        readonly alignment: 4;
+        readonly fields: {
+            readonly header: {
+                readonly offset: 0;
+                readonly size: 8;
+                readonly alignment: 4;
+                readonly type: "ot_scene_record_header";
+            };
+            readonly x: {
+                readonly offset: 8;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "i32";
+            };
+            readonly y: {
+                readonly offset: 12;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "i32";
+            };
+            readonly width: {
+                readonly offset: 16;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+            readonly count: {
+                readonly offset: 20;
+                readonly size: 4;
+                readonly alignment: 4;
+                readonly type: "u32";
+            };
+        };
+    };
 };
 export declare const nativeConstants: {
     readonly OT_CONTEXT_ABI_VERSION: 2;
@@ -7836,6 +7903,7 @@ export declare const nativeConstants: {
     readonly OT_SCENE_RECORD_SCENE_BODY: 10;
     readonly OT_SCENE_RECORD_IMAGE: 11;
     readonly OT_SCENE_RECORD_UNICODE: 12;
+    readonly OT_SCENE_RECORD_CELLS: 13;
     readonly OT_SCENE_RECORD_GRAYSCALE_FOREGROUND: 1;
     readonly OT_SCENE_RECORD_GRAYSCALE_BACKGROUND: 2;
     readonly OT_SCENE_RECORD_GRAYSCALE_SUPERSAMPLED: 4;
