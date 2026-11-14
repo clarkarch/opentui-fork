@@ -124,6 +124,10 @@ jobs:
       - name: Build FFmpeg
         working-directory: packages/native
         run: |
+          # The build graph also compiles the host module and its musl test
+          # executable, so their prefixes must exist even when the published
+          # library targets another platform.
+          bun scripts/build-ffmpeg.ts
           for target in ${{ matrix.dirs }}; do
             bun scripts/build-ffmpeg.ts --target="$target"
           done

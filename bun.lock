@@ -11,7 +11,7 @@
     },
     "packages/core": {
       "name": "@opentui/core",
-      "version": "0.8.4-fork.4",
+      "version": "0.8.4-fork.5",
       "dependencies": {
         "bun-ffi-structs": "0.3.1",
         "diff": "9.0.0",
@@ -26,14 +26,14 @@
         "web-tree-sitter": "0.25.10",
       },
       "optionalDependencies": {
-        "@clarkarch/opentui-fork-darwin-arm64": "0.8.4-fork.4",
-        "@clarkarch/opentui-fork-darwin-x64": "0.8.4-fork.4",
-        "@clarkarch/opentui-fork-linux-arm64": "0.8.4-fork.4",
-        "@clarkarch/opentui-fork-linux-arm64-musl": "0.8.4-fork.4",
-        "@clarkarch/opentui-fork-linux-x64": "0.8.4-fork.4",
-        "@clarkarch/opentui-fork-linux-x64-musl": "0.8.4-fork.4",
-        "@clarkarch/opentui-fork-win32-arm64": "0.8.4-fork.4",
-        "@clarkarch/opentui-fork-win32-x64": "0.8.4-fork.4",
+        "@clarkarch/opentui-fork-darwin-arm64": "0.8.4-fork.5",
+        "@clarkarch/opentui-fork-darwin-x64": "0.8.4-fork.5",
+        "@clarkarch/opentui-fork-linux-arm64": "0.8.4-fork.5",
+        "@clarkarch/opentui-fork-linux-arm64-musl": "0.8.4-fork.5",
+        "@clarkarch/opentui-fork-linux-x64": "0.8.4-fork.5",
+        "@clarkarch/opentui-fork-linux-x64-musl": "0.8.4-fork.5",
+        "@clarkarch/opentui-fork-win32-arm64": "0.8.4-fork.5",
+        "@clarkarch/opentui-fork-win32-x64": "0.8.4-fork.5",
       },
       "peerDependencies": {
         "web-tree-sitter": "0.25.10",
