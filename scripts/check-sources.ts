@@ -5,6 +5,7 @@ import { readdirSync, readFileSync } from "node:fs"
 import { join, resolve } from "node:path"
 import process from "node:process"
 import { variantName, variants, zigOutputName } from "../packages/core/scripts/variants"
+import { PUBLISHED_CORE_NAME } from "../packages/core/src/published-package"
 import { NODE26_MIN_VERSION } from "./node26.mjs"
 
 const root = resolve(process.argv[2] ?? join(import.meta.dirname, ".."))
@@ -96,8 +97,16 @@ expectTargets("packages/rust/README.md", /\| `([^`]+)` +\|$/gm, zigNames, true)
 for (const file of ["packages/rust/scripts/check-targets.sh", "packages/rust/run.sh", "packages/rust/test.sh"]) {
   expectTargets(file, zigPattern, zigNames, false)
 }
-for (const file of [
+// The fork's loader names the published platform packages, while the upstream
+// documentation still names @opentui/core's packages. Check each against the
+// naming it actually uses.
+expectTargets(
   "packages/core/src/platform/runtime-assets.bun.ts",
+  /@clarkarch\/opentui-fork-([a-z0-9-]+)/g,
+  npmNames,
+  true,
+)
+for (const file of [
   "packages/web/src/content/docs/getting-started/runtime-support.mdx",
   "packages/web/src/content/docs/reference/api-index.mdx",
 ]) {
@@ -125,16 +134,18 @@ for (const dir of [
   }
 }
 const optional = Object.keys(json("packages/core/package.json").optionalDependencies ?? {})
-const packages = new Set([...npmNames].map((name) => `@opentui/core-${name}`))
+const packages = new Set([...npmNames].map((name) => `${PUBLISHED_CORE_NAME}-${name}`))
 if (optional.length !== packages.size || !optional.every((name) => packages.has(name))) {
   problems.add(
     `packages/core/package.json: optionalDependencies ${optional.join(", ")}, expected ${[...packages].join(", ")}`,
   )
 }
 
+// The fork's Rust crate carries its own FFMPEG-SOURCE.md because its native
+// library deliberately has no FFmpeg decoder. The license files still have to
+// match the vendored source exactly.
 for (const [name, source] of Object.entries({
   "LICENSE-FFMPEG": "COPYING.LGPLv2.1",
-  "FFMPEG-SOURCE.md": "README.md",
   "LICENSE-ZLIB": "LICENSE-ZLIB",
 })) {
   const copy = `packages/rust/crates/opentui-sys/${name}`

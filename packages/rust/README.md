@@ -21,7 +21,7 @@ A terminal UI framework for Rust built on
 > pins the commit a build uses. To pin a release instead, name its tag:
 >
 > ```toml
-> opentui = { git = "https://github.com/clarkarch/opentui-fork", tag = "v0.8.4-fork.3" }
+> opentui = { git = "https://github.com/clarkarch/opentui-fork", tag = "v0.8.4-fork.4" }
 > ```
 >
 > The native library comes with the repository:

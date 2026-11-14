@@ -6,8 +6,7 @@ import { EmbeddedTerminalRenderable } from "./EmbeddedTerminal.js"
 const GRAPHICS_QUERY = "\x1b_Gi=31337,s=1,v=1,a=q,t=d,f=24;AAAA\x1b\\"
 
 // A 2x2 PNG, base64 encoded the way the kitty protocol transmits it.
-const PNG_2x2 =
-  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEElEQVR4nGP4z8DwHwohFABFzAf5Zsv/OQAAAABJRU5ErkJggg=="
+const PNG_2x2 = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEElEQVR4nGP4z8DwHwohFABFzAf5Zsv/OQAAAABJRU5ErkJggg=="
 
 describe("EmbeddedTerminalRenderable graphics", () => {
   let setup: TestRendererSetup

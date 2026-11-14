@@ -37,7 +37,7 @@ upstream core, without changing a single import:
 
 ```jsonc
 "dependencies": {
-  "@opentui/core": "npm:@clarkarch/opentui-fork@0.8.4-fork.3"
+  "@opentui/core": "npm:@clarkarch/opentui-fork@0.8.4-fork.4"
 }
 ```
 
@@ -46,7 +46,7 @@ Or install it under its own name, when the import name does not have to stay
 
 ```jsonc
 "dependencies": {
-  "@clarkarch/opentui-fork": "0.8.4-fork.3"
+  "@clarkarch/opentui-fork": "0.8.4-fork.4"
 }
 ```
 
@@ -55,7 +55,7 @@ upstream name, so both spellings work.
 
 The versions are `0.8.4-fork.N` — the upstream version the fork tracks, plus
 the fork's release counter. They are prereleases, so ask for them explicitly
-(`^0.8.4-fork.3`); a plain `^0.8.4` does not match them.
+(`^0.8.4-fork.4`); a plain `^0.8.4` does not match them.
 
 For Rust, depend on this repository. The fork's default branch is the branch
 with the patches, so no branch, tag, or revision is needed, and the crate
@@ -104,7 +104,7 @@ new release. Install from `https://opentui.com/docs/next` to follow the main bra
 
 ## Development
 
-Development requires Bun 1.4.1 or later and Zig 0.17.1.
+Development requires Bun 1.4.4 or later and Zig 0.17.1.
 
 See [AGENTS.md](AGENTS.md) for engineering, tooling, and verification conventions.
 

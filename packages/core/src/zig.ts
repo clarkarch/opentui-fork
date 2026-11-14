@@ -1800,8 +1800,14 @@ function encodeImageDrawOptions(options: NativeContextImageDraw, words: Uint32Ar
   // tfm fork: float f32 field, opt-in via the OPACITY_OVERRIDE flag so a zeroed
   // options record keeps inheriting the render-tree opacity.
   const opacityOverride = options.opacityOverride
-  if (opacityOverride !== undefined && opacityOverride !== null && (typeof opacityOverride !== "number" || Number.isNaN(opacityOverride))) throw new TypeError("Image opacity override must be a number")
-  if (opacityOverride != null && (opacityOverride < 0 || opacityOverride > 1)) throw new TypeError("Image opacity override must be within 0..1")
+  if (
+    opacityOverride !== undefined &&
+    opacityOverride !== null &&
+    (typeof opacityOverride !== "number" || Number.isNaN(opacityOverride))
+  )
+    throw new TypeError("Image opacity override must be a number")
+  if (opacityOverride != null && (opacityOverride < 0 || opacityOverride > 1))
+    throw new TypeError("Image opacity override must be within 0..1")
   const hasOpacityOverride = opacityOverride !== undefined && opacityOverride !== null
   const preserveAspect = options.preserveAspect === true
   words[word + fields.flags.offset / 4] =
@@ -1809,7 +1815,9 @@ function encodeImageDrawOptions(options: NativeContextImageDraw, words: Uint32Ar
     (sourceHeight === undefined || sourceHeight === null ? 0 : 2) |
     (hasOpacityOverride ? nativeConstants.OT_IMAGE_DRAW_OPACITY_OVERRIDE : 0) |
     (preserveAspect ? nativeConstants.OT_IMAGE_DRAW_PRESERVE_ASPECT : 0)
-  new Float32Array(signed.buffer, base + fields.opacity_override.offset, 1)[0] = hasOpacityOverride ? opacityOverride : -1
+  new Float32Array(signed.buffer, base + fields.opacity_override.offset, 1)[0] = hasOpacityOverride
+    ? opacityOverride
+    : -1
   for (const [field, value] of [
     ["width", options.width],
     ["height", options.height],
@@ -4128,14 +4136,8 @@ export class FFIRenderLib {
       options.maxScrollback ?? 10_000,
       "Embedded terminal maxScrollback",
     )
-    record[layout.fields.cell_width_px.offset / 4] = embeddedTerminalCellSize(
-      options.cellWidthPx ?? 0,
-      "cell width",
-    )
-    record[layout.fields.cell_height_px.offset / 4] = embeddedTerminalCellSize(
-      options.cellHeightPx ?? 0,
-      "cell height",
-    )
+    record[layout.fields.cell_width_px.offset / 4] = embeddedTerminalCellSize(options.cellWidthPx ?? 0, "cell width")
+    record[layout.fields.cell_height_px.offset / 4] = embeddedTerminalCellSize(options.cellHeightPx ?? 0, "cell height")
     const output = new Uint32Array(handleWords)
     const pointer = this.nativeContextPointer(context, "ot_embedded_terminal_create")
     nativeResult(
@@ -6138,7 +6140,14 @@ export class FFIRenderLib {
     const fitId = IMAGE_FITS.indexOf(fit)
     const protocolId = IMAGE_PROTOCOL_TO_ID[protocol]
     if (fitId < 0 || !Number.isInteger(protocolId)) throw new TypeError("Unknown image fit or protocol")
-    if (placementOpacity !== undefined && placementOpacity !== null && (typeof placementOpacity !== "number" || Number.isNaN(placementOpacity) || placementOpacity < 0 || placementOpacity > 1)) {
+    if (
+      placementOpacity !== undefined &&
+      placementOpacity !== null &&
+      (typeof placementOpacity !== "number" ||
+        Number.isNaN(placementOpacity) ||
+        placementOpacity < 0 ||
+        placementOpacity > 1)
+    ) {
       throw new TypeError("Image placement opacity must be within 0..1")
     }
     // Negative inherits the node opacity (matches the native default).

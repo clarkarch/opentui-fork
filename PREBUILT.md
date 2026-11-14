@@ -49,8 +49,8 @@ committed Linux binary cannot serve.
        cp "/tmp/native-$target/native-${target}-${file}" "packages/native/lib/$target/"
      done
    done
-   npm pack @clarkarch/opentui-fork@0.8.4-fork.3 --pack-destination /tmp
-   tar -xzf /tmp/clarkarch-opentui-fork-0.8.4-fork.3.tgz -C /tmp
+   npm pack @clarkarch/opentui-fork@0.8.4-fork.4 --pack-destination /tmp
+   tar -xzf /tmp/clarkarch-opentui-fork-0.8.4-fork.4.tgz -C /tmp
    rm -rf packages/core/dist && mkdir -p packages/core/dist
    cp -R /tmp/package/. packages/core/dist/
    # `dist` and `lib` are gitignored, so a plain `git add` skips the artifacts — hence -f.
@@ -149,10 +149,10 @@ macOS SDK.
 
 The fork is also published to npm, under its own scope:
 
-| package | contents |
-| --- | --- |
-| `@clarkarch/opentui-fork` | the JS/TS core (this is `packages/core/dist`) |
-| `@clarkarch/opentui-fork-<platform>-<arch>[-<abi>]` | one native library per target |
+| package                                             | contents                                      |
+| --------------------------------------------------- | --------------------------------------------- |
+| `@clarkarch/opentui-fork`                           | the JS/TS core (this is `packages/core/dist`) |
+| `@clarkarch/opentui-fork-<platform>-<arch>[-<abi>]` | one native library per target                 |
 
 The per-platform packages are `optionalDependencies` of the core, so an
 install pulls only the library for the host. Their `index.bun.js` imports the
@@ -184,7 +184,7 @@ The git tag `v0.8.4-fork.N` marks the same release in the repository, so a
 Cargo dependency can pin it by tag instead of tracking the branch:
 
 ```toml
-opentui = { git = "https://github.com/clarkarch/opentui-fork", tag = "v0.8.4-fork.3" }
+opentui = { git = "https://github.com/clarkarch/opentui-fork", tag = "v0.8.4-fork.4" }
 ```
 
 A tag's tree carries the committed artifacts, so a consumer that pins a tag
@@ -219,4 +219,3 @@ A local dry run stages the packages without publishing:
 ```sh
 bun scripts/publish-fork.ts --native-dir packages/native/lib --dry-run
 ```
-

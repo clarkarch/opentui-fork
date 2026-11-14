@@ -368,7 +368,14 @@ export class ImageRenderable extends Renderable {
     fit: ImageFit = this._fit,
     protocol: ImageRenderProtocol = this._protocol,
   ): void {
-    this._ctx.nativeScene.setImage(this, image, fit, protocol, this.buffered ? this.frameBuffer : null, this._placementOpacity)
+    this._ctx.nativeScene.setImage(
+      this,
+      image,
+      fit,
+      protocol,
+      this.buffered ? this.frameBuffer : null,
+      this._placementOpacity,
+    )
   }
 
   protected destroySelf(): void {

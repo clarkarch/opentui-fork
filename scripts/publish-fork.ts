@@ -31,19 +31,9 @@ import { dirname, join, resolve } from "node:path"
 import process from "node:process"
 import { fileURLToPath } from "node:url"
 import { PUBLISHED_CORE_NAME } from "../packages/core/src/published-package"
-import {
-  nativeLibraryFileName,
-  nativePackageName,
-  stageNativePackage,
-} from "../packages/core/scripts/native-package"
+import { nativeLibraryFileName, nativePackageName, stageNativePackage } from "../packages/core/scripts/native-package"
 import { variants, zigOutputName } from "../packages/core/scripts/variants"
-import {
-  publishPackage,
-  publishedState,
-  readPackageJson,
-  waitUntilServed,
-  type PublishedState,
-} from "./npm-publish"
+import { publishPackage, publishedState, readPackageJson, waitUntilServed, type PublishedState } from "./npm-publish"
 
 interface CoreManifest {
   readonly name: string

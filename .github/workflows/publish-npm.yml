@@ -102,7 +102,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.4.4"
+          bun-version-file: package.json
 
       # The repository's own action: the Zig version comes from
       # packages/native/build.zig.zon.
@@ -191,7 +191,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.4.4"
+          bun-version-file: package.json
 
       # The repository's own action: the Zig version comes from
       # packages/native/build.zig.zon.
