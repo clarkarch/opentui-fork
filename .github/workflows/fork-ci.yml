@@ -54,7 +54,7 @@ jobs:
 
       - name: Build FFmpeg
         working-directory: packages/native
-        run: bun scripts/build-ffmpeg.ts --target=x86_64-linux
+        run: bun scripts/build-ffmpeg.ts
 
       - name: Build the native library
         working-directory: packages/native
