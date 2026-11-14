@@ -237,6 +237,7 @@ var nativeSymbols = {
     args: ["ptr", "buffer", "u32", "u32", "u32", "u32", "u32", "ptr", "u32", "buffer"],
     returns: "i32"
   },
+  ot_edit_buffer_convert_offset: { args: ["ptr", "buffer", "u32", "u32", "buffer"], returns: "i32" },
   ot_edit_buffer_measure_text: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
   ot_edit_measure_text: { args: ["ptr", "ptr", "u32", "u32", "u32", "buffer"], returns: "i32" },
   ot_edit_buffer_set_defaults: { args: ["ptr", "buffer", "u32", "buffer"], returns: "i32" },
@@ -2224,6 +2225,9 @@ var nativeConstants = {
   OT_EDIT_CLEAR: 10,
   OT_EDIT_CLEAR_HISTORY: 11,
   OT_EDIT_DEBUG_ROPE: 12,
+  OT_EDIT_CURSOR_OFFSET_ATOMIC: 13,
+  OT_EDIT_KEEP_OUTSIDE: 14,
+  OT_EDIT_ATOMIC: 1,
   OT_EDIT_POSITION_CURSOR: 0,
   OT_EDIT_POSITION_NEXT_WORD: 1,
   OT_EDIT_POSITION_PREV_WORD: 2,
@@ -2233,6 +2237,10 @@ var nativeConstants = {
   OT_EDIT_POSITION_LINE_START: 6,
   OT_EDIT_POSITION_END: 7,
   OT_EDIT_POSITION_PREV_CHAR: 8,
+  OT_EDIT_BYTE_TO_CELL: 0,
+  OT_EDIT_CELL_TO_BYTE: 1,
+  OT_EDIT_UTF16_TO_CELL: 2,
+  OT_EDIT_CELL_TO_UTF16: 3,
   OT_EDITOR_STYLE_FOREGROUND: 1,
   OT_EDITOR_STYLE_BACKGROUND: 2,
   OT_EDITOR_STYLE_ATTRIBUTES: 4,
@@ -2279,6 +2287,8 @@ var nativeConstants = {
   OT_MD_BLOCK_MATH: 512,
   OT_MD_BLOCK_HEADER: 1024,
   OT_MD_BLOCK_OPEN: 2048,
+  OT_MD_BLOCK_ALIGN_LEFT: 4096,
+  OT_MD_BLOCK_ALIGN_RIGHT: 8192,
   OT_MD_SPAN_CODE: 1,
   OT_MD_SPAN_MATH: 2,
   OT_EDITOR_MOVE_UP: 0,
@@ -6128,7 +6138,10 @@ var NativeEditCommand2;
   NativeEditCommand[NativeEditCommand["Clear"] = 10] = "Clear";
   NativeEditCommand[NativeEditCommand["ClearHistory"] = 11] = "ClearHistory";
   NativeEditCommand[NativeEditCommand["DebugRope"] = 12] = "DebugRope";
+  NativeEditCommand[NativeEditCommand["CursorOffsetAtomic"] = 13] = "CursorOffsetAtomic";
+  NativeEditCommand[NativeEditCommand["KeepOutside"] = 14] = "KeepOutside";
 })(NativeEditCommand2 ||= {});
+var NativeEditAtomic = 1;
 var NativeEditPositionQuery2;
 ((NativeEditPositionQuery) => {
   NativeEditPositionQuery[NativeEditPositionQuery["Cursor"] = 0] = "Cursor";
@@ -8532,6 +8545,7 @@ class FFIRenderLib2 {
   sceneFlushApplied = new Uint32Array(1);
   editorSelectionRecord = createEditorSelectionRecord();
   editorViewInfoRecord = createContextRecord(nativeLayouts.ot_editor_view_info);
+  markRecords = new Uint32Array(16 * nativeLayouts.ot_edit_mark.size / 4);
   videoStateRecord = new Uint8Array(nativeLayouts.ot_video_state.size);
   videoStateView = new DataView(this.videoStateRecord.buffer);
   selectionResetRecord = encodeEditorSelection({ operation: 2 /* Reset */ });
@@ -9202,6 +9216,23 @@ class FFIRenderLib2 {
       nativeResult("ot_text_buffer_highlight", this.opentui.symbols.ot_text_buffer_highlight(pointer, handle, selector, value, record));
     });
   }
+  contextGroupSet(context, names) {
+    const encoded = names.map((name) => this.encoder.encode(name));
+    const ends = new Uint32Array(encoded.length);
+    const bytes = new Uint8Array(encoded.reduce((end, name, index) => ends[index] = end + name.length, 0));
+    encoded.forEach((name, index) => bytes.set(name, ends[index] - name.length));
+    const output = new Uint32Array(1);
+    const pointer = this.nativeContextPointer(context, "ot_context_group_set");
+    nativeResult("ot_context_group_set", this.opentui.symbols.ot_context_group_set(pointer, viewOrNull(bytes), bytes.length, viewOrNull(ends), ends.length, output));
+    return output[0];
+  }
+  contextTextBufferSetLayer(context, text, layerId, start, end, runs) {
+    const handle = encodeContextHandle(context, text);
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_text_buffer_set_layer");
+      nativeResult("ot_text_buffer_set_layer", this.opentui.symbols.ot_text_buffer_set_layer(pointer, handle, layerId, start, end, viewOrNull(runs), runs.length / 3));
+    });
+  }
   contextTextBufferGetHighlights(context, text, line) {
     const handle = encodeContextHandle(context, text);
     const row = toSafeFFIU32Length(line, "Highlight line");
@@ -9548,6 +9579,16 @@ class FFIRenderLib2 {
     const pointer = this.nativeContextPointer(context, "ot_edit_buffer_get_range");
     return this.readText("ot_edit_buffer_get_range", (bytes, capacity, count) => this.opentui.symbols.ot_edit_buffer_get_range(pointer, handle, coords, rowStart, colStart, rowEnd, colEnd, bytes, capacity, count));
   }
+  contextEditBufferConvertOffset(context, editBuffer, value, toCell) {
+    const operation = "ot_edit_buffer_convert_offset";
+    const handle = encodeContextHandle(context, editBuffer);
+    const input = toSafeFFIU32Length(value, "Edit buffer index or offset");
+    const conversion = toCell ? nativeConstants.OT_EDIT_UTF16_TO_CELL : nativeConstants.OT_EDIT_CELL_TO_UTF16;
+    const output = new Uint32Array(1);
+    const pointer = this.nativeContextPointer(context, operation);
+    nativeResult(operation, this.opentui.symbols.ot_edit_buffer_convert_offset(pointer, handle, conversion, input, output));
+    return output[0];
+  }
   contextEditBufferMeasureText(context, editBuffer, bytes) {
     const handle = encodeContextHandle(context, editBuffer);
     const input = sessionBytes(bytes, "Edit buffer measure length");
@@ -9630,6 +9671,62 @@ class FFIRenderLib2 {
     if (count[0] !== capacity)
       throw new NativeError2("ot_edit_buffer_get_highlights", -5 /* InternalError */);
     return decodeContextHighlights(records);
+  }
+  contextEditBufferMark(context, editBuffer, operation, mark) {
+    const layout = nativeLayouts.ot_edit_mark;
+    const handle = encodeContextHandle(context, editBuffer);
+    const fields = layout.fields;
+    let record = null;
+    if (mark) {
+      record = createContextRecord(layout);
+      record[fields.id.offset / 4] = toSafeFFIU32Length(mark.id ?? 0, "Mark id");
+      record[fields.kind.offset / 4] = toSafeFFIU32Length(mark.kind ?? 0, "Mark type id");
+      record[fields.flags.offset / 4] = mark.atomic ? nativeConstants.OT_EDIT_MARK_ATOMIC : 0;
+      record[fields.style.offset / 4] = toSafeFFIU32Length(mark.style ?? 0, "Mark style ID");
+      record[fields.priority.offset / 4] = toSafeFFIU32Length(mark.priority ?? 0, "Mark priority");
+      record[fields.start.offset / 4] = toSafeFFIU32Length(mark.start ?? 0, "Mark start");
+      record[fields.end.offset / 4] = toSafeFFIU32Length(mark.end ?? 0, "Mark end");
+    }
+    const output = record && new Uint32Array(1);
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_edit_buffer_mark");
+      nativeResult("ot_edit_buffer_mark", this.opentui.symbols.ot_edit_buffer_mark(pointer, handle, operation, record, output));
+    });
+    return output?.[0] ?? 0;
+  }
+  contextEditBufferGetMarks(context, editBuffer, id = 0, kind = nativeConstants.OT_EDIT_MARK_ANY_KIND) {
+    const layout = nativeLayouts.ot_edit_mark;
+    const handle = encodeContextHandle(context, editBuffer);
+    const markId = toSafeFFIU32Length(id, "Mark id");
+    const markKind = toSafeFFIU32Length(kind, "Mark type id");
+    const count = new Uint32Array(1);
+    const pointer = this.nativeContextPointer(context, "ot_edit_buffer_get_marks");
+    const words = layout.size / 4;
+    const copy = () => this.opentui.symbols.ot_edit_buffer_get_marks(pointer, handle, markId, markKind, this.markRecords, this.markRecords.length / words, count);
+    let status = copy();
+    if (status !== 0 /* Ok */) {
+      nativeResult("ot_edit_buffer_get_marks", this.opentui.symbols.ot_edit_buffer_get_marks(pointer, handle, markId, markKind, null, 0, count));
+      if (count[0] * words <= this.markRecords.length)
+        nativeResult("ot_edit_buffer_get_marks", status);
+      this.markRecords = new Uint32Array(count[0] * 2 * words);
+      status = copy();
+      nativeResult("ot_edit_buffer_get_marks", status);
+    }
+    const records = this.markRecords;
+    const marks = [];
+    for (let offset = 0;offset < count[0] * words; offset += words) {
+      const field = (name) => records[offset + layout.fields[name].offset / 4];
+      marks.push({
+        id: field("id"),
+        kind: field("kind"),
+        atomic: (field("flags") & nativeConstants.OT_EDIT_MARK_ATOMIC) !== 0,
+        style: field("style"),
+        priority: field("priority"),
+        start: field("start"),
+        end: field("end")
+      });
+    }
+    return marks;
   }
   contextEditorViewSetViewport(context, view, viewport, sizeOnly = false, moveCursor = false) {
     const layout = nativeLayouts.ot_editor_viewport;
@@ -13849,7 +13946,7 @@ var Yoga = {
 };
 var yoga_default = Yoga;
 
-export { nativeLayouts, nativeConstants, toArrayBuffer, singleton, getSingleton, destroySingleton, envRegistry2, registerEnvVar2, clearEnvCache2, generateEnvMarkdown2, generateEnvColored2, env2, stringWidth, resolveBundledFilePath2, Worker, TextAttributes2, ATTRIBUTE_BASE_BITS2, ATTRIBUTE_BASE_MASK2, getBaseAttributes2, DebugOverlayCorner2, TargetChannel2, DEFAULT_FOREGROUND_RGB2, DEFAULT_BACKGROUND_RGB2, normalizeIndexedColorIndex2, ansi256IndexToRgb2, RGBA2, normalizeColorValue2, hexToRgb2, rgbToHex2, hsvToRgb2, parseColor2, createTextAttributes2, attributesWithLink2, getLinkId2, visualizeRenderableTree2, isStyledText2, StyledText2, stringToStyledText2, black2, red2, green2, yellow2, blue2, magenta2, cyan2, white2, brightBlack2, brightRed2, brightGreen2, brightYellow2, brightBlue2, brightMagenta2, brightCyan2, brightWhite2, bgBlack2, bgRed2, bgGreen2, bgYellow2, bgBlue2, bgMagenta2, bgCyan2, bgWhite2, bold2, italic2, underline2, strikethrough2, dim2, reverse2, blink2, fg2, bg2, link2, t2, YogaEnumKind, YogaFloatKind, YogaValueKind, sceneSetEnum, sceneGetEnum, sceneSetFloat, sceneGetFloat, sceneSetValue, sceneGetValue, sceneSetDimension, UNDEFINED_VALUE, parseYogaValue, SpanInfoStruct, NativeAudioStreamFormat2, NativeAudioStreamState2, NativeAudioStreamStateNames, NativeAudioStreamCloseReason2, isBunfsPath, normalizeBunfsPath, resolveDefaultParserAsset, resolveDefaultTreeSitterWorkerPath, resolveTreeSitterWasm, NativeAudioStreamState3, NativeAudioStreamCloseReason3, NativeAudioStreamFormat3, MAX_LINK_URL_BYTES2, NativeTextViewCommand2, NativeEditCommand2, NativeEditPositionQuery2, NativeEditorStyleMask2, NativeEditHighlightOperation2, NativeEditorCommand2, NativeEditorSelectionOperation2, NativeEditorPositionQuery2, NativeEditEvent2, NativeStyleGroup, NativeStyleFlags, NATIVE_EDGE_NONE2, NativeBorder2, NativeSceneHook2, NativeSceneFrame2, NativeScenePaintPhase2, emptySceneScrollState, NATIVE_BUFFER_TEXT_BYTES_MAX2, NativeSessionState2, NativeSessionRenderStatus2, NATIVE_SESSION_CONTROL_PACKET_BYTES2, NativeSessionTerminalPhase2, NativeSessionPumpStatus2, NativeStatus2, NativeError2, NativeClipboardOperationStatus2, NativeClipboardStartStatus2, NativeClipboardCancelStatus2, NativeClipboardCopyStatus2, NativeClipboardDestroyStatus2, NativeClipboardShutdownStatus2, SceneStaging, NativePaintRecorder, LogLevel2, FFIRenderLib2, setRenderLibPath2, resolveRenderLib2, Align2, BoxSizing2, Dimension2, Direction2, Display2, Edge2, Errata2, ExperimentalFeature2, FlexDirection2, Gutter2, Justify2, LogLevel3, MeasureMode2, NodeType2, Overflow2, PositionType2, Unit2, Wrap2, ALIGN_AUTO2, ALIGN_FLEX_START2, ALIGN_CENTER2, ALIGN_FLEX_END2, ALIGN_STRETCH2, ALIGN_BASELINE2, ALIGN_SPACE_BETWEEN2, ALIGN_SPACE_AROUND2, ALIGN_SPACE_EVENLY2, BOX_SIZING_BORDER_BOX2, BOX_SIZING_CONTENT_BOX2, DIMENSION_WIDTH2, DIMENSION_HEIGHT2, DIRECTION_INHERIT2, DIRECTION_LTR2, DIRECTION_RTL2, DISPLAY_FLEX2, DISPLAY_NONE2, DISPLAY_CONTENTS2, EDGE_LEFT2, EDGE_TOP2, EDGE_RIGHT2, EDGE_BOTTOM2, EDGE_START2, EDGE_END2, EDGE_HORIZONTAL2, EDGE_VERTICAL2, EDGE_ALL2, ERRATA_NONE2, ERRATA_STRETCH_FLEX_BASIS2, ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2, ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2, ERRATA_ALL2, ERRATA_CLASSIC2, EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2, FLEX_DIRECTION_COLUMN2, FLEX_DIRECTION_COLUMN_REVERSE2, FLEX_DIRECTION_ROW2, FLEX_DIRECTION_ROW_REVERSE2, GUTTER_COLUMN2, GUTTER_ROW2, GUTTER_ALL2, JUSTIFY_FLEX_START2, JUSTIFY_CENTER2, JUSTIFY_FLEX_END2, JUSTIFY_SPACE_BETWEEN2, JUSTIFY_SPACE_AROUND2, JUSTIFY_SPACE_EVENLY2, LOG_LEVEL_ERROR2, LOG_LEVEL_WARN2, LOG_LEVEL_INFO2, LOG_LEVEL_DEBUG2, LOG_LEVEL_VERBOSE2, LOG_LEVEL_FATAL2, MEASURE_MODE_UNDEFINED2, MEASURE_MODE_EXACTLY2, MEASURE_MODE_AT_MOST2, NODE_TYPE_DEFAULT2, NODE_TYPE_TEXT2, OVERFLOW_VISIBLE2, OVERFLOW_HIDDEN2, OVERFLOW_SCROLL2, POSITION_TYPE_STATIC2, POSITION_TYPE_RELATIVE2, POSITION_TYPE_ABSOLUTE2, UNIT_UNDEFINED2, UNIT_POINT2, UNIT_PERCENT2, UNIT_AUTO2, WRAP_NO_WRAP2, WRAP_WRAP2, WRAP_WRAP_REVERSE2, YogaStatus2, YogaError2, Config2, Node2, exports_yoga, yoga_default };
+export { nativeLayouts, nativeConstants, toArrayBuffer, singleton, getSingleton, destroySingleton, envRegistry2, registerEnvVar2, clearEnvCache2, generateEnvMarkdown2, generateEnvColored2, env2, stringWidth, resolveBundledFilePath2, Worker, TextAttributes2, ATTRIBUTE_BASE_BITS2, ATTRIBUTE_BASE_MASK2, getBaseAttributes2, DebugOverlayCorner2, TargetChannel2, DEFAULT_FOREGROUND_RGB2, DEFAULT_BACKGROUND_RGB2, normalizeIndexedColorIndex2, ansi256IndexToRgb2, RGBA2, normalizeColorValue2, hexToRgb2, rgbToHex2, hsvToRgb2, parseColor2, createTextAttributes2, attributesWithLink2, getLinkId2, visualizeRenderableTree2, isStyledText2, StyledText2, stringToStyledText2, black2, red2, green2, yellow2, blue2, magenta2, cyan2, white2, brightBlack2, brightRed2, brightGreen2, brightYellow2, brightBlue2, brightMagenta2, brightCyan2, brightWhite2, bgBlack2, bgRed2, bgGreen2, bgYellow2, bgBlue2, bgMagenta2, bgCyan2, bgWhite2, bold2, italic2, underline2, strikethrough2, dim2, reverse2, blink2, fg2, bg2, link2, t2, YogaEnumKind, YogaFloatKind, YogaValueKind, sceneSetEnum, sceneGetEnum, sceneSetFloat, sceneGetFloat, sceneSetValue, sceneGetValue, sceneSetDimension, UNDEFINED_VALUE, parseYogaValue, SpanInfoStruct, NativeAudioStreamFormat2, NativeAudioStreamState2, NativeAudioStreamStateNames, NativeAudioStreamCloseReason2, isBunfsPath, normalizeBunfsPath, resolveDefaultParserAsset, resolveDefaultTreeSitterWorkerPath, resolveTreeSitterWasm, NativeAudioStreamState3, NativeAudioStreamCloseReason3, NativeAudioStreamFormat3, MAX_LINK_URL_BYTES2, NativeTextViewCommand2, NativeEditCommand2, NativeEditAtomic, NativeEditPositionQuery2, NativeEditorStyleMask2, NativeEditHighlightOperation2, NativeEditorCommand2, NativeEditorSelectionOperation2, NativeEditorPositionQuery2, NativeEditEvent2, NativeStyleGroup, NativeStyleFlags, NATIVE_EDGE_NONE2, NativeBorder2, NativeSceneHook2, NativeSceneFrame2, NativeScenePaintPhase2, emptySceneScrollState, NATIVE_BUFFER_TEXT_BYTES_MAX2, NativeSessionState2, NativeSessionRenderStatus2, NATIVE_SESSION_CONTROL_PACKET_BYTES2, NativeSessionTerminalPhase2, NativeSessionPumpStatus2, NativeStatus2, NativeError2, NativeClipboardOperationStatus2, NativeClipboardStartStatus2, NativeClipboardCancelStatus2, NativeClipboardCopyStatus2, NativeClipboardDestroyStatus2, NativeClipboardShutdownStatus2, SceneStaging, NativePaintRecorder, LogLevel2, FFIRenderLib2, setRenderLibPath2, resolveRenderLib2, Align2, BoxSizing2, Dimension2, Direction2, Display2, Edge2, Errata2, ExperimentalFeature2, FlexDirection2, Gutter2, Justify2, LogLevel3, MeasureMode2, NodeType2, Overflow2, PositionType2, Unit2, Wrap2, ALIGN_AUTO2, ALIGN_FLEX_START2, ALIGN_CENTER2, ALIGN_FLEX_END2, ALIGN_STRETCH2, ALIGN_BASELINE2, ALIGN_SPACE_BETWEEN2, ALIGN_SPACE_AROUND2, ALIGN_SPACE_EVENLY2, BOX_SIZING_BORDER_BOX2, BOX_SIZING_CONTENT_BOX2, DIMENSION_WIDTH2, DIMENSION_HEIGHT2, DIRECTION_INHERIT2, DIRECTION_LTR2, DIRECTION_RTL2, DISPLAY_FLEX2, DISPLAY_NONE2, DISPLAY_CONTENTS2, EDGE_LEFT2, EDGE_TOP2, EDGE_RIGHT2, EDGE_BOTTOM2, EDGE_START2, EDGE_END2, EDGE_HORIZONTAL2, EDGE_VERTICAL2, EDGE_ALL2, ERRATA_NONE2, ERRATA_STRETCH_FLEX_BASIS2, ERRATA_ABSOLUTE_POSITION_WITHOUT_INSETS_EXCLUDES_PADDING2, ERRATA_ABSOLUTE_PERCENT_AGAINST_INNER_SIZE2, ERRATA_ALL2, ERRATA_CLASSIC2, EXPERIMENTAL_FEATURE_WEB_FLEX_BASIS2, FLEX_DIRECTION_COLUMN2, FLEX_DIRECTION_COLUMN_REVERSE2, FLEX_DIRECTION_ROW2, FLEX_DIRECTION_ROW_REVERSE2, GUTTER_COLUMN2, GUTTER_ROW2, GUTTER_ALL2, JUSTIFY_FLEX_START2, JUSTIFY_CENTER2, JUSTIFY_FLEX_END2, JUSTIFY_SPACE_BETWEEN2, JUSTIFY_SPACE_AROUND2, JUSTIFY_SPACE_EVENLY2, LOG_LEVEL_ERROR2, LOG_LEVEL_WARN2, LOG_LEVEL_INFO2, LOG_LEVEL_DEBUG2, LOG_LEVEL_VERBOSE2, LOG_LEVEL_FATAL2, MEASURE_MODE_UNDEFINED2, MEASURE_MODE_EXACTLY2, MEASURE_MODE_AT_MOST2, NODE_TYPE_DEFAULT2, NODE_TYPE_TEXT2, OVERFLOW_VISIBLE2, OVERFLOW_HIDDEN2, OVERFLOW_SCROLL2, POSITION_TYPE_STATIC2, POSITION_TYPE_RELATIVE2, POSITION_TYPE_ABSOLUTE2, UNIT_UNDEFINED2, UNIT_POINT2, UNIT_PERCENT2, UNIT_AUTO2, WRAP_NO_WRAP2, WRAP_WRAP2, WRAP_WRAP_REVERSE2, YogaStatus2, YogaError2, Config2, Node2, exports_yoga, yoga_default };
 
-//# debugId=BD9F3F40835F962864756E2164756E21
-//# sourceMappingURL=chunk-bun-babe5jf6.js.map
+//# debugId=7D4F35E65A7BB7EA64756E2164756E21
+//# sourceMappingURL=chunk-bun-dg1wb94g.js.map

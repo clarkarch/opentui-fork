@@ -2,7 +2,9 @@ import type { EditBuffer } from "../edit-buffer.js";
 import type { EditorView } from "../editor-view.js";
 export interface Extmark {
     id: number;
+    /** Inclusive document cell offset, counting one cell per newline. */
     start: number;
+    /** Exclusive document cell offset, counting one cell per newline. */
     end: number;
     virtual: boolean;
     styleId?: number;
@@ -11,7 +13,9 @@ export interface Extmark {
     typeId: number;
 }
 export interface ExtmarkOptions {
+    /** Inclusive document cell offset, counting one cell per newline. */
     start: number;
+    /** Exclusive document cell offset, counting one cell per newline. */
     end: number;
     virtual?: boolean;
     styleId?: number;
@@ -21,84 +25,35 @@ export interface ExtmarkOptions {
     metadata?: any;
 }
 /**
- * WARNING: This is simulating extmarks in the edit buffer
- * and will move to a real native implementation in the future.
- * Use with caution.
+ * Extmarks live in the native edit buffer, which moves them with edits and restores them with undo and redo. Ids are
+ * never reused. Text inserted strictly inside a virtual extmark, or an edit that removes part of it, drops it. While a
+ * controller lives and its view has no selection, the buffer's Left, Right, Backspace, Delete and offset setter and the
+ * view's Up and Down apply the native cursor rules around virtual extmarks.
  */
 export declare class ExtmarksController {
     private editBuffer;
     private editorView;
-    private extmarks;
-    private extmarksByTypeId;
-    private metadata;
-    private nextId;
+    private state;
     private destroyed;
-    private history;
-    private typeNameToId;
-    private typeIdToName;
-    private nextTypeId;
-    private originalMoveCursorLeft;
-    private originalMoveCursorRight;
-    private originalSetCursorByOffset;
-    private originalMoveUpVisual;
-    private originalMoveDownVisual;
-    private originalDeleteCharBackward;
-    private originalDeleteChar;
-    private originalInsertText;
-    private originalInsertChar;
-    private originalDeleteRange;
-    private originalSetText;
-    private originalReplaceText;
-    private originalClear;
-    private originalNewLine;
-    private originalDeleteLine;
-    private originalEditorViewDeleteSelectedText;
-    private originalEditorViewReplaceSelectedText;
-    private originalUndo;
-    private originalRedo;
-    private readonly contentChangeListener;
+    private readonly atomic;
     constructor(editBuffer: EditBuffer, editorView: EditorView);
-    private wrapCursorMovement;
-    private moveBefore;
-    private leaveVirtualExtmark;
-    /**
-     * @internal A cursor that a wheel step, a pointer or the offset setter left inside virtual extmarks goes to the
-     * outer edge of the marks around it: toward the end for a positive `direction`, the start for a negative one, or the
-     * nearer edge, as the Rust editor's. Not while a selection is left: it holds the cursor at its focus.
-     */
-    _keepCursorOutside(direction: number): void;
-    private outside;
-    private wrapDeletion;
-    private wrapInsertion;
-    private wrapEditorViewDeleteSelectedText;
-    private setupContentChangeListener;
-    private deleteExtmarkById;
-    private findVirtualExtmarkContaining;
-    private adjustExtmarksAfterInsertion;
-    adjustExtmarksAfterDeletion(deleteOffset: number, length: number, updateHighlights?: boolean): void;
-    private offsetToPosition;
-    private positionToOffset;
-    /** Cells an edit adds to the document, negative when it removes them. A grapheme rejoined across the edit changes widths, so measure the end. */
-    private measureChange;
-    private shiftExtmarks;
-    private updateHighlights;
-    private offsetExcludingNewlines;
+    private toExtmark;
+    /** Marks a half-open document cell range, counting one cell per newline. Returns a mark ID. */
     create(options: ExtmarkOptions): number;
     delete(id: number): boolean;
     get(id: number): Extmark | null;
     getAll(): Extmark[];
     getVirtual(): Extmark[];
+    /** Looks up marks covering a document cell offset, counting one cell per newline. */
     getAtOffset(offset: number): Extmark[];
     getAllForTypeId(typeId: number): Extmark[];
     clear(): void;
-    private saveSnapshot;
-    private snapshotExtmarks;
-    private restoreSnapshot;
-    private wrapUndoRedo;
     registerType(typeName: string): number;
     getTypeId(typeName: string): number | null;
     getTypeName(typeId: number): string | null;
     getMetadataFor(extmarkId: number): any;
+    private get gone();
+    /** Stops the cursor rules for its view. The marks, their payloads and the type names stay with the buffer. */
     destroy(): void;
 }
 export declare function createExtmarksController(editBuffer: EditBuffer, editorView: EditorView): ExtmarksController;

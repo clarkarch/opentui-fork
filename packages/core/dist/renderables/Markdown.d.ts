@@ -303,7 +303,10 @@ export declare class MarkdownRenderable extends Renderable {
     private tableOf;
     /** The blocks that are children of block `index`, in order. */
     private childrenOf;
-    /** Fills a table from its rows and cells: a header row in the heading style, then the body, as wide as the header. */
+    /**
+     * Fills a table from its rows and cells: a header row in the heading style, then the body, as wide as the header,
+     * each column aligned as its delimiter row says.
+     */
     private fillTable;
     /** A cell's content: the parser's output, in the heading style in a header row, through the hook. */
     private readCell;

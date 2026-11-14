@@ -111,7 +111,7 @@ import {
   Gutter2,
   MeasureMode2,
   exports_yoga
-} from "./chunk-bun-babe5jf6.js";
+} from "./chunk-bun-dg1wb94g.js";
 import {
   isValidBorderStyle2,
   parseBorderStyle2,
@@ -244,7 +244,7 @@ import {
   CliRenderEvents2,
   RendererControlState2,
   CliRenderer2
-} from "./chunk-bun-wj93w8tk.js";
+} from "./chunk-bun-apbxttxp.js";
 // src/syntax-style.ts
 var attributeNames = ["bold", "italic", "underline", "dim", "strikethrough"];
 function cloneStyle(style) {
@@ -9581,6 +9581,7 @@ class TextTableRenderable extends Renderable2 {
   _wrapMode;
   _columnWidthMode;
   _columnFitter;
+  _columnAlignments;
   _cellPaddingX;
   _cellPaddingY;
   _columnGap;
@@ -9637,6 +9638,7 @@ class TextTableRenderable extends Renderable2 {
       this._wrapMode = options.wrapMode ?? this._defaultOptions.wrapMode;
       this._columnWidthMode = options.columnWidthMode ?? this._defaultOptions.columnWidthMode;
       this._columnFitter = this.resolveColumnFitter(options.columnFitter);
+      this._columnAlignments = [...options.columnAlignments ?? []];
       this._cellPaddingX = this.resolveCellPadding(options.cellPaddingX ?? options.cellPadding);
       this._cellPaddingY = this.resolveCellPadding(options.cellPaddingY ?? options.cellPadding);
       this._columnGap = this.resolveColumnGap(options.columnGap);
@@ -9699,6 +9701,13 @@ class TextTableRenderable extends Renderable2 {
       return;
     this._columnFitter = next;
     this.invalidateLayout();
+  }
+  get columnAlignments() {
+    return [...this._columnAlignments];
+  }
+  set columnAlignments(value) {
+    this._columnAlignments = [...value ?? []];
+    this.invalidateLayout(false);
   }
   get cellPadding() {
     return this._cellPaddingX === this._cellPaddingY ? this._cellPaddingX : 0;
@@ -10253,6 +10262,7 @@ class TextTableRenderable extends Renderable2 {
         const contentWidth = Math.max(1, colWidth - horizontalPadding);
         const contentHeight = Math.max(1, rowHeight - verticalPadding);
         cell.textBufferView.setViewport(0, 0, contentWidth, contentHeight);
+        cell.textBufferView.setTextAlign(this._columnAlignments[colIdx] ?? "left");
       }
     }
   }
@@ -11223,6 +11233,7 @@ class MarkdownRenderable extends Renderable2 {
           width: "100%",
           flexShrink: 0
         });
+        code._setStreamsDeltas(true);
         this.setCode(index, code);
         return code;
       }
@@ -11285,13 +11296,15 @@ class MarkdownRenderable extends Renderable2 {
   setCode(index, code) {
     const block = this._doc.blocks[index];
     code.filetype = (block.flags & nativeConstants.OT_MD_BLOCK_MATH) !== 0 ? undefined : infoStringToFiletype2(this.view(index).lang ?? "");
-    code.syntaxStyle = this._syntaxStyle;
+    const copy = this._styleCopy;
+    code.syntaxStyle = copy && copy.source === this._syntaxStyle ? copy.copy : this._syntaxStyle;
     code.fg = this._fg;
     code.bg = this._bg;
     code.conceal = this._concealCode;
     code.drawUnstyledText = (block.flags & nativeConstants.OT_MD_BLOCK_MATH) !== 0 || !this._streaming;
     code.streaming = this._streaming;
     code.content = this.leafText(index);
+    code._setStreamsDeltas((block.flags & nativeConstants.OT_MD_BLOCK_CLOSED) === 0);
   }
   afterChange(index, refresh, layout) {
     const block = this._doc.blocks[index];
@@ -11387,7 +11400,14 @@ class MarkdownRenderable extends Renderable2 {
       return;
     const columns = this._doc.blocks[index].number;
     const previous = table.content;
-    const content = this.childrenOf(index).map((row, r) => {
+    const rows = this.childrenOf(index);
+    table.columnAlignments = this.childrenOf(rows[0]).map((cell) => {
+      const flags = this._doc.blocks[cell].flags;
+      if (!(flags & nativeConstants.OT_MD_BLOCK_ALIGN_RIGHT))
+        return "left";
+      return flags & nativeConstants.OT_MD_BLOCK_ALIGN_LEFT ? "center" : "right";
+    });
+    const content = rows.map((row, r) => {
       const header = (this._doc.blocks[row].flags & nativeConstants.OT_MD_BLOCK_HEADER) !== 0;
       const cells = this.childrenOf(row).map((cell, c) => {
         const shown = this._shown[cell];
@@ -12786,5 +12806,5 @@ export {
   yellow2 as yellow
 };
 
-//# debugId=C7A885B93A9C226F64756E2164756E21
+//# debugId=A567DA55F11B8CAB64756E2164756E21
 //# sourceMappingURL=index.bun.js.map

@@ -10,6 +10,8 @@ interface TextChunkOptions {
         start: number;
         end: number;
     }>;
+    /** Receives, per chunk, the style names it merges in order (a native group set). */
+    names?: string[][];
 }
 export declare function treeSitterToTextChunks(content: string, highlights: SimpleHighlight[], syntaxStyle: SyntaxStyle, options?: TextChunkOptions): TextChunk[];
 export interface TreeSitterToStyledTextOptions {

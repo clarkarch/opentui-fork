@@ -421,6 +421,9 @@ export declare const OT_EDIT_CURSOR_OFFSET = 9;
 export declare const OT_EDIT_CLEAR = 10;
 export declare const OT_EDIT_CLEAR_HISTORY = 11;
 export declare const OT_EDIT_DEBUG_ROPE = 12;
+export declare const OT_EDIT_CURSOR_OFFSET_ATOMIC = 13;
+export declare const OT_EDIT_KEEP_OUTSIDE = 14;
+export declare const OT_EDIT_ATOMIC = 1;
 export declare const OT_EDIT_POSITION_CURSOR = 0;
 export declare const OT_EDIT_POSITION_NEXT_WORD = 1;
 export declare const OT_EDIT_POSITION_PREV_WORD = 2;
@@ -430,6 +433,10 @@ export declare const OT_EDIT_POSITION_COORDS = 5;
 export declare const OT_EDIT_POSITION_LINE_START = 6;
 export declare const OT_EDIT_POSITION_END = 7;
 export declare const OT_EDIT_POSITION_PREV_CHAR = 8;
+export declare const OT_EDIT_BYTE_TO_CELL = 0;
+export declare const OT_EDIT_CELL_TO_BYTE = 1;
+export declare const OT_EDIT_UTF16_TO_CELL = 2;
+export declare const OT_EDIT_CELL_TO_UTF16 = 3;
 export declare const OT_EDITOR_STYLE_FOREGROUND = 1;
 export declare const OT_EDITOR_STYLE_BACKGROUND = 2;
 export declare const OT_EDITOR_STYLE_ATTRIBUTES = 4;
@@ -476,6 +483,8 @@ export declare const OT_MD_BLOCK_HOOKED = 256;
 export declare const OT_MD_BLOCK_MATH = 512;
 export declare const OT_MD_BLOCK_HEADER = 1024;
 export declare const OT_MD_BLOCK_OPEN = 2048;
+export declare const OT_MD_BLOCK_ALIGN_LEFT = 4096;
+export declare const OT_MD_BLOCK_ALIGN_RIGHT = 8192;
 export declare const OT_MD_SPAN_CODE = 1;
 export declare const OT_MD_SPAN_MATH = 2;
 export declare const OT_EDITOR_MOVE_UP = 0;
@@ -1206,6 +1215,10 @@ export declare const nativeSymbols: {
     };
     readonly ot_edit_buffer_get_range: {
         readonly args: readonly ["ptr", "buffer", "u32", "u32", "u32", "u32", "u32", "ptr", "u32", "buffer"];
+        readonly returns: "i32";
+    };
+    readonly ot_edit_buffer_convert_offset: {
+        readonly args: readonly ["ptr", "buffer", "u32", "u32", "buffer"];
         readonly returns: "i32";
     };
     readonly ot_edit_buffer_measure_text: {
@@ -7427,6 +7440,9 @@ export declare const nativeConstants: {
     readonly OT_EDIT_CLEAR: 10;
     readonly OT_EDIT_CLEAR_HISTORY: 11;
     readonly OT_EDIT_DEBUG_ROPE: 12;
+    readonly OT_EDIT_CURSOR_OFFSET_ATOMIC: 13;
+    readonly OT_EDIT_KEEP_OUTSIDE: 14;
+    readonly OT_EDIT_ATOMIC: 1;
     readonly OT_EDIT_POSITION_CURSOR: 0;
     readonly OT_EDIT_POSITION_NEXT_WORD: 1;
     readonly OT_EDIT_POSITION_PREV_WORD: 2;
@@ -7436,6 +7452,10 @@ export declare const nativeConstants: {
     readonly OT_EDIT_POSITION_LINE_START: 6;
     readonly OT_EDIT_POSITION_END: 7;
     readonly OT_EDIT_POSITION_PREV_CHAR: 8;
+    readonly OT_EDIT_BYTE_TO_CELL: 0;
+    readonly OT_EDIT_CELL_TO_BYTE: 1;
+    readonly OT_EDIT_UTF16_TO_CELL: 2;
+    readonly OT_EDIT_CELL_TO_UTF16: 3;
     readonly OT_EDITOR_STYLE_FOREGROUND: 1;
     readonly OT_EDITOR_STYLE_BACKGROUND: 2;
     readonly OT_EDITOR_STYLE_ATTRIBUTES: 4;
@@ -7482,6 +7502,8 @@ export declare const nativeConstants: {
     readonly OT_MD_BLOCK_MATH: 512;
     readonly OT_MD_BLOCK_HEADER: 1024;
     readonly OT_MD_BLOCK_OPEN: 2048;
+    readonly OT_MD_BLOCK_ALIGN_LEFT: 4096;
+    readonly OT_MD_BLOCK_ALIGN_RIGHT: 8192;
     readonly OT_MD_SPAN_CODE: 1;
     readonly OT_MD_SPAN_MATH: 2;
     readonly OT_EDITOR_MOVE_UP: 0;

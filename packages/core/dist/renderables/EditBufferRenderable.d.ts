@@ -18,7 +18,9 @@ export declare enum EditBufferRenderableEvents {
 }
 export declare function isEditBufferRenderable(obj: unknown): obj is EditBufferRenderable;
 export interface CursorChangeEvent {
+    /** Zero-based logical line. */
     line: number;
+    /** Display-cell column on that logical line, not a UTF-16 index. */
     visualColumn: number;
 }
 export interface ContentChangeEvent {
@@ -96,12 +98,18 @@ export declare abstract class EditBufferRenderable extends Renderable implements
     get scrollY(): number;
     get scrollMargin(): number;
     set scrollMargin(value: number | undefined);
+    /** Buffer text with LF line breaks. Index or slice it in UTF-16 units, not cursor offsets. */
     get plainText(): string;
+    /** Logical row, display-cell column, and document cell offset (one per newline). */
     get logicalCursor(): LogicalCursor;
+    /** Viewport-relative wrapped row and cell column, plus the logical position and document cell offset. */
     get visualCursor(): VisualCursor;
+    /** Display cells from the document start, one per newline. Use editBuffer.cellOffsetToStringIndex for plainText. */
     get cursorOffset(): number;
+    /** Sets the cursor in document display cells, counting each newline as one. */
     set cursorOffset(offset: number);
     private selectionSide;
+    /** Legacy under-cursor lookup with line-end adjustments; not a conversion from cells to a UTF-16 caret index. */
     get cursorCharacterOffset(): number | undefined;
     get textColor(): RGBA;
     set textColor(value: RGBA | string | undefined);
@@ -141,18 +149,23 @@ export declare abstract class EditBufferRenderable extends Renderable implements
     /** @internal */
     get _needsAutoScrollUpdate(): boolean;
     protected onUpdate(deltaTime: number): void;
+    /** Returns the selected text as a UTF-16-indexed JavaScript string. */
     getSelectedText(): string;
     hasSelection(): boolean;
+    /** Returns half-open document cell bounds, counting one cell per newline. */
     getSelection(): {
         start: number;
         end: number;
     } | null;
     private deleteSelectedText;
     private resetSelection;
+    /** Selects [start, end) in document display cells, counting one cell per newline. */
     setSelection(start: number, end: number): void;
+    /** Takes document cell offsets (one per newline); cell occupancy includes the grapheme at the larger endpoint. */
     setSelectionInclusive(start: number, end: number): void;
     clearSelection(): boolean;
     deleteSelection(): boolean;
+    /** Sets the cursor by zero-based logical row and display-cell column. */
     setCursor(row: number, col: number): void;
     insertChar(char: string): void;
     insertText(text: string): void;
@@ -162,18 +175,23 @@ export declare abstract class EditBufferRenderable extends Renderable implements
     newLine(): boolean;
     deleteLine(): boolean;
     private collapseSelectionToEdge;
+    /** Moves left by a cursor stop, not one UTF-16 unit; select extends the cell range. */
     moveCursorLeft(options?: {
         select?: boolean;
     }): boolean;
+    /** Moves right by a cursor stop, not one UTF-16 unit; select extends the cell range. */
     moveCursorRight(options?: {
         select?: boolean;
     }): boolean;
+    /** Moves up one wrapped row; select extends the document cell range. */
     moveCursorUp(options?: {
         select?: boolean;
     }): boolean;
+    /** Moves down one wrapped row; select extends the document cell range. */
     moveCursorDown(options?: {
         select?: boolean;
     }): boolean;
+    /** Moves to a zero-based logical line. */
     gotoLine(line: number): void;
     gotoLineStart(): void;
     gotoLineTextEnd(): void;
@@ -200,9 +218,11 @@ export declare abstract class EditBufferRenderable extends Renderable implements
     deleteToLineStart(): boolean;
     undo(): boolean;
     redo(): boolean;
+    /** Moves to the next word boundary; select extends the document cell range. */
     moveWordForward(options?: {
         select?: boolean;
     }): boolean;
+    /** Moves to the previous word boundary; select extends the document cell range. */
     moveWordBackward(options?: {
         select?: boolean;
     }): boolean;
@@ -218,7 +238,9 @@ export declare abstract class EditBufferRenderable extends Renderable implements
     get onContentChange(): ((event: ContentChangeEvent) => void) | undefined;
     get syntaxStyle(): SyntaxStyle | null;
     set syntaxStyle(style: SyntaxStyle | null);
+    /** Highlights a range in display cells relative to the logical line. */
     addHighlight(lineIdx: number, highlight: Highlight): void;
+    /** Highlights a range in document display cells excluding newlines, not UTF-16 indices. */
     addHighlightByCharRange(highlight: Highlight): void;
     removeHighlightsByRef(hlRef: number): void;
     clearLineHighlights(lineIdx: number): void;
@@ -235,8 +257,11 @@ export declare abstract class EditBufferRenderable extends Renderable implements
      */
     replaceText(text: string): void;
     clear(): void;
+    /** Deletes a half-open range between (zero-based logical line, display-cell column) pairs. */
     deleteRange(startLine: number, startCol: number, endLine: number, endCol: number): void;
+    /** Reads [startOffset, endOffset) in document display cells, counting one cell per newline. */
     getTextRange(startOffset: number, endOffset: number): string;
+    /** Reads a half-open range between (zero-based logical row, display-cell column) pairs. */
     getTextRangeByCoords(startRow: number, startCol: number, endRow: number, endCol: number): string;
     private setNativeEditorOptions;
     protected updateSelectionForMovement(shiftPressed: boolean, isBeforeMovement: boolean): void;

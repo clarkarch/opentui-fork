@@ -34,45 +34,71 @@ export declare class EditorView {
     setWrapMode(mode: "none" | "char" | "word"): void;
     getVirtualLineCount(): number;
     getTotalVirtualLineCount(): number;
+    /** Selects [start, end) in document display cells, counting each newline as one. */
     setSelection(start: number, end: number, bgColor?: RGBA, fgColor?: RGBA): void;
+    /** Sets the exclusive end in document display cells, counting each newline as one. */
     updateSelection(end: number, bgColor?: RGBA, fgColor?: RGBA): void;
     resetSelection(): void;
+    /** Returns half-open bounds in document display cells, counting each newline as one. */
     getSelection(): {
         start: number;
         end: number;
     } | null;
     hasSelection(): boolean;
+    /** Selects between viewport-local positions: x in display cells, y in wrapped rows. */
     setLocalSelection(anchorX: number, anchorY: number, focusX: number, focusY: number, bgColor?: RGBA, fgColor?: RGBA, updateCursor?: boolean, followCursor?: boolean, behavior?: SelectionBehavior): boolean;
+    /** Updates the selection between viewport-local cell columns and wrapped rows. */
     updateLocalSelection(anchorX: number, anchorY: number, focusX: number, focusY: number, bgColor?: RGBA, fgColor?: RGBA, updateCursor?: boolean, followCursor?: boolean, behavior?: SelectionBehavior): boolean;
     resetLocalSelection(): void;
     convertSelectionToCell(): boolean;
     setSelectionOccupancy(occupancy: SelectionOccupancy): void;
     getSelectionOccupancy(): SelectionOccupancy;
+    /** Selects document cell offsets (one per newline); cell occupancy includes the grapheme at the larger endpoint. */
     setSelectionInclusive(start: number, end: number, bgColor?: RGBA, fgColor?: RGBA): void;
     setSelectionColors(bgColor?: RGBA, fgColor?: RGBA): void;
+    /** Returns selected text as a UTF-16-indexed JavaScript string. */
     getSelectedText(): string;
+    /** Returns the zero-based logical row and display-cell column. */
     getCursor(): {
         row: number;
         col: number;
     };
+    /** Returns the buffer text as a UTF-16-indexed JavaScript string. */
     getText(): string;
+    /** Returns viewport and logical cell coordinates; the offset counts document cells, one per newline. */
     getVisualCursor(): VisualCursor;
+    /** @internal Set while an extmarks controller lives: Up and Down apply the cursor rules around virtual extmarks. */
+    _atomic: boolean;
+    private rules;
+    /** Moves the cursor up one wrapped row in the view. */
     moveUpVisual(): void;
+    /** Moves the cursor down one wrapped row in the view. */
     moveDownVisual(): void;
     deleteSelectedText(): void;
     /** @internal The native controller replaces a selection in one checked operation. */
     _replaceSelectedText(text: string): NativeEditorReplacement;
+    /** Sets the cursor in document display cells, counting each newline as one. */
     setCursorByOffset(offset: number): void;
+    /** Returns the next word boundary in logical and viewport cell coordinates. */
     getNextWordBoundary(): VisualCursor;
+    /** Returns the previous word boundary in logical and viewport cell coordinates. */
     getPrevWordBoundary(): VisualCursor;
+    /** Returns the logical line end in logical and viewport cell coordinates. */
     getEOL(): VisualCursor;
+    /** Returns the wrapped row start in logical and viewport cell coordinates. */
     getVisualSOL(): VisualCursor;
+    /** Returns the wrapped row end in logical and viewport cell coordinates. */
     getVisualEOL(): VisualCursor;
     gotoVisualLineEnd(): void;
     getLineInfo(): LineInfo;
     getLogicalLineInfo(): LineInfo;
-    /** @internal Moves a cursor left inside virtual extmarks to an edge, when the view has an extmark controller. */
+    /**
+     * @internal A cursor that a wheel step, a pointer or the offset setter left inside virtual extmarks goes to the outer
+     * edge of the marks around it: toward the end for a positive `direction`, the start for a negative one, or the nearer
+     * edge. Only with an extmarks controller, and not while a selection is left: it holds the cursor at its focus.
+     */
     _keepCursorOutside(direction: number): void;
+    /** Marks use half-open document cell ranges, counting each newline as one. */
     get extmarks(): any;
     setPlaceholderStyledText(chunks: {
         text: string;

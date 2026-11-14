@@ -37,6 +37,7 @@ import {
   resolveDefaultParserAsset,
   resolveDefaultTreeSitterWorkerPath,
   resolveTreeSitterWasm,
+  NativeEditAtomic,
   NativeStyleGroup,
   NativeStyleFlags,
   NATIVE_EDGE_NONE2,
@@ -69,7 +70,7 @@ import {
   PositionType2,
   Unit2,
   Wrap2
-} from "./chunk-bun-babe5jf6.js";
+} from "./chunk-bun-dg1wb94g.js";
 
 // src/Renderable.ts
 import { EventEmitter as EventEmitter4 } from "events";
@@ -4503,7 +4504,10 @@ function treeSitterToTextChunks2(content, highlights, syntaxStyle, options) {
             }
           }
         }
-        const finalStyle = Object.keys(mergedStyle).length > 0 ? mergedStyle : defaultStyle;
+        const merged = Object.keys(mergedStyle).length > 0;
+        const finalStyle = merged ? mergedStyle : defaultStyle;
+        const strikes = (group) => group === "markup.strikethrough" && !syntaxStyle.getRegisteredNames().some((name) => name === group || name === "markup");
+        options?.names?.push(merged ? sortedGroups.flatMap(({ group }) => strikes(group) ? ["default", group] : [group]) : ["default"]);
         chunks.push({
           __isChunk: true,
           text: segmentText,
@@ -4516,6 +4520,7 @@ function treeSitterToTextChunks2(content, highlights, syntaxStyle, options) {
     } else if (currentOffset < boundary.offset) {
       const text = content.slice(currentOffset, boundary.offset);
       const style = baseStyle ?? defaultStyle;
+      options?.names?.push(["default"]);
       chunks.push({
         __isChunk: true,
         text,
@@ -4558,6 +4563,7 @@ function treeSitterToTextChunks2(content, highlights, syntaxStyle, options) {
   if (currentOffset < content.length) {
     const text = content.slice(currentOffset);
     const style = baseStyle ?? defaultStyle;
+    options?.names?.push(["default"]);
     chunks.push({
       __isChunk: true,
       text,
@@ -4958,6 +4964,27 @@ class TreeSitterClient2 extends EventEmitter2 {
     });
   }
   async highlightOnce(content, filetype) {
+    return this.request({
+      type: "ONESHOT_HIGHLIGHT",
+      content,
+      filetype,
+      messageId: `oneshot_${this.messageIdCounter++}`
+    });
+  }
+  async highlightAppend(copyId, offset, text, filetype) {
+    const messageId = `append_${this.messageIdCounter++}`;
+    return this.request({ type: "APPEND_HIGHLIGHT", copyId, offset, text, filetype, messageId });
+  }
+  async removeCopy(copyId) {
+    if (!this.initialized) {
+      if (!this.initializePromise)
+        return;
+      await this.initialize().catch(() => {});
+    }
+    if (this.worker)
+      this.sendWorkerMessage({ type: "DISPOSE_COPY", copyId });
+  }
+  async request(message) {
     if (!this.initialized) {
       try {
         await this.initialize();
@@ -4965,16 +4992,11 @@ class TreeSitterClient2 extends EventEmitter2 {
         return { error: "Could not highlight because of initialization error" };
       }
     }
-    const messageId = `oneshot_${this.messageIdCounter++}`;
+    const messageId = message.messageId;
     return new Promise((resolve, reject) => {
       this.messageCallbacks.set(messageId, { resolve, reject });
       try {
-        this.sendWorkerMessage({
-          type: "ONESHOT_HIGHLIGHT",
-          content,
-          filetype,
-          messageId
-        });
+        this.sendWorkerMessage(message);
       } catch (error) {
         this.messageCallbacks.delete(messageId);
         reject(error instanceof Error ? error : new Error(String(error)));
@@ -5692,554 +5714,67 @@ async function destroyTreeSitterClient2() {
   destroySingleton(TREE_SITTER_CLIENT_KEY);
   await client2.destroy();
 }
-// src/lib/extmarks-history.ts
-class ExtmarksHistory {
-  undoStack = [];
-  redoStack = [];
-  saveSnapshot(extmarks, nextId) {
-    const snapshot = {
-      extmarks: new Map(Array.from(extmarks.entries()).map(([id, extmark]) => [id, { ...extmark }])),
-      nextId
-    };
-    this.undoStack.push(snapshot);
-    this.redoStack = [];
-  }
-  undo() {
-    if (this.undoStack.length === 0)
-      return null;
-    return this.undoStack.pop();
-  }
-  redo() {
-    if (this.redoStack.length === 0)
-      return null;
-    return this.redoStack.pop();
-  }
-  pushRedo(snapshot) {
-    this.redoStack.push(snapshot);
-  }
-  pushUndo(snapshot) {
-    this.undoStack.push(snapshot);
-  }
-  clear() {
-    this.undoStack = [];
-    this.redoStack = [];
-  }
-  canUndo() {
-    return this.undoStack.length > 0;
-  }
-  canRedo() {
-    return this.redoStack.length > 0;
-  }
+// src/lib/extmarks.ts
+var states = new WeakMap;
+function bufferState(editBuffer) {
+  let state = states.get(editBuffer);
+  if (state)
+    return state;
+  state = { payloads: new Map, typeNameToId: new Map, typeIdToName: new Map, nextTypeId: 1, controllers: [] };
+  states.set(editBuffer, state);
+  const payloads = state.payloads;
+  editBuffer._onHistoryReset = () => payloads.clear();
+  return state;
+}
+function isU32(value) {
+  return Number.isInteger(value) && value >= 0 && value <= 4294967295;
 }
 
-// src/lib/extmarks.ts
 class ExtmarksController2 {
   editBuffer;
   editorView;
-  extmarks = new Map;
-  extmarksByTypeId = new Map;
-  metadata = new Map;
-  nextId = 1;
+  state;
   destroyed = false;
-  history = new ExtmarksHistory;
-  typeNameToId = new Map;
-  typeIdToName = new Map;
-  nextTypeId = 1;
-  originalMoveCursorLeft;
-  originalMoveCursorRight;
-  originalSetCursorByOffset;
-  originalMoveUpVisual;
-  originalMoveDownVisual;
-  originalDeleteCharBackward;
-  originalDeleteChar;
-  originalInsertText;
-  originalInsertChar;
-  originalDeleteRange;
-  originalSetText;
-  originalReplaceText;
-  originalClear;
-  originalNewLine;
-  originalDeleteLine;
-  originalEditorViewDeleteSelectedText;
-  originalEditorViewReplaceSelectedText;
-  originalUndo;
-  originalRedo;
-  contentChangeListener = () => {
-    if (!this.destroyed)
-      this.updateHighlights();
-  };
+  atomic = () => !this.editorView.hasSelection();
   constructor(editBuffer, editorView) {
     this.editBuffer = editBuffer;
     this.editorView = editorView;
-    this.originalMoveCursorLeft = editBuffer.moveCursorLeft.bind(editBuffer);
-    this.originalMoveCursorRight = editBuffer.moveCursorRight.bind(editBuffer);
-    this.originalSetCursorByOffset = editBuffer.setCursorByOffset.bind(editBuffer);
-    this.originalMoveUpVisual = editorView.moveUpVisual.bind(editorView);
-    this.originalMoveDownVisual = editorView.moveDownVisual.bind(editorView);
-    this.originalDeleteCharBackward = editBuffer.deleteCharBackward.bind(editBuffer);
-    this.originalDeleteChar = editBuffer.deleteChar.bind(editBuffer);
-    this.originalInsertText = editBuffer.insertText.bind(editBuffer);
-    this.originalInsertChar = editBuffer.insertChar.bind(editBuffer);
-    this.originalDeleteRange = editBuffer.deleteRange.bind(editBuffer);
-    this.originalSetText = editBuffer.setText.bind(editBuffer);
-    this.originalReplaceText = editBuffer.replaceText.bind(editBuffer);
-    this.originalClear = editBuffer.clear.bind(editBuffer);
-    this.originalNewLine = editBuffer.newLine.bind(editBuffer);
-    this.originalDeleteLine = editBuffer.deleteLine.bind(editBuffer);
-    this.originalEditorViewDeleteSelectedText = editorView.deleteSelectedText.bind(editorView);
-    this.originalEditorViewReplaceSelectedText = editorView._replaceSelectedText.bind(editorView);
-    this.originalUndo = editBuffer.undo.bind(editBuffer);
-    this.originalRedo = editBuffer.redo.bind(editBuffer);
-    this.wrapCursorMovement();
-    this.wrapDeletion();
-    this.wrapInsertion();
-    this.wrapEditorViewDeleteSelectedText();
-    this.wrapUndoRedo();
-    this.setupContentChangeListener();
+    this.state = bufferState(editBuffer);
+    this.state.controllers.push(this);
+    editBuffer._atomic = this.atomic;
+    editorView._atomic = true;
   }
-  wrapCursorMovement() {
-    this.editBuffer.moveCursorLeft = () => {
-      if (this.destroyed) {
-        this.originalMoveCursorLeft();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
-        this.originalMoveCursorLeft();
-        return;
-      }
-      const targetOffset = currentOffset - 1;
-      if (targetOffset < 0) {
-        this.originalMoveCursorLeft();
-        return;
-      }
-      const virtualExtmark = this.findVirtualExtmarkContaining(targetOffset);
-      if (virtualExtmark && currentOffset >= virtualExtmark.end) {
-        this.moveBefore(virtualExtmark);
-        return;
-      }
-      this.originalMoveCursorLeft();
+  toExtmark(mark) {
+    return {
+      id: mark.id,
+      start: mark.start,
+      end: mark.end,
+      virtual: mark.atomic,
+      styleId: mark.style || undefined,
+      priority: mark.priority,
+      data: this.state.payloads.get(mark.id)?.data,
+      typeId: mark.kind
     };
-    this.editBuffer.moveCursorRight = () => {
-      if (this.destroyed) {
-        this.originalMoveCursorRight();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
-        this.originalMoveCursorRight();
-        return;
-      }
-      const targetOffset = currentOffset + 1;
-      if (this.editBuffer.offsetToPosition(targetOffset) === null) {
-        this.originalMoveCursorRight();
-        return;
-      }
-      const virtualExtmark = this.findVirtualExtmarkContaining(targetOffset);
-      if (virtualExtmark && currentOffset <= virtualExtmark.start) {
-        this.editBuffer.setCursorByOffset(virtualExtmark.end);
-        return;
-      }
-      this.originalMoveCursorRight();
-    };
-    this.editorView.moveUpVisual = () => {
-      if (this.destroyed || this.editorView.hasSelection()) {
-        this.originalMoveUpVisual();
-        return;
-      }
-      this.originalMoveUpVisual();
-      this.leaveVirtualExtmark();
-    };
-    this.editorView.moveDownVisual = () => {
-      if (this.destroyed || this.editorView.hasSelection()) {
-        this.originalMoveDownVisual();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      this.originalMoveDownVisual();
-      this.leaveVirtualExtmark(currentOffset);
-    };
-    this.editBuffer.setCursorByOffset = (offset) => {
-      if (this.destroyed) {
-        this.originalSetCursorByOffset(offset);
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hasSelection = this.editorView.hasSelection();
-      if (hasSelection) {
-        this.originalSetCursorByOffset(offset);
-        return;
-      }
-      const movingForward = offset > currentOffset;
-      if (movingForward) {
-        const virtualExtmark = this.findVirtualExtmarkContaining(offset);
-        if (virtualExtmark && currentOffset <= virtualExtmark.start) {
-          this.originalSetCursorByOffset(virtualExtmark.end);
-          return;
-        }
-      } else {
-        for (const extmark of this.extmarks.values()) {
-          if (extmark.virtual && currentOffset >= extmark.end && offset < extmark.end && offset >= extmark.start) {
-            this.moveBefore(extmark);
-            return;
-          }
-        }
-      }
-      this.originalSetCursorByOffset(offset);
-    };
-  }
-  moveBefore(extmark) {
-    this.originalSetCursorByOffset(extmark.start);
-    this.originalMoveCursorLeft();
-    const inside = this.findVirtualExtmarkContaining(this.editBuffer.getCursorPosition().offset);
-    if (inside && inside.start < extmark.start)
-      this.moveBefore(inside);
-  }
-  leaveVirtualExtmark(from = -1) {
-    const offset = this.editBuffer.getCursorPosition().offset;
-    const extmark = this.findVirtualExtmarkContaining(offset);
-    if (!extmark)
-      return;
-    if (offset - extmark.start < extmark.end - offset) {
-      this.moveBefore(extmark);
-      if (this.editBuffer.getCursorPosition().offset > from)
-        return;
-    }
-    this.originalSetCursorByOffset(this.outside(extmark.end, 1));
-  }
-  _keepCursorOutside(direction) {
-    if (this.extmarks.size === 0 || this.editorView.hasSelection())
-      return;
-    const offset = this.editBuffer.getCursorPosition().offset;
-    const start = this.outside(offset, -1);
-    if (start === offset)
-      return;
-    const end = this.outside(offset, 1);
-    const toEnd = direction === 0 ? end - offset <= offset - start : direction > 0;
-    this.originalSetCursorByOffset(toEnd ? end : start);
-  }
-  outside(offset, direction) {
-    for (let inside = true;inside; ) {
-      inside = false;
-      for (const extmark of this.extmarks.values()) {
-        if (extmark.virtual && extmark.start < offset && offset < extmark.end) {
-          offset = direction > 0 ? extmark.end : extmark.start;
-          inside = true;
-        }
-      }
-    }
-    return offset;
-  }
-  wrapDeletion() {
-    this.editBuffer.deleteCharBackward = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalDeleteCharBackward();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hadSelection = this.editorView.hasSelection();
-      if (currentOffset === 0 || hadSelection) {
-        this.originalDeleteCharBackward();
-        this.saveSnapshot();
-        return;
-      }
-      const targetOffset = currentOffset - 1;
-      const virtualExtmark = this.findVirtualExtmarkContaining(targetOffset);
-      if (virtualExtmark && currentOffset === virtualExtmark.end) {
-        const startCursor = this.offsetToPosition(virtualExtmark.start);
-        const endCursor = this.offsetToPosition(virtualExtmark.end);
-        const deleteOffset = virtualExtmark.start;
-        const change = this.measureChange(() => this.originalDeleteRange(startCursor.row, startCursor.col, endCursor.row, endCursor.col));
-        this.saveSnapshot();
-        this.deleteExtmarkById(virtualExtmark.id);
-        this.shiftExtmarks(deleteOffset, change);
-        return;
-      }
-      const deleteOffset = this.editBuffer._getPrevCharBoundary().offset;
-      const change = this.measureChange(() => this.originalDeleteCharBackward());
-      this.saveSnapshot();
-      this.shiftExtmarks(deleteOffset, change);
-    });
-    this.editBuffer.deleteChar = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalDeleteChar();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const hadSelection = this.editorView.hasSelection();
-      if (hadSelection) {
-        this.originalDeleteChar();
-        this.saveSnapshot();
-        return;
-      }
-      const targetOffset = currentOffset;
-      const virtualExtmark = this.findVirtualExtmarkContaining(targetOffset);
-      if (virtualExtmark && currentOffset === virtualExtmark.start) {
-        const startCursor = this.offsetToPosition(virtualExtmark.start);
-        const endCursor = this.offsetToPosition(virtualExtmark.end);
-        const deleteOffset = virtualExtmark.start;
-        const change = this.measureChange(() => this.originalDeleteRange(startCursor.row, startCursor.col, endCursor.row, endCursor.col));
-        this.saveSnapshot();
-        this.deleteExtmarkById(virtualExtmark.id);
-        this.shiftExtmarks(deleteOffset, change);
-        return;
-      }
-      const change = this.measureChange(() => this.originalDeleteChar());
-      this.saveSnapshot();
-      this.shiftExtmarks(currentOffset, change);
-    });
-    this.editBuffer.deleteRange = (startLine, startCol, endLine, endCol) => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalDeleteRange(startLine, startCol, endLine, endCol);
-        return;
-      }
-      const startOffset = Math.min(this.positionToOffset(startLine, startCol), this.positionToOffset(endLine, endCol));
-      const change = this.measureChange(() => this.originalDeleteRange(startLine, startCol, endLine, endCol));
-      this.saveSnapshot();
-      this.shiftExtmarks(startOffset, change);
-    });
-    this.editBuffer.deleteLine = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalDeleteLine();
-        return;
-      }
-      const row = this.editBuffer.getCursorPosition().row;
-      const lineStart = this.editBuffer.getLineStartOffset(row);
-      const [start, end] = row + 1 < this.editBuffer.getLineCount() ? [lineStart, this.editBuffer.getLineStartOffset(row + 1)] : [Math.max(0, lineStart - 1), this.editBuffer.getEOL().offset];
-      this.originalDeleteLine();
-      this.saveSnapshot();
-      this.adjustExtmarksAfterDeletion(start, end - start);
-    });
-  }
-  wrapInsertion() {
-    this.editBuffer.insertText = (text) => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalInsertText(text);
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const change = this.measureChange(() => this.originalInsertText(text));
-      this.saveSnapshot();
-      this.shiftExtmarks(currentOffset, change);
-    });
-    this.editBuffer.insertChar = (char) => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalInsertChar(char);
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      const change = this.measureChange(() => this.originalInsertChar(char));
-      this.saveSnapshot();
-      this.shiftExtmarks(currentOffset, change);
-    });
-    this.editBuffer.setText = (text) => {
-      if (this.destroyed) {
-        this.originalSetText(text);
-        return;
-      }
-      this.editBuffer.runMutation(() => {
-        this.originalSetText(text);
-        this.clear();
-      });
-    };
-    this.editBuffer.replaceText = (text) => {
-      if (this.destroyed) {
-        this.originalReplaceText(text);
-        return;
-      }
-      this.editBuffer.runMutation(() => {
-        this.originalReplaceText(text);
-        this.saveSnapshot();
-        this.clear();
-      });
-    };
-    this.editBuffer.clear = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalClear();
-        return;
-      }
-      this.originalClear();
-      this.saveSnapshot();
-      this.clear();
-    });
-    this.editBuffer.newLine = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalNewLine();
-        return;
-      }
-      const currentOffset = this.editBuffer.getCursorPosition().offset;
-      this.originalNewLine();
-      this.saveSnapshot();
-      this.adjustExtmarksAfterInsertion(currentOffset, 1);
-    });
-  }
-  wrapEditorViewDeleteSelectedText() {
-    this.editorView._replaceSelectedText = (text) => this.editBuffer.runMutation(() => {
-      if (this.destroyed)
-        return this.originalEditorViewReplaceSelectedText(text);
-      const selection = this.editorView.getSelection();
-      const deleteOffset = selection ? Math.min(selection.start, selection.end) : 0;
-      const cursorOffset = this.editBuffer.getCursorPosition().offset;
-      let result;
-      const change = this.measureChange(() => result = this.originalEditorViewReplaceSelectedText(text));
-      const insertOffset = result.deleted ? deleteOffset : cursorOffset;
-      const insertLength = result.inserted ? this.editBuffer.getCursorPosition().offset - insertOffset : 0;
-      if (result.deleted) {
-        this.saveSnapshot();
-        this.shiftExtmarks(deleteOffset, change - insertLength, false);
-      }
-      if (result.inserted)
-        this.saveSnapshot();
-      this.shiftExtmarks(insertOffset, insertLength, false);
-      if (change !== 0 || insertLength !== 0)
-        this.updateHighlights();
-      return result;
-    });
-    this.editorView.deleteSelectedText = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed) {
-        this.originalEditorViewDeleteSelectedText();
-        return;
-      }
-      const selection = this.editorView.getSelection();
-      if (!selection) {
-        this.originalEditorViewDeleteSelectedText();
-        this.saveSnapshot();
-        return;
-      }
-      const deleteOffset = Math.min(selection.start, selection.end);
-      const change = this.measureChange(() => this.originalEditorViewDeleteSelectedText());
-      this.saveSnapshot();
-      this.shiftExtmarks(deleteOffset, change);
-    });
-  }
-  setupContentChangeListener() {
-    this.editBuffer.on("content-changed", this.contentChangeListener);
-  }
-  deleteExtmarkById(id) {
-    const extmark = this.extmarks.get(id);
-    if (extmark) {
-      this.extmarks.delete(id);
-      this.extmarksByTypeId.get(extmark.typeId)?.delete(id);
-      this.metadata.delete(id);
-    }
-  }
-  findVirtualExtmarkContaining(offset) {
-    for (const extmark of this.extmarks.values()) {
-      if (extmark.virtual && offset >= extmark.start && offset < extmark.end) {
-        return extmark;
-      }
-    }
-    return null;
-  }
-  adjustExtmarksAfterInsertion(insertOffset, length, updateHighlights = true) {
-    for (const extmark of this.extmarks.values()) {
-      if (extmark.start >= insertOffset) {
-        extmark.start += length;
-        extmark.end += length;
-      } else if (extmark.end > insertOffset) {
-        extmark.end += length;
-      }
-    }
-    if (updateHighlights)
-      this.updateHighlights();
-  }
-  adjustExtmarksAfterDeletion(deleteOffset, length, updateHighlights = true) {
-    const toDelete = [];
-    for (const extmark of this.extmarks.values()) {
-      if (extmark.end <= deleteOffset) {
-        continue;
-      }
-      if (extmark.start >= deleteOffset + length) {
-        extmark.start -= length;
-        extmark.end -= length;
-      } else if (extmark.start >= deleteOffset && extmark.end <= deleteOffset + length) {
-        toDelete.push(extmark.id);
-      } else if (extmark.start < deleteOffset && extmark.end > deleteOffset + length) {
-        extmark.end -= length;
-      } else if (extmark.start < deleteOffset && extmark.end > deleteOffset) {
-        extmark.end -= Math.min(extmark.end, deleteOffset + length) - deleteOffset;
-      } else if (extmark.start < deleteOffset + length && extmark.end > deleteOffset + length) {
-        const overlap = deleteOffset + length - extmark.start;
-        extmark.start = deleteOffset;
-        extmark.end -= length;
-      }
-    }
-    for (const id of toDelete) {
-      this.deleteExtmarkById(id);
-    }
-    if (updateHighlights)
-      this.updateHighlights();
-  }
-  offsetToPosition(offset) {
-    const result = this.editBuffer.offsetToPosition(offset);
-    if (!result) {
-      return { row: 0, col: 0 };
-    }
-    return result;
-  }
-  positionToOffset(row, col) {
-    return this.editBuffer.positionToOffset(row, col);
-  }
-  measureChange(edit) {
-    const before = this.editBuffer._getEOF().offset;
-    edit();
-    return this.editBuffer._getEOF().offset - before;
-  }
-  shiftExtmarks(offset, change, updateHighlights = true) {
-    if (change > 0)
-      this.adjustExtmarksAfterInsertion(offset, change, updateHighlights);
-    else if (change < 0)
-      this.adjustExtmarksAfterDeletion(offset, -change, updateHighlights);
-  }
-  updateHighlights() {
-    this.editBuffer.clearAllHighlights();
-    for (const extmark of this.extmarks.values()) {
-      if (extmark.styleId !== undefined) {
-        this.editBuffer.addHighlightByCharRange({
-          start: this.offsetExcludingNewlines(extmark.start),
-          end: this.offsetExcludingNewlines(extmark.end),
-          styleId: extmark.styleId,
-          priority: extmark.priority ?? 0,
-          hlRef: extmark.id & 65535
-        });
-      }
-    }
-  }
-  offsetExcludingNewlines(offset) {
-    return offset - (this.editBuffer.offsetToPosition(offset)?.row ?? 0);
   }
   create(options) {
     if (this.destroyed) {
       throw new Error("ExtmarksController is destroyed");
     }
-    const id = this.nextId++;
-    const typeId = options.typeId ?? 0;
-    const extmark = {
-      id,
-      start: options.start,
-      end: options.end,
-      virtual: options.virtual ?? false,
-      styleId: options.styleId,
-      priority: options.priority,
-      data: options.data,
-      typeId
-    };
-    this.extmarks.set(id, extmark);
-    if (!this.extmarksByTypeId.has(typeId)) {
-      this.extmarksByTypeId.set(typeId, new Set);
-    }
-    this.extmarksByTypeId.get(typeId).add(id);
-    if (options.metadata !== undefined) {
-      this.metadata.set(id, options.metadata);
-    }
-    try {
-      this.updateHighlights();
-    } catch (error) {
-      this.deleteExtmarkById(id);
-      this.updateHighlights();
-      throw error;
+    const { start, end, typeId = 0, styleId = 0, priority = 0 } = options;
+    const offset = (value) => Number.isInteger(value) && value >= 0 ? Math.min(value, 4294967295) : -1;
+    const [from, to] = [offset(start), offset(end)];
+    if (from < 0 || to < from || !isU32(typeId) || !isU32(styleId) || !isU32(priority))
+      return 0;
+    const id = this.editBuffer._mark(0 /* Add */, {
+      kind: typeId,
+      atomic: options.virtual ?? false,
+      style: styleId,
+      priority,
+      start: from,
+      end: to
+    });
+    if (options.data !== undefined || options.metadata !== undefined) {
+      this.state.payloads.set(id, { data: options.data, metadata: options.metadata });
     }
     return id;
   }
@@ -6247,159 +5782,74 @@ class ExtmarksController2 {
     if (this.destroyed) {
       throw new Error("ExtmarksController is destroyed");
     }
-    const extmark = this.extmarks.get(id);
-    if (!extmark)
-      return false;
-    this.deleteExtmarkById(id);
-    this.updateHighlights();
-    return true;
+    return isU32(id) && id !== 0 && this.editBuffer._mark(1 /* Remove */, { id }) !== 0;
   }
   get(id) {
-    if (this.destroyed)
+    if (this.gone || !isU32(id) || id === 0)
       return null;
-    return this.extmarks.get(id) ?? null;
+    const [mark] = this.editBuffer._getMarks(id);
+    return mark ? this.toExtmark(mark) : null;
   }
   getAll() {
-    if (this.destroyed)
+    if (this.gone)
       return [];
-    return Array.from(this.extmarks.values());
+    return this.editBuffer._getMarks().map((mark) => this.toExtmark(mark));
   }
   getVirtual() {
-    if (this.destroyed)
-      return [];
-    return Array.from(this.extmarks.values()).filter((e) => e.virtual);
+    return this.getAll().filter((e) => e.virtual);
   }
   getAtOffset(offset) {
-    if (this.destroyed)
-      return [];
-    return Array.from(this.extmarks.values()).filter((e) => offset >= e.start && offset < e.end);
+    return this.getAll().filter((e) => offset >= e.start && offset < e.end);
   }
   getAllForTypeId(typeId) {
-    if (this.destroyed)
+    if (this.gone || !isU32(typeId))
       return [];
-    const ids = this.extmarksByTypeId.get(typeId);
-    if (!ids)
-      return [];
-    return Array.from(ids).map((id) => this.extmarks.get(id)).filter((e) => e !== undefined);
+    return this.editBuffer._getMarks(0, typeId).filter((mark) => mark.kind === typeId).map((mark) => this.toExtmark(mark));
   }
   clear() {
-    if (this.destroyed)
+    if (this.gone)
       return;
-    this.extmarks.clear();
-    this.extmarksByTypeId.clear();
-    this.metadata.clear();
-    this.updateHighlights();
-  }
-  saveSnapshot() {
-    this.history.saveSnapshot(this.snapshotExtmarks(), this.nextId);
-  }
-  snapshotExtmarks() {
-    return new Map(Array.from(this.extmarks, ([id, extmark]) => [id, { ...extmark, metadata: this.metadata.get(id) }]));
-  }
-  restoreSnapshot(snapshot) {
-    this.extmarks.clear();
-    this.extmarksByTypeId.clear();
-    this.metadata.clear();
-    for (const [id, saved] of snapshot.extmarks) {
-      const { metadata, ...extmark } = saved;
-      this.extmarks.set(id, extmark);
-      if (!this.extmarksByTypeId.has(extmark.typeId)) {
-        this.extmarksByTypeId.set(extmark.typeId, new Set);
-      }
-      this.extmarksByTypeId.get(extmark.typeId).add(id);
-      if (metadata !== undefined)
-        this.metadata.set(id, metadata);
-    }
-    this.nextId = snapshot.nextId;
-    this.updateHighlights();
-  }
-  wrapUndoRedo() {
-    this.editBuffer.undo = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed || !this.history.canUndo()) {
-        return this.originalUndo();
-      }
-      const result = this.originalUndo();
-      const currentSnapshot = {
-        extmarks: this.snapshotExtmarks(),
-        nextId: this.nextId
-      };
-      this.history.pushRedo(currentSnapshot);
-      const snapshot = this.history.undo();
-      this.restoreSnapshot(snapshot);
-      return result;
-    });
-    this.editBuffer.redo = () => this.editBuffer.runMutation(() => {
-      if (this.destroyed || !this.history.canRedo()) {
-        return this.originalRedo();
-      }
-      const result = this.originalRedo();
-      const currentSnapshot = {
-        extmarks: this.snapshotExtmarks(),
-        nextId: this.nextId
-      };
-      this.history.pushUndo(currentSnapshot);
-      const snapshot = this.history.redo();
-      this.restoreSnapshot(snapshot);
-      return result;
-    });
+    this.editBuffer._mark(2 /* Clear */);
   }
   registerType(typeName) {
     if (this.destroyed) {
       throw new Error("ExtmarksController is destroyed");
     }
-    const existing = this.typeNameToId.get(typeName);
+    const state = this.state;
+    const existing = state.typeNameToId.get(typeName);
     if (existing !== undefined) {
       return existing;
     }
-    const typeId = this.nextTypeId++;
-    this.typeNameToId.set(typeName, typeId);
-    this.typeIdToName.set(typeId, typeName);
+    const typeId = state.nextTypeId++;
+    state.typeNameToId.set(typeName, typeId);
+    state.typeIdToName.set(typeId, typeName);
     return typeId;
   }
   getTypeId(typeName) {
     if (this.destroyed)
       return null;
-    return this.typeNameToId.get(typeName) ?? null;
+    return this.state.typeNameToId.get(typeName) ?? null;
   }
   getTypeName(typeId) {
     if (this.destroyed)
       return null;
-    return this.typeIdToName.get(typeId) ?? null;
+    return this.state.typeIdToName.get(typeId) ?? null;
   }
   getMetadataFor(extmarkId) {
-    if (this.destroyed)
+    if (!this.get(extmarkId))
       return;
-    return this.metadata.get(extmarkId);
+    return this.state.payloads.get(extmarkId)?.metadata;
+  }
+  get gone() {
+    return this.destroyed || this.editBuffer.isDestroyed;
   }
   destroy() {
     if (this.destroyed)
       return;
-    this.editBuffer.off("content-changed", this.contentChangeListener);
-    this.editBuffer.moveCursorLeft = this.originalMoveCursorLeft;
-    this.editBuffer.moveCursorRight = this.originalMoveCursorRight;
-    this.editBuffer.setCursorByOffset = this.originalSetCursorByOffset;
-    this.editorView.moveUpVisual = this.originalMoveUpVisual;
-    this.editorView.moveDownVisual = this.originalMoveDownVisual;
-    this.editBuffer.deleteCharBackward = this.originalDeleteCharBackward;
-    this.editBuffer.deleteChar = this.originalDeleteChar;
-    this.editBuffer.insertText = this.originalInsertText;
-    this.editBuffer.insertChar = this.originalInsertChar;
-    this.editBuffer.deleteRange = this.originalDeleteRange;
-    this.editBuffer.setText = this.originalSetText;
-    this.editBuffer.replaceText = this.originalReplaceText;
-    this.editBuffer.clear = this.originalClear;
-    this.editBuffer.newLine = this.originalNewLine;
-    this.editBuffer.deleteLine = this.originalDeleteLine;
-    this.editorView.deleteSelectedText = this.originalEditorViewDeleteSelectedText;
-    this.editorView._replaceSelectedText = this.originalEditorViewReplaceSelectedText;
-    this.editBuffer.undo = this.originalUndo;
-    this.editBuffer.redo = this.originalRedo;
-    this.extmarks.clear();
-    this.extmarksByTypeId.clear();
-    this.metadata.clear();
-    this.typeNameToId.clear();
-    this.typeIdToName.clear();
-    this.history.clear();
+    const controllers = this.state.controllers;
+    controllers.splice(controllers.indexOf(this), 1);
+    this.editorView._atomic = controllers.some((controller) => controller.editorView === this.editorView);
+    this.editBuffer._atomic = controllers.at(-1)?.atomic;
     this.destroyed = true;
   }
 }
@@ -10469,6 +9919,14 @@ class TextBuffer2 {
   clearAllHighlights() {
     this.highlight(4 /* ClearAll */);
   }
+  _groupSet(names) {
+    this.guard();
+    return this.lib.contextGroupSet(this.native.handle.context, names);
+  }
+  _setLayer(layerId, start, end, runs) {
+    this.guard();
+    this.lib.contextTextBufferSetLayer(this.native.handle.context, this.native.handle, layerId, start, end, runs);
+  }
   getLineHighlights(lineIdx) {
     this.guard();
     return this.lib.contextTextBufferGetHighlights(this.native.handle.context, this.native.handle, lineIdx);
@@ -10774,6 +10232,9 @@ class EditBuffer2 extends EventEmitter5 {
       throw error;
     }
   }
+  get isDestroyed() {
+    return this._destroyed;
+  }
   guard() {
     if (this._destroyed)
       throw new Error("EditBuffer is destroyed");
@@ -10809,9 +10270,12 @@ class EditBuffer2 extends EventEmitter5 {
     this.guard();
     this.lib.contextEditBufferSetDefaults(this.native.handle.context, this.native.handle, mask, style);
   }
+  _onHistoryReset;
   setNativeText(text, preserveHistory = false) {
     const textBytes = this.lib.encoder.encode(text);
     this.lib.contextEditBufferSetText(this.native.handle.context, this.native.handle, textBytes, preserveHistory);
+    if (!preserveHistory)
+      this._onHistoryReset?.();
   }
   setText(text) {
     this.runMutation(() => this.setNativeText(text));
@@ -10852,11 +10316,15 @@ class EditBuffer2 extends EventEmitter5 {
     this.guard();
     return this.lib.contextEditBufferInsertText(this.native.handle.context, this.native.handle, this.lib.encoder.encode(text));
   }
+  _atomic;
+  rules() {
+    return this._atomic?.() ? NativeEditAtomic : 0;
+  }
   deleteChar() {
-    this.command(0 /* DeleteForward */);
+    this.command(0 /* DeleteForward */, this.rules());
   }
   deleteCharBackward() {
-    this.command(1 /* Backspace */);
+    this.command(1 /* Backspace */, this.rules());
   }
   deleteRange(startLine, startCol, endLine, endCol) {
     this.guard();
@@ -10869,10 +10337,10 @@ class EditBuffer2 extends EventEmitter5 {
     this.command(3 /* DeleteLine */);
   }
   moveCursorLeft() {
-    this.command(4 /* MoveLeft */);
+    this.command(4 /* MoveLeft */, this.rules());
   }
   moveCursorRight() {
-    this.command(5 /* MoveRight */);
+    this.command(5 /* MoveRight */, this.rules());
   }
   moveCursorUp() {
     this.command(6 /* MoveUp */);
@@ -10892,7 +10360,10 @@ class EditBuffer2 extends EventEmitter5 {
     return this.lib.contextEditBufferSetCursor(this.native.handle.context, this.native.handle, line, col);
   }
   setCursorByOffset(offset) {
-    this.command(9 /* CursorOffset */, offset);
+    this.command(this.rules() ? 13 /* CursorOffsetAtomic */ : 9 /* CursorOffset */, offset);
+  }
+  _keepOutside(direction) {
+    this.command(14 /* KeepOutside */, direction > 0 ? 1 : direction < 0 ? 2 : 0);
   }
   getCursorPosition() {
     this.guard();
@@ -10907,11 +10378,13 @@ class EditBuffer2 extends EventEmitter5 {
   getEOL() {
     return this.position(3 /* Eol */);
   }
-  _getEOF() {
-    return this.position(7 /* End */);
+  _mark(operation, mark) {
+    this.guard();
+    return this.lib.contextEditBufferMark(this.native.handle.context, this.native.handle, operation, mark);
   }
-  _getPrevCharBoundary() {
-    return this.position(8 /* PrevChar */);
+  _getMarks(id, kind) {
+    this.guard();
+    return this.lib.contextEditBufferGetMarks(this.native.handle.context, this.native.handle, id, kind);
   }
   offsetToPosition(offset) {
     const result = this.position(4 /* Offset */, offset);
@@ -10926,6 +10399,14 @@ class EditBuffer2 extends EventEmitter5 {
   measureText(text) {
     this.guard();
     return this.lib.contextEditBufferMeasureText(this.native.handle.context, this.native.handle, this.lib.encoder.encode(text));
+  }
+  stringIndexToCellOffset(index) {
+    this.guard();
+    return this.lib.contextEditBufferConvertOffset(this.native.handle.context, this.native.handle, index, true);
+  }
+  cellOffsetToStringIndex(offset) {
+    this.guard();
+    return this.lib.contextEditBufferConvertOffset(this.native.handle.context, this.native.handle, offset, false);
   }
   getTextRange(startOffset, endOffset) {
     this.guard();
@@ -11011,6 +10492,7 @@ class EditBuffer2 extends EventEmitter5 {
       if (!this.native.owner.disposed)
         this.lib.releaseAfterPaint(this.native.handle.context, () => this.lib.destroyContextEditBuffer(this.native.handle.context, this.native.handle));
       this._destroyed = true;
+      this._onHistoryReset?.();
       this.unsubscribe?.();
       this.unsubscribe = undefined;
       this.removeAllListeners();
@@ -11196,11 +10678,15 @@ class EditorView2 {
   getVisualCursor() {
     return this.position(0 /* Cursor */);
   }
+  _atomic = false;
+  rules() {
+    return this._atomic && !this.hasSelection() ? NativeEditAtomic : 0;
+  }
   moveUpVisual() {
-    this.command(0 /* MoveUp */);
+    this.command(0 /* MoveUp */, this.rules());
   }
   moveDownVisual() {
-    this.command(1 /* MoveDown */);
+    this.command(1 /* MoveDown */, this.rules());
   }
   deleteSelectedText() {
     this.command(3 /* DeleteSelection */);
@@ -11239,7 +10725,8 @@ class EditorView2 {
     return this.lib.contextEditorViewGetLines(this.native.handle.context, this.native.handle, true);
   }
   _keepCursorOutside(direction) {
-    this._extmarksController?._keepCursorOutside(direction);
+    if (this.rules())
+      this.editBuffer._keepOutside(direction);
   }
   get extmarks() {
     this.guard();
@@ -14391,6 +13878,7 @@ for (const key of SCROLLBOX_PADDING_KEYS) {
 
 // src/renderables/Code.ts
 var PREVIEW = -2;
+var SYNTAX_LAYER = 1;
 
 class CodeRenderable2 extends TextBufferRenderable2 {
   static nativeIntegration = {
@@ -14428,6 +13916,10 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   _highlightingPromise = Promise.resolve();
   _renderedLineSources;
   _mappedLineInfo;
+  _deltas;
+  _groupSets = new Map;
+  static nextCopy = 0;
+  _streamsDeltas = false;
   _contentDefaultOptions = {
     content: "",
     conceal: true,
@@ -14542,7 +14034,17 @@ class CodeRenderable2 extends TextBufferRenderable2 {
     this.runMutation(() => this.writeContent(value));
   }
   writeContent(value) {
+    const delta = this._deltas && value.startsWith(this._content) ? value.slice(this._content.length) : undefined;
     this._content = value;
+    if (delta !== undefined) {
+      this.textBuffer.append(delta);
+      this._version++;
+      this.setHighlightsDirty(true);
+      this.updateTextInfo();
+      this.requestRender();
+      return;
+    }
+    this.stopDeltas();
     if (this._streaming && this._shouldRenderTextBuffer && this._shownVersion >= 0 && !this._drawUnstyledText) {
       this.invalidateHighlights();
       this.requestRender();
@@ -14554,10 +14056,27 @@ class CodeRenderable2 extends TextBufferRenderable2 {
     } else {
       this.textBuffer.setText(value);
       this._shownVersion = -1;
+      if (this._streamsDeltas && this.deltasAllowed()) {
+        const id = CodeRenderable2.nextCopy++;
+        this._deltas = { client: this._treeSitterClient, id, filetype: this._filetype, sent: 0 };
+      }
     }
     this.invalidateHighlights();
     this.setRenderedLineSources(undefined);
     this.updateTextInfo();
+  }
+  deltasAllowed() {
+    return this._streaming && !!this._filetype && !this._conceal && !this._onHighlight && !this._onChunks && !this._baseHighlight && !this._initialStyledText;
+  }
+  _setStreamsDeltas(open) {
+    this._streamsDeltas = open;
+    if (!open && this._shownVersion === this._version)
+      this.stopDeltas();
+  }
+  stopDeltas() {
+    const deltas = this._deltas;
+    this._deltas = undefined;
+    deltas?.client.removeCopy(deltas.id).catch(() => {});
   }
   updateStreamingPreview(content, initialStyledText) {
     this._content = content;
@@ -14669,6 +14188,8 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   set streaming(value) {
     if (this._streaming !== value) {
       this._streaming = value;
+      if (!value)
+        this.stopDeltas();
       this.invalidateHighlights(false);
     }
   }
@@ -14742,7 +14263,16 @@ class CodeRenderable2 extends TextBufferRenderable2 {
     if (!this._streaming || !this._shouldRenderTextBuffer || this._shownVersion === -1)
       this.setShouldRenderTextBuffer(this._shownVersion === this._version);
   }
+  currentDeltas() {
+    const deltas = this._deltas;
+    const same = deltas?.client === this._treeSitterClient && deltas.filetype === this._filetype;
+    return same && this.deltasAllowed() ? deltas : undefined;
+  }
   async startHighlight() {
+    const deltas = this.currentDeltas();
+    if (deltas)
+      return this.highlightDelta(deltas);
+    this.stopDeltas();
     const content = this._content;
     const filetype = this._filetype;
     const version = this._version;
@@ -14814,6 +14344,52 @@ class CodeRenderable2 extends TextBufferRenderable2 {
         return;
       this.settle(-1, undefined, undefined, !!this._onChunks);
     }
+  }
+  async highlightDelta(deltas) {
+    const version = this._version;
+    const offset = deltas.sent;
+    const content = this._content;
+    deltas.sent = content.length;
+    this._isHighlighting = true;
+    const answer = await deltas.client.highlightAppend(deltas.id, offset, content.slice(offset), deltas.filetype).catch((error) => ({ highlights: undefined, error: String(error) }));
+    if (this.currentDeltas() !== deltas || this.isDestroyed)
+      return;
+    try {
+      if (!answer.highlights)
+        throw new Error(answer.error);
+      const names = [];
+      const { highlights } = answer;
+      const options = { enabled: false, names };
+      const chunks = highlights.length ? treeSitterToTextChunks2(content, highlights, this._syntaxStyle, options) : [];
+      const runs = [];
+      let end = 0;
+      chunks.forEach((chunk, index) => {
+        if (!chunk.text)
+          return;
+        const start = end;
+        end += Buffer.byteLength(chunk.text);
+        const key = names[index];
+        let set = this._groupSets.get(key.join(`
+`));
+        if (set === undefined)
+          this._groupSets.set(key.join(`
+`), set = this.textBuffer._groupSet(key));
+        runs.push(start, end, set);
+      });
+      if (this.textBuffer.getSyntaxStyle() !== this._syntaxStyle)
+        this.textBuffer.setSyntaxStyle(this._syntaxStyle);
+      this.textBuffer._setLayer(SYNTAX_LAYER, 0, Buffer.byteLength(content), new Uint32Array(runs));
+    } catch {
+      this.stopDeltas();
+      this._highlightRerun = true;
+      return;
+    }
+    this._shownVersion = version;
+    this._isHighlighting = false;
+    if (!this._streamsDeltas && deltas.sent === this._content.length)
+      this.stopDeltas();
+    this.setShouldRenderTextBuffer(true);
+    this.requestRender();
   }
   settle(version, text, lineSources, keep = false) {
     if (!keep) {
@@ -14948,6 +14524,7 @@ class CodeRenderable2 extends TextBufferRenderable2 {
       return;
     const hasContent = this._content.length > 0;
     if (!hasContent || !this._filetype) {
+      this.stopDeltas();
       this.setShouldRenderTextBuffer(hasContent);
       this.setHighlightsDirty(false);
       this.clearPendingHighlight();
@@ -14977,6 +14554,7 @@ class CodeRenderable2 extends TextBufferRenderable2 {
   destroyOwnedResources() {
     this.runCleanup((run) => {
       run(() => this.clearPendingHighlight());
+      run(() => this.stopDeltas());
       run(() => super.destroyOwnedResources());
     });
   }
@@ -19717,9 +19295,10 @@ class EditBufferRenderable2 extends Renderable2 {
     const side = this.selectionSide() ?? 0;
     const had = this.hasSelection();
     this.resetSelection();
-    this.editorView._keepCursorOutside(side);
-    if (had)
+    if (had) {
+      this.editorView._keepCursorOutside(side);
       this.requestRender();
+    }
     return had;
   }
   deleteSelection() {
@@ -19751,6 +19330,8 @@ class EditBufferRenderable2 extends Renderable2 {
       }
       this.requestRender();
     });
+    if (this.editorView._atomic)
+      this.editBuffer._keepOutside(0);
   }
   deleteChar() {
     if (this.hasSelection()) {
@@ -19800,7 +19381,8 @@ class EditBufferRenderable2 extends Renderable2 {
       return true;
     this.updateSelectionForMovement(select, true);
     this.editBuffer.moveCursorLeft();
-    this.updateSelectionForMovement(select, false);
+    if (select)
+      this.updateSelectionForMovement(true, false);
     this.requestRender();
     return true;
   }
@@ -19810,7 +19392,8 @@ class EditBufferRenderable2 extends Renderable2 {
       return true;
     this.updateSelectionForMovement(select, true);
     this.editBuffer.moveCursorRight();
-    this.updateSelectionForMovement(select, false);
+    if (select)
+      this.updateSelectionForMovement(true, false);
     this.requestRender();
     return true;
   }
@@ -19818,7 +19401,8 @@ class EditBufferRenderable2 extends Renderable2 {
     const select = options?.select ?? false;
     this.updateSelectionForMovement(select, true);
     this.editorView.moveUpVisual();
-    this.updateSelectionForMovement(select, false);
+    if (select)
+      this.updateSelectionForMovement(true, false);
     this.requestRender();
     return true;
   }
@@ -19826,7 +19410,8 @@ class EditBufferRenderable2 extends Renderable2 {
     const select = options?.select ?? false;
     this.updateSelectionForMovement(select, true);
     this.editorView.moveDownVisual();
-    this.updateSelectionForMovement(select, false);
+    if (select)
+      this.updateSelectionForMovement(true, false);
     this.requestRender();
     return true;
   }
@@ -19960,7 +19545,8 @@ class EditBufferRenderable2 extends Renderable2 {
     this.updateSelectionForMovement(select, true);
     const nextWord = this.editBuffer.getNextWordBoundary();
     this.editBuffer.setCursorByOffset(nextWord.offset);
-    this.updateSelectionForMovement(select, false);
+    if (select)
+      this.updateSelectionForMovement(true, false);
     this.requestRender();
     return true;
   }
@@ -19971,7 +19557,8 @@ class EditBufferRenderable2 extends Renderable2 {
     this.updateSelectionForMovement(select, true);
     const prevWord = this.editBuffer.getPrevWordBoundary();
     this.editBuffer.setCursorByOffset(prevWord.offset);
-    this.updateSelectionForMovement(select, false);
+    if (select)
+      this.updateSelectionForMovement(true, false);
     this.requestRender();
     return true;
   }
@@ -20110,7 +19697,10 @@ class EditBufferRenderable2 extends Renderable2 {
   updateSelectionForMovement(shiftPressed, isBeforeMovement) {
     if (!shiftPressed) {
       this._keyboardSelectionActive = false;
-      this.clearSelection();
+      if (isBeforeMovement)
+        this.clearSelection();
+      else
+        this.editorView._keepCursorOutside(0);
       return;
     }
     if (!this.selectable)
@@ -24877,5 +24467,5 @@ Captured external output:
 
 export { isValidBorderStyle2, parseBorderStyle2, BorderChars2, getBorderFromSides2, getBorderSides2, borderCharsToArray2, BorderCharArrays2, KeyEvent2, PasteEvent2, KeyHandler2, InternalKeyHandler2, fonts2, measureText2, getCharacterPositions2, coordinateToCharacterIndex2, renderFontToFrameBuffer2, hastToStyledText2, SystemClock2, kittyKeyMap, terminalNamedSingleStrokeKeys2, parseKeypress2, LinearScrollAccel2, MacOSScrollAccel2, parseAlign2, parseAlignItems2, parseAlignContent2, parseBoxSizing2, parseDimension2, parseDirection2, parseDisplay2, parseEdge2, parseFlexDirection2, parseGutter2, parseJustify2, parseLayoutMode2, parseLogLevel2, parseMeasureMode2, parseOverflow2, parsePositionType2, parseUnit2, parseWrap2, Selection2, convertGlobalToLocalSelection2, ASCIIFontSelectionHelper2, treeSitterToTextChunks2, treeSitterToStyledText2, addDefaultParsers2, TreeSitterClient2, DataPathsManager2, getDataPaths2, extensionToFiletype2, basenameToFiletype2, extToFiletype2, pathToFiletype2, infoStringToFiletype2, getTreeSitterClient2, destroyTreeSitterClient2, ExtmarksController2, createExtmarksController2, TerminalPalette2, createTerminalPalette2, normalizeTerminalPalette2, buildTerminalPaletteSignature2, decodePasteBytes2, stripAnsiSequences2, createHostClipboard2, createClipboard2, ClipboardTarget2, createRendererClipboardAdapter2, detectLinks2, acquireSessionBufferLease2, ResourceContext2, OptimizedBuffer2, LayoutEvents2, RenderableEvents2, isRenderable2, BaseRenderable2, Renderable2, RootRenderable2, TextBuffer2, TextBufferView2, EditBuffer2, measureEditText2, EditorView2, Timeline2, engine2, getTimelineEngine2, createTimeline2, ANSI, BoxRenderable2, TextBufferRenderable2, SliderRenderable2, ScrollBarRenderable2, ArrowRenderable2, scrollUnitSize2, ScrollBoxWrapper2, ScrollBoxViewport2, ScrollBoxContent2, ScrollBoxBar2, ScrollBoxRenderable2, CodeRenderable2, ImageLoadError2, ImageError2, imageInfo2, NativeImage2, NativeImagePool2, resolveImageRenderProtocol2, checkCrop2, sameCrop2, ImageRenderable2, isTextNodeRenderable2, TextNodeRenderable2, RootTextNodeRenderable2, TextRenderable2, NativeSession2, defaultKeyAliases, mergeKeyAliases, mergeKeyBindings, getKeyBindingAction, buildKeyBindingsMap, capture2, ConsolePosition2, TerminalConsole2, EditBufferRenderableEvents2, isEditBufferRenderable2, EditBufferRenderable2, buildKittyKeyboardFlags2, MouseEvent2, MouseButton2, createCliRenderer2, CliRenderEvents2, RendererControlState2, CliRenderer2 };
 
-//# debugId=33989ECACA265B0364756E2164756E21
-//# sourceMappingURL=chunk-bun-wj93w8tk.js.map
+//# debugId=F32A99CE828F2C5E64756E2164756E21
+//# sourceMappingURL=chunk-bun-apbxttxp.js.map

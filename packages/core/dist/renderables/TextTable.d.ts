@@ -9,11 +9,14 @@ export type TextTableCellContent = TextChunk[] | null | undefined;
 export type TextTableContent = TextTableCellContent[][];
 export type TextTableColumnWidthMode = "content" | "full";
 export type TextTableColumnFitter = "proportional" | "balanced";
+export type TextTableColumnAlignment = "left" | "center" | "right";
 export interface TextTableOptions extends RenderableOptions<TextTableRenderable> {
     content?: TextTableContent;
     wrapMode?: "none" | "char" | "word";
     columnWidthMode?: TextTableColumnWidthMode;
     columnFitter?: TextTableColumnFitter;
+    /** Each column's line alignment in its cells, by column; a missing entry is `"left"`. */
+    columnAlignments?: TextTableColumnAlignment[];
     cellPadding?: number;
     cellPaddingX?: number;
     cellPaddingY?: number;
@@ -37,6 +40,7 @@ export declare class TextTableRenderable extends Renderable {
     private _wrapMode;
     private _columnWidthMode;
     private _columnFitter;
+    private _columnAlignments;
     private _cellPaddingX;
     private _cellPaddingY;
     private _columnGap;
@@ -73,6 +77,8 @@ export declare class TextTableRenderable extends Renderable {
     set columnWidthMode(value: TextTableColumnWidthMode);
     get columnFitter(): TextTableColumnFitter;
     set columnFitter(value: TextTableColumnFitter);
+    get columnAlignments(): TextTableColumnAlignment[];
+    set columnAlignments(value: TextTableColumnAlignment[] | undefined);
     get cellPadding(): number;
     set cellPadding(value: number);
     get cellPaddingX(): number;

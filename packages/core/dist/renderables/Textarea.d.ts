@@ -61,5 +61,6 @@ export declare class TextareaRenderable extends EditBufferRenderable {
     get onSubmit(): ((event: SubmitEvent) => void) | undefined;
     set keyBindings(bindings: KeyBinding[] | null | undefined);
     set keyAliasMap(aliases: TextareaKeyAliasMap);
+    /** Mark endpoints count document display cells, including one per newline. */
     get extmarks(): ExtmarksController;
 }

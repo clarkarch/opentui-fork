@@ -5,10 +5,10 @@ import {
   TreeSitterClient2,
   ANSI,
   CliRenderer2
-} from "./chunk-bun-wj93w8tk.js";
+} from "./chunk-bun-apbxttxp.js";
 import {
   nativeConstants
-} from "./chunk-bun-babe5jf6.js";
+} from "./chunk-bun-dg1wb94g.js";
 
 // src/testing/mock-keys.ts
 import { Buffer as Buffer2 } from "buffer";
@@ -733,6 +733,9 @@ class MockTreeSitterClient extends TreeSitterClient2 {
     this._highlightPromises.push({ promise, resolve, timeout });
     return promise;
   }
+  highlightAppend(_copyId, _offset, text, filetype) {
+    return this.highlightOnce(text, filetype);
+  }
   setMockResult(result) {
     this._mockResult = result;
   }
@@ -996,5 +999,5 @@ export {
   setRendererCapabilities
 };
 
-//# debugId=EBF6FAF1F3F2D27464756E2164756E21
+//# debugId=54EC35222162D04C64756E2164756E21
 //# sourceMappingURL=testing.bun.js.map

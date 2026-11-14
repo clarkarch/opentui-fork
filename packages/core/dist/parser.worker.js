@@ -3763,6 +3763,7 @@ function translateLuaMatch(query) {
 
 class ParserWorker {
   bufferParsers = new Map;
+  copies = new Map;
   filetypeParserOptions = new Map;
   filetypeAliases = new Map;
   filetypeParsers = new Map;
@@ -4331,14 +4332,17 @@ class ParserWorker {
     }
     return this.getHighlights(parserState, matches, injectionRanges);
   }
-  disposeBuffer(bufferId) {
-    const parserState = this.bufferParsers.get(bufferId);
+  disposeBuffer(bufferId, parsers = this.bufferParsers) {
+    const parserState = parsers.get(bufferId);
     if (!parserState) {
       return;
     }
     parserState.tree.delete();
     parserState.parser.delete();
-    this.bufferParsers.delete(bufferId);
+    parsers.delete(bufferId);
+  }
+  disposeCopy(copyId) {
+    this.disposeBuffer(copyId, this.copies);
   }
   async handleOneShotHighlight(content, filetype, messageId) {
     const reusableState = await this.getReusableParser(filetype);
@@ -4364,31 +4368,70 @@ class ParserWorker {
       return;
     }
     try {
-      const matches = reusableState.filetypeParser.queries.highlights.captures(tree.rootNode);
-      let injectionRanges = new Map;
-      if (reusableState.filetypeParser.queries.injections) {
-        const parserState = {
-          parser: reusableState.parser,
-          tree,
-          queries: reusableState.filetypeParser.queries,
-          filetype,
-          content,
-          injectionMapping: reusableState.filetypeParser.injectionMapping
-        };
-        const injectionResult = await this.processInjections(parserState);
-        matches.push(...injectionResult.captures);
-        injectionRanges = injectionResult.injectionRanges;
-      }
-      const highlights = this.getSimpleHighlights(matches, injectionRanges);
-      postWorkerMessage({
-        type: "ONESHOT_HIGHLIGHT_RESPONSE",
-        messageId,
-        hasParser: true,
-        highlights
+      const highlights = await this.simpleHighlights({
+        parser: reusableState.parser,
+        tree,
+        queries: reusableState.filetypeParser.queries,
+        filetype,
+        content,
+        injectionMapping: reusableState.filetypeParser.injectionMapping
       });
+      postWorkerMessage({ type: "ONESHOT_HIGHLIGHT_RESPONSE", messageId, hasParser: true, highlights });
     } finally {
       tree.delete();
     }
+  }
+  async handleAppendHighlight(copyId, offset, text, filetype, messageId) {
+    const reply = (answer) => postWorkerMessage({ type: "ONESHOT_HIGHLIGHT_RESPONSE", messageId, hasParser: true, ...answer });
+    let state = this.copies.get(copyId);
+    if ((state?.content.length ?? 0) !== offset)
+      return reply({ error: "Append does not continue the buffer" });
+    if (!state) {
+      const filetypeParser = await this.resolveFiletypeParser(filetype);
+      if (!filetypeParser)
+        return reply({ hasParser: false, warning: `No parser available for filetype ${filetype}` });
+      const parser = new Parser;
+      let tree = null;
+      try {
+        parser.setLanguage(filetypeParser.language);
+        tree = parser.parse(text);
+      } finally {
+        if (!tree)
+          parser.delete();
+      }
+      if (!tree)
+        return reply({ error: "Failed to parse buffer" });
+      const { queries, injectionMapping } = filetypeParser;
+      state = { parser, tree, queries, filetype, content: text, injectionMapping };
+      this.copies.set(copyId, state);
+    } else if (text) {
+      const content = state.content + text;
+      const position = endPosition(state.content);
+      state.tree.edit({
+        startIndex: offset,
+        oldEndIndex: offset,
+        newEndIndex: content.length,
+        startPosition: position,
+        oldEndPosition: position,
+        newEndPosition: endPosition(content)
+      });
+      const tree = state.parser.parse(content, state.tree);
+      if (!tree)
+        return reply({ error: "Failed to parse buffer" });
+      state.tree.delete();
+      state.tree = tree;
+      state.content = content;
+    }
+    if (filetype === "markdown" && state.content.endsWith("```")) {
+      return this.handleOneShotHighlight(state.content, filetype, messageId);
+    }
+    reply({ highlights: await this.simpleHighlights(state) });
+  }
+  async simpleHighlights(parserState) {
+    const matches = parserState.queries.highlights.captures(parserState.tree.rootNode);
+    const { captures, injectionRanges } = await this.processInjections(parserState);
+    matches.push(...captures);
+    return this.getSimpleHighlights(matches, injectionRanges);
   }
   async updateDataPath(dataPath) {
     this.dataPath = dataPath;
@@ -4420,6 +4463,15 @@ class ParserWorker {
       throw new Error(`Failed to clear cache: ${error}`);
     }
   }
+}
+function endPosition(text) {
+  let row = 0;
+  for (let at = text.indexOf(`
+`);at !== -1; at = text.indexOf(`
+`, at + 1))
+    row++;
+  return { row, column: text.length - text.lastIndexOf(`
+`) - 1 };
 }
 function logMessage(type, ...args2) {
   postWorkerMessage({
@@ -4537,6 +4589,12 @@ if (isWorkerRuntime) {
         case "ONESHOT_HIGHLIGHT":
           await worker.handleOneShotHighlight(message.content, message.filetype, message.messageId);
           break;
+        case "DISPOSE_COPY":
+          worker.disposeCopy(message.copyId);
+          break;
+        case "APPEND_HIGHLIGHT":
+          await worker.handleAppendHighlight(message.copyId, message.offset, message.text, message.filetype, message.messageId);
+          break;
         case "UPDATE_DATA_PATH":
           try {
             await worker.updateDataPath(message.dataPath);
@@ -4584,14 +4642,15 @@ if (isWorkerRuntime) {
   };
   const bufferQueues = new Map;
   setWorkerMessageHandler((event) => {
-    if (!("bufferId" in event.data))
+    const { data } = event;
+    const key = "bufferId" in data ? data.bufferId : ("copyId" in data) ? `copy ${data.copyId}` : undefined;
+    if (key === undefined)
       return handleMessage(event);
-    const { bufferId } = event.data;
-    const queued = (bufferQueues.get(bufferId) ?? Promise.resolve()).then(() => handleMessage(event));
-    bufferQueues.set(bufferId, queued);
-    queued.then(() => bufferQueues.get(bufferId) === queued && bufferQueues.delete(bufferId));
+    const queued = (bufferQueues.get(key) ?? Promise.resolve()).then(() => handleMessage(event));
+    bufferQueues.set(key, queued);
+    queued.then(() => bufferQueues.get(key) === queued && bufferQueues.delete(key));
   });
 }
 
-//# debugId=8D67B8A10DFB079E64756E2164756E21
+//# debugId=B34B2C3B634686F564756E2164756E21
 //# sourceMappingURL=parser.worker.js.map

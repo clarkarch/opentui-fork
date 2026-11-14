@@ -16,6 +16,11 @@ export declare class MockTreeSitterClient extends TreeSitterClient {
         warning?: string;
         error?: string;
     }>;
+    highlightAppend(_copyId: number, _offset: number, text: string, filetype: string): Promise<{
+        highlights?: SimpleHighlight[];
+        warning?: string;
+        error?: string;
+    }>;
     setMockResult(result: {
         highlights?: SimpleHighlight[];
         warning?: string;

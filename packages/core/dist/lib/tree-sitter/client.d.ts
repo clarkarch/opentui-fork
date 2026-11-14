@@ -47,6 +47,19 @@ export declare class TreeSitterClient extends EventEmitter<TreeSitterClientEvent
         warning?: string;
         error?: string;
     }>;
+    /**
+     * @internal Appends `text` at `offset` to the worker's copy `copyId` (created by the first append, at offset 0; free
+     * it with `removeCopy`), parses it with the tree it kept, and answers the highlights of the whole copy. An offset
+     * that differs from the copy's length is an error. Copies have their own ids, apart from buffers.
+     */
+    highlightAppend(copyId: number, offset: number, text: string, filetype: string): Promise<{
+        highlights?: SimpleHighlight[];
+        warning?: string;
+        error?: string;
+    }>;
+    /** @internal Frees copy `copyId`. An append still waiting for the worker to start posts first, so this waits too. */
+    removeCopy(copyId: number): Promise<void>;
+    private request;
     private handleWorkerMessage;
     preloadParser(filetype: string): Promise<boolean>;
     createBuffer(id: number, content: string, filetype: string, version?: number, autoInitialize?: boolean): Promise<boolean>;

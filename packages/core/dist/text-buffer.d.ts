@@ -68,6 +68,10 @@ export declare class TextBuffer {
     removeHighlightsByRef(hlRef: number): void;
     clearLineHighlights(lineIdx: number): void;
     clearAllHighlights(): void;
+    /** @internal The Context's group-set id for an ordered list of style names; later names win. */
+    _groupSet(names: readonly string[]): number;
+    /** @internal Replaces layer `layerId` in `[start, end)` UTF-8 bytes with (start, end, group set) runs. */
+    _setLayer(layerId: number, start: number, end: number, runs: Uint32Array): void;
     getLineHighlights(lineIdx: number): Array<Highlight>;
     getHighlightCount(): number;
     setSyntaxStyle(style: SyntaxStyle | null): void;

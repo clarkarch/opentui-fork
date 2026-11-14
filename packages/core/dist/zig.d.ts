@@ -168,8 +168,12 @@ export declare enum NativeEditCommand {
     CursorOffset = 9,
     Clear = 10,
     ClearHistory = 11,
-    DebugRope = 12
+    DebugRope = 12,
+    CursorOffsetAtomic = 13,
+    KeepOutside = 14
 }
+/** The argument that applies the cursor rules around atomic marks to Left, Right, Backspace, Delete, Up and Down. */
+export declare const NativeEditAtomic = 1;
 export declare enum NativeEditPositionQuery {
     Cursor = 0,
     NextWord = 1,
@@ -200,6 +204,21 @@ export declare enum NativeEditHighlightOperation {
     RemoveRef = 2,
     ClearLine = 3,
     ClearAll = 4
+}
+export declare enum NativeEditMarkOperation {
+    Add = 0,
+    Remove = 1,
+    Clear = 2
+}
+/** An edit mark in cursor offsets; `style` is a SyntaxStyle id, 0 for none. */
+export interface NativeEditMark {
+    id: number;
+    kind: number;
+    atomic: boolean;
+    style: number;
+    priority: number;
+    start: number;
+    end: number;
 }
 export interface NativeEditorViewport {
     x: number;
@@ -1028,15 +1047,23 @@ export declare enum LogLevel {
  * Logical coordinates (logicalRow, logicalCol) are document-absolute.
  */
 export interface VisualCursor {
+    /** Wrapped row relative to the top of the viewport. */
     visualRow: number;
+    /** Display-cell column relative to the viewport. */
     visualCol: number;
+    /** Zero-based logical line in the document. */
     logicalRow: number;
+    /** Display-cell column relative to the logical line start. */
     logicalCol: number;
+    /** Display cells from the document start, counting each newline as one. */
     offset: number;
 }
 export interface LogicalCursor {
+    /** Zero-based logical line in the document. */
     row: number;
+    /** Display cells from the logical line start. */
     col: number;
+    /** Display cells from the document start, counting each newline as one. */
     offset: number;
 }
 export interface MeasureResult {
@@ -1078,6 +1105,7 @@ export declare class FFIRenderLib {
     private sceneFlushApplied;
     private editorSelectionRecord;
     private readonly editorViewInfoRecord;
+    private markRecords;
     private readonly videoStateRecord;
     private readonly videoStateView;
     private readonly selectionResetRecord;
@@ -1196,6 +1224,10 @@ export declare class FFIRenderLib {
     contextTextBufferSetDefaults(context: NativeContextHandle, text: ContextTextBufferHandle, mask: NativeEditorStyleMask, style: NativeEditorStyle): void;
     contextTextBufferSetTabWidth(context: NativeContextHandle, text: ContextTextBufferHandle, width: number): void;
     contextTextBufferHighlight(context: NativeContextHandle, text: ContextTextBufferHandle, operation: NativeEditHighlightOperation, argument?: number, highlight?: Highlight): void;
+    /** The Context's id for an ordered list of style names (`ot_context_group_set`). */
+    contextGroupSet(context: NativeContextHandle, names: readonly string[]): number;
+    /** Replaces layer `layerId` in `[start, end)` bytes with `runs`: (start, end, group set) triples. */
+    contextTextBufferSetLayer(context: NativeContextHandle, text: ContextTextBufferHandle, layerId: number, start: number, end: number, runs: Uint32Array): void;
     contextTextBufferGetHighlights(context: NativeContextHandle, text: ContextTextBufferHandle, line: number): Highlight[];
     contextTextBufferViewSetViewport(context: NativeContextHandle, view: ContextTextBufferViewHandle, viewport: NativeEditorViewport, sizeOnly?: boolean): void;
     contextTextBufferViewCommand(context: NativeContextHandle, view: ContextTextBufferViewHandle, command: NativeTextViewCommand, argument: number): void;
@@ -1233,6 +1265,7 @@ export declare class FFIRenderLib {
     contextEditBufferHistory(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, redo: boolean): string | null;
     contextEditBufferGetPosition(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, query: NativeEditPositionQuery, a?: number, b?: number): LogicalCursor | null;
     contextEditBufferGetRange(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, byCoords: boolean, startRow: number, startCol: number, endRow: number, endCol: number): string;
+    contextEditBufferConvertOffset(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, value: number, toCell: boolean): number;
     contextEditBufferMeasureText(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, bytes: Uint8Array): number;
     editMeasureText(bytes: Uint8Array, widthMethod: WidthMethod, tabWidth: number): number;
     contextEditBufferSetDefaults(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, mask: NativeEditorStyleMask, style: NativeEditorStyle): void;
@@ -1241,6 +1274,10 @@ export declare class FFIRenderLib {
     contextSyntaxStyleGetStyleCount(context: NativeContextHandle, style: ContextSyntaxStyleHandle): number;
     contextEditBufferHighlight(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, operation: NativeEditHighlightOperation, argument?: number, highlight?: Highlight): void;
     contextEditBufferGetHighlights(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, line: number): Highlight[];
+    /** Adds, removes or clears marks; returns the new id, the removed id or 0. */
+    contextEditBufferMark(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, operation: NativeEditMarkOperation, mark?: Partial<NativeEditMark>): number;
+    /** Marks in (start, id) order: mark `id`, or all for 0, of type `kind`, or any when it is omitted. */
+    contextEditBufferGetMarks(context: NativeContextHandle, editBuffer: ContextEditBufferHandle, id?: number, kind?: number): NativeEditMark[];
     contextEditorViewSetViewport(context: NativeContextHandle, view: ContextEditorViewHandle, viewport: NativeEditorViewport, sizeOnly?: boolean, moveCursor?: boolean): void;
     contextEditorViewGetViewport(context: NativeContextHandle, view: ContextEditorViewHandle): NativeEditorViewport;
     contextEditorViewSetScrollMargin(context: NativeContextHandle, view: ContextEditorViewHandle, margin: number): void;

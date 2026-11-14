@@ -87,6 +87,16 @@ export type TreeSitterWorkerRequest = {
     filetype: string;
     messageId: string;
 } | {
+    type: "APPEND_HIGHLIGHT";
+    copyId: number;
+    offset: number;
+    text: string;
+    filetype: string;
+    messageId: string;
+} | {
+    type: "DISPOSE_COPY";
+    copyId: number;
+} | {
     type: "UPDATE_DATA_PATH";
     dataPath: string;
     messageId: string;

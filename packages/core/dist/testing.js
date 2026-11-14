@@ -4,10 +4,10 @@ import {
   TreeSitterClient2,
   ANSI,
   CliRenderer2
-} from "./chunk-node-c6za8m8j.js";
+} from "./chunk-node-x2zzjntw.js";
 import {
   nativeConstants
-} from "./chunk-node-pyb9qqc6.js";
+} from "./chunk-node-n4dtenmw.js";
 
 // src/testing/mock-keys.ts
 import { Buffer as Buffer2 } from "node:buffer";
@@ -732,6 +732,9 @@ class MockTreeSitterClient extends TreeSitterClient2 {
     this._highlightPromises.push({ promise, resolve, timeout });
     return promise;
   }
+  highlightAppend(_copyId, _offset, text, filetype) {
+    return this.highlightOnce(text, filetype);
+  }
   setMockResult(result) {
     this._mockResult = result;
   }
@@ -995,5 +998,5 @@ export {
   setRendererCapabilities
 };
 
-//# debugId=0FA35D935F7CF36564756E2164756E21
+//# debugId=0FE0EBC8689BC38164756E2164756E21
 //# sourceMappingURL=testing.js.map

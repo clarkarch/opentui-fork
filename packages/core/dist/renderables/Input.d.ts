@@ -43,6 +43,7 @@ export declare class InputRenderable extends TextareaRenderable {
      */
     insertText(text: string): void;
     protected defaultDimension(kind: "width" | "height"): number | "auto" | `${number}%`;
+    /** The single-line text, indexed in UTF-16 code units, not cursor cells. */
     get value(): string;
     set value(value: string);
     focus(): void;
@@ -59,8 +60,10 @@ export declare class InputRenderable extends TextareaRenderable {
     redo(): boolean;
     deleteCharacter(direction: "backward" | "forward"): void;
     set maxLength(maxLength: number);
+    /** Maximum input length in UTF-16 code units. */
     get maxLength(): number;
     set minLength(minLength: number);
+    /** Minimum length for submission in UTF-16 code units. */
     get minLength(): number;
     set placeholder(placeholder: string);
     get placeholder(): string;

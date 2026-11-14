@@ -59,6 +59,10 @@ export declare class CodeRenderable extends TextBufferRenderable {
     private _highlightingPromise;
     private _renderedLineSources?;
     private _mappedLineInfo?;
+    private _deltas?;
+    private _groupSets;
+    private static nextCopy;
+    private _streamsDeltas;
     protected _contentDefaultOptions: {
         content: string;
         conceal: true;
@@ -77,6 +81,14 @@ export declare class CodeRenderable extends TextBufferRenderable {
     private setShouldRenderTextBuffer;
     set content(value: string);
     private writeContent;
+    private deltasAllowed;
+    /**
+     * @internal Markdown marks a fence while its block is open: while it streams, its appends go to the highlighter as
+     * deltas. A closed block's text is final, so its worker copy goes (C4 question 4): now if the last reply covers the
+     * text, else once the reply for the rest lands.
+     */
+    _setStreamsDeltas(open: boolean): void;
+    private stopDeltas;
     updateStreamingPreview(content: string, initialStyledText: StyledText): void;
     get lineInfo(): LineInfo;
     getLineSources(startLine: number, lineCount: number): number[];
@@ -108,7 +120,9 @@ export declare class CodeRenderable extends TextBufferRenderable {
     protected transformChunks(chunks: TextChunk[], context: ChunkRenderContext): Promise<TextChunk[]>;
     private ensureVisibleTextBeforeHighlight;
     private paintHighlightsOnly;
+    private currentDeltas;
     private startHighlight;
+    private highlightDelta;
     private settle;
     private runHighlights;
     private clearPendingHighlight;
