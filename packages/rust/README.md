@@ -148,12 +148,16 @@ Line Tools (`xcode-select --install`). On a Mac, `bun run build` in
 `zig build -Doptimize=ReleaseFast -Dlibrary-target=x86_64-macos.13.0` (or
 `aarch64-macos.13.0`). The Windows build needs no SDK, so Zig makes it on any
 system: `zig build -Doptimize=ReleaseFast -Dlibrary-target=x86_64-windows-gnu`.
-The native library has NO video decoder. Upstream links a decode-only LGPL
-FFmpeg into it for `VideoView`; the fork's consumers do not use it, and the
-decoder costs ~3 MB per published library plus minutes of build time per
-target. So `VideoView` exists but every open fails as unavailable. Build with
-`-Dvideo=false` to make that explicit; the default build has no FFmpeg prefix
-to find, so it does the same thing.
+`VideoView` needs a library built with FFmpeg: the native build links it from
+`packages/native/.cache/ffmpeg/prefix/<target>`, which `bun run build` makes for
+the host, and warns and leaves video out without it.
+
+The default native library includes FFmpeg under LGPL-2.1-or-later, even if
+your app never uses `VideoView`. `opentui-sys` ships `LICENSE-FFMPEG` and
+`FFMPEG-SOURCE.md`; the Rust code is MIT-licensed. To link OpenTUI without
+FFmpeg, run `sh scripts/prepare-zig-deps.sh` and `zig build -Dvideo=false
+-Doptimize=ReleaseFast` in `packages/native`. Set `OPENTUI_LIB_DIR` to the
+absolute path of the resulting `lib/<artifact directory>` when you run Cargo.
 
 `crates/opentui-sys/src/generated.rs` is generated from
 `packages/native/include/opentui.h`: `bun run generate:abi` in `packages/core`

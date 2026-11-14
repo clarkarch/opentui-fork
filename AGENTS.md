@@ -139,14 +139,10 @@ This branch is a fork that carries patches upstream does not have. It is publish
   `optionalDependencies` pins together — the pins are exact versions.
 - Publish with `bun scripts/publish-fork.ts --native-dir <dir>`: the platform packages first, then the core, so an
   install never sees the core without its library. The `publish-npm` workflow does this from CI.
-- The fork ships NO native video. Upstream links a decode-only LGPL FFmpeg into the native library
-  for `VideoRenderable`; the fork's consumers do not use it, and the decoder costs ~3 MB per published library plus
-  minutes of build time per target. So the native build runs without an FFmpeg prefix: `packages/native`'s
-  `prepare:zig` prepares the vendored sources only, the build compiles the video shim in its "unavailable" mode, and
-  `VideoRenderable` exists but every open fails as unavailable. Keep it that way until a consumer needs real video.
-  `packages/native/scripts/build-ffmpeg.ts` and the vendored FFmpeg sources are upstream's and are kept for reference
-  only — nothing in the fork's build or CI calls them, and the docs must not claim the shipped library decodes video.
-- The native packages carry the vendored licenses (Ghostty, wuffs, stb, libwebp, lcms2). The list lives in
+- Native video links the same decode-only LGPL FFmpeg as upstream. `packages/native`'s `prepare:zig` builds the host
+  prefix, and the release workflows build the prefix for every published target and pass `-Drequire-video`, so a
+  missing decoder fails the build instead of silently shipping a library without video.
+- The native packages carry the vendored licenses (Ghostty, wuffs, stb, libwebp, lcms2, FFmpeg, zlib). The list lives in
   `packages/core/scripts/native-package.ts`; the build and the publish path stage through it, so a new vendored
   dependency has to be added there — a published package missing a license is a legal problem, not a style one.
 - The published package must be SELF-CONTAINED: a consumer that installs it under its own name has no `@opentui/core`

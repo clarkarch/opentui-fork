@@ -141,11 +141,10 @@ if (optional.length !== packages.size || !optional.every((name) => packages.has(
   )
 }
 
-// The fork's Rust crate carries its own FFMPEG-SOURCE.md because its native
-// library deliberately has no FFmpeg decoder. The license files still have to
-// match the vendored source exactly.
+// The FFmpeg notices in the Rust crate must match the vendored source exactly.
 for (const [name, source] of Object.entries({
   "LICENSE-FFMPEG": "COPYING.LGPLv2.1",
+  "FFMPEG-SOURCE.md": "README.md",
   "LICENSE-ZLIB": "LICENSE-ZLIB",
 })) {
   const copy = `packages/rust/crates/opentui-sys/${name}`

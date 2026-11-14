@@ -63,16 +63,16 @@ From `packages/native`, `bun run build` installs the header and libraries under
 the shared library. Windows produces `opentui-static.lib`, `opentui.lib` for DLL
 imports, and `opentui.dll`. Static linkage also needs the platform libraries, and
 on macOS and Windows the C++ runtime; the Linux archive carries its own, private
-libc++. `zig build -Dall` builds all supported targets, and
-`zig build -Dlibrary-target=<target>` builds one target.
+libc++. `zig build -Dall` builds all supported targets.
 
-The fork's libraries have **no video decoder**: the video shim compiles in its
-"unavailable" mode, so `VideoRenderable` exists but every open fails. Upstream
-links a decode-only LGPL FFmpeg build into the libraries and builds it first
-with [`scripts/build-ffmpeg.ts`](scripts/build-ffmpeg.ts); the fork skips that
-(the decoder costs ~3 MB per published library plus minutes of build time per
-target), and nothing calls the script. The vendored sources under
-`src/vendor/ffmpeg/` are kept for reference only.
+Native video statically links a decode-only LGPL FFmpeg build into the libraries.
+`bun run build` builds it first with [`scripts/build-ffmpeg.ts`](scripts/build-ffmpeg.ts)
+and caches it under `.cache/ffmpeg`. On macOS, static linkage of video also needs the
+VideoToolbox, CoreMedia, CoreVideo, CoreServices, and QuartzCore frameworks, and
+Windows needs `bcrypt`. Targets outside the FFmpeg build configuration compile video
+as unavailable. [`src/vendor/ffmpeg/README.md`](src/vendor/ffmpeg/README.md) lists the
+pinned sources, licenses, and how to relink with a modified FFmpeg.
+`zig build -Dlibrary-target=<target>` builds one target.
 
 The fork's release (`native-latest`) publishes the stripped library for every
 target, plus the header and, where the platform has one, the static archive.

@@ -95,17 +95,31 @@ jobs:
       # workflow building with an old compiler.
       - uses: ./.github/actions/setup-zig
 
+      # Native video statically links FFmpeg. Its static libraries depend only on the pinned build script.
+      - name: Restore FFmpeg build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/native/.cache/ffmpeg/prefix
+            packages/native/.cache/ffmpeg/downloads
+          key: ffmpeg-v1-${{ runner.os }}-${{ matrix.output }}-${{ hashFiles('packages/native/scripts/build-ffmpeg.ts', '.zig-version') }}
+
       - name: Prepare zig dependencies
         working-directory: packages/native
-        # Only the vendored sources: the fork ships no FFmpeg, so the native
-        # video decoder stays unavailable and no decoder prefix is built.
         run: sh scripts/prepare-zig-deps.sh
+
+      - name: Build FFmpeg
+        working-directory: packages/native
+        run: |
+          for target in ${{ matrix.dirs }}; do
+            bun scripts/build-ffmpeg.ts --target="$target"
+          done
 
       - name: Build
         working-directory: packages/native
         run: |
           for target in ${{ matrix.targets }}; do
-            zig build -Doptimize=ReleaseFast -Dlibrary-target="$target"
+            zig build -Doptimize=ReleaseFast -Dlibrary-target="$target" -Drequire-video
           done
 
       - name: Verify and strip

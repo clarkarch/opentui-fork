@@ -56,65 +56,6 @@ export interface StagedNativePackage {
   readonly headerHash: string
 }
 
-/**
- * The manifest of a native package.
- *
- * The `libc` field is deliberately NOT set. npm and Bun use it to skip the
- * package on a host whose libc does not match, and that breaks the BUILD of
- * every glibc consumer: the loader picks the musl library with a RUNTIME
- * check (`process.env.OPENTUI_LIBC === "musl"`), which a bundler cannot fold
- * away, so `bun build --compile` still has to RESOLVE the musl import — and a
- * skipped package cannot be resolved. Without the field the musl package
- * installs next to the glibc one on every Linux host, the import resolves, and
- * the compiled binary carries both libraries (which is what it needs anyway:
- * the choice happens at runtime).
- */
-export function nativePackageManifest(options: {
-  readonly target: NativeTarget
-  readonly packageName: string
-  readonly metadata: NativePackageMetadata
-  readonly publishedCoreName: string
-}): Record<string, unknown> {
-  const { target, packageName, metadata, publishedCoreName } = options
-  return {
-    name: packageName,
-    version: metadata.version,
-    description: `Prebuilt ${target.platform}-${target.arch}${target.abi ? `-${target.abi}` : ""} binaries for ${publishedCoreName}`,
-    type: "module",
-    main: "index.js",
-    module: "index.js",
-    types: "index.d.ts",
-    license: metadata.license,
-    author: metadata.author,
-    homepage: PUBLISHED_HOMEPAGE,
-    repository: PUBLISHED_REPOSITORY,
-    bugs: PUBLISHED_BUGS,
-    keywords: [...(metadata.keywords ?? []), "prebuild", "prebuilt"],
-    exports: {
-      ".": {
-        bun: "./index.bun.js",
-        import: "./index.js",
-        types: "./index.d.ts",
-      },
-    },
-    os: [target.platform],
-    cpu: [target.arch],
-  }
-}
-
-/**
- * The manifest of a native package.
- *
- * The `libc` field is deliberately NOT set. npm and Bun use it to skip the
- * package on a host whose libc does not match, and that breaks the BUILD of
- * every glibc consumer: the loader picks the musl library with a RUNTIME
- * check (`process.env.OPENTUI_LIBC === "musl"`), which a bundler cannot fold
- * away, so `bun build --compile` still has to RESOLVE the musl import — and a
- * skipped package cannot be resolved. Without the field the musl package
- * installs next to the glibc one on every Linux host, the import resolves, and
- * the compiled binary carries both libraries (which is what it needs anyway:
- * the choice happens at runtime).
- */
 export function nativePackageManifest(options: {
   readonly target: NativeTarget
   readonly packageName: string
@@ -131,7 +72,7 @@ export function nativePackageManifest(options: {
     main: "index.js",
     module: "index.js",
     types: "index.d.ts",
-    license: metadata.license,
+    license: metadata.license ? `${metadata.license} AND LGPL-2.1-or-later` : "LGPL-2.1-or-later",
     author: metadata.author,
     homepage: PUBLISHED_HOMEPAGE,
     repository: PUBLISHED_REPOSITORY,
@@ -247,6 +188,9 @@ export function stageNativePackage(options: {
     [join(licenses.nativeRoot, "src", "vendor", "libwebp", "PATENTS"), "PATENTS-LIBWEBP"],
     [join(licenses.nativeRoot, "src", "vendor", "libwebp", "AUTHORS"), "AUTHORS-LIBWEBP"],
     [join(licenses.nativeRoot, "src", "vendor", "lcms2", "LICENSE"), "LICENSE-LCMS2"],
+    [join(licenses.nativeRoot, "src", "vendor", "ffmpeg", "COPYING.LGPLv2.1"), "LICENSE-FFMPEG"],
+    [join(licenses.nativeRoot, "src", "vendor", "ffmpeg", "README.md"), "FFMPEG-SOURCE.md"],
+    [join(licenses.nativeRoot, "src", "vendor", "ffmpeg", "LICENSE-ZLIB"), "LICENSE-ZLIB"],
   ] as const) {
     if (!existsSync(source)) throw new Error(`Required native license file is missing: ${source}`)
     copyFileSync(source, join(destination, destinationName))

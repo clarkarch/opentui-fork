@@ -238,14 +238,18 @@ if (buildNative) {
 
   const zigArgs = ["build", `-Doptimize=${isDev ? "Debug" : "ReleaseFast"}`]
   if (buildAll) {
-    // The fork ships no FFmpeg: the native video decoder stays unavailable.
-    zigArgs.push("-Dall")
+    // Release builds must never fall back to building without video.
+    zigArgs.push("-Dall", "-Drequire-video")
   }
   if (gpaSafeStats) {
     zigArgs.push("-Dgpa-safe-stats=true")
   }
 
-  if (!skipZig) runCommand("zig", zigArgs, nativeRoot, "Error: Zig build failed")
+  if (!skipZig) {
+    // Native video statically links FFmpeg; prepare:zig builds only the host prefixes.
+    if (buildAll) runCommand("bun", ["scripts/build-ffmpeg.ts", "--all"], nativeRoot, "Error: FFmpeg build failed")
+    runCommand("zig", zigArgs, nativeRoot, "Error: Zig build failed")
+  }
 
   const variantsToPackage = buildAll ? variants : [getHostVariant()]
 
