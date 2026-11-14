@@ -24,6 +24,9 @@
 
 ## Verification
 
+- **Do not build or test this repository locally unless the user explicitly asks for a specific local run. CI is the build
+  and test authority.** Push the branch and use the fork's CI workflows.
+- The checks below describe what CI must cover. Run them locally only when the user explicitly authorizes a local run.
 - Run the narrowest relevant test first, then the affected package suite.
 - Ordinary TypeScript source changes do not require the root build. Use the affected package's `test`, `typecheck`,
   `build`, or validation scripts as applicable.
