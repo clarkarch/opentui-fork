@@ -24,7 +24,7 @@ use std::rc::Rc;
 /// # Ok::<(), opentui::Error>(())
 /// ```
 #[derive(Clone)]
-pub struct Textarea(Rc<EditorCore>);
+pub struct Textarea(pub(crate) Rc<EditorCore>);
 
 impl Widget for Textarea {
     fn element(&self) -> &Element {
@@ -60,6 +60,7 @@ impl Textarea {
         self.clone()
     }
 
+    /// The buffer text. Rust string indices count UTF-8 bytes, not cursor cells.
     pub fn text(&self) -> String {
         self.0.text()
     }

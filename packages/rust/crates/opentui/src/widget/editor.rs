@@ -11,16 +11,18 @@ use crate::native::{
     SelectionUnit, SyntaxStyle, Viewport, WrapMode,
 };
 use crate::style::{Color, Span, Style};
-use crate::syntax::{self, SyntaxTheme};
+use crate::syntax::{Incremental, SyntaxTheme};
 use std::cell::{Cell, RefCell};
 use std::cmp::Ordering;
 use std::rc::Rc;
+use std::sync::Arc;
 
 /// What a key does in an [`Input`](super::Input) or [`Textarea`](super::Textarea). Bind keys to actions with
 /// `bind`, or run one directly with `perform`.
 ///
 /// Movement collapses a selection; the `Select` variants extend it from where it started. Lines are logical lines
-/// (between line breaks); visual lines are the rows wrapping produces.
+/// (between line breaks); visual lines are the rows wrapping produces. Left/right step by cursor stops, not bytes;
+/// up/down step by wrapped rows. Selection offsets count display cells, one per newline.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum EditorAction {
     MoveLeft,
@@ -73,8 +75,8 @@ macro_rules! extmark_methods {
     () => {
         /// Marks a range of the text so it moves with edits: a styled decoration, or with
         /// [`ExtmarkOptions::atomic`], a token the cursor and deletions treat as one unit, such as a mention. Offsets
-        /// count as the cursor's do and past the text mean its end; see [`Extmark`]. Replacing the text with `set_text`
-        /// or `set_value` removes all marks; undoing an edit brings back the marks it removed.
+        /// count display cells (one per newline) and past the text mean its end; see [`Extmark`]. Replacing the text
+        /// with `set_text` or `set_value` removes all marks; undoing an edit brings back the marks it removed.
         pub fn add_extmark(&self, range: std::ops::Range<u32>, options: ExtmarkOptions) -> ExtmarkId {
             self.0.add_extmark(range, options)
         }
@@ -99,13 +101,13 @@ macro_rules! extmark_methods {
             self.0.extmarks().into_iter().find(|mark| mark.id == id)
         }
 
-        /// The marks that cover `offset`: they start at or before it and end after it.
+        /// The marks that cover a document cell offset (one cell per newline): `start <= offset < end`.
         pub fn extmarks_at(&self, offset: u32) -> Vec<Extmark> {
             self.0.extmarks().into_iter().filter(|mark| mark.start <= offset && offset < mark.end).collect()
         }
 
-        /// Moves the cursor to a document offset, clearing the selection. An offset inside an atomic mark moves to
-        /// its nearer edge.
+        /// Moves the cursor in document display cells (one per newline), clearing the selection. An offset inside
+        /// an atomic mark moves to its nearer edge.
         pub fn set_cursor_offset(&self, offset: u32) -> Self {
             self.0.set_cursor_offset(offset);
             self.clone()
@@ -216,13 +218,13 @@ macro_rules! editor_methods {
             self.clone()
         }
 
-        /// The cursor as a document offset: display columns, with one position per line break. For plain ASCII on
-        /// one line, this is the character index.
+        /// Display cells from the document start, one per newline. Convert with
+        /// [`EditBuffer::cell_offset_to_byte_index`](crate::native::EditBuffer::cell_offset_to_byte_index) before slicing the text.
         pub fn cursor_offset(&self) -> u32 {
             self.0.report(self.0.buffer.info()).map_or(0, |info| info.cursor_offset)
         }
 
-        /// The selected text, or an empty string.
+        /// The selected UTF-8 text, or an empty string. String slice bounds are bytes, not selection cells.
         pub fn selected_text(&self) -> String {
             use super::Behavior;
             self.0.selected_text().unwrap_or_default()
@@ -300,12 +302,19 @@ pub(crate) struct EditorCore {
     tracking: Cell<bool>,
     /// A press left the cursor on its cell, maybe inside an atomic mark, until a rule moves it out.
     held: Cell<bool>,
+    /// A rule command left the cursor outside the atomic marks since the step or edit began, so it needs no check.
+    settled: Cell<bool>,
     cursor_options: Cell<EditorOptions>,
     pub on_cursor: Callbacks<(u32, u32)>,
     filetype: RefCell<Option<String>>,
-    syntax_theme: RefCell<SyntaxTheme>,
+    syntax_theme: RefCell<Arc<SyntaxTheme>>,
     /// The content epoch highlighted last, or `None` when the next frame highlights the text.
     highlighted: Cell<Option<u64>>,
+    /// The highlighter of the filetype, with the tree of the text it highlighted last.
+    incremental: RefCell<Option<Incremental>>,
+    /// Layers written, for tests.
+    #[cfg(test)]
+    layers: Cell<usize>,
 }
 
 impl EditorCore {
@@ -318,7 +327,7 @@ impl EditorCore {
             // A Context too full for a buffer has failed already; the report ends the app this turn.
             None => panic!("opentui: failed to create an edit buffer: {:?}", app.check()),
         };
-        let view = match app.report(EditorView::new(&buffer, 1, 1)) {
+        let view = match app.report(EditorView::new(&buffer, 0, 0)) {
             Some(view) => view,
             None => panic!("opentui: failed to create an editor view: {:?}", app.check()),
         };
@@ -346,11 +355,15 @@ impl EditorCore {
             extmarks: RefCell::new(Extmarks::default()),
             tracking: Cell::new(false),
             held: Cell::new(false),
+            settled: Cell::new(false),
             cursor_options: Cell::new(EditorOptions { color: theme.cursor, ..Default::default() }),
             on_cursor: Callbacks::default(),
             filetype: RefCell::new(None),
-            syntax_theme: RefCell::new(SyntaxTheme::from_theme(&theme)),
+            syntax_theme: RefCell::new(Arc::new(SyntaxTheme::from_theme(&theme))),
             highlighted: Cell::new(None),
+            incremental: RefCell::new(None),
+            #[cfg(test)]
+            layers: Cell::new(0),
         });
         core.element.set_focusable(true);
         core.element.pointer.set(Some(crate::native::MousePointer::TEXT));
@@ -497,9 +510,7 @@ impl EditorCore {
             if start.is_none() && self.pointer_unit.replace(SelectionUnit::Cell) != SelectionUnit::Cell {
                 self.report(self.view.convert_selection_to_cell());
             }
-            let before = self.cursor().2;
-            step(self);
-            self.keep_cursor_outside(self.cursor().2.cmp(&before));
+            self.settled_step(step);
             let cursor = self.cursor().2;
             self.anchor.set(start);
             let colors = self.colors.borrow().selection;
@@ -522,59 +533,35 @@ impl EditorCore {
             return;
         }
         self.clear_selection_state();
+        self.settled_step(step);
+    }
+
+    /// Runs a step, then keeps the cursor out of atomic marks unless a rule command already did.
+    fn settled_step(&self, step: impl FnOnce(&Self)) {
         let before = self.cursor().2;
+        self.settled.set(false);
         step(self);
-        self.keep_cursor_outside(self.cursor().2.cmp(&before));
-    }
-
-    /// Moves the cursor one column, past atomic marks as Core moves past virtual ones (`extmarks.ts`): left from a
-    /// mark's end goes to the start of the character before it, and right from at most its start goes to its end. A live
-    /// selection moves one character, as Core's does.
-    fn step_horizontal(&self, forward: bool) {
-        let before = self.cursor().2;
-        let edge = if self.selection().is_some() {
-            None
-        } else if forward {
-            let mark = extmarks::atomic_containing(&self.marks(), before + 1);
-            mark.filter(|mark| before <= mark.start).map(|mark| mark.end)
-        } else {
-            before
-                .checked_sub(1)
-                .and_then(|target| extmarks::atomic_containing(&self.marks(), target))
-                .filter(|mark| before >= mark.end)
-                .map(|mark| mark.start)
-        };
-        let command = match edge {
-            Some(end) if forward => EditCommand::CursorOffset(end),
-            Some(start) => return self.move_before(start),
-            None if forward => EditCommand::MoveRight,
-            None => EditCommand::MoveLeft,
-        };
-        self.report(self.buffer.command(command));
-    }
-
-    /// One unit step left from a mark's start, so a wide character or a tab before it is not split.
-    fn move_before(&self, start: u32) {
-        self.report(self.buffer.command(EditCommand::CursorOffset(start)));
-        self.report(self.buffer.command(EditCommand::MoveLeft));
-    }
-
-    /// Moves the cursor one visual row. Landing in an atomic mark sends it to the nearer edge, as Core's: before the
-    /// start, or the end. Moving down never goes back to or before where it started.
-    fn step_vertical(&self, down: bool) {
-        let before = self.cursor().2;
-        self.report(if down { self.view.move_down() } else { self.view.move_up() });
-        let after = self.cursor().2;
-        let marks = self.marks();
-        let Some(mark) = extmarks::atomic_containing(&marks, after) else { return };
-        if after - mark.start < mark.end - after {
-            self.move_before(mark.start);
-            if !down || self.cursor().2 > before {
-                return;
-            }
+        if !self.settled.get() {
+            self.keep_cursor_outside(self.cursor().2.cmp(&before));
         }
-        // Past later marks that overlap the end, so the cursor is not left inside one.
-        self.report(self.buffer.command(EditCommand::CursorOffset(Self::outside(&marks, mark.end, true))));
+    }
+
+    /// Sends an edit command with the cursor rules around atomic marks, which settle the cursor.
+    fn command_atomic(&self, command: EditCommand) {
+        self.report(self.buffer.command_atomic(command));
+        self.settled.set(true);
+    }
+
+    /// Moves the cursor one column, past atomic marks as Core moves past virtual ones (native rules, `OT_EDIT_ATOMIC`):
+    /// left from a mark's end goes to the start of the unit before it, and right from its start or one cell before it
+    /// goes to its end. A live selection moves one character, as Core's does.
+    fn step_horizontal(&self, forward: bool) {
+        let command = if forward { EditCommand::MoveRight } else { EditCommand::MoveLeft };
+        if self.selection().is_some() {
+            self.report(self.buffer.command(command));
+        } else {
+            self.command_atomic(command);
+        }
     }
 
     fn goto_buffer_end(&self) {
@@ -637,8 +624,11 @@ impl EditorCore {
         match action {
             A::MoveLeft => self.movement(false, Some(false), |s| s.step_horizontal(false)),
             A::MoveRight => self.movement(false, Some(true), |s| s.step_horizontal(true)),
-            A::MoveUp => self.movement(false, None, |s| s.step_vertical(false)),
-            A::MoveDown => self.movement(false, None, |s| s.step_vertical(true)),
+            // Landing in an atomic mark leaves it by the nearer edge, as Core's; Down never goes back.
+            A::MoveUp | A::MoveDown => self.movement(false, None, |s| {
+                s.report(s.view.move_atomic(action == A::MoveDown));
+                s.settled.set(true);
+            }),
             A::SelectLeft => self.movement(true, None, |s| s.step_horizontal(false)),
             A::SelectRight => self.movement(true, None, |s| s.step_horizontal(true)),
             A::SelectUp => self.movement(true, None, |s| {
@@ -676,14 +666,15 @@ impl EditorCore {
             A::WordBackward => self.movement(false, Some(false), |s| s.goto_word(false)),
             A::SelectWordForward => self.movement(true, None, |s| s.goto_word(true)),
             A::SelectWordBackward => self.movement(true, None, |s| s.goto_word(false)),
+            // At an atomic mark's end (Backspace) or start (Delete) the whole mark goes, as one edit.
             A::Backspace => {
-                if !self.delete_selection() && !self.delete_atomic(false) {
-                    self.report(self.buffer.command(EditCommand::Backspace));
+                if !self.delete_selection() {
+                    self.command_atomic(EditCommand::Backspace);
                 }
             }
             A::Delete => {
-                if !self.delete_selection() && !self.delete_atomic(true) {
-                    self.report(self.buffer.command(EditCommand::DeleteForward));
+                if !self.delete_selection() {
+                    self.command_atomic(EditCommand::DeleteForward);
                 }
             }
             A::DeleteWordForward | A::DeleteWordBackward => {
@@ -788,15 +779,6 @@ impl EditorCore {
 
     // Extmarks.
 
-    /// The marks in creation (id) order, the order the cursor rules search them in. Native code moves them with each
-    /// edit.
-    fn marks(&self) -> Vec<Extmark> {
-        let marks = self.report(self.buffer.marks()).unwrap_or_default();
-        let mut marks: Vec<Extmark> = marks.iter().map(|(raw, style)| Extmark::from_native(raw, *style)).collect();
-        marks.sort_by_key(|mark| mark.id);
-        marks
-    }
-
     /// Runs an edit and keeps the cursor out of atomic marks, once for nested edits.
     pub fn tracked<R>(&self, edit: impl FnOnce() -> R) -> R {
         if self.tracking.get() {
@@ -808,11 +790,15 @@ impl EditorCore {
             self.keep_cursor_outside(Ordering::Equal);
         }
         self.tracking.set(true);
+        self.settled.set(false);
         let cursor_before = self.cursor().2;
         let result = edit();
         self.tracking.set(false);
-        // Undo can bring back a mark around the cursor, so this runs even when no mark was there before.
-        self.keep_cursor_outside(self.cursor().2.cmp(&cursor_before));
+        // Undo can bring back a mark around the cursor, so this runs even when no mark was there before, unless a rule
+        // command settled the cursor during the edit.
+        if !self.settled.get() {
+            self.keep_cursor_outside(self.cursor().2.cmp(&cursor_before));
+        }
         result
     }
 
@@ -820,41 +806,8 @@ impl EditorCore {
     /// start for `Less`, or the nearer one.
     fn keep_cursor_outside(&self, toward: Ordering) {
         self.held.set(false);
-        let marks = self.marks();
-        let cursor = self.cursor().2;
-        let (start, end) = (Self::outside(&marks, cursor, false), Self::outside(&marks, cursor, true));
-        let to_end = match toward {
-            Ordering::Less => false,
-            Ordering::Greater => true,
-            Ordering::Equal => end - cursor <= cursor - start,
-        };
-        if start != cursor {
-            self.report(self.buffer.command(EditCommand::CursorOffset(if to_end { end } else { start })));
-        }
-    }
-
-    /// The first offset from `offset` toward the end (`forward`) or the start that no atomic mark surrounds.
-    fn outside(marks: &[Extmark], mut offset: u32, forward: bool) -> u32 {
-        while let Some(mark) = extmarks::atomic_around(marks, offset) {
-            offset = if forward { mark.end } else { mark.start };
-        }
-        offset
-    }
-
-    /// Deletes a whole atomic mark that starts at the cursor (`forward`) or ends at it. Returns whether it did.
-    fn delete_atomic(&self, forward: bool) -> bool {
-        let cursor = self.cursor().2;
-        let mark = self.marks().into_iter().find(|mark| {
-            mark.options.atomic
-                && mark.start < mark.end
-                && if forward { mark.start == cursor } else { mark.end == cursor }
-        });
-        let Some(mark) = mark else { return false };
-        let colors = self.colors.borrow().selection;
-        self.report(self.view.select_range(mark.start, mark.end, colors));
-        self.report(self.view.delete_selection());
-        self.clear_selection_state();
-        true
+        self.report(self.buffer.keep_outside(toward));
+        self.settled.set(true);
     }
 
     /// The buffer's style table. Until `syntax_style` sets one, the editor makes its own, with its syntax theme.
@@ -895,8 +848,10 @@ impl EditorCore {
         self.report(self.buffer.clear_marks());
     }
 
+    /// The marks in (start, id) order. Native code moves them with each edit.
     pub fn extmarks(&self) -> Vec<Extmark> {
-        let mut marks = self.marks();
+        let marks = self.report(self.buffer.marks()).unwrap_or_default();
+        let mut marks: Vec<Extmark> = marks.iter().map(|(raw, style)| Extmark::from_native(raw, *style)).collect();
         marks.sort_by_key(|mark| (mark.start, mark.id));
         marks
     }
@@ -925,6 +880,7 @@ impl EditorCore {
         }
         *self.filetype.borrow_mut() = filetype.map(str::to_owned);
         self.highlighted.set(None);
+        self.incremental.take();
         if filetype.is_some() {
             self.element.add_hooks(Hooks::UPDATE);
             self.element.app().inspect(App::request_redraw);
@@ -936,6 +892,7 @@ impl EditorCore {
     pub fn set_syntax_theme(&self, theme: SyntaxTheme) {
         // Without a table yet there is nothing to restyle, and no table to make: one the app bound stays.
         let table = self.extmarks.borrow().syntax.clone();
+        let theme = Arc::new(theme);
         let restyled = table.is_some_and(|table| self.report(table.set_capture_theme(&theme)) == Some(true));
         if restyled || *self.syntax_theme.borrow() != theme {
             *self.syntax_theme.borrow_mut() = theme;
@@ -943,8 +900,9 @@ impl EditorCore {
         }
     }
 
-    /// Highlights the text as its filetype when it changed since the last highlight, or the filetype did. Each piece
-    /// becomes a layer run of its capture names, which paint merges as `Code` merges their styles, below extmarks.
+    /// Highlights the text as its filetype when it changed since the last highlight, or the filetype did, reusing the
+    /// tree of the last highlight. Each piece becomes a layer run of its capture names, which paint merges as `Code`
+    /// merges their styles, below extmarks. The whole layer is written; native changes only the runs that differ.
     fn highlight(&self) {
         let filetype = self.filetype.borrow();
         let Some(filetype) = filetype.as_deref() else { return };
@@ -953,7 +911,8 @@ impl EditorCore {
             return;
         }
         let text = self.text();
-        let named = syntax::highlight_names(&text, filetype).unwrap_or_default();
+        let mut incremental = self.incremental.borrow_mut();
+        let named = incremental.get_or_insert_with(|| Incremental::new(filetype)).update(text).unwrap_or_default();
         // Without pieces the editor makes no table, so one the app bound on the buffer stays.
         let table = if named.0.is_empty() { None } else { self.table() };
         let runs = match table {
@@ -962,6 +921,8 @@ impl EditorCore {
         };
         let Some(runs) = self.report(runs) else { return };
         self.report(self.buffer.set_layer(extmarks::SYNTAX_LAYER, 0..u32::MAX, &runs));
+        #[cfg(test)]
+        self.layers.set(self.layers.get() + 1);
     }
 
     fn scroll(&self, rows: i64) {
@@ -1081,9 +1042,9 @@ impl Behavior for EditorCore {
 mod tests {
     use super::*;
     use crate::native::{Highlight, LayerRun};
-    use crate::sys;
     use crate::testing::TestApp;
     use crate::widget::{Container, Textarea, Widget};
+    use crate::{syntax, sys};
     use std::collections::HashMap;
 
     /// Syntax highlighting as the editor did it with value-named styles: each piece's merged style registered under a
@@ -1099,16 +1060,19 @@ mod tests {
     }
 
     impl Valued {
-        fn refresh(&mut self, buffer: &EditBuffer) {
-            let Some(filetype) = self.filetype else { return };
+        /// Highlights as C4's oracle expects, with `own` the editor's highlighter where a fresh parse has an error;
+        /// returns whether it had one.
+        fn refresh(&mut self, buffer: &EditBuffer, own: Option<&Incremental>) -> bool {
+            let Some(filetype) = self.filetype else { return false };
             let epoch = buffer.info().unwrap().content_epoch;
             if self.highlighted.replace(epoch) == Some(epoch) {
-                return;
+                return false;
             }
             self.cleared = false;
             let text = buffer.text().unwrap();
+            let (ranges, error) = syntax::expected_ranges(&text, filetype, own, &self.theme).unwrap_or_default();
             let mut runs = Vec::new();
-            for (range, style) in syntax::highlight_ranges(&text, filetype, &self.theme).unwrap_or_default() {
+            for (range, style) in ranges {
                 if style == Style::new() {
                     continue;
                 }
@@ -1120,6 +1084,7 @@ mod tests {
                 runs.push(LayerRun { start_byte: range.start as u32, end_byte: range.end as u32, group_set });
             }
             buffer.set_layer(extmarks::SYNTAX_LAYER, 0..u32::MAX, &runs).unwrap();
+            error
         }
 
         fn restyle(&mut self) {
@@ -1129,11 +1094,11 @@ mod tests {
         }
     }
 
-    // Rust and Markdown fragments, split at `|`.
+    // Rust, JavaScript and Markdown fragments, split at `|`: balanced ones, and openers and closers alone.
     const PIECES: &str = "let |fn f() {|}|x| = |1|\"s\\n\"|// c|/* b */|'a'|\t|\n|\u{65e5}\u{672c}|\u{e9}|# h|*e*|`c`|\
-                          ```rust\n|r#\"r\"#|;|\r\n|\"a\\n\u{fe0f}\"|\u{301}";
+                          ```rust\n|r#\"r\"#|;|\r\n|\"a\\n\u{fe0f}\"|\u{301}|/*|*/|r#\"|{|*|`|```python\n| => x|\"";
     const KEYS: &[&str] = &["backspace", "delete", "left", "right", "up", "down", "home", "end", "ctrl+-", "ctrl+."];
-    const FILETYPES: &[Option<&str>] = &[Some("rust"), Some("markdown"), Some("cobol"), None];
+    const FILETYPES: &[Option<&str>] = &[Some("rust"), Some("markdown"), Some("javascript"), Some("cobol"), None];
 
     // A group set composes its names as `Style::patch` does: fg and bg from the last name with one, attributes added.
     // Each run of random names paints as a run of its merged style under one name of its own.
@@ -1372,11 +1337,23 @@ mod tests {
 
     // P12: capture-name group sets paint byte-identical frames to value-named ones, over random edits, filetype
     // changes (with and without a grammar), clear_highlights, theme switches (longest-prefix and first-part themes,
-    // `default` styles, attributes over attributes) and table swaps, and styled extmarks above both.
+    // `default` styles, attributes over attributes, a color per capture name) and table swaps, and styled extmarks
+    // above both. C4 invariants 1, 5 and 9: the value-named twin highlights a fresh parse (an error-free text must
+    // highlight so) or the editor's own tree; edits at any place, through the view and through `buffer()`, undo and
+    // redo, and `set_text` reuse the tree; each highlight writes one layer.
     #[test]
     fn capture_name_sets_paint_as_value_named_styles_did() {
         let pieces: Vec<&str> = PIECES.split('|').collect();
-        let mut compared = 0;
+        // Review-bigboi-r2's JavaScript append (`f` becomes a function), review-bigboi's repeated line, and
+        // review-opus's two Markdown edits: the first `*` deleted, and a fence's info string changed.
+        let rows = [
+            ("javascript", "const f =\n  (x)", 15, 0, " => x"),
+            ("rust", "// x\n// x\n// x\n// x\n", 0, 0, "// x\n"),
+            ("markdown", "a *b\nc d* e", 2, 1, ""),
+            ("markdown", "```rust\nlet x = 1;\n```\n", 3, 4, "python"),
+        ];
+        let injective = syntax::injective_theme();
+        let (mut compared, mut erroneous, mut own_differs) = (0, 0, 0);
         for seed in 1..=200u64 {
             let mut state = seed.wrapping_mul(0x9e37_79b9_7f4a_7c15);
             let mut next = |bound: usize| {
@@ -1396,27 +1373,53 @@ mod tests {
                 .style("markup", Style::new().fg(Color::YELLOW).dim())
                 .style("markup.heading", Style::new().strikethrough());
             let themes = [
+                injective.clone(),
                 SyntaxTheme::from_theme(&named.theme()),
                 other.style("string", red.bg(Color::BLUE)),
                 nested.clone(),
                 nested.first_part_fallback(),
             ];
+            let row = rows.get(seed as usize - 1);
+            let filetype = row.map_or("rust", |row| row.0);
             let mut twin = Valued {
                 table: SyntaxStyle::new(valued.session().context()).unwrap(),
                 sets: HashMap::new(),
-                filetype: Some("rust"),
+                filetype: Some(filetype),
                 theme: themes[0].clone(),
                 highlighted: None,
                 cleared: false,
             };
-            let areas = [Textarea::new(&named).filetype("rust").grow(1.0), Textarea::new(&valued).grow(1.0)];
+            let areas = [Textarea::new(&named).filetype(filetype).grow(1.0), Textarea::new(&valued).grow(1.0)];
             areas[1].syntax_style(&twin.table);
+            areas[0].syntax_theme(themes[0].clone());
             for (app, area) in [&named, &valued].into_iter().zip(&areas) {
                 app.root().add(area);
                 area.focus();
             }
+            // An edit through the view: `deleted` characters at a cursor offset, then a piece typed there.
+            let edit = |at: u32, deleted: usize, piece: &str| {
+                for (app, area) in [&named, &valued].into_iter().zip(&areas) {
+                    area.set_cursor_offset(at);
+                    (0..deleted).for_each(|_| app.press("delete"));
+                    area.insert(piece);
+                }
+            };
+            // Whether the next highlight is the filetype's first, the one parse without a tree.
+            let (mut layers, mut first) = (0, true);
             for step in 0..24 {
-                match if step == 0 { 8 } else { next(16) } {
+                let command = match (row, step) {
+                    (Some(row), 0) => {
+                        areas.iter().for_each(|area| drop(area.set_text(row.1)));
+                        17
+                    }
+                    (Some(row), 1) => {
+                        edit(row.2, row.3, row.4);
+                        17
+                    }
+                    (_, 0) => 8,
+                    _ => next(20),
+                };
+                match command {
                     0..=4 => {
                         let text = pieces[next(pieces.len())];
                         named.type_text(text);
@@ -1435,7 +1438,7 @@ mod tests {
                         let filetype = FILETYPES[next(FILETYPES.len())];
                         areas[0].filetype(filetype);
                         if twin.filetype != filetype {
-                            (twin.filetype, twin.highlighted) = (filetype, None);
+                            (twin.filetype, twin.highlighted, first) = (filetype, None, true);
                             if filetype.is_none() {
                                 areas[1].buffer().set_layer(extmarks::SYNTAX_LAYER, 0..u32::MAX, &[]).unwrap();
                             }
@@ -1443,6 +1446,10 @@ mod tests {
                     }
                     10 => {
                         areas.iter().for_each(|area| area.buffer().clear_highlights().unwrap());
+                        // Plain until the editor highlights again, also after a restyle the twin had due.
+                        if areas[0].0.highlighted.get() == Some(areas[0].0.epoch()) {
+                            twin.highlighted = Some(areas[1].buffer().info().unwrap().content_epoch);
+                        }
                         twin.cleared = true;
                     }
                     11 => {
@@ -1467,21 +1474,76 @@ mod tests {
                             area.add_extmark(start..start + length, options);
                         }
                     }
+                    14 => edit(next(areas[0].text().chars().count() + 1) as u32, next(4), pieces[next(pieces.len())]),
+                    15 => {
+                        let how = next(4);
+                        for area in &areas {
+                            match how {
+                                0 => drop(area.perform(EditorAction::Undo)),
+                                1 => drop(area.perform(EditorAction::Redo)),
+                                2 => drop(area.buffer().undo().unwrap()),
+                                _ => drop(area.buffer().redo().unwrap()),
+                            }
+                        }
+                    }
+                    16 => {
+                        let (column, deleted, piece) = (next(12) as u32, next(3) as u32, pieces[next(pieces.len())]);
+                        let undoable = next(2) == 0;
+                        for area in &areas {
+                            if undoable {
+                                area.buffer().set_text(piece, true).unwrap();
+                            } else {
+                                // Out-of-range places fail alike in both buffers.
+                                let _ = area.buffer().delete_range((0, column), (0, column + deleted));
+                                let _ = area.buffer().insert(piece);
+                            }
+                        }
+                    }
                     _ => {
-                        twin.refresh(areas[1].buffer());
-                        let (want, got) = (valued.render(), named.render());
+                        let core = &areas[0].0;
+                        let epoch = core.epoch();
+                        let due = core.filetype.borrow().is_some() && core.highlighted.get() != Some(epoch);
+                        let parses = syntax::FRESH_PARSES.get();
+                        let got = named.render();
+                        let parses = syntax::FRESH_PARSES.get() - parses;
+                        let error = twin.refresh(areas[1].buffer(), None);
+                        let mut want = valued.render();
+                        let own = core.incremental.borrow();
+                        if error && want.cells != got.cells {
+                            // Where a fresh parse has an error, a whole query of the editor's own tree.
+                            twin.highlighted = None;
+                            twin.refresh(areas[1].buffer(), own.as_ref());
+                            want = valued.render();
+                            own_differs += 1;
+                        }
+                        erroneous += usize::from(error);
                         let differ = want.cells.iter().zip(&got.cells).position(|(want, got)| want != got);
                         assert!(differ.is_none(), "seed {seed} step {step} cell {differ:?}: {:?}", areas[0].text());
+                        // C4 invariant 5: a highlight per epoch change writes one layer, and parses without a tree only
+                        // the first text of its filetype.
+                        assert_eq!(core.layers.get() - layers, usize::from(due), "seed {seed} step {step}");
+                        layers = core.layers.get();
+                        let parsed = due && core.filetype.borrow().as_deref().is_some_and(syntax::has_grammar);
+                        assert_eq!(
+                            parses,
+                            usize::from(parsed && first),
+                            "seed {seed} step {step}: parses without a tree"
+                        );
+                        first &= !parsed;
                         compared += 1;
                     }
                 }
             }
         }
-        assert!(compared > 500, "{compared} compared");
+        // How many highlights had text with a parse error, where the twin is a fresh highlight only if the editor's
+        // own tree agrees (1b), against 1a's error-free rest.
+        println!("C4 1b on {erroneous} of {compared} frames; the editor's own tree painted otherwise on {own_differs}");
+        assert!(compared > 500 && erroneous * 4 < compared * 3, "{compared} compared, {erroneous} with errors");
     }
 
-    // 474: with marks, a key read the whole text twice to find the edit; native code moves marks now. A typed key
-    // reads the marks once, after the edit, however many there are: one count and one copy.
+    // 474: with marks, a key read the whole text twice to find the edit; native code moves marks now. The cursor rules
+    // around atomic marks run natively too (C5.3), so no key reads the marks, however many there are, and each key
+    // sends one rule command.
     #[test]
     fn keys_with_marks_read_no_text() {
         for count in [1, 40] {
@@ -1496,15 +1558,17 @@ mod tests {
             }
             area.set_cursor_offset(0);
             app.render();
-            let reads = || (crate::native::TEXT_READS.with(Cell::get), crate::native::MARK_READS.with(Cell::get));
-            crate::native::TEXT_READS.with(|reads| reads.set(0));
-            crate::native::MARK_READS.with(|reads| reads.set(0));
-            app.press("x");
-            assert_eq!(reads(), (0, 2), "{count} marks");
-            for key in ["backspace", "right", "delete"] {
-                app.press(key);
-            }
-            assert_eq!(crate::native::TEXT_READS.with(Cell::get), 0);
+            let keys = ["x", "left", "right", "backspace", "delete", "up", "down", "home"];
+            let counters = [&crate::native::TEXT_READS, &crate::native::MARK_READS, &crate::native::RULE_CALLS];
+            let reads: Vec<_> = keys
+                .iter()
+                .map(|key| {
+                    counters.iter().for_each(|counter| counter.with(|calls| calls.set(0)));
+                    app.press(key);
+                    counters.map(|counter| counter.with(Cell::get))
+                })
+                .collect();
+            assert_eq!(reads, [[0, 0, 1]; 8], "{keys:?} with {count} marks");
             assert_eq!(area.extmarks()[0].range(), 2..7);
         }
     }

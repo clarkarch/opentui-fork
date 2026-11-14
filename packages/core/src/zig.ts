@@ -246,7 +246,12 @@ export enum NativeEditCommand {
   Clear = 10,
   ClearHistory = 11,
   DebugRope = 12,
+  CursorOffsetAtomic = 13,
+  KeepOutside = 14,
 }
+
+/** The argument that applies the cursor rules around atomic marks to Left, Right, Backspace, Delete, Up and Down. */
+export const NativeEditAtomic = 1
 
 export enum NativeEditPositionQuery {
   Cursor = 0,
@@ -281,6 +286,23 @@ export enum NativeEditHighlightOperation {
   RemoveRef = 2,
   ClearLine = 3,
   ClearAll = 4,
+}
+
+export enum NativeEditMarkOperation {
+  Add = 0,
+  Remove = 1,
+  Clear = 2,
+}
+
+/** An edit mark in cursor offsets; `style` is a SyntaxStyle id, 0 for none. */
+export interface NativeEditMark {
+  id: number
+  kind: number
+  atomic: boolean
+  style: number
+  priority: number
+  start: number
+  end: number
 }
 
 export interface NativeEditorViewport {
@@ -3587,16 +3609,24 @@ type ContextObjectDestroySymbol =
  * Logical coordinates (logicalRow, logicalCol) are document-absolute.
  */
 export interface VisualCursor {
-  visualRow: number // Viewport-relative row (0 = top of viewport)
-  visualCol: number // Viewport-relative column (0 = left edge of viewport when not wrapping)
-  logicalRow: number // Document-absolute row
-  logicalCol: number // Document-absolute column
-  offset: number // Global display-width offset from buffer start
+  /** Wrapped row relative to the top of the viewport. */
+  visualRow: number
+  /** Display-cell column relative to the viewport. */
+  visualCol: number
+  /** Zero-based logical line in the document. */
+  logicalRow: number
+  /** Display-cell column relative to the logical line start. */
+  logicalCol: number
+  /** Display cells from the document start, counting each newline as one. */
+  offset: number
 }
 
 export interface LogicalCursor {
+  /** Zero-based logical line in the document. */
   row: number
+  /** Display cells from the logical line start. */
   col: number
+  /** Display cells from the document start, counting each newline as one. */
   offset: number
 }
 
@@ -3658,6 +3688,8 @@ export class FFIRenderLib {
     createEditorSelectionRecord()
   // Info reads never call back into JavaScript, so one output record serves every read.
   private readonly editorViewInfoRecord = createContextRecord(nativeLayouts.ot_editor_view_info)
+  // Kept between mark queries, which decode it before the next call.
+  private markRecords = new Uint32Array((16 * nativeLayouts.ot_edit_mark.size) / 4)
   private readonly videoStateRecord = new Uint8Array(nativeLayouts.ot_video_state.size)
   private readonly videoStateView = new DataView(this.videoStateRecord.buffer)
   private readonly selectionResetRecord = encodeEditorSelection({ operation: NativeEditorSelectionOperation.Reset })
@@ -4790,6 +4822,55 @@ export class FFIRenderLib {
     })
   }
 
+  /** The Context's id for an ordered list of style names (`ot_context_group_set`). */
+  public contextGroupSet(context: NativeContextHandle, names: readonly string[]): number {
+    const encoded = names.map((name) => this.encoder.encode(name))
+    const ends = new Uint32Array(encoded.length)
+    const bytes = new Uint8Array(encoded.reduce((end, name, index) => (ends[index] = end + name.length), 0))
+    encoded.forEach((name, index) => bytes.set(name, ends[index]! - name.length))
+    const output = new Uint32Array(1)
+    const pointer = this.nativeContextPointer(context, "ot_context_group_set")
+    nativeResult(
+      "ot_context_group_set",
+      this.opentui.symbols.ot_context_group_set(
+        pointer,
+        viewOrNull(bytes),
+        bytes.length,
+        viewOrNull(ends),
+        ends.length,
+        output,
+      ),
+    )
+    return output[0]!
+  }
+
+  /** Replaces layer `layerId` in `[start, end)` bytes with `runs`: (start, end, group set) triples. */
+  public contextTextBufferSetLayer(
+    context: NativeContextHandle,
+    text: ContextTextBufferHandle,
+    layerId: number,
+    start: number,
+    end: number,
+    runs: Uint32Array,
+  ): void {
+    const handle = encodeContextHandle(context, text)
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_text_buffer_set_layer")
+      nativeResult(
+        "ot_text_buffer_set_layer",
+        this.opentui.symbols.ot_text_buffer_set_layer(
+          pointer,
+          handle,
+          layerId,
+          start,
+          end,
+          viewOrNull(runs),
+          runs.length / 3,
+        ),
+      )
+    })
+  }
+
   public contextTextBufferGetHighlights(
     context: NativeContextHandle,
     text: ContextTextBufferHandle,
@@ -5391,6 +5472,25 @@ export class FFIRenderLib {
     )
   }
 
+  public contextEditBufferConvertOffset(
+    context: NativeContextHandle,
+    editBuffer: ContextEditBufferHandle,
+    value: number,
+    toCell: boolean,
+  ): number {
+    const operation = "ot_edit_buffer_convert_offset"
+    const handle = encodeContextHandle(context, editBuffer)
+    const input = toSafeFFIU32Length(value, "Edit buffer index or offset")
+    const conversion = toCell ? nativeConstants.OT_EDIT_UTF16_TO_CELL : nativeConstants.OT_EDIT_CELL_TO_UTF16
+    const output = new Uint32Array(1)
+    const pointer = this.nativeContextPointer(context, operation)
+    nativeResult(
+      operation,
+      this.opentui.symbols.ot_edit_buffer_convert_offset(pointer, handle, conversion, input, output),
+    )
+    return output[0]
+  }
+
   public contextEditBufferMeasureText(
     context: NativeContextHandle,
     editBuffer: ContextEditBufferHandle,
@@ -5528,6 +5628,91 @@ export class FFIRenderLib {
     )
     if (count[0] !== capacity) throw new NativeError("ot_edit_buffer_get_highlights", NativeStatus.InternalError)
     return decodeContextHighlights(records)
+  }
+
+  /** Adds, removes or clears marks; returns the new id, the removed id or 0. */
+  public contextEditBufferMark(
+    context: NativeContextHandle,
+    editBuffer: ContextEditBufferHandle,
+    operation: NativeEditMarkOperation,
+    mark?: Partial<NativeEditMark>,
+  ): number {
+    const layout = nativeLayouts.ot_edit_mark
+    const handle = encodeContextHandle(context, editBuffer)
+    const fields = layout.fields
+    let record: Uint32Array | null = null
+    if (mark) {
+      record = createContextRecord(layout)
+      record[fields.id.offset / 4] = toSafeFFIU32Length(mark.id ?? 0, "Mark id")
+      record[fields.kind.offset / 4] = toSafeFFIU32Length(mark.kind ?? 0, "Mark type id")
+      record[fields.flags.offset / 4] = mark.atomic ? nativeConstants.OT_EDIT_MARK_ATOMIC : 0
+      record[fields.style.offset / 4] = toSafeFFIU32Length(mark.style ?? 0, "Mark style ID")
+      record[fields.priority.offset / 4] = toSafeFFIU32Length(mark.priority ?? 0, "Mark priority")
+      record[fields.start.offset / 4] = toSafeFFIU32Length(mark.start ?? 0, "Mark start")
+      record[fields.end.offset / 4] = toSafeFFIU32Length(mark.end ?? 0, "Mark end")
+    }
+    const output = record && new Uint32Array(1)
+    this.getYogaHost().runMutation(() => {
+      const pointer = this.nativeContextPointer(context, "ot_edit_buffer_mark")
+      nativeResult(
+        "ot_edit_buffer_mark",
+        this.opentui.symbols.ot_edit_buffer_mark(pointer, handle, operation, record, output),
+      )
+    })
+    return output?.[0] ?? 0
+  }
+
+  /** Marks in (start, id) order: mark `id`, or all for 0, of type `kind`, or any when it is omitted. */
+  public contextEditBufferGetMarks(
+    context: NativeContextHandle,
+    editBuffer: ContextEditBufferHandle,
+    id = 0,
+    kind: number = nativeConstants.OT_EDIT_MARK_ANY_KIND,
+  ): NativeEditMark[] {
+    const layout = nativeLayouts.ot_edit_mark
+    const handle = encodeContextHandle(context, editBuffer)
+    const markId = toSafeFFIU32Length(id, "Mark id")
+    const markKind = toSafeFFIU32Length(kind, "Mark type id")
+    const count = new Uint32Array(1)
+    const pointer = this.nativeContextPointer(context, "ot_edit_buffer_get_marks")
+    const words = layout.size / 4
+    const copy = () =>
+      this.opentui.symbols.ot_edit_buffer_get_marks(
+        pointer,
+        handle,
+        markId,
+        markKind,
+        this.markRecords,
+        this.markRecords.length / words,
+        count,
+      )
+    // One call while the marks fit the kept records; an undersized call fails without output, so count and grow.
+    let status = copy()
+    if (status !== NativeStatus.Ok) {
+      nativeResult(
+        "ot_edit_buffer_get_marks",
+        this.opentui.symbols.ot_edit_buffer_get_marks(pointer, handle, markId, markKind, null, 0, count),
+      )
+      if (count[0] * words <= this.markRecords.length) nativeResult("ot_edit_buffer_get_marks", status)
+      this.markRecords = new Uint32Array(count[0] * 2 * words)
+      status = copy()
+      nativeResult("ot_edit_buffer_get_marks", status)
+    }
+    const records = this.markRecords
+    const marks: NativeEditMark[] = []
+    for (let offset = 0; offset < count[0] * words; offset += words) {
+      const field = (name: keyof typeof layout.fields) => records[offset + layout.fields[name].offset / 4]
+      marks.push({
+        id: field("id"),
+        kind: field("kind"),
+        atomic: (field("flags") & nativeConstants.OT_EDIT_MARK_ATOMIC) !== 0,
+        style: field("style"),
+        priority: field("priority"),
+        start: field("start"),
+        end: field("end"),
+      })
+    }
+    return marks
   }
 
   public contextEditorViewSetViewport(

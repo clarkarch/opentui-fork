@@ -7,7 +7,7 @@ use crate::layout::{Edge, Gutter, LayoutProperty};
 use crate::native::{
     MarkdownBlock, MarkdownDoc, MarkdownLeaf, MarkdownOptions, MarkdownResult, NodeKind, SyntaxStyle, WrapMode,
 };
-use crate::style::{Attributes, BorderStyle, Color, Sides, Span, Style};
+use crate::style::{Alignment, Attributes, BorderStyle, Color, Sides, Span, Style};
 use crate::syntax::{SyntaxTheme, filetype_for_info_string};
 use crate::sys;
 use crate::theme::Theme;
@@ -543,7 +543,7 @@ impl Markdown {
         if self.0.options.borrow().conceal != conceal {
             Rc::make_mut(&mut self.0.options.borrow_mut()).conceal = conceal;
             self.change_options();
-            self.rebuild_all(false);
+            self.rebuild_where(|block| block.parent.is_none());
         }
         self.clone()
     }
@@ -571,9 +571,18 @@ impl Markdown {
 
     /// How tables look. [`MarkdownTableStyle::Grid`] by default.
     pub fn table_options(&self, options: MarkdownTableOptions) -> Self {
-        if self.0.options.borrow().table != options {
+        let old = self.0.options.borrow().table;
+        if old != options {
             Rc::make_mut(&mut self.0.options.borrow_mut()).table = options;
-            self.rebuild_all(false);
+            if (MarkdownTableOptions { border_color: options.border_color, ..old }) == options {
+                for shown in self.0.blocks.borrow().iter() {
+                    if let Some(Rendered::Table(table)) = &shown.rendered {
+                        table.border_color(options.border_color.unwrap_or(self.0.styles.get().rule));
+                    }
+                }
+            } else {
+                self.rebuild_where(|block| block.kind == sys::OT_MD_TABLE);
+            }
         }
         self.clone()
     }
@@ -594,7 +603,7 @@ impl Markdown {
         code_blocks.retain(|(key, _)| *key != language);
         code_blocks.push((language, Rc::new(render)));
         drop(options);
-        self.rebuild_all(false);
+        self.rebuild_where(|block| block.kind == sys::OT_MD_CODE);
         self.clone()
     }
 
@@ -602,7 +611,7 @@ impl Markdown {
     pub fn remove_code_block_renderer(&self, language: &str) -> Self {
         let language = filetype_for_info_string(language).unwrap_or_else(|| language.to_owned());
         Rc::make_mut(&mut self.0.options.borrow_mut()).code_blocks.retain(|(key, _)| *key != language);
-        self.rebuild_all(false);
+        self.rebuild_where(|block| block.kind == sys::OT_MD_CODE);
         self.clone()
     }
 
@@ -618,7 +627,7 @@ impl Markdown {
     pub fn inline_hook(&self, hook: impl Fn(Vec<InlineSpan>, &InlineContext<'_>) -> Vec<InlineSpan> + 'static) -> Self {
         let had = Rc::make_mut(&mut self.0.options.borrow_mut()).inline_hook.replace(Rc::new(hook)).is_some();
         if had {
-            self.rebuild_all(false);
+            self.rebuild_where(|block| block.parent.is_none());
         } else {
             self.change_options();
         }
@@ -668,7 +677,7 @@ impl Markdown {
             selected
         };
         for top in selected {
-            self.rebuild_subtree(top, false);
+            self.rebuild_subtree(top);
         }
         self.clone()
     }
@@ -1082,6 +1091,7 @@ impl Markdown {
         let options = Rc::clone(&self.0.options.borrow());
         // Display math is code of the language `math` for renderers, as Core's `lang: "math"`; without one it is plain.
         let name = if block.has(sys::OT_MD_BLOCK_MATH) { Some("math") } else { info.as_deref() };
+        let closed = block.has(sys::OT_MD_BLOCK_CLOSED);
         let custom = name.and_then(|info| {
             let language = filetype_for_info_string(info)?;
             let (_, render) = options.code_blocks.iter().find(|(key, _)| *key == language)?;
@@ -1089,7 +1099,6 @@ impl Markdown {
                 Some(Rendered::Custom(widget)) => Some(widget),
                 _ => None,
             };
-            let closed = block.has(sys::OT_MD_BLOCK_CLOSED);
             let (conceal, streaming) = (options.conceal, options.streaming);
             if !streaming {
                 self.0.rendered_code.borrow_mut().push(block.index);
@@ -1100,8 +1109,9 @@ impl Markdown {
             return Some(Rendered::Custom(widget));
         }
         let language = info.as_deref().and_then(|info| info.split_whitespace().next());
+        // A closed fence's text no longer grows, so its view keeps no tree once highlighted.
         if let Some(Rendered::Code(container, view)) = previous {
-            view.filetype(language).set_code(code.as_str());
+            view.filetype(language).set_code(code.as_str()).0.set_closed(closed);
             return Some(Rendered::Code(container.clone(), view.clone()));
         }
         let base = self.base(block.parent);
@@ -1113,6 +1123,7 @@ impl Markdown {
             .set_code(code)
             .wrap(WrapMode::Word)
             .focusable(false);
+        view.0.set_closed(closed);
         Some(Rendered::Code(View::new(app).bg(colors.code_bg).child(&view), view))
     }
 
@@ -1142,9 +1153,9 @@ impl Markdown {
     }
 
     /// Fills a table from its rows and cells: a header row in the heading color, then the body, each row as wide as
-    /// the header. Like Core's, cells do not follow column alignment.
+    /// the header, each column aligned as its delimiter row says.
     fn fill_table(&self, app: &App, doc: &MarkdownDoc, table: u32) {
-        let (widget, columns, rows) = {
+        let (widget, columns, rows, alignments) = {
             let blocks = self.0.blocks.borrow();
             let Some(Some(Rendered::Table(widget))) = blocks.get(table as usize).map(|shown| shown.rendered.clone())
             else {
@@ -1152,18 +1163,31 @@ impl Markdown {
             };
             let columns = blocks[table as usize].block.number as usize;
             let mut rows: Vec<(bool, Vec<u32>)> = Vec::new();
+            let mut alignments = Vec::new();
             for shown in &blocks[table as usize + 1..] {
                 match (shown.block.kind, shown.block.parent) {
                     (sys::OT_MD_TABLE_ROW, Some(parent)) if parent == table => {
                         rows.push((shown.block.has(sys::OT_MD_BLOCK_HEADER), Vec::new()));
                     }
                     (sys::OT_MD_TABLE_CELL, Some(_)) => {
+                        // The header row has every column.
+                        if rows.len() == 1 {
+                            let left = shown.block.has(sys::OT_MD_BLOCK_ALIGN_LEFT);
+                            let right = shown.block.has(sys::OT_MD_BLOCK_ALIGN_RIGHT);
+                            alignments.push(if !right {
+                                Alignment::Left
+                            } else if left {
+                                Alignment::Center
+                            } else {
+                                Alignment::Right
+                            });
+                        }
                         rows.last_mut().expect("a cell follows its row").1.push(shown.block.index)
                     }
                     _ => break,
                 }
             }
-            (widget, columns, rows)
+            (widget, columns, rows, alignments)
         };
         let header = self.0.styles.get().table_header;
         let conceal = self.0.options.borrow().conceal;
@@ -1190,7 +1214,7 @@ impl Markdown {
                 row
             })
             .collect();
-        widget.set_content(content);
+        widget.column_alignments(alignments).set_content(content);
     }
 
     /// A list's gap and its items' markers: numbers align on their right, and the list is loose when a blank line
@@ -1302,75 +1326,67 @@ impl Markdown {
         if let (Some(app), Some(style)) = (self.app(), &self.0.style) {
             app.report(styles.register(style));
         }
-        self.rebuild_all(true);
+        self.rebuild_where(|block| block.parent.is_none());
     }
 
-    fn rebuild_all(&self, keep_code: bool) {
+    fn rebuild_where(&self, select: impl Fn(&MarkdownBlock) -> bool) {
         let tops: Vec<u32> =
-            self.0.blocks.borrow().iter().filter(|shown| shown.block.parent.is_none()).map(|s| s.block.index).collect();
+            self.0.blocks.borrow().iter().filter(|shown| select(&shown.block)).map(|s| s.block.index).collect();
         for top in tops {
-            self.rebuild_subtree(top, keep_code);
+            self.rebuild_subtree(top);
         }
     }
 
-    /// Builds top-level block `top` and its descendants again, keeping the text widgets of paragraphs and headings
-    /// (the doc writes them, or the widget writes them again here), and with `keep_code`, for new styles, the code
-    /// widgets, which restyle their highlight as it is.
-    fn rebuild_subtree(&self, top: u32, keep_code: bool) {
+    /// Builds `top` and its descendants again, keeping prose widgets and built-in code views with their highlights.
+    fn rebuild_subtree(&self, top: u32) {
         let (Some(app), Some(doc)) = (self.app(), &self.0.doc) else { return };
         let end = {
             let blocks = self.0.blocks.borrow();
-            (top as usize + 1..blocks.len()).find(|&i| blocks[i].block.parent.is_none()).unwrap_or(blocks.len())
+            (top as usize + 1..blocks.len())
+                .find(|&i| blocks[i].block.parent.is_none_or(|p| p < top))
+                .unwrap_or(blocks.len())
         };
-        let old_top = self.0.blocks.borrow()[top as usize].rendered.clone();
-        let position = old_top.as_ref().and_then(|old| {
-            let id = old.widget().id();
-            self.0.element.child_behaviors().iter().position(|child| child.element().id() == id)
-        });
-        if let Some(old) = &old_top {
-            old.widget().detach();
-        }
         let mut refresh = Refresh::default();
         for index in top as usize..end {
             let (block, old) = {
                 let blocks = self.0.blocks.borrow();
                 (blocks[index].block.clone(), blocks[index].rendered.clone())
             };
-            let new = match (&block.kind, old) {
+            let new = match (&block.kind, old.as_ref()) {
                 (&PARAGRAPH | &HEADING, Some(Rendered::Text(text))) => {
                     let base = self.base(block.parent);
-                    text.detach();
                     text.fg(base.fg.unwrap_or(self.0.colors.borrow().text)).attributes(base.attributes);
-                    Some(Rendered::Text(text))
+                    Some(Rendered::Text(text.clone()))
                 }
                 // A registered renderer chooses again; a built-in view it declines restyles as it is.
-                (&sys::OT_MD_CODE, Some(old @ Rendered::Code(..))) if keep_code => {
-                    let new = self.code_block(&app, doc, &block, Some(&old));
+                (&sys::OT_MD_CODE, Some(old @ Rendered::Code(..))) => {
+                    let new = self.code_block(&app, doc, &block, Some(old));
                     if let Some(Rendered::Code(container, code)) = &new {
                         let colors = *self.0.colors.borrow();
-                        container.detach();
                         container.bg(colors.code_bg);
                         let fg = self.base(block.parent).fg.unwrap_or(colors.text);
                         code.0.restyle(Arc::clone(&self.0.syntax.borrow()), fg);
+                    } else if let Some(Rendered::Custom(widget)) = &new {
+                        widget.shrink(0.0);
                     }
                     new
                 }
                 _ => self.build_block(&app, doc, &block),
             };
-            self.0.blocks.borrow_mut()[index].rendered = new.clone();
-            if index != top as usize
-                && let Some(new) = &new
-            {
+            if index == top as usize {
+                if old.as_ref().map(Rendered::widget) != new.as_ref().map(Rendered::widget) {
+                    self.replace(block.parent, old.as_ref(), new.as_ref());
+                }
+            } else if let Some(new) = &new {
                 self.attach(block.parent, new);
             }
-        }
-        let new_top = self.0.blocks.borrow()[top as usize].rendered.clone();
-        if let Some(new_top) = &new_top {
-            self.0.element.insert(new_top.widget().element(), position);
+            self.0.blocks.borrow_mut()[index].rendered = new;
         }
         for index in top as usize..end {
             self.after_rebuild(&app, doc, index, &mut refresh);
         }
+        // Replacing a fence or table inside a list doesn't change the surrounding list's gaps or markers.
+        refresh.lists.retain(|&list| list >= top);
         self.finish_refresh(&app, doc, refresh);
     }
 
@@ -1489,52 +1505,132 @@ mod tests {
         assert_eq!(app.text().trim_end(), "para\n===\n\nother");
     }
 
-    // C4 invariant 3 (P11): new colors and a new syntax theme keep every code block's widget and restyle its
-    // highlight, a running one included: no highlight starts and no layer is written. The settled frame equals a
-    // document built with them, with the new code background, a quoted block's text color and the streamed tail.
+    // C4 invariant 3 (P11): live options keep built-in code and its highlight, including one still running.
     #[cfg(feature = "tree-sitter")]
     #[test]
-    fn a_theme_switch_keeps_code_blocks_and_highlights_nothing() {
+    fn option_changes_keep_builtin_fences_streaming() {
         use crate::widget::code::tests::settle;
-        let source = "```rust\nlet a = \"s\";\n```\n\n> ```rust\n> fn q() {}\n> ```\n\n```rust\nlet b = 1;\n";
+        let source = concat!(
+            "```rust\nlet a = \"s\";\n```\n\n> | **cell** |\n> |---|\n> | b |\n>\n",
+            "> ```rust\n> fn q() {}\n> ```\n>\n> ```rust diagram\n> fn diagram() {}\n> ```\n\n```rust\nlet b = 1;\n",
+        );
         let theme = SyntaxTheme::new()
             .style("keyword", Style::new().fg(Color::RED).bold())
             .style("string", Style::new().fg(Color::GREEN))
             .style("default", Style::new().italic());
-        let colors = |app: &TestApp| MarkdownColors {
-            code_bg: Color::BLUE,
-            quote: Color::YELLOW,
-            ..MarkdownColors::from_theme(&app.theme())
+        let renderer = |label: &'static str, calls: Rc<Cell<usize>>| {
+            move |block: &CodeBlock<'_>| {
+                calls.set(calls.get() + 1);
+                let label = if block.conceal { label } else { "source" };
+                (block.info == "rust diagram" || (label == "new" && block.code.starts_with("fn q")))
+                    .then(|| block.previous.cloned().unwrap_or_else(|| Text::new(block.app, label).as_any()))
+            }
         };
-        let codes = |markdown: &Markdown| -> Vec<Code> {
-            let blocks = markdown.0.blocks.borrow();
-            (blocks.iter().filter_map(|shown| match &shown.rendered {
-                Some(Rendered::Code(_, code)) => Some(code.clone()),
-                _ => None,
-            }))
-            .collect()
+        let setup = |app: &TestApp, calls| {
+            Markdown::new(app)
+                .streaming(true)
+                .table_options(MarkdownTableOptions { border_color: Some(Color::RED), ..Default::default() })
+                .inline_hook(|spans, _| spans)
+                .code_block_renderer("rust", renderer("old", calls))
         };
-        let (app, fresh) = (TestApp::new(30, 12), TestApp::new(30, 12));
-        let markdown = Markdown::new(&app).streaming(true);
-        app.root().add(&markdown);
-        markdown.set_markdown(source);
-        settle(&app, &codes(&markdown));
-        markdown.append("let c = 2;\n");
-        app.render();
-        let before: Vec<_> = codes(&markdown).iter().map(|code| (code.element().id(), code.0.work.get())).collect();
-        assert_eq!(before.len(), 3);
-        markdown.syntax_theme(theme.clone()).colors(colors(&app));
-        let after: Vec<_> = codes(&markdown).iter().map(|code| (code.element().id(), code.0.work.get())).collect();
-        assert_eq!(after, before, "the switch built or highlighted a code block");
-        let got = settle(&app, &codes(&markdown));
-        let parses: Vec<_> = codes(&markdown).iter().map(|code| code.0.work.get().0).collect();
-        assert_eq!(parses, before.iter().map(|(_, work)| work.0).collect::<Vec<_>>());
-        let twin = Markdown::new(&fresh).syntax_theme(theme).colors(colors(&fresh)).streaming(true);
-        fresh.root().add(&twin);
-        twin.set_markdown(format!("{source}let c = 2;\n"));
-        let want = settle(&fresh, &codes(&twin));
-        let differ = want.cells.iter().zip(&got.cells).position(|(want, got)| want != got);
-        assert!(differ.is_none(), "cell {differ:?}");
+        let codes = |doc: &Markdown| -> Vec<Code> {
+            let blocks = doc.0.blocks.borrow();
+            blocks
+                .iter()
+                .filter_map(|s| match &s.rendered {
+                    Some(Rendered::Code(_, code)) => Some(code.clone()),
+                    _ => None,
+                })
+                .collect()
+        };
+        let id = |doc: &Markdown, kind| {
+            let blocks = doc.0.blocks.borrow();
+            let shown = blocks.iter().find(|s| s.block.kind == kind).unwrap();
+            shown.rendered.as_ref().unwrap().widget().id()
+        };
+        for change in ["theme", "color", "reset", "layout", "renderer", "remove", "conceal", "hook"] {
+            let apply = |doc: &Markdown, calls| match change {
+                "theme" => doc.syntax_theme(theme.clone()).colors(MarkdownColors {
+                    code_bg: Color::BLUE,
+                    quote: Color::YELLOW,
+                    ..MarkdownColors::from_theme(&doc.app().unwrap().theme())
+                }),
+                "color" => {
+                    doc.table_options(MarkdownTableOptions { border_color: Some(Color::BLUE), ..Default::default() })
+                }
+                "reset" => doc.table_options(MarkdownTableOptions::default()),
+                "layout" => {
+                    doc.table_options(MarkdownTableOptions { style: MarkdownTableStyle::Columns, ..Default::default() })
+                }
+                "renderer" => doc.code_block_renderer("rust", renderer("new", calls)),
+                "remove" => doc.remove_code_block_renderer("rust"),
+                "conceal" => doc.conceal(false),
+                "hook" => doc.inline_hook(|_, _| vec![Span::raw("rewritten").into()]),
+                _ => unreachable!(),
+            };
+            let app = TestApp::new(32, 24);
+            let calls = Rc::new(Cell::new(0));
+            let doc = setup(&app, calls.clone()).set_markdown(source);
+            app.root().add(&doc);
+            settle(&app, &codes(&doc));
+            // C4 invariant 4 and question 4: each fence's highlights took its text once, and only the open one keeps
+            // its tree, also where a fence is built closed (opus-2).
+            let kept = |doc: &Markdown| -> Vec<_> {
+                (codes(doc).iter()).map(|c| (c.0.handed.get(), c.0.incremental.borrow().is_some())).collect()
+            };
+            assert_eq!(kept(&doc), [(12, false), (9, false), (10, true)], "{change}");
+            let tail = "let c = 2;\n";
+            doc.append(tail);
+            app.render(); // Start the tail's highlight before changing the option.
+            let before = codes(&doc);
+            assert_eq!(before.len(), 3);
+            for c in &before {
+                c.0.work.set((0, 0));
+            }
+            let (quote, table) = (id(&doc, sys::OT_MD_QUOTE), id(&doc, sys::OT_MD_TABLE));
+            calls.set(0);
+            apply(&doc, calls.clone());
+            let after = codes(&doc);
+            assert!(after.iter().all(|c| c.0.work.get() == (0, 0)), "{change}: highlighted or wrote a layer");
+            settle(&app, &after);
+            let new = after.iter().filter(|c| !before.iter().any(|old| old.id() == c.id())).count();
+            let parses: usize = after.iter().map(|c| c.0.work.get().0).sum();
+            // Removing the renderer must build and highlight the one fence it used to own.
+            let expected = usize::from(change == "remove");
+            let builtins = 3 + expected - usize::from(change == "renderer");
+            assert_eq!((after.len(), new, parses), (builtins, expected, expected), "{change}: (Code, new, parses)");
+            // The open fence kept its tree through the change: its highlights took only the tail's line.
+            let (open, closed) = kept(&doc).split_last().map(|(open, closed)| (*open, closed.to_vec())).unwrap();
+            assert_eq!(open, (21, true), "{change}: the open fence");
+            assert!(closed.iter().all(|(_, tree)| !tree), "{change}: a closed fence kept its tree");
+            if matches!(change, "color" | "reset" | "layout" | "renderer" | "remove") {
+                assert_eq!(calls.get(), if change == "renderer" { 4 } else { 0 }, "{change}: renderer calls");
+                assert_eq!(quote, id(&doc, sys::OT_MD_QUOTE), "{change}: replaced the table's parent");
+                if change != "layout" {
+                    assert_eq!(table, id(&doc, sys::OT_MD_TABLE), "{change}: replaced the table");
+                }
+            }
+            for chunk in ["", "let d = 3;\n```\n"] {
+                if !chunk.is_empty() {
+                    doc.append(chunk);
+                }
+                let fresh = TestApp::new(32, 24);
+                let twin =
+                    apply(&setup(&fresh, Rc::default()), Rc::default()).set_markdown(format!("{source}{tail}{chunk}"));
+                fresh.root().add(&twin);
+                assert!(settle(&app, &codes(&doc)) == settle(&fresh, &codes(&twin)), "{change}, append {chunk:?}");
+            }
+            // A line and the closer in one append: the last highlight took only that line, then the tree went.
+            assert_eq!(kept(&doc).last(), Some(&(32, false)), "{change}: closed");
+            // Reopened (its closer gone), the fence parses its text again once, then keeps its tree for each new line
+            // (bigboi-4); a closer alone releases the tree with no highlight to land (opus-2).
+            doc.set_markdown(format!("{source}{tail}let d = 3;\n"));
+            for (line, handed, open) in [("// z\n", 69, true), ("// y\n", 74, true), ("```\n", 74, false)] {
+                doc.append(line);
+                settle(&app, &codes(&doc));
+                assert_eq!(kept(&doc).last(), Some(&(handed, open)), "{change}: after {line:?}");
+            }
+        }
     }
 
     // A restyle keeps a code block's widget only as a fresh build would choose it: a changed info string changes the

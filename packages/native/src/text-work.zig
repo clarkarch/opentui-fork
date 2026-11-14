@@ -14,6 +14,8 @@ pub const Counts = struct {
     lines_shifted: u64 = 0,
     /// Partial layouts that reach the splice of their staged lines.
     splices: u64 = 0,
+    /// Edit steps that prepare a mark version before publishing a new root.
+    mark_preparations: u64 = 0,
     /// Measures that walk lines, and the logical lines they measure.
     measure_passes: u64 = 0,
     measure_lines: u64 = 0,
@@ -58,6 +60,12 @@ pub const Counts = struct {
     tail_writes: u64 = 0,
     tail_write_bytes: u64 = 0,
     rope_rebuilds: u64 = 0,
+    /// Layer runs a `set` writes or moves, including the runs a growing layer reallocates.
+    layer_runs_copied: u64 = 0,
+    /// Set runs whose edges a `setLayer` looks up in the text, since the layer does not hold them.
+    layer_run_seeks: u64 = 0,
+    /// Held runs a `setLayer` steps past while it looks for the new runs among them.
+    layer_runs_walked: u64 = 0,
 };
 
 const enabled = builtin.is_test;

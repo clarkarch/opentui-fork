@@ -91,15 +91,18 @@ pub fn ot_edit_buffer_set_tab_width(context: ?*Owner, id: ?*const c.ot_handle, w
 
 pub fn ot_edit_buffer_command(context: ?*Owner, id: ?*const c.ot_handle, command: u32, argument: u32) callconv(.c) c.ot_status {
     const owner = admit(context, false) catch |err| return fail(context, err);
-    if (id == null or command > c.OT_EDIT_DEBUG_ROPE or
-        (command != c.OT_EDIT_GOTO_LINE and command != c.OT_EDIT_CURSOR_OFFSET and argument != 0)) return fail(owner, error.InvalidOptions);
+    const atomic = argument == c.OT_EDIT_ATOMIC;
+    const flagged = command <= c.OT_EDIT_BACKSPACE or command == c.OT_EDIT_MOVE_LEFT or command == c.OT_EDIT_MOVE_RIGHT;
+    if (id == null or command > c.OT_EDIT_KEEP_OUTSIDE or (command == c.OT_EDIT_KEEP_OUTSIDE and argument > 2) or
+        (command != c.OT_EDIT_GOTO_LINE and command != c.OT_EDIT_CURSOR_OFFSET and command < c.OT_EDIT_CURSOR_OFFSET_ATOMIC and
+            argument != 0 and !(flagged and atomic))) return fail(owner, error.InvalidOptions);
     const operation: ctx.EditCommand = switch (command) {
-        c.OT_EDIT_DELETE_FORWARD => .delete_forward,
-        c.OT_EDIT_BACKSPACE => .backspace,
+        c.OT_EDIT_DELETE_FORWARD => .{ .delete_forward = atomic },
+        c.OT_EDIT_BACKSPACE => .{ .backspace = atomic },
         c.OT_EDIT_NEW_LINE => .new_line,
         c.OT_EDIT_DELETE_LINE => .delete_line,
-        c.OT_EDIT_MOVE_LEFT => .move_left,
-        c.OT_EDIT_MOVE_RIGHT => .move_right,
+        c.OT_EDIT_MOVE_LEFT => .{ .move_left = atomic },
+        c.OT_EDIT_MOVE_RIGHT => .{ .move_right = atomic },
         c.OT_EDIT_MOVE_UP => .move_up,
         c.OT_EDIT_MOVE_DOWN => .move_down,
         c.OT_EDIT_GOTO_LINE => .{ .goto_line = argument },
@@ -107,6 +110,8 @@ pub fn ot_edit_buffer_command(context: ?*Owner, id: ?*const c.ot_handle, command
         c.OT_EDIT_CLEAR => .clear,
         c.OT_EDIT_CLEAR_HISTORY => .clear_history,
         c.OT_EDIT_DEBUG_ROPE => .debug_rope,
+        c.OT_EDIT_CURSOR_OFFSET_ATOMIC => .{ .cursor_offset_atomic = argument },
+        c.OT_EDIT_KEEP_OUTSIDE => .{ .keep_outside = @fromBackingInt(@intCast(argument)) },
         else => unreachable,
     };
     owner.core.editCommand(abi.handleFromC(id.?.*), operation) catch |err| return fail(owner, err);
@@ -156,6 +161,21 @@ pub fn ot_edit_buffer_get_range(context: ?*Owner, id: ?*const c.ot_handle, by_co
     else
         .{ .offsets = .{ .start = start_col, .end = end_col } };
     out.?.* = owner.core.editBufferGetRange(abi.handleFromC(id.?.*), range, if (bytes) |p| p[0..capacity] else &.{}) catch |err| return fail(owner, err);
+    return c.OT_OK;
+}
+
+pub fn ot_edit_buffer_convert_offset(context: ?*Owner, id: ?*const c.ot_handle, conversion: u32, value: u32, out: ?*u32) callconv(.c) c.ot_status {
+    const owner = admit(context, true) catch |err| return fail(context, err);
+    if (out == null) return fail(owner, error.InvalidOptions);
+    const editor = edit(owner, id) catch |err| return fail(owner, err);
+    const tb = editor.buffer.tb;
+    out.?.* = switch (conversion) {
+        c.OT_EDIT_BYTE_TO_CELL => tb.weightAtByte(value, true),
+        c.OT_EDIT_CELL_TO_BYTE => tb.byteAtCell(value, true),
+        c.OT_EDIT_UTF16_TO_CELL => tb.weightAtByte(tb.convertUtf16(value, true), true),
+        c.OT_EDIT_CELL_TO_UTF16 => tb.convertUtf16(tb.byteAtCell(value, true), false),
+        else => return fail(owner, error.InvalidOptions),
+    };
     return c.OT_OK;
 }
 
@@ -243,7 +263,7 @@ pub fn ot_edit_buffer_mark(context: ?*Owner, id: ?*const c.ot_handle, operation:
 fn markFromC(ptr: ?*const c.ot_edit_mark) !eb.EditBuffer.MarkOptions {
     const value = try record(c.ot_edit_mark, ptr);
     const by_value = value.flags & c.OT_EDIT_MARK_STYLE_VALUE != 0;
-    if (value.id != 0 or value.start_byte != 0 or value.end_byte != 0 or value.priority > 255 or value.start > value.end or
+    if (value.id != 0 or value.start_byte != 0 or value.end_byte != 0 or (value.priority > 255 and (by_value or value.style != 0)) or value.start > value.end or
         value.flags & ~@as(u32, c.OT_EDIT_MARK_ATOMIC | c.OT_EDIT_MARK_STYLE_VALUE) != 0 or
         value.style & c.OT_STYLE_RUN_FLAG != 0 or (by_value and value.style != 0)) return error.InvalidOptions;
     if (!by_value and !std.meta.eql(value.value, std.mem.zeroes(c.ot_editor_style))) return error.InvalidOptions;
@@ -252,7 +272,7 @@ fn markFromC(ptr: ?*const c.ot_edit_mark) !eb.EditBuffer.MarkOptions {
         .atomic = value.flags & c.OT_EDIT_MARK_ATOMIC != 0,
         .style = value.style,
         .style_value = if (by_value) styleDefinition(try styleRecord(&value.value)) else null,
-        .priority = @intCast(value.priority),
+        .priority = value.priority,
         .start = value.start,
         .end = value.end,
     };
@@ -323,11 +343,12 @@ pub fn ot_editor_view_set_scroll_margin(context: ?*Owner, id: ?*const c.ot_handl
 
 pub fn ot_editor_view_command(context: ?*Owner, id: ?*const c.ot_handle, command: u32, argument: u32) callconv(.c) c.ot_status {
     const owner = admit(context, false) catch |err| return fail(context, err);
-    if (id == null or command > c.OT_EDITOR_TAB_INDICATOR or (command < c.OT_EDITOR_CURSOR_OFFSET and argument != 0) or
+    const vertical = command == c.OT_EDITOR_MOVE_UP or command == c.OT_EDITOR_MOVE_DOWN;
+    if (id == null or command > c.OT_EDITOR_TAB_INDICATOR or (command < c.OT_EDITOR_CURSOR_OFFSET and argument != 0 and !(vertical and argument == c.OT_EDIT_ATOMIC)) or
         (command == c.OT_EDITOR_WRAP_MODE and argument > c.OT_SCENE_WRAP_WORD)) return fail(owner, error.InvalidOptions);
     const operation: ctx.EditorCommand = switch (command) {
-        c.OT_EDITOR_MOVE_UP => .move_up,
-        c.OT_EDITOR_MOVE_DOWN => .move_down,
+        c.OT_EDITOR_MOVE_UP => .{ .move_up = argument != 0 },
+        c.OT_EDITOR_MOVE_DOWN => .{ .move_down = argument != 0 },
         c.OT_EDITOR_GOTO_LINE_END => .goto_line_end,
         c.OT_EDITOR_DELETE_SELECTION => .delete_selection,
         c.OT_EDITOR_CURSOR_OFFSET => .{ .cursor_offset = argument },
@@ -689,7 +710,7 @@ test "Context checked history matches ABI metadata cursor and observer order" {
             const self: *@This() = @ptrCast(@alignCast(data.?));
             self.events[self.count] = event;
             self.count += 1;
-            self.core.editCommand(handle, .move_left) catch |err| {
+            self.core.editCommand(handle, .{ .move_left = false }) catch |err| {
                 self.rejection = err;
             };
         }
@@ -777,11 +798,11 @@ test "Context editor ABI rejects malformed arguments without side effects" {
     const tabs = try std.testing.allocator.alloc(u8, (std.math.maxInt(u32) - 1) / 254 + 1);
     defer std.testing.allocator.free(tabs);
     @memset(tabs, '\t');
-    for (0..28) |row| {
+    for (0..30) |row| {
         const status = switch (row) {
             0 => ot_edit_buffer_set_tab_width(&owner, &edit_id, 256),
-            1 => ot_edit_buffer_command(&owner, &edit_id, c.OT_EDIT_DEBUG_ROPE + 1, 0),
-            2 => ot_edit_buffer_command(&owner, &edit_id, c.OT_EDIT_MOVE_LEFT, 1),
+            1 => ot_edit_buffer_command(&owner, &edit_id, c.OT_EDIT_KEEP_OUTSIDE + 1, 0),
+            2 => ot_edit_buffer_command(&owner, &edit_id, c.OT_EDIT_NEW_LINE, c.OT_EDIT_ATOMIC),
             3 => ot_edit_buffer_history(&owner, &edit_id, 2, &bytes, bytes.len, &count),
             4 => ot_edit_buffer_history(&owner, &edit_id, 0, &bytes, bytes.len - 1, &count),
             5 => abi.ot_edit_buffer_set_text(&owner, &edit_id, "x", 1, 2),
@@ -808,6 +829,8 @@ test "Context editor ABI rejects malformed arguments without side effects" {
             25 => ot_edit_measure_text(&owner, "a", 1, c.OT_WIDTH_METHOD_UNICODE, 0, null),
             26 => ot_edit_measure_text(&owner, tabs.ptr, @intCast(tabs.len), c.OT_WIDTH_METHOD_UNICODE, 255, &count),
             27 => ot_edit_buffer_get_position(&owner, &edit_id, c.OT_EDIT_POSITION_END, 1, 0, &position),
+            28 => ot_edit_buffer_convert_offset(&owner, &edit_id, c.OT_EDIT_CELL_TO_UTF16 + 1, 0, &count),
+            29 => ot_edit_buffer_convert_offset(&owner, &edit_id, c.OT_EDIT_CELL_TO_BYTE, 0, null),
             else => unreachable,
         };
         try std.testing.expectEqual(c.OT_INVALID_ARGUMENT, status);

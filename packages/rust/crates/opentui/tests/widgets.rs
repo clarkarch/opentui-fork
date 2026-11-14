@@ -7,9 +7,61 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::time::Duration;
 
+#[path = "support/allocations.rs"]
+mod allocations;
+
 fn rows(app: &TestApp) -> Vec<String> {
     let capture = app.render();
     (0..capture.height).map(|y| capture.row(y).trim_end().to_owned()).collect()
+}
+
+#[test]
+fn sibling_paint_and_hits_match_a_fresh_tree() {
+    let rows: Vec<serde_json::Value> =
+        serde_json::from_str(include_str!("../../../../core/src/tests/fixtures/sibling-paint-order.json")).unwrap();
+    for row in rows {
+        let key = row["key"].as_str().unwrap();
+        let after = row["after"].as_str().unwrap();
+        let observe = |fresh: bool| {
+            let app = TestApp::new(3, 1);
+            let nodes = ["A", "B", "C"].map(|k| {
+                let width = 3 - "ABC".find(k).unwrap();
+                Text::new(&app, k.repeat(width))
+                    .absolute()
+                    .width(width as u32)
+                    .height(1)
+                    .z_index(i32::from(row["raised"] == k))
+            });
+            let parent = app.root();
+            let other = View::new(&app).width(0).height(0);
+            let child = &nodes["ABC".find(key).unwrap()];
+            if row["reparent"] == true {
+                parent.add(&other);
+                if !fresh {
+                    other.add(child);
+                }
+            }
+            for k in (if fresh { after } else { row["before"].as_str().unwrap() }).chars() {
+                parent.add(&nodes["ABC".find(k).unwrap()]);
+            }
+            if !fresh {
+                app.present().unwrap();
+                parent.insert(after.find(key).unwrap() + usize::from(row["reparent"] == true), child);
+            }
+            let frame = app.text();
+            let hits = (0..3)
+                .map(|x| {
+                    let hit = app.session().hit_test(x, 0).unwrap();
+                    nodes.iter().zip('A'..='C').find(|(n, _)| Some(n.id()) == hit).map_or('?', |(_, k)| k)
+                })
+                .collect::<String>();
+            (frame, hits)
+        };
+        let fresh = observe(true);
+        let expected = row["frame"].as_str().unwrap();
+        assert_eq!((&*fresh.0, &*fresh.1), (expected, expected), "{row}");
+        assert_eq!(observe(false), fresh, "{row}");
+    }
 }
 
 #[test]
@@ -973,9 +1025,12 @@ fn syntax_fg(app: &TestApp, name: &str) -> Color {
 fn code_highlights_numbers_lines_and_scrolls() {
     use opentui::widget::Code;
     let app = TestApp::new(24, 3);
-    let code = Code::new(&app).filetype("rust").line_numbers(true).grow(1.0);
+    let code = Code::new(&app).filetype("rust").line_numbers(true).wrap(WrapMode::Word).grow(1.0);
     let source: String = (1..=12).map(|line| format!("let x{line} = \"v\"; // c\n")).collect();
     code.set_code(source.trim_end());
+    // Before its first layout the view has no width, so it wraps nothing: 12 rows, not one per character.
+    assert_eq!(code.scroll_to(u32::MAX).scroll_position(), 12);
+    code.scroll_to(0);
     app.root().add(&code);
     // Core's gutter: at least three cells, with one cell of padding on each side of the number.
     assert_eq!(rows(&app), ["  1 let x1 = \"v\"; // c", "  2 let x2 = \"v\"; // c", "  3 let x3 = \"v\"; // c"]);
@@ -1324,9 +1379,11 @@ fn display_math_without_a_renderer_shows_plain_tex() {
 fn highlighted_code_restyles_appends_and_theme_changes() {
     use opentui::syntax::SyntaxTheme;
     use opentui::widget::Code;
-    let app = TestApp::new(30, 2);
+    let app = TestApp::new(30, 3);
     let code = Code::new(&app).filetype("rs").grow(1.0);
     app.root().add(&code);
+    let other = Code::new(&app).filetype("rs").set_code("let peer;").height(1);
+    app.root().add(&other);
     code.append("let a = 1;");
     code.append(" // done");
     let capture = app.render();
@@ -1342,9 +1399,16 @@ fn highlighted_code_restyles_appends_and_theme_changes() {
     // Two appends keep the shown highlight: the tail stays plain until the worker's lands.
     code.append(" let c;").append(" let d;");
     assert_eq!(app.render().cell(7, 1).unwrap().fg, app.theme().foreground);
-    code.syntax_theme(SyntaxTheme::new().style("keyword", Style::new().fg(Color::RED)));
+    let mut theme = SyntaxTheme::new().style("keyword", Style::new().fg(Color::RED));
+    for i in 0..128 {
+        theme.set(format!("unused.{i}"), Style::new());
+    }
+    let before = allocations::count();
+    code.syntax_theme(theme);
+    assert!(allocations::count() - before < 128, "restyling copied the unused scopes");
     let capture = app.render();
     assert_eq!(capture.cell(0, 0).unwrap().fg, Color::RED);
+    assert_eq!(capture.cell(0, 2).unwrap().fg, keyword);
     assert_eq!(capture.cell(11, 0).unwrap().fg, app.theme().foreground);
     code.filetype(None);
     assert_eq!(app.render().cell(0, 0).unwrap().fg, app.theme().foreground);
@@ -1817,6 +1881,8 @@ fn line_numbers_follow_wrapping_signs_and_colors() {
     let editor = Textarea::new(&app).grow(1.0);
     editor.set_text("one\ntwo is long\nthree");
     let numbered = LineNumbers::new(&app, &editor).grow(1.0);
+    // Before the first frame the editor has no width, so it wraps nothing.
+    assert_eq!(editor.view().info(false).unwrap().total_virtual_line_count, 3);
     app.root().add(&numbered);
     assert_eq!(rows(&app), [" 1 one", " 2 two is long", " 3 three", ""]);
     assert_eq!(app.render().cell(1, 0).unwrap().fg, app.theme().muted);
@@ -1941,6 +2007,20 @@ fn diffs_show_unified_and_split_views_with_numbers_signs_and_colors() {
 
     diff.set_diff("@@ broken\n");
     assert_eq!(rows(&app)[0], "Error parsing diff: unknown hunk header on line 1:");
+
+    // Same displayed text: changing every marker adds map buckets, not a string allocation per row.
+    diff.view(DiffView::Unified);
+    let context = format!("@@ -1,128 +1,128 @@\n{}", " x\n".repeat(128));
+    diff.set_diff(&context);
+    let rebuild = |patch: &str| {
+        let before = allocations::count();
+        diff.set_diff(patch);
+        allocations::count() - before
+    };
+    for (ranges, line) in [("-0,0 +1,128", "+x\n"), ("-1,128 +0,0", "-x\n")] {
+        let signed = format!("@@ {ranges} @@\n{}", line.repeat(128));
+        assert!(rebuild(&signed) < rebuild(&context) + 128, "each {line:?} row allocated its own sign");
+    }
 }
 
 #[test]
@@ -2103,11 +2183,11 @@ fn markdown_renders_nested_lists_quotes_and_tables() {
             "│ - inside",
             "",
             "┌──────────────┬─────────────┐",
-            "│Name          │Size         │",
+            "│Name          │         Size│",
             "├──────────────┼─────────────┤",
-            "│a             │1            │",
+            "│a             │            1│",
             "├──────────────┼─────────────┤",
-            "│bb            │22           │",
+            "│bb            │           22│",
             "└──────────────┴─────────────┘",
             "",
             "",
@@ -2277,6 +2357,29 @@ fn moves_into_an_atomic_extmark_go_to_its_nearer_edge() {
     area.set_cursor_offset(4);
     app.press("backspace");
     assert_eq!(area.text(), "a");
+    // One mark at a time: chips whose separator spaces were deleted are stepped over and deleted one by one; an older
+    // mark around the cursor does not hide a newer one whose edge is there; the second cell of a wide character is
+    // not a stop; Up from the end of a wrapped mark does not stay there. The cursor is set before the marks.
+    for (text, columns, marks, from, keys, to, after) in [
+        ("xx @a@b@c yy", 20, &[(3, 5), (5, 7), (7, 9)][..], 2, &["right", "delete", "backspace"][..], 3, "xx @c yy"),
+        ("abcdefghijklmno", 20, &[(1, 8), (3, 6)], 3, &["delete"], 3, "abcghijklmno"),
+        ("abcdefghijklmno", 20, &[(1, 8), (3, 6)], 6, &["backspace"], 3, "abcghijklmno"),
+        ("a日b", 20, &[], 2, &[], 1, "a日b"),
+        (wrapped, 6, &[(2, 15)], 15, &["up"], 0, wrapped),
+    ] {
+        let app = TestApp::new(columns, 4);
+        let area = Textarea::new(&app).grow(1.0);
+        area.set_text(text);
+        app.root().add(&area);
+        area.focus();
+        app.render();
+        area.set_cursor_offset(from);
+        for &(start, end) in marks {
+            area.add_extmark(start..end, ExtmarkOptions::default().atomic());
+        }
+        keys.iter().for_each(|key| app.press(key));
+        assert_eq!((area.cursor_offset(), area.text().as_str()), (to, after), "{keys:?} from {from} in {text:?}");
+    }
 }
 
 #[test]
