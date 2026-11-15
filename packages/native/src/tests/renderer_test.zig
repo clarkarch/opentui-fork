@@ -339,7 +339,7 @@ test "renderer letterboxes a downscaled Kitty copy that keeps its aspect" {
     try std.testing.expectEqual(renderer.RenderStatus.rendered, test_renderer.render(true));
 
     const output = test_renderer.memory.lastWrite();
-    try std.testing.expect(std.mem.find(u8, output, "a=t,f=24,s=16,v=16") != null);
+    try std.testing.expect(std.mem.find(u8, output, "a=t,f=32,s=16,v=16") != null);
     const transmit_start = std.mem.find(u8, output, "\x1b_Ga=t").?;
     const transmit_end = std.mem.findPos(u8, output, transmit_start, "\x1b\\").? + 2;
     const transmitted = try terminal_image_test.decodeKittyChunks(output[transmit_start..transmit_end]);
