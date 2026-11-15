@@ -37,7 +37,7 @@ upstream core, without changing a single import:
 
 ```jsonc
 "dependencies": {
-  "@opentui/core": "npm:@clarkarch/opentui-fork@0.8.4-fork.4"
+  "@opentui/core": "npm:@clarkarch/opentui-fork@0.9.0-fork.1"
 }
 ```
 
@@ -46,16 +46,16 @@ Or install it under its own name, when the import name does not have to stay
 
 ```jsonc
 "dependencies": {
-  "@clarkarch/opentui-fork": "0.8.4-fork.4"
+  "@clarkarch/opentui-fork": "0.9.0-fork.1"
 }
 ```
 
 The published package is self-contained: it never imports itself by the
 upstream name, so both spellings work.
 
-The versions are `0.8.4-fork.N` — the upstream version the fork tracks, plus
+The versions are `0.9.0-fork.N` — the upstream version the fork tracks, plus
 the fork's release counter. They are prereleases, so ask for them explicitly
-(`^0.8.4-fork.4`); a plain `^0.8.4` does not match them.
+(`^0.9.0-fork.1`); a plain `^0.9.0` does not match them.
 
 For Rust, depend on this repository. The fork's default branch is the branch
 with the patches, so no branch, tag, or revision is needed, and the crate

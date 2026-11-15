@@ -56,7 +56,7 @@ use crate::theme::{Theme, ThemeMode};
 use crate::widget::{AnyWidget, Behavior, Callbacks, Element, Painter, ScrollInner, View, Widget};
 use std::any::{Any, TypeId};
 use std::cell::{Cell, RefCell};
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::ops::Deref;
 use std::rc::{Rc, Weak};
 use std::sync::Arc;
@@ -831,7 +831,8 @@ impl App {
         self.0.terminal_active.get() && self.report(self.0.session.notify(message, title)).unwrap_or(false)
     }
 
-    /// Runs `task` after the current event finishes, before the next frame.
+    /// Runs `task` after the current event finishes, before the next frame. A task still queued when the app ends, or
+    /// deferred while it ends, is dropped without running.
     pub fn defer(&self, task: impl FnOnce(&mut Cx<'_>) + 'static) {
         self.0.deferred.borrow_mut().push_back(Box::new(task));
     }
@@ -1517,11 +1518,32 @@ impl App {
         self.0.filter_areas.borrow_mut().clear();
         self.0.in_frame.set(true);
         // Only an app with ticks tells them which widgets the frame draws, so the others pay nothing per request. A
-        // subscription made during the frame counts it as drawn already.
+        // subscription made during the frame counts it as drawn already. A widget clipped out of view is not drawn;
+        // the root, which has no paint slot, always is.
         let draft = if self.0.animations.borrow().ticks.is_some() {
+            let root = self.root().id();
             self.0.session.frame(&options, |request| {
-                if let HostRequest::Update { num, .. } = request {
-                    self.mark_drawn(num);
+                match &request {
+                    HostRequest::Update { num, .. } if *num == root => self.mark_drawn(|widget| widget == root),
+                    HostRequest::Record { slots, .. } => {
+                        // Drawn when its area, at least one cell per axis since children may overflow it, meets the
+                        // clip.
+                        let meets = |start: f64, size: f32, clip: i32, clip_size: u32| {
+                            start < f64::from(clip) + f64::from(clip_size)
+                                && start + f64::from(size.max(1.0)) > f64::from(clip)
+                        };
+                        let drawn: HashSet<u32> = slots
+                            .iter()
+                            .filter(|slot| {
+                                let ((x, y, width, height), paint) = (slot.clip, &slot.paint);
+                                meets(paint.screen_x, paint.width, x, width)
+                                    && meets(paint.screen_y, paint.height, y, height)
+                            })
+                            .map(|slot| slot.num)
+                            .collect();
+                        self.mark_drawn(|widget| drawn.contains(&widget));
+                    }
+                    _ => {}
                 }
                 self.host_request(request)
             })
@@ -1759,38 +1781,41 @@ impl App {
         if let Some(headless) = self.0.headless.get() {
             headless.clear();
         }
-        self.0.messages.borrow_mut().clear();
-        // Callbacks drop after each borrow: what they own may end ticks or cancel timers as it drops.
+        // Everything drops after its borrow: what it owns may call the app as it drops.
+        self.0.messages.take();
         self.0.animations.take();
         let timers = self.0.timers.borrow_mut().clear();
         drop(timers);
-        self.0.filter_areas.borrow_mut().clear();
+        self.0.filter_areas.take();
         let timelines = std::mem::take(&mut *self.0.timelines.borrow_mut());
         for timeline in timelines.iter().filter_map(Weak::upgrade) {
             timeline.teardown();
         }
-        self.0.deferred.borrow_mut().clear();
         self.0.proxy.close();
-        #[cfg(feature = "tokio")]
-        {
-            self.0.tasks.borrow_mut().clear();
-            *self.0.runtime.borrow_mut() = tasks::Runtime::default();
-        }
         self.close_clipboard();
         crate::console::unregister(self.0.console_id.get());
-        let console = std::mem::take(&mut *self.0.console.borrow_mut());
-        drop(console);
-        *self.0.focus.borrow_mut() = None;
-        *self.0.capture.borrow_mut() = None;
-        *self.0.selection.borrow_mut() = None;
-        *self.0.drag.borrow_mut() = None;
-        self.0.hover.borrow_mut().clear();
+        self.0.console.take();
+        self.0.focus.take();
+        self.0.capture.take();
+        self.0.selection.take();
+        self.0.drag.take();
+        self.0.hover.take();
         let live: Vec<Rc<dyn Behavior>> = self.0.registry.borrow().values().filter_map(Weak::upgrade).collect();
         for widget in &live {
             widget.teardown();
             widget.element().teardown();
         }
         crate::pty::teardown(self);
+        // Tasks deferred or spawned until now, also while the above dropped, are dropped without running.
+        for _ in 0..TURN_WORK_MAX {
+            #[cfg(feature = "tokio")]
+            self.0.tasks.take();
+            if self.0.deferred.take().is_empty() {
+                break;
+            }
+        }
+        #[cfg(feature = "tokio")]
+        self.0.runtime.take();
     }
 
     // Headless driving for tests.

@@ -49,8 +49,8 @@ committed Linux binary cannot serve.
        cp "/tmp/native-$target/native-${target}-${file}" "packages/native/lib/$target/"
      done
    done
-   npm pack @clarkarch/opentui-fork@0.8.4-fork.4 --pack-destination /tmp
-   tar -xzf /tmp/clarkarch-opentui-fork-0.8.4-fork.4.tgz -C /tmp
+   npm pack @clarkarch/opentui-fork@0.9.0-fork.1 --pack-destination /tmp
+   tar -xzf /tmp/clarkarch-opentui-fork-0.9.0-fork.1.tgz -C /tmp
    rm -rf packages/core/dist && mkdir -p packages/core/dist
    cp -R /tmp/package/. packages/core/dist/
    # `dist` and `lib` are gitignored, so a plain `git add` skips the artifacts — hence -f.
@@ -175,16 +175,16 @@ literal (the asset updater writes the consumer's parser file with one) is left
 alone, and the build fails if a self-import survives. `bun run test:dist`
 asserts both.
 
-Versions are `0.8.4-fork.N`: the upstream version the fork is based on, plus
+Versions are `0.9.0-fork.N`: the upstream version the fork is based on, plus
 the fork's own release counter. They are prereleases of the upstream version,
-so a consumer has to ask for them explicitly (`^0.8.4-fork.1`), which is what
+so a consumer has to ask for them explicitly (`^0.9.0-fork.1`), which is what
 `package.json` pins.
 
-The git tag `v0.8.4-fork.N` marks the same release in the repository, so a
+The git tag `v0.9.0-fork.N` marks the same release in the repository, so a
 Cargo dependency can pin it by tag instead of tracking the branch:
 
 ```toml
-opentui = { git = "https://github.com/clarkarch/opentui-fork", tag = "v0.8.4-fork.4" }
+opentui = { git = "https://github.com/clarkarch/opentui-fork", tag = "v0.9.0-fork.1" }
 ```
 
 A tag's tree carries the committed artifacts, so a consumer that pins a tag

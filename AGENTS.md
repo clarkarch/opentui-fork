@@ -170,6 +170,9 @@ This branch is a fork that carries patches upstream does not have. It is publish
   so a small raster was both warped and softened by the area filter. Letterboxing keeps a source that already fits the
   box at its native size (no resample at all), so it stays crisp. `fill` (stretch) and `cover` (crop) are unchanged, and
   a zeroed options record still stretches.
+  - Every Kitty transmit that RESIZES a source must go through `sourceForPixelBox`. This includes the large-image copy
+    path: a copy that bypasses the helper would stretch the art again and reintroduce the bug upstream's path is
+    merged around.
   - Two limits of the letterbox, learned from tfm: the margins are TRANSPARENT and Sixel DROPS alpha < 128 pixels
     (index 255), so a padded source becomes a HOLE in the payload — a caller that wants a filled box should render the
     source at the box's aspect itself (tfm renders its icon rasters into the EXACT placement box for this reason). And
