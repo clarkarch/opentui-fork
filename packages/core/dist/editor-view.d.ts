@@ -77,7 +77,7 @@ export declare class EditorView {
     deleteSelectedText(): void;
     /** @internal The native controller replaces a selection in one checked operation. */
     _replaceSelectedText(text: string): NativeEditorReplacement;
-    /** Sets the cursor in document display cells, counting each newline as one. */
+    /** Sets the cursor in document display cells, counting each newline as one. Offsets past the end clamp to the end. */
     setCursorByOffset(offset: number): void;
     /** Returns the next word boundary in logical and viewport cell coordinates. */
     getNextWordBoundary(): VisualCursor;

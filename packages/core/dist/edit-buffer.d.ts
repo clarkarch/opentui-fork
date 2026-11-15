@@ -78,7 +78,7 @@ export declare class EditBuffer extends EventEmitter {
     setCursor(line: number, col: number): void;
     /** Sets the cursor by zero-based logical line and display-cell column. */
     setCursorToLineCol(line: number, col: number): void;
-    /** Sets the cursor in display cells from the document start, counting each newline as one cell. */
+    /** Sets the cursor in display cells from the document start, counting each newline as one cell. Offsets past the end clamp to the end. */
     setCursorByOffset(offset: number): void;
     /** @internal Moves a cursor inside virtual extmarks to their outer edge: the end (> 0), the start (< 0) or nearer. */
     _keepOutside(direction: number): void;
