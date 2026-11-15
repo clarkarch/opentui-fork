@@ -2191,12 +2191,18 @@ pub const CliRenderer = struct {
             if (copy != .none) {
                 defer cropped.deinit();
                 const size = self.kittyCopySize(placement, copy);
+                // A whole copy is already scaled from the whole source with its
+                // aspect, and the terminal scales that copy to the placement's
+                // cells. Letterboxing it would add transparent margins and
+                // change the encoding. A crop is drawn into the placement's
+                // pixel box, so it keeps the placement's aspect rule.
+                const preserve_aspect = copy == .crop and placement.preserve_aspect;
                 const resized = try sourceForPixelBox(
                     self.allocator,
                     cropped,
                     size[0],
                     size[1],
-                    placement.preserve_aspect,
+                    preserve_aspect,
                 );
                 if (placement.opacity < 255) try applyAlphaOpacity(resized, placement.opacity);
                 return .{ .image = resized, .owned = true };
