@@ -313,7 +313,7 @@ test "renderer letterboxes a downscaled Kitty copy that keeps its aspect" {
         pixels[index * 4] = 255;
         pixels[index * 4 + 3] = 255;
     }
-    const value = try image.createFromRgba(std.testing.allocator, &pixels, 64, 32, 64 * 32 * 4);
+    const value = try image.createFromRgba(std.testing.allocator, &pixels, 64, 32, 64 * 4);
     defer value.deinit();
     const image_handle: u32 = 1;
     test_renderer.renderer.terminal.caps.kitty_graphics = true;
