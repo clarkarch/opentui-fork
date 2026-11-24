@@ -191,6 +191,11 @@ export function stageNativePackage(options: {
     [join(licenses.nativeRoot, "src", "vendor", "ffmpeg", "COPYING.LGPLv2.1"), "LICENSE-FFMPEG"],
     [join(licenses.nativeRoot, "src", "vendor", "ffmpeg", "README.md"), "FFMPEG-SOURCE.md"],
     [join(licenses.nativeRoot, "src", "vendor", "ffmpeg", "LICENSE-ZLIB"), "LICENSE-ZLIB"],
+    [join(licenses.nativeRoot, "THIRD_PARTY_LICENSES", "YOGA"), "LICENSE-YOGA"],
+    [join(licenses.nativeRoot, "THIRD_PARTY_LICENSES", "ZIG"), "LICENSE-ZIG"],
+    [join(licenses.nativeRoot, "THIRD_PARTY_LICENSES", "LLVM"), "LICENSE-LLVM"],
+    [join(licenses.nativeRoot, "THIRD_PARTY_LICENSES", "MINGW-W64"), "LICENSE-MINGW-W64"],
+    [join(licenses.nativeRoot, "THIRD_PARTY_LICENSES", "GDTOA"), "LICENSE-GDTOA"],
   ] as const) {
     if (!existsSync(source)) throw new Error(`Required native license file is missing: ${source}`)
     copyFileSync(source, join(destination, destinationName))
