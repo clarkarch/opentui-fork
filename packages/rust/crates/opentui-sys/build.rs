@@ -69,15 +69,17 @@ fn main() {
     } else {
         &["opentui.h", shared_library]
     };
-    // Only a checkout of OpenTUI can build the library; Cargo marks its own git checkouts with .cargo-ok. A consumer's
-    // .cargo/config.toml can name its own setup step in OPENTUI_LIB_HINT.
+    // Only a checkout of OpenTUI carries the native source tree beside the crate; a registry package does not. The
+    // fork also commits the built library there, so a Cargo git checkout needs no OPENTUI_LIB_DIR even though Cargo
+    // marks its checkout with .cargo-ok. A consumer's .cargo/config.toml can name its own setup step in
+    // OPENTUI_LIB_HINT.
     let version = env!("CARGO_PKG_VERSION");
     let from_release = format!(
         "extract opentui-native-v{version}-{release}.zip from OpenTUI's v{version} release and set OPENTUI_LIB_DIR to \
          that directory"
     );
     let root = PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").unwrap()).join("../../../..");
-    let checkout = root.join("packages/native/build.zig").is_file() && !root.join(".cargo-ok").exists();
+    let checkout = root.join("packages/native/build.zig").is_file();
     let advice = match env::var("OPENTUI_LIB_HINT") {
         Ok(hint) if !hint.is_empty() => hint,
         _ if env::var_os("OPENTUI_LIB_DIR").is_some() => {
