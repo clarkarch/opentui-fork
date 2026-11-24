@@ -88,10 +88,10 @@ fn frameContentHash(frame: *const OptimizedBuffer) u64 {
     hasher.update(std.mem.asBytes(&[2]u32{ frame.width, frame.height }));
     for (frame.image_placements.items) |placement| {
         const fields = [_]u32{
-            placement.image_handle,           @bitCast(placement.x),   @bitCast(placement.y),
-            placement.width,                  placement.height,        placement.pixel_width,
-            placement.pixel_height,           placement.source_x,      placement.source_y,
-            placement.source_width,           placement.source_height, placement.opacity,
+            placement.image_handle,          @bitCast(placement.x),   @bitCast(placement.y),
+            placement.width,                 placement.height,        placement.pixel_width,
+            placement.pixel_height,          placement.source_x,      placement.source_y,
+            placement.source_width,          placement.source_height, placement.opacity,
             @backingInt(placement.protocol),
         };
         hasher.update(std.mem.asBytes(&fields));
@@ -261,6 +261,21 @@ fn kittySourceSpan(origin: u32, length: u32, offset: u32, count: u32, span: u32)
     return .{ .start = @intCast(start_u64), .len = @intCast(end - start_u64) };
 }
 
+// The protocol writers show the source inside the placement's pixel box. A box
+// whose aspect differs from the source's distorts the image when the source is
+// stretched to it, so a placement that keeps its aspect ("fit") is letterboxed
+// inside the box instead: the art keeps its shape and still fills the box.
+fn sourceForPixelBox(
+    allocator: Allocator,
+    source: *native_image.Image,
+    pixel_width: u32,
+    pixel_height: u32,
+    preserve_aspect: bool,
+) !*native_image.Image {
+    if (preserve_aspect) return native_image.fitWithin(allocator, source, pixel_width, pixel_height);
+    return native_image.resize(allocator, source, pixel_width, pixel_height, .area);
+}
+
 // Per-frame invalidation state for one placement. Sixel pixels live inside the
 // covered cells, so a changed Sixel placement must clear and repaint its own
 // rectangle; everything outside placements diffs normally. The resolved
@@ -296,6 +311,9 @@ const SixelCacheKey = struct {
     pixel_width: u32,
     pixel_height: u32,
     opacity: u8,
+    /// A letterboxed payload differs from a stretched one, so the fit mode is
+    /// part of the cache key.
+    preserve_aspect: bool,
     background_hash: u64,
 };
 
@@ -1378,7 +1396,13 @@ pub const CliRenderer = struct {
             prepared_owned = true;
         }
         if (placement.pixel_width != prepared.width() or placement.pixel_height != prepared.height()) {
-            const resized = try native_image.resize(self.allocator, prepared, placement.pixel_width, placement.pixel_height, .area);
+            const resized = try sourceForPixelBox(
+                self.allocator,
+                prepared,
+                placement.pixel_width,
+                placement.pixel_height,
+                placement.preserve_aspect,
+            );
             if (prepared_owned) prepared.deinit();
             prepared = resized;
             prepared_owned = true;
@@ -2167,7 +2191,19 @@ pub const CliRenderer = struct {
             if (copy != .none) {
                 defer cropped.deinit();
                 const size = self.kittyCopySize(placement, copy);
-                const resized = try native_image.resize(self.allocator, cropped, size[0], size[1], .area);
+                // A whole copy is already scaled from the whole source with its
+                // aspect, and the terminal scales that copy to the placement's
+                // cells. Letterboxing it would add transparent margins and
+                // change the encoding. A crop is drawn into the placement's
+                // pixel box, so it keeps the placement's aspect rule.
+                const preserve_aspect = copy == .crop and placement.preserve_aspect;
+                const resized = try sourceForPixelBox(
+                    self.allocator,
+                    cropped,
+                    size[0],
+                    size[1],
+                    preserve_aspect,
+                );
                 if (placement.opacity < 255) try applyAlphaOpacity(resized, placement.opacity);
                 return .{ .image = resized, .owned = true };
             }
@@ -2428,6 +2464,7 @@ pub const CliRenderer = struct {
                 .pixel_width = placement.pixel_width,
                 .pixel_height = placement.pixel_height,
                 .opacity = placement.opacity,
+                .preserve_aspect = placement.preserve_aspect,
                 .background_hash = if (placement.placement_id <= self.imageDirty.items.len)
                     self.imageDirty.items[placement.placement_id - 1].background_hash
                 else
@@ -2461,7 +2498,13 @@ pub const CliRenderer = struct {
                 prepared_owned = true;
             }
             if (placement.pixel_width != prepared.width() or placement.pixel_height != prepared.height()) {
-                const resized = try native_image.resize(self.allocator, prepared, placement.pixel_width, placement.pixel_height, .area);
+                const resized = try sourceForPixelBox(
+                    self.allocator,
+                    prepared,
+                    placement.pixel_width,
+                    placement.pixel_height,
+                    placement.preserve_aspect,
+                );
                 if (prepared_owned) prepared.deinit();
                 prepared = resized;
                 prepared_owned = true;
@@ -2751,6 +2794,37 @@ pub const CliRenderer = struct {
                     const state = &image_dirty_items[id - 1];
                     if (state.protocol == .fallback) break :blk;
                     if (!should_force and !state.clear and self.shownBlank(currentCell.?.char, state.protocol)) {
+                        // The placement's pixels are unchanged, but the CELL under
+                        // it may not be: a scrim fill dims the background of the
+                        // reserved cells too. Skipping the write would leave the
+                        // pre-scrim background on the terminal, which shows
+                        // through any alpha raster as a square behind it. Emit
+                        // the cell only when its colors/attributes changed. The
+                        // image composites ABOVE the cell, so a bg-only write is
+                        // safe.
+                        const cell_changed = !buf.rgbaEqual(currentCell.?.bg, cell.bg) or
+                            !buf.rgbaEqual(currentCell.?.fg, cell.fg) or currentCell.?.attributes != cell.attributes;
+                        if (cell_changed) {
+                            if (!frame_started) {
+                                self.beginRenderFrame(writer);
+                                frame_started = true;
+                            }
+                            writer.writeAll(ansi.ANSI.reset) catch {};
+                            ansi.ANSI.moveToOutput(writer, x + 1, y + 1 + self.renderOffset) catch {};
+                            self.emitColor(writer, cell.fg, false);
+                            self.emitColor(writer, cell.bg, true);
+                            ansi.TextAttributes.applyAttributesOutputWriter(writer, cell.attributes) catch {};
+                            writer.writeByte(' ') catch {};
+                            currentFg = cell.fg;
+                            currentBg = cell.bg;
+                            currentAttributes = cell.attributes;
+                            clearRunY = y;
+                            clearRunEnd = x + 1;
+                            runLength = 0;
+                            self.currentRenderBuffer.syncCell(x, y, cell);
+                            cellsUpdated += 1;
+                            continue;
+                        }
                         if (runLength > 0) {
                             writer.writeAll(ansi.ANSI.reset) catch {};
                             runLength = 0;

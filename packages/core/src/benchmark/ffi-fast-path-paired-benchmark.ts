@@ -472,7 +472,7 @@ function buildNodeBenchmark(target: Target): void {
       target.childSource,
       "--target=node",
       `--outdir=${target.buildDir}`,
-      "--external=@opentui/core-*",
+      "--external=@clarkarch/opentui-fork-*",
       "--external=web-tree-sitter",
     ],
     { cwd: target.packageRoot, encoding: "utf8" },

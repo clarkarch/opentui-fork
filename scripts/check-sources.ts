@@ -6,6 +6,7 @@ import { join, resolve } from "node:path"
 import process from "node:process"
 import { gunzipSync } from "node:zlib"
 import { variantName, variants, zigOutputName } from "../packages/core/scripts/variants"
+import { PUBLISHED_CORE_NAME } from "../packages/core/src/published-package"
 import { NODE26_MIN_VERSION } from "./node26.mjs"
 
 const root = resolve(process.argv[2] ?? join(import.meta.dirname, ".."))
@@ -100,8 +101,16 @@ expectTargets(rustInstall, /^\|[^|\n]+\|[^|\n]+\| `([^`]+)` +\|/gm, npmNames, tr
 for (const file of ["packages/rust/scripts/check-targets.sh", "packages/rust/run.sh", "packages/rust/test.sh"]) {
   expectTargets(file, zigPattern, zigNames, false)
 }
-for (const file of [
+// The fork's loader names the published platform packages, while the upstream
+// documentation still names @opentui/core's packages. Check each against the
+// naming it actually uses.
+expectTargets(
   "packages/core/src/platform/runtime-assets.bun.ts",
+  /@clarkarch\/opentui-fork-([a-z0-9-]+)/g,
+  npmNames,
+  true,
+)
+for (const file of [
   "packages/web/src/content/docs/getting-started/runtime-support.mdx",
   "packages/web/src/content/docs/reference/api-index.mdx",
 ]) {
@@ -129,7 +138,7 @@ for (const dir of [
   }
 }
 const optional = Object.keys(json("packages/core/package.json").optionalDependencies ?? {})
-const packages = new Set([...npmNames].map((name) => `@opentui/core-${name}`))
+const packages = new Set([...npmNames].map((name) => `${PUBLISHED_CORE_NAME}-${name}`))
 if (optional.length !== packages.size || !optional.every((name) => packages.has(name))) {
   problems.add(
     `packages/core/package.json: optionalDependencies ${optional.join(", ")}, expected ${[...packages].join(", ")}`,

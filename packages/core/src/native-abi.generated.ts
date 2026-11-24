@@ -1,7 +1,7 @@
 // Generated from packages/native/include/opentui.h and scripts/native-abi-pointers.ts.
 // Run `bun run generate:abi` in packages/core. Do not edit.
 // Inspect audit input: bun scripts/native-abi.ts --audit
-// ABI audit SHA-256: d3566b262e1248a72d2eb4eaa6f8852dc82c14f532d5141156cad517a84951d8
+// ABI audit SHA-256: 99c9f53d7c773a3cbe436f0996347dde3404f74a51d1f93a462dbc803e709108
 
 export const OT_CONTEXT_ABI_VERSION = 2
 export const OT_OK = 0
@@ -537,6 +537,8 @@ export const OT_IMAGE_PROTOCOL_SIXEL = 2
 export const OT_IMAGE_PROTOCOL_BLOCKS = 3
 export const OT_IMAGE_DRAW_SOURCE_WIDTH = 1
 export const OT_IMAGE_DRAW_SOURCE_HEIGHT = 2
+export const OT_IMAGE_DRAW_OPACITY_OVERRIDE = 4
+export const OT_IMAGE_DRAW_PRESERVE_ASPECT = 8
 export const OT_IMAGE_ENCODED_BYTES_MAX = 67108864
 export const OT_IMAGE_FORMAT_UNKNOWN = 0
 export const OT_IMAGE_FORMAT_PNG = 1
@@ -881,6 +883,7 @@ export const nativeSymbols = {
   ot_scene_set_paint: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_scene_flush: { args: ["ptr", "ptr", "u32", "buffer"], returns: "i32" },
   ot_scene_set_surface: { args: ["ptr", "buffer", "ptr"], returns: "i32" },
+  ot_scene_set_fill_dims_images: { args: ["ptr", "buffer", "u32"], returns: "i32" },
   ot_scene_set_box_details: { args: ["ptr", "buffer", "buffer", "ptr", "u32", "ptr", "u32"], returns: "i32" },
   ot_scene_set_viewport: { args: ["ptr", "buffer", "ptr"], returns: "i32" },
   ot_scene_set_scroll: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
@@ -926,6 +929,7 @@ export const nativeSymbols = {
   ot_embedded_terminal_destroy: { args: ["ptr", "buffer"], returns: "i32" },
   ot_embedded_terminal_write: { args: ["ptr", "buffer", "ptr", "u32"], returns: "i32" },
   ot_embedded_terminal_resize: { args: ["ptr", "buffer", "u32", "u32"], returns: "i32" },
+  ot_embedded_terminal_set_cell_size: { args: ["ptr", "buffer", "u32", "u32"], returns: "i32" },
   ot_embedded_terminal_command: { args: ["ptr", "buffer", "u32", "i32"], returns: "i32" },
   ot_embedded_terminal_set_selection: { args: ["ptr", "buffer", "u32", "u32", "u32", "u32"], returns: "i32" },
   ot_embedded_terminal_get_selected_text: { args: ["ptr", "buffer", "ptr", "u32", "buffer"], returns: "i32" },
@@ -1026,7 +1030,7 @@ export const nativeSymbols = {
   ot_image_copy_png: { args: ["ptr", "buffer", "buffer", "u64", "buffer"], returns: "i32" },
   ot_image_take_pixels: { args: ["ptr", "buffer", "buffer"], returns: "i32" },
   ot_image_pixels_release: { args: ["ptr", "buffer"], returns: "i32" },
-  ot_scene_set_image: { args: ["ptr", "buffer", "ptr", "u32", "u32", "ptr"], returns: "i32" },
+  ot_scene_set_image: { args: ["ptr", "buffer", "ptr", "u32", "u32", "ptr", "f32"], returns: "i32" },
   ot_scene_set_crop: { args: ["ptr", "buffer", "u32", "u32", "u32", "u32"], returns: "i32" },
   ot_scene_set_video: { args: ["ptr", "buffer", "u32", "ptr"], returns: "i32" },
   ot_video_open: { args: ["ptr", "buffer", "ptr", "u32", "u32", "buffer"], returns: "i32" },
@@ -1709,7 +1713,7 @@ export const nativeLayouts = {
     },
   },
   ot_embedded_terminal_options: {
-    size: 24,
+    size: 32,
     alignment: 4,
     fields: {
       struct_size: { offset: 0, size: 4, alignment: 4, type: "u32" },
@@ -1717,7 +1721,9 @@ export const nativeLayouts = {
       cols: { offset: 8, size: 4, alignment: 4, type: "u32" },
       rows: { offset: 12, size: 4, alignment: 4, type: "u32" },
       max_scrollback: { offset: 16, size: 4, alignment: 4, type: "u32" },
-      reserved: { offset: 20, size: 4, alignment: 4, type: "u32" },
+      cell_width_px: { offset: 20, size: 4, alignment: 4, type: "u32" },
+      cell_height_px: { offset: 24, size: 4, alignment: 4, type: "u32" },
+      reserved: { offset: 28, size: 4, alignment: 4, type: "u32" },
     },
   },
   ot_embedded_terminal_cursor: {
@@ -2057,7 +2063,8 @@ export const nativeLayouts = {
       source_y: { offset: 44, size: 4, alignment: 4, type: "u32" },
       source_width: { offset: 48, size: 4, alignment: 4, type: "u32" },
       source_height: { offset: 52, size: 4, alignment: 4, type: "u32" },
-      reserved: { offset: 56, size: 8, alignment: 4, type: "[2]u32" },
+      opacity_override: { offset: 56, size: 4, alignment: 4, type: "f32" },
+      reserved: { offset: 60, size: 4, alignment: 4, type: "[1]u32" },
     },
   },
   ot_session_kitty_image_transport: {
@@ -3083,6 +3090,8 @@ export const nativeConstants = {
   OT_IMAGE_PROTOCOL_BLOCKS: 3,
   OT_IMAGE_DRAW_SOURCE_WIDTH: 1,
   OT_IMAGE_DRAW_SOURCE_HEIGHT: 2,
+  OT_IMAGE_DRAW_OPACITY_OVERRIDE: 4,
+  OT_IMAGE_DRAW_PRESERVE_ASPECT: 8,
   OT_IMAGE_ENCODED_BYTES_MAX: 67108864,
   OT_IMAGE_FORMAT_UNKNOWN: 0,
   OT_IMAGE_FORMAT_PNG: 1,

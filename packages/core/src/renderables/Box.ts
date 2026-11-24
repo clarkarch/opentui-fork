@@ -22,6 +22,10 @@ export interface BoxOptions<TRenderable extends Renderable = BoxRenderable> exte
   borderColor?: string | RGBA
   customBorderChars?: BorderCharacters
   shouldFill?: boolean
+  /** tfm fork: a TRANSLUCENT fill keeps the image placements it covers and dims
+   * them instead of deleting them (the modal scrim overlay). Opaque fills and
+   * the default (false) are unchanged. */
+  fillDimsImages?: boolean
   title?: string
   titleColor?: string | RGBA
   titleAlignment?: "left" | "center" | "right"
@@ -62,6 +66,7 @@ export class BoxRenderable extends Renderable {
   protected _customBorderChars?: Uint32Array
   protected borderSides: BorderSidesConfig
   private _shouldFill: boolean
+  private _fillDimsImages: boolean
   protected _title?: string
   protected _titleColor?: RGBA
   protected _titleAlignment: "left" | "center" | "right"
@@ -105,6 +110,10 @@ export class BoxRenderable extends Renderable {
       this._customBorderChars = this._customBorderCharsObj ? borderCharsToArray(this._customBorderCharsObj) : undefined
       this.borderSides = getBorderSides(this._border)
       this._shouldFill = options.shouldFill ?? this._defaultOptions.shouldFill
+      this._fillDimsImages = options.fillDimsImages ?? false
+      // scene-painted boxes go through the native paintBox path (the JS
+      // renderSelf is not the paint hook), so the flag must reach the node too
+      if (this._fillDimsImages) this._ctx.nativeScene.setFillDimsImages(this, true)
       this._title = options.title
       this._titleColor = options.titleColor ? RGBA.clone(parseColor(options.titleColor)) : undefined
       this._titleAlignment = options.titleAlignment || this._defaultOptions.titleAlignment
@@ -328,6 +337,20 @@ export class BoxRenderable extends Renderable {
     if (this._shouldFill === value) return
     this.setNativeScenePaint({ shouldFill: value })
     this._shouldFill = value
+    this.requestRender()
+  }
+
+  /** tfm fork: translucent-fill dimming for image placements (scrim overlay). */
+  get fillDimsImages(): boolean {
+    return this._fillDimsImages
+  }
+
+  set fillDimsImages(value: boolean) {
+    const next = value ?? false
+    if (this._fillDimsImages === next) return
+    this._fillDimsImages = next
+    if (this.isFreed()) return
+    this._ctx.nativeScene.setFillDimsImages(this, next)
     this.requestRender()
   }
 

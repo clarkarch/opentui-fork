@@ -1,6 +1,6 @@
 {
   "name": "@opentui/qrcode",
-  "version": "0.9.9",
+  "version": "0.9.9-fork.1",
   "description": "QR code encoder and renderable for OpenTUI",
   "license": "MIT",
   "repository": {

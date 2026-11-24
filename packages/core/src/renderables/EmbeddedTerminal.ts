@@ -56,6 +56,7 @@ export class EmbeddedTerminalRenderable extends Renderable {
   private selection = false
   private composedHookGeneration = 0n
   private _transparentBackground = false
+  private _cellSize: { width: number; height: number } = { width: 0, height: 0 }
   private readonly sizeDefaults: { width: number; height: number }
 
   constructor(ctx: RenderContext, options: EmbeddedTerminalOptions) {
@@ -76,13 +77,51 @@ export class EmbeddedTerminalRenderable extends Renderable {
       this._onTerminalResize = options.onTerminalResize
       this._onScreenChange = options.onScreenChange
       this.selectable = options.selectable ?? true
-      const config = { cols, rows, maxScrollback: options.maxScrollback }
+      const cell = this.hostCellSize()
+      const config = {
+        cols,
+        rows,
+        maxScrollback: options.maxScrollback,
+        cellWidthPx: cell.width,
+        cellHeightPx: cell.height,
+      }
       this.handle = this.lib.createContextEmbeddedTerminal(ctx.nativeScene.driver.context, config)
       this.transparentBackground = options.transparentBackground ?? false
       this.setupMouse(options)
     } catch (error) {
       this.rollbackConstruction(error)
     }
+  }
+
+  /// The host terminal's cell size in pixels.
+  ///
+  /// Kitty image placements are sized in pixels, so the VT needs the cell
+  /// geometry to place them. The pixel resolution is only known once the
+  /// terminal answers the size query, so this can change later.
+  private hostCellSize(): { width: number; height: number } {
+    const resolution = this._ctx.resolution
+    const width = this._ctx.terminalWidth ?? 0
+    const height = this._ctx.terminalHeight ?? 0
+    if (!resolution || width <= 0 || height <= 0) return { width: 0, height: 0 }
+    return {
+      width: Math.max(1, Math.floor(resolution.width / width)),
+      height: Math.max(1, Math.floor(resolution.height / height)),
+    }
+  }
+
+  /// Pushes the host cell size to the VT when it changed.
+  private syncCellSize(): void {
+    if (!this.handle) return
+    const cell = this.hostCellSize()
+    if (cell.width === this._cellSize.width && cell.height === this._cellSize.height) return
+    this._cellSize = cell
+    if (cell.width === 0 && cell.height === 0) return
+    this.lib.contextEmbeddedTerminalSetCellSize(
+      this._ctx.nativeScene.driver.context,
+      this.handle,
+      cell.width,
+      cell.height,
+    )
   }
 
   protected override defaultDimension(kind: "width" | "height"): number {
@@ -288,6 +327,7 @@ export class EmbeddedTerminalRenderable extends Renderable {
     const rows = Math.min(Math.floor(height), 0xffff)
     this.lib.contextEmbeddedTerminalResize(this.handle.context, this.handle, cols, rows)
     this.lib.contextEmbeddedTerminalInvalidate(this.handle.context, this.handle)
+    this.syncCellSize()
     this.flushResponses()
     this._onTerminalResize?.(cols, rows)
   }
@@ -302,6 +342,9 @@ export class EmbeddedTerminalRenderable extends Renderable {
 
   protected renderSelf(buffer: OptimizedBuffer): void {
     if (!this.handle || !this.frameBuffer || !this.visible || this.isDestroyed) return
+    // The host's pixel resolution can arrive after the pane was built, so the
+    // cell size is refreshed on every paint.
+    this.syncCellSize()
     // A hook can dirty retained cells, even if it removes itself before this paint.
     if (
       this.renderBefore ||

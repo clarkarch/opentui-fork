@@ -22,6 +22,57 @@ OpenCode uses OpenTUI in production for millions of users.
 
 [Website](https://opentui.com) | [Documentation](https://opentui.com/docs) | [Packages](https://opentui.com/packages)
 
+## This fork
+
+This is a fork of `anomalyco/opentui` on the `tfm` branch, carrying patches
+that upstream does not have yet — a per-image placement opacity, a translucent
+fill that dims the images it covers instead of deleting them, and an embedded
+terminal that renders kitty graphics (including the unicode-placeholder
+style). The patches live in the Zig native layer, so they need the matching
+TypeScript bindings; `bun run build:lib` refuses to build when the generated
+ABI is stale.
+
+The fork is published to npm as `@clarkarch/opentui-fork`. Use it like the
+upstream core, without changing a single import:
+
+```jsonc
+"dependencies": {
+  "@opentui/core": "npm:@clarkarch/opentui-fork@0.9.9-fork.1"
+}
+```
+
+Or install it under its own name, when the import name does not have to stay
+`@opentui/core`:
+
+```jsonc
+"dependencies": {
+  "@clarkarch/opentui-fork": "0.9.9-fork.1"
+}
+```
+
+The published package is self-contained: it never imports itself by the
+upstream name, so both spellings work.
+
+The versions are `0.9.0-fork.N` — the upstream version the fork tracks, plus
+the fork's release counter. They are prereleases, so ask for them explicitly
+(`^0.9.9-fork.1`); a plain `^0.9.9` does not match them.
+
+For Rust, depend on this repository. The fork's default branch is the branch
+with the patches, so no branch, tag, or revision is needed, and the crate
+names stay upstream's:
+
+```toml
+[dependencies]
+opentui = { git = "https://github.com/clarkarch/opentui-fork", features = ["tokio", "tree-sitter"] }
+```
+
+`cargo update` moves it; `Cargo.lock` pins the commit. The native library
+travels with the repository, so a build needs no native toolchain. See
+[packages/rust/README.md](packages/rust/README.md).
+
+See [PREBUILT.md](PREBUILT.md) for what the branch carries and how to publish
+it.
+
 ## Packages
 
 - [`@opentui/core`](packages/core) - Native terminal UI library with TypeScript bindings.

@@ -1,3 +1,5 @@
+import { publishedPlatformPackageName } from "./published-package.js"
+
 export type NodeAssetTarget = {
   readonly platform: "darwin" | "linux" | "win32"
   readonly arch: "arm64" | "x64"
@@ -29,7 +31,7 @@ export function getNativeAssetDescriptor(target: NodeAssetTarget): NativeAssetDe
   }
 
   const libcSuffix = target.platform === "linux" && target.libc === "musl" ? "-musl" : ""
-  const packageName = `@opentui/core-${target.platform}-${target.arch}${libcSuffix}`
+  const packageName = publishedPlatformPackageName(`${target.platform}-${target.arch}${libcSuffix}`)
   const fileName = NATIVE_FILE_NAMES[target.platform]
   return {
     key: `${packageName}/${fileName}`,

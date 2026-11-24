@@ -1,0 +1,6 @@
+.{
+    .name = .wuffs,
+    .version = "0.0.0",
+    .fingerprint = 0x67c0c059a05cd63c,
+    .paths = .{""},
+}

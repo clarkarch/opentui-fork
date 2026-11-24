@@ -1,0 +1,115 @@
+name: fork-ci
+
+# The fork's own gate. It proves the two things a downstream Rust project
+# depends on: the crates build and link against the patched native library,
+# and a project that depends on this repository builds the way a downstream
+# project does.
+#
+# The release artifacts are built by native-artifacts.yml; this workflow builds
+# the host library only, because the Rust checks need one target.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tfm]
+    paths:
+      - "packages/native/**"
+      - "packages/rust/**"
+      # Prose cannot change a binary or a crate. A README edit under either
+      # matched the filters above and burned a full consumer build.
+      - "!packages/native/**.md"
+      - "!packages/rust/**.md"
+      - ".github/workflows/fork-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    name: rust crates and a git dependency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      # The repository's own action: the Zig version comes from
+      # packages/native/build.zig.zon.
+      - uses: ./.github/actions/setup-zig
+
+      # Native video statically links FFmpeg. Its static libraries depend only on the pinned build script.
+      - name: Restore FFmpeg build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/native/.cache/ffmpeg/prefix
+            packages/native/.cache/ffmpeg/downloads
+          key: ffmpeg-v1-${{ runner.os }}-${{ hashFiles('packages/native/scripts/build-ffmpeg.ts', '.zig-version') }}
+
+      - name: Prepare zig dependencies
+        working-directory: packages/native
+        run: sh scripts/prepare-zig-deps.sh
+
+      - name: Build FFmpeg
+        working-directory: packages/native
+        run: bun scripts/build-ffmpeg.ts
+
+      - name: Build the native library
+        working-directory: packages/native
+        run: zig build -Doptimize=ReleaseFast -Drequire-video
+
+      - name: Run the native tests
+        working-directory: packages/native
+        run: sh scripts/test.sh -Drequire-video
+
+      - name: Strip a copy the way the release does
+        # The release ships stripped libraries, and the committed artifacts are
+        # copied from it. A strip that breaks the static archive would break
+        # every Rust consumer, so the checks below run against the stripped
+        # copy, not the build.
+        run: |
+          dir="$GITHUB_WORKSPACE/packages/native/lib/x86_64-linux"
+          stripped="$RUNNER_TEMP/stripped"
+          mkdir -p "$stripped"
+          cp "$dir/libopentui.so" "$dir/libopentui.a" "$dir/opentui.h" "$stripped/"
+          if ! command -v llvm-strip >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq llvm
+          fi
+          llvm-strip --strip-unneeded "$stripped/libopentui.so" "$stripped/libopentui.a"
+          ls -l "$stripped"
+
+      - name: Restore the committed artifacts
+        # The build wrote over the committed library, so the checkout now
+        # holds this job's build where a consumer's clone would hold the
+        # committed one. The consumer step below needs the committed files:
+        # it proves that what the branch carries is what a downstream project
+        # links and runs.
+        run: |
+          git checkout -- packages/native/lib
+          git clean -fdx -- packages/native/lib
+          ls -l packages/native/lib/x86_64-linux
+
+      - name: Install the pinned Rust toolchain
+        working-directory: packages/rust
+        run: |
+          rustup toolchain install
+          cargo fetch --locked
+
+      - name: Run the Rust workspace checks
+        working-directory: packages/rust
+        env:
+          CI: "true"
+          # The stripped copy: the same files the release and the committed
+          # artifacts carry, with the header beside them.
+          OPENTUI_LIB_DIR: ${{ runner.temp }}/stripped
+        run: sh test.sh all
+
+      - name: Build a project that depends on this repository
+        # The consumer clones this repository and builds the crates from the
+        # clone, so it finds the committed artifacts, not this job's build.
+        # No OPENTUI_LIB_DIR: the crates look in the clone, which is what a
+        # downstream project does.
+        run: sh packages/rust/scripts/consumer-smoke.sh

@@ -27,6 +27,9 @@
 
 ## Verification
 
+- **Do not build or test this repository locally unless the user explicitly asks for a specific local run. CI is the build
+  and test authority.** Push the branch and use the fork's CI workflows.
+- The checks below describe what CI must cover. Run them locally only when the user explicitly authorizes a local run.
 - Run the narrowest relevant test first, then the affected package suite.
 - Ordinary TypeScript source changes do not require the root build. Use the affected package's `test`, `typecheck`,
   `build`, or validation scripts as applicable.
@@ -52,8 +55,132 @@ terminal or platform is unavailable locally.
 - Run the narrowest test first (`cargo test -p opentui --test <file>`; `tests/lifecycle.rs` also needs the
   examples built), then `sh packages/rust/test.sh shared`, and `static` on Linux and macOS when linking changes.
   `rustfmt.toml` is the Rust formatting source of truth.
+- **The fork's Rust crates are consumed as a git dependency on the default branch**
+  (`https://github.com/clarkarch/opentui-fork`): the crate names stay upstream's (`opentui`, `opentui-sys`,
+  `opentui-ssh`) so a consumer moves between the fork and upstream by changing the dependency's source, and a
+  future upstream merge is a small diff instead of a rename. `packages/rust/scripts/consumer-smoke.sh` builds a
+  throwaway project against the repository, which is what the `fork-ci` workflow runs.
+- A Cargo git dependency with no `branch`/`rev`/`tag` resolves to the repository's DEFAULT branch, so the fork's
+  default branch must be `tfm` (the patched one); `main` stays the upstream mirror. The release tags
+  (`v<upstream>-fork.N`) pin the same tree, and a tag's tree carries the committed artifacts, so a consumer that pins a
+  tag links the same library a consumer that tracks the branch does.
+- The crates are NOT published to crates.io: eleven crates would need a version bump per fork release, the static
+  archive is far over crates.io's size cap, and the versions are permanent. A project that must be publishable can wrap
+  the git dependency in one crate of its own.
+- **Nothing is built by hand.** CI builds the native library for every target (`native-artifacts`) and the npm
+  packages (`publish-npm`); the committed artifacts under `packages/core/dist` and `packages/native/lib` are
+  copied from that CI output, stripped, and committed. See PREBUILT.md. The committed native directory holds the
+  library, the static archive, AND `opentui.h`: the crates check the header against the bindings they were
+  generated from, so a consumer needs it beside the library it links, and a commit without it fails every
+  downstream build.
 - A change to `opentui.h` also runs `sh packages/rust/test.sh shared` and fixes the crates in the same pull request.
 - The crates carry `@opentui/core`'s version; `prepare-release` sets it.
+
+### The fork's image ABI in Rust
+
+The fork's `opentui.h` adds an `opacity_override` parameter to `ot_scene_set_image`, so upstream's Rust
+call site does not compile against the regenerated bindings. The safe layer carries it:
+
+- `Node::set_image_with_opacity(image, fit, protocol, opacity_override)` and `IMAGE_OPACITY_INHERIT` (a negative
+  value inherits the render-tree opacity; `0.0..=1.0` replaces it). `Node::set_image` keeps upstream's behaviour.
+- `ImageView::placement_opacity(Option<f32>)` is the widget-level spelling, with the same range check as the JS side.
+- `Node::set_fill_dims_images(bool)` and `View::fill_dims_images(bool)` carry the fork's box flag: a translucent fill
+  keeps the image placements it covers and dims them in place instead of deleting them.
+- `ImageFit::Contain` needs no Rust-side flag. The fork's scene turns the node's fit into the native
+  `OT_IMAGE_DRAW_PRESERVE_ASPECT` placement, so a Rust app gets the letterboxed, undistorted placement for free.
+
+The terminal's size in pixels is part of the same story: an image sizes its pixels and cells with it. Core keeps it in
+`renderer.resolution`; the Rust crate had no way to read it, so a Rust app that drew an image at the terminal's real
+size had to ask the terminal itself. `Host::pixel_resolution()` and `App::pixel_resolution()` now carry it, and
+`App::on_pixel_resolution(...)` reports it when it arrives. A resize forgets it: the cell size may have changed with
+it, and the terminal answers the next query.
+
+Regenerating the bindings (`bun run generate:abi` in `packages/core`) changes `generated.rs` and the header hash in
+it; `opentui-sys`'s build script refuses a native library whose header does not match that hash, so a native rebuild
+has to follow an ABI change.
+
+## Fork publishing (the `tfm` branch)
+
+This branch is a fork that carries patches upstream does not have. It is published to npm under its own scope,
+`@clarkarch/opentui-fork`, plus one package per native target (`@clarkarch/opentui-fork-<platform>-<arch>[-<abi>]`).
+
+- The in-repo package name stays `@opentui/core`. The monorepo's internal imports and the upstream rebase depend on it;
+  only the PUBLISHED artifacts carry the fork's name. `packages/core/src/published-package.ts` is the single source for it.
+- A BUILD JOB MUST PUBLISH ONLY WHAT IT BUILT. The checkout carries the committed Linux artifacts, and the native build
+  writes to the same paths, so uploading the whole `packages/native/lib/` tree lets a job's artifact carry the OTHER
+  target's committed library — and the publish job copies the artifacts into one directory, last-wins. The committed
+  library then overwrites the fresh one, and the release ships a stale binary that no test catches (a consumer that
+  links it still works: it is the same ABI, just old code). Both workflows stage what the job built into `out/<target>/`
+  with a `manifest.txt` of sha256s, and the publish job copies exactly the manifest's files and fails when the artifact
+  holds an unlisted one.
+- The COMMITTED ARTIFACTS ARE THE OUTPUT, so they must not trigger a rebuild: `packages/native/lib/**` is excluded from
+  the `packages/native/**` path filter of `native-artifacts.yml` and `publish-npm.yml`. `fork-ci.yml` keeps it — that
+  workflow is the gate that proves the committed artifacts link and run.
+- PROSE IS NOT A BUILD INPUT. A markdown edit under `packages/native/` or `packages/rust/` matched the path filter and
+  burned a full rebuild of every target (21 min) plus an npm publish (19 min) plus the consumer build (9 min) — for a
+  README. Those trees exclude `**.md`. The pattern is `packages/native/**.md`, not `packages/native/**/*.md`: the
+  filter's `**` spans the `/`, so `**.md` matches a markdown file at any depth, while `**/*.md` needs two slashes and
+  misses the top-level README. A workflow file's own path stays in the filter — a changed workflow has to be validated.
+- A native build is NOT byte-reproducible (a fresh ELF build-id), so the committed library's bytes differ from a later
+  release's. The CODE does not: the `.text` segment hashes the same. What a consumer can rely on is the header, and the
+  header is byte-identical — it is the file the crates hash-check.
+- `packages/core/dist` and `packages/native/lib` are gitignored, so a refresh needs `git add -f`. The committed native
+  directory holds the library, the static archive, AND `opentui.h`: the crates check the header against the bindings
+  they were generated from, so a consumer needs it beside the library it links, and a commit without it fails every
+  downstream build.
+- The Rust crates' build script refuses a native artifact whose header does not hash to what `generated.rs` was
+  generated from. That check is the gate that catches a stale or mismatched artifact BEFORE a consumer sees it.
+- The loader imports the platform packages with LITERAL specifiers, because `bun build --compile` has to see the
+  `import("./libopentui.so", { type: "file" })` inside them to embed the library in a binary. A computed specifier is
+  invisible to the bundler and the compiled binary silently loses its library. Keep the literals literal.
+- Those literals, the manifest's `optionalDependencies` and the build script's package names have to agree.
+  `packages/core/src/published-package.test.ts` fails when they drift; run it after touching any of them.
+- A leftover `@opentui/core-<target>` reference loads the UNPATCHED upstream library next to the patched JS. That is an
+  ABI mismatch, not a fallback — the same guard fails on it.
+- The version is `<upstream version>-fork.N` (upstream version + release counter). It is a prerelease of the upstream
+  version, so consumers have to ask for it explicitly. Bump it in `packages/core/package.json` AND in the
+  `optionalDependencies` pins together — the pins are exact versions.
+- Publish with `bun scripts/publish-fork.ts --native-dir <dir>`: the platform packages first, then the core, so an
+  install never sees the core without its library. The `publish-npm` workflow does this from CI.
+- Native video links the same decode-only LGPL FFmpeg as upstream. `packages/native`'s `prepare:zig` builds the host
+  prefix, and the release workflows build the prefix for every published target and pass `-Drequire-video`, so a
+  missing decoder fails the build instead of silently shipping a library without video.
+- The native packages carry the vendored licenses (Ghostty, wuffs, stb, libwebp, lcms2, FFmpeg, zlib). The list lives in
+  `packages/core/scripts/native-package.ts`; the build and the publish path stage through it, so a new vendored
+  dependency has to be added there — a published package missing a license is a legal problem, not a style one.
+- The published package must be SELF-CONTAINED: a consumer that installs it under its own name has no `@opentui/core`
+  to resolve, so the build rewrites the package's self-imports to relative paths (`scripts/published-self-imports.ts`,
+  AST-based so generated code in a template literal survives). The build FAILS if a self-import survives, and
+  `bun run test:dist` asserts it. A new relative import in a transpiled entry point also needs its target emitted into
+  the dist — the runtime plugin is transpiled, not bundled, so `./published-package.js` has to exist as a file.
+- The runtime plugin registers the published name (`@clarkarch/opentui-fork` and `/testing`) next to `@opentui/core`,
+  so a plugin that imports the fork by either name reaches the HOST's core instance instead of loading a second copy.
+- Upstream's curated `ghostty-zig-0.17.patch` was written for a build that DISABLES the Kitty graphics protocol
+  (`-Dvt-features=-kitty-graphics,-glyph-protocol`). Zig analyzes function bodies lazily, so that build never analyzed
+  the kitty-graphics code path and its Zig 0.17 breakages survived the patch — the fork ENABLES the protocol, so it hit
+  them. The fork therefore carries its OWN patch layer, applied AFTER upstream's:
+  `packages/native/src/vendor/zig-deps/ghostty-kitty-graphics-zig-0.17.patch`. The concrete breakage was Zig 0.17 giving
+  `std.ArrayList` a `pointer_stability` field, which breaks the struct literals that adopt an owned slice; the curated
+  patch fixed two of the three in `graphics_image.zig` and missed one. Only API migrations are taken from Ghostty's own
+  0.17 tree — its unrelated feature changes stay out.
+- A vendored patch written for a FEATURE-DISABLED build only covers the code that build actually analyzed. When the fork
+  turns a protocol ON that upstream turns OFF, the newly-live code needs its own audit against the upstream Zig version,
+  not just the vendored patch.
+- The fork carries an **aspect-preserving placement** patch (`OT_IMAGE_DRAW_PRESERVE_ASPECT`): the Kitty and Sixel
+  writers used to resize a placement's source to the placement's pixel box, and a cell grid makes a mismatched box the
+  common case (the fitted cell size is rounded). A "fit" placement is now letterboxed inside its box instead — the art
+  keeps its shape and the box gets transparent margins. The point is not only geometry: the old resize was a RESAMPLE,
+  so a small raster was both warped and softened by the area filter. Letterboxing keeps a source that already fits the
+  box at its native size (no resample at all), so it stays crisp. `fill` (stretch) and `cover` (crop) are unchanged, and
+  a zeroed options record still stretches.
+  - Every Kitty transmit that RESIZES a source must go through `sourceForPixelBox`. This includes the large-image copy
+    path: a copy that bypasses the helper would stretch the art again and reintroduce the bug upstream's path is
+    merged around.
+  - Two limits of the letterbox, learned from tfm: the margins are TRANSPARENT and Sixel DROPS alpha < 128 pixels
+    (index 255), so a padded source becomes a HOLE in the payload — a caller that wants a filled box should render the
+    source at the box's aspect itself (tfm renders its icon rasters into the EXACT placement box for this reason). And
+    the flag is inert for a Kitty placement the writer does not resize: a small placement is transmitted as-is and the
+    TERMINAL scales it into the cell rect, so only the caller's own pixels can make that 1:1.
 
 ## Portable FFI
 

@@ -109,7 +109,7 @@ test "Context encoded Unicode drawing rejection preserves cells and producer ref
 test "Context embedded terminal owns parsing and retains composed glyphs after teardown" {
     const owner = try context.Context.init(testing.allocator, testing.io, .{});
     defer owner.deinit() catch unreachable;
-    const terminal = try owner.createEmbeddedTerminal(8, 3, 4096);
+    const terminal = try owner.createEmbeddedTerminal(8, 3, 4096, .{});
     const target = try owner.createBuffer(8, 3, .{});
     try owner.embeddedTerminalWrite(terminal, "A\u{4e2d}B\x1b[6n");
     var bytes: [64]u8 = undefined;
@@ -131,7 +131,7 @@ test "Context embedded terminal releases failed construction" {
         fn run(allocator: std.mem.Allocator) !void {
             const owner = try context.Context.init(allocator, testing.io, .{ .object_capacity = 4 });
             defer owner.deinit() catch unreachable;
-            _ = try owner.createEmbeddedTerminal(8, 3, 4096);
+            _ = try owner.createEmbeddedTerminal(8, 3, 4096, .{});
         }
     };
     try testing.checkAllAllocationFailures(testing.allocator, Probe.run, .{});
@@ -140,7 +140,7 @@ test "Context embedded terminal releases failed construction" {
 test "Context embedded terminal VT column modes cannot resize the caller viewport" {
     const owner = try context.Context.init(testing.allocator, testing.io, .{ .render_cells_max = 24 });
     defer owner.deinit() catch unreachable;
-    const id = try owner.createEmbeddedTerminal(8, 3, 0);
+    const id = try owner.createEmbeddedTerminal(8, 3, 0, .{});
     const target = try owner.createBuffer(8, 3, .{});
     const terminal = try owner.raw().getEmbeddedTerminal(id);
     for ([_][]const u8{ "\x1b[?40h\x1b[?3h", "\x1b[?3l", "\x1b[?3s\x1b[?3h\x1b[?3r", "\x1bc\x1b[?40;3h" }) |input| {

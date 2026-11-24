@@ -1,0 +1,244 @@
+The fork's own Zig 0.17 fixes for the Kitty graphics protocol.
+
+OpenTUI's curated `ghostty-zig-0.17.patch` was written for a build that
+DISABLES the Kitty graphics protocol (`-Dvt-features=-kitty-graphics,
+-glyph-protocol`), so the kitty-graphics code path was never semantically
+analyzed and its Zig 0.17 breakages were never fixed. The fork ENABLES
+the protocol (the embedded terminal renders Kitty images), which exposes
+them.
+
+The concrete breakage: Zig 0.17 gave `std.ArrayList` a `pointer_stability`
+field, so the struct literal that adopts an owned slice
+
+    managed = .{ .items = data, .capacity = data.len };
+
+no longer compiles ("missing struct field: pointer_stability"). The
+curated patch fixed the two neighbouring literals but not this one.
+
+Every form below is Ghostty's own Zig 0.17 migration, so the vendored
+kitty-graphics closure matches Ghostty's own 0.17 tree. Only API
+migrations are taken; Ghostty's unrelated feature changes (its macOS
+shared-memory name policy, its extra tests) are deliberately left out.
+
+This patch is applied AFTER `ghostty-zig-0.17.patch`.
+
+diff --git a/src/terminal/c/kitty_graphics.zig b/src/terminal/c/kitty_graphics.zig
+index 0b78537..c5df7d3 100644
+--- a/src/terminal/c/kitty_graphics.zig
++++ b/src/terminal/c/kitty_graphics.zig
+@@ -305,7 +305,7 @@ pub fn placement_iterator_set(
+     if (comptime !build_options.kitty_graphics) return .no_value;
+ 
+     if (comptime std.debug.runtime_safety) {
+-        _ = std.enums.fromInt(PlacementIteratorOption, @intFromEnum(option)) orelse {
++        _ = std.enums.fromInt(PlacementIteratorOption, @backingInt(option)) orelse {
+             return .invalid_value;
+         };
+     }
+diff --git a/src/terminal/kitty/graphics_command.zig b/src/terminal/kitty/graphics_command.zig
+index e57ad17..d82f4da 100644
+--- a/src/terminal/kitty/graphics_command.zig
++++ b/src/terminal/kitty/graphics_command.zig
+@@ -21,7 +21,7 @@ const log = std.log.scoped(.kitty_gfx);
+ /// A `[52]?u32` table is 416 bytes versus 216 bytes for this layout, and
+ /// its larger copies erased the smaller lookup code.
+ /// `std.EnumMap` added optional-return lowering,
+-/// `std.StaticBitSet(52)` kept the same size but generated larger code
++/// `std.bit_set.Static(52)` kept the same size but generated larger code
+ /// for the packed mask. Passing the table by pointer removed the copies
+ /// but did not improve end-to-end throughput. Keep this representation
+ /// unless a new benchmark shows an improvement in the zig compilers codegen.
+diff --git a/src/terminal/kitty/graphics_exec.zig b/src/terminal/kitty/graphics_exec.zig
+index b1b968b..c3efecb 100644
+--- a/src/terminal/kitty/graphics_exec.zig
++++ b/src/terminal/kitty/graphics_exec.zig
+@@ -2405,7 +2405,7 @@ test "kittygfx relative placement chain depth limit" {
+         var buf: [64]u8 = undefined;
+         const cmd = try command.Parser.parseString(
+             alloc,
+-            try std.fmt.bufPrint(&buf, "a=p,i=1,p={},P=1,Q={}", .{ id, id - 1 }),
++            try std.mem.print(&buf, "a=p,i=1,p={},P=1,Q={}", .{ id, id - 1 }),
+         );
+         defer cmd.deinit(alloc);
+         try testing.expect(execute(io, alloc, &t, &cmd).?.ok());
+diff --git a/src/terminal/kitty/graphics_image.zig b/src/terminal/kitty/graphics_image.zig
+index 306e972..4770042 100644
+--- a/src/terminal/kitty/graphics_image.zig
++++ b/src/terminal/kitty/graphics_image.zig
+@@ -174,7 +174,7 @@ pub const LoadingImage = struct {
+ 
+         // Otherwise, the payload data is guaranteed to be a path.
+ 
+-        if (comptime builtin.os.tag != .windows) {
++        if (comptime builtin.target.os.tag != .windows) {
+             if (std.mem.indexOfScalar(u8, cmd.data, 0) != null) {
+                 // POSIX paths cannot contain internal nulls.
+                 log.warn("invalid image path: BadPathName", .{});
+@@ -203,7 +203,7 @@ pub const LoadingImage = struct {
+     ) !void {
+         // android does not support POSIX shared memory.
+         // windows is currently unsupported, does it support shm?
+-        if (comptime builtin.abi.isAndroid() or builtin.target.os.tag == .windows) {
++        if (comptime builtin.target.abi.isAndroid() or builtin.target.os.tag == .windows) {
+             return error.UnsupportedMedium;
+         }
+ 
+@@ -351,7 +351,7 @@ pub const LoadingImage = struct {
+         // is checked before the open. The canonical path of the opened
+         // file is checked again in validatedFilePath. See kitty_windows
+         // for what is refused and why.
+-        if (comptime builtin.os.tag == .windows) {
++        if (comptime builtin.target.os.tag == .windows) {
+             kitty_windows.checkPath(path) catch |err| {
+                 log.warn("invalid image path: {}", .{err});
+                 return error.InvalidData;
+@@ -456,7 +456,7 @@ pub const LoadingImage = struct {
+                     else => error.InvalidData,
+                 };
+             };
+-            managed = .{ .items = data, .capacity = data.len };
++            managed = .fromOwnedSlice(data);
+         } else {
+             reader.appendRemaining(alloc, &managed, .limited(max_size)) catch {
+                 log.warn("failed to read image file: {?}", .{buf_reader.err});
+@@ -466,7 +466,7 @@ pub const LoadingImage = struct {
+ 
+         // Set our data
+         assert(self.data.items.len == 0);
+-        self.data = .{ .items = managed.items, .capacity = managed.capacity, .pointer_stability = .{} };
++        self.data = managed;
+     }
+ 
+     /// Returns the canonical path of an open file after applying the file
+@@ -474,7 +474,7 @@ pub const LoadingImage = struct {
+     fn validatedFilePath(io: std.Io, file: std.Io.File, buf: []u8) ![]const u8 {
+         const path = buf[0..try file.realPath(io, buf)];
+ 
+-        if (comptime builtin.os.tag == .windows) {
++        if (comptime builtin.target.os.tag == .windows) {
+             try kitty_windows.checkCanonicalPath(path);
+             return path;
+         }
+@@ -602,10 +602,10 @@ pub const LoadingImage = struct {
+     /// Debug function to write the data to a file. This is useful for
+     /// capturing some test data for unit tests.
+     pub fn debugDump(io: std.Io, self: LoadingImage) !void {
+-        if (comptime builtin.mode != .Debug) @compileError("debugDump in non-debug");
++        if (comptime builtin.mode != .debug) @compileError("debugDump in non-debug");
+ 
+         var buf: [1024]u8 = undefined;
+-        const filename = try std.fmt.bufPrint(
++        const filename = try std.mem.print(
+             &buf,
+             "image-{s}-{s}-{d}x{d}-{}.data",
+             .{
+@@ -662,7 +662,7 @@ pub const LoadingImage = struct {
+         };
+ 
+         self.data.deinit(alloc);
+-        self.data = .{ .items = decompressed, .capacity = decompressed.len, .pointer_stability = .{} };
++        self.data = .fromOwnedSlice(decompressed);
+ 
+         // Make sure we note that our image is no longer compressed
+         self.image.compression = .none;
+@@ -940,7 +940,7 @@ test "shared memory names follow POSIX rules" {
+ }
+ 
+ test "image load rejects invalid POSIX shared memory names" {
+-    if (comptime builtin.abi.isAndroid() or
++    if (comptime builtin.target.abi.isAndroid() or
+         builtin.target.os.tag == .windows or
+         !builtin.link_libc)
+     {
+@@ -1519,8 +1519,7 @@ test "image load: rgb, not compressed, relative regular file" {
+             .height = 15,
+             .image_id = 31,
+         } },
+-        .data = try std.fmt.allocPrint(
+-            alloc,
++        .data = try alloc.print(
+             ".zig-cache/tmp/{s}/image.data",
+             .{tmp_dir.sub_path},
+         ),
+@@ -1538,7 +1537,7 @@ test "image load: rgb, not compressed, relative regular file" {
+ }
+ 
+ test "image load: blocklist applies to opened file after symlink swap" {
+-    if (builtin.os.tag == .windows) return error.SkipZigTest;
++    if (builtin.target.os.tag == .windows) return error.SkipZigTest;
+ 
+     const testing = std.testing;
+     const io = testing.io;
+@@ -1571,7 +1570,7 @@ test "image load: blocklist applies to opened file after symlink swap" {
+ }
+ 
+ test "image load: windows UNC path is rejected before open" {
+-    if (builtin.os.tag != .windows) return error.SkipZigTest;
++    if (builtin.target.os.tag != .windows) return error.SkipZigTest;
+ 
+     const testing = std.testing;
+     const alloc = testing.allocator;
+@@ -1610,7 +1609,7 @@ test "image load: windows UNC path is rejected before open" {
+ }
+ 
+ test "image load: windows device namespace paths are rejected before open" {
+-    if (builtin.os.tag != .windows) return error.SkipZigTest;
++    if (builtin.target.os.tag != .windows) return error.SkipZigTest;
+ 
+     const testing = std.testing;
+     const alloc = testing.allocator;
+@@ -1681,7 +1680,7 @@ test "image load: windows device namespace paths are rejected before open" {
+ }
+ 
+ test "image load: windows reserved device names are rejected before open" {
+-    if (builtin.os.tag != .windows) return error.SkipZigTest;
++    if (builtin.target.os.tag != .windows) return error.SkipZigTest;
+ 
+     const testing = std.testing;
+     const alloc = testing.allocator;
+@@ -1721,7 +1720,7 @@ test "image load: windows reserved device names are rejected before open" {
+ }
+ 
+ test "image load: windows local file accepted in forward slash and upper case spellings" {
+-    if (builtin.os.tag != .windows) return error.SkipZigTest;
++    if (builtin.target.os.tag != .windows) return error.SkipZigTest;
+ 
+     const testing = std.testing;
+     const alloc = testing.allocator;
+@@ -1774,7 +1773,7 @@ test "image load: windows local file accepted in forward slash and upper case sp
+ }
+ 
+ test "image load: windows temporary file with differently spelled directory" {
+-    if (builtin.os.tag != .windows) return error.SkipZigTest;
++    if (builtin.target.os.tag != .windows) return error.SkipZigTest;
+ 
+     const testing = std.testing;
+     const alloc = testing.allocator;
+@@ -1826,7 +1825,7 @@ test "image load: windows temporary file with differently spelled directory" {
+ }
+ 
+ test "image load: windows canonical path check accepts a local file opened through a device spelling" {
+-    if (builtin.os.tag != .windows) return error.SkipZigTest;
++    if (builtin.target.os.tag != .windows) return error.SkipZigTest;
+ 
+     const testing = std.testing;
+     const alloc = testing.allocator;
+@@ -1855,7 +1854,7 @@ test "image load: windows canonical path check accepts a local file opened throu
+ }
+ 
+ test "image load: windows canonical path check rejects a file reached through a UNC share" {
+-    if (builtin.os.tag != .windows) return error.SkipZigTest;
++    if (builtin.target.os.tag != .windows) return error.SkipZigTest;
+ 
+     const testing = std.testing;
+     const alloc = testing.allocator;
+@@ -1874,8 +1873,7 @@ test "image load: windows canonical path check rejects a file reached through a
+     // share, which is how a junction or symlink into a share would look
+     // to the post-open check. The share needs the server service and an
+     // administrative token, so the test is skipped when the open fails.
+-    const unc_path = try std.fmt.allocPrint(
+-        alloc,
++    const unc_path = try alloc.print(
+         "\\\\localhost\\{c}$\\{s}",
+         .{ real_path[0], real_path[3..] },
+     );

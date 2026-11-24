@@ -1,0 +1,290 @@
+name: native-artifacts
+
+# Builds the patched native library for every supported target and publishes it
+# as a GitHub release (`native-latest`). Downstream projects (e.g. tedit) fetch
+# the asset for their host from `native-artifacts.json`.
+#
+# The Linux glibc artifacts are also committed to the branch (see PREBUILT.md);
+# the release exists so that macOS and Windows hosts — which cannot be served
+# by a committed Linux binary — get the patched library too.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tfm]
+    paths:
+      - "packages/native/**"
+      # The committed artifacts are this workflow's own output, copied back
+      # into the tree by scripts/refresh-prebuilt.sh. Rebuilding on them
+      # would republish what the release already carries, and the republish
+      # would not match the committed bytes, so the tree would drift from the
+      # release on every refresh.
+      - "!packages/native/lib/**"
+      # Prose cannot change a binary. A README edit under packages/native
+      # matched the filter above and burned a full rebuild of every target.
+      # "**.md" matches a markdown file at any depth.
+      - "!packages/native/**.md"
+      - "scripts/build-native-manifest.ts"
+      - ".github/workflows/native-artifacts.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.output }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - output: x86_64-linux
+            targets: x86_64-linux-gnu.2.17
+            dirs: x86_64-linux
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: aarch64-linux
+            targets: aarch64-linux-gnu.2.17
+            dirs: aarch64-linux
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: x86_64-linux-musl
+            targets: x86_64-linux-musl
+            dirs: x86_64-linux-musl
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: aarch64-linux-musl
+            targets: aarch64-linux-musl
+            dirs: aarch64-linux-musl
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: x86_64-windows
+            targets: x86_64-windows-gnu
+            dirs: x86_64-windows
+            os: ubuntu-latest
+            file: opentui.dll
+          - output: aarch64-windows
+            targets: aarch64-windows-gnu
+            dirs: aarch64-windows
+            os: ubuntu-latest
+            file: opentui.dll
+          # macOS needs the macOS SDK to link CoreAudio; Zig cannot cross to
+          # Darwin without it, so these build on a macOS host. Both arches
+          # build in one job: the macOS runner pool is small, and two jobs
+          # waiting for it is how a whole release gets cancelled.
+          #
+          # The Intel runner, not macos-latest: the arm64 macOS pool is the
+          # most contended one on GitHub, and a job that cannot be acquired
+          # takes the whole release down with it. The job builds both
+          # arches anyway, so the host's architecture does not matter.
+          - output: macos
+            targets: x86_64-macos.13.0 aarch64-macos.13.0
+            dirs: x86_64-macos aarch64-macos
+            os: macos-15-intel
+            file: libopentui.dylib
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      # The repository's own action: it reads the Zig version from
+      # packages/native/build.zig.zon, so an upstream bump cannot leave this
+      # workflow building with an old compiler.
+      - uses: ./.github/actions/setup-zig
+
+      # Native video statically links FFmpeg. Its static libraries depend only on the pinned build script.
+      - name: Restore FFmpeg build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/native/.cache/ffmpeg/prefix
+            packages/native/.cache/ffmpeg/downloads
+          key: ffmpeg-v1-${{ runner.os }}-${{ matrix.output }}-${{ hashFiles('packages/native/scripts/build-ffmpeg.ts', '.zig-version') }}
+
+      - name: Prepare zig dependencies
+        working-directory: packages/native
+        run: sh scripts/prepare-zig-deps.sh
+
+      - name: Build FFmpeg
+        working-directory: packages/native
+        run: |
+          # The build graph also compiles the host module and its musl test
+          # executable, so their prefixes must exist even when the published
+          # library targets another platform.
+          bun scripts/build-ffmpeg.ts
+          for target in ${{ matrix.dirs }}; do
+            bun scripts/build-ffmpeg.ts --target="$target"
+          done
+
+      - name: Build
+        working-directory: packages/native
+        run: |
+          for target in ${{ matrix.targets }}; do
+            zig build -Doptimize=ReleaseFast -Dlibrary-target="$target" -Drequire-video
+          done
+
+      - name: Verify and strip
+        working-directory: packages/native
+        run: |
+          # The release copies are stripped so downloads stay small. The static
+          # archive is stripped too: it is what the Rust crates link by default,
+          # and unstripped it is 51 MB against 8 MB stripped.
+          #
+          # llvm-strip, not strip: the host's strip only understands the host
+          # architecture, so the aarch64 libraries kept every symbol (29 MB
+          # instead of 5 MB) — and the failure was swallowed, so nobody saw
+          # it. llvm-strip is multi-target, and a failed strip now fails the
+          # build instead of shipping a fat library.
+          for dir in ${{ matrix.dirs }}; do
+            lib="lib/$dir/${{ matrix.file }}"
+            if [ ! -f "$lib" ]; then
+              echo "expected $lib to exist after the build"
+              ls -R lib || true
+              exit 1
+            fi
+            archive="lib/$dir/libopentui.a"
+            if [ "${{ runner.os }}" = "Linux" ]; then
+              if ! command -v llvm-strip >/dev/null; then
+                sudo apt-get update -qq
+                sudo apt-get install -y -qq llvm
+              fi
+              llvm-strip --strip-unneeded "$lib"
+              [ -f "$archive" ] && llvm-strip --strip-unneeded "$archive"
+            else
+              # BSD strip reads no archive, and llvm-strip rejects Mach-O
+              # archives with "option is not supported for MachO", so the
+              # archive ships as it was built. It is the big file; the library
+              # is the one every consumer downloads.
+              strip -x "$lib"
+            fi
+            # The header travels with the library: the Rust crates check it
+            # against the bindings they were generated from, so a consumer needs
+            # it beside the library it links.
+            [ -f "lib/$dir/opentui.h" ] || { echo "expected lib/$dir/opentui.h to exist after the build"; exit 1; }
+            ls -l "lib/$dir"
+          done
+
+      - name: Stage what this job built
+        # Only what this job built, with a manifest of it.
+        #
+        # The checkout carries the committed Linux libraries, and the build
+        # writes to the same paths, so uploading the whole tree would mix
+        # them in: the x86_64 job's artifact would carry the committed
+        # aarch64 library, and the publish job would copy it over the fresh
+        # one. The manifest says what this job produced, so the publish job
+        # can copy that and nothing else.
+        working-directory: packages/native
+        run: |
+          rm -rf out
+          mkdir -p out
+          for dir in ${{ matrix.dirs }}; do
+            mkdir -p "out/$dir"
+            for file in lib/$dir/*; do
+              cp "$file" "out/$dir/"
+            done
+          done
+          cd out
+          : > manifest.txt
+          for file in */*; do
+            printf '%s %s %s\n' "${file%%/*}" "${file##*/}" "$(sha256sum "$file" | cut -d' ' -f1)" >> manifest.txt
+          done
+          cat manifest.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          # The staged directory: the library, the static archive, and the
+          # header the crates check their bindings against, plus the manifest
+          # of what this job built. One directory per target, so the publish
+          # job reads the target from the directory.
+          name: native-${{ matrix.output }}
+          path: packages/native/out/
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # The manifest script lives in the repository: without the checkout the
+      # publish job has no source tree at all.
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Stage release assets
+        run: |
+          mkdir -p release
+          for artifact in artifacts/native-*; do
+            # Each artifact carries a manifest of what its job built, and the
+            # publish job copies exactly those files. The checkout holds
+            # committed Linux libraries, so an artifact can carry a file its
+            # job never built: copying the manifest's files only keeps a
+            # committed library from overwriting another target's fresh one,
+            # and the check below fails on the extra rather than shipping it.
+            while read -r dir file sha; do
+              source="$artifact/$dir/$file"
+              [ -f "$source" ] || { echo "the artifact is missing $source"; exit 1; }
+              actual=$(sha256sum "$source" | cut -d' ' -f1)
+              [ "$actual" = "$sha" ] || { echo "the checksum of $source does not match its manifest"; exit 1; }
+              # Windows' static archive is not usable by the Rust crates:
+              # they link the DLL there, through its import library. It is
+              # 50 MB unstripped, so it stays out of the release.
+              case "$dir/$file" in
+                *-windows/opentui-static.lib) continue ;;
+              esac
+              cp "$source" "release/native-${dir}-${file}"
+            done < "$artifact/manifest.txt"
+            # Every file the artifact holds has to be in its manifest.
+            held=$(find "$artifact" -type f ! -name manifest.txt | wc -l)
+            listed=$(wc -l < "$artifact/manifest.txt")
+            [ "$held" -eq "$listed" ] || {
+              echo "the artifact $artifact holds $held files, its manifest lists $listed"
+              exit 1
+            }
+          done
+          ls -l release
+
+      - name: Build the manifest
+        run: bun scripts/build-native-manifest.ts release
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view native-latest >/dev/null 2>&1; then
+            gh release upload native-latest release/* --clobber
+          else
+            gh release create native-latest release/* \
+              --title "native artifacts" \
+              --notes "Patched libopentui for every supported target. Fetch the asset for your host via native-artifacts.json."
+          fi
+
+      - name: Install the pinned Rust toolchain
+        # The consumer project carries this toolchain file, so it builds the
+        # crates with the version they are tested with.
+        working-directory: packages/rust
+        run: rustup toolchain install
+
+      - name: Build a consumer against the published release
+        # The path a consumer on a platform the repository does not carry
+        # takes: fetch the artifacts from the release, point OPENTUI_LIB_DIR
+        # at them, build and run. The script is the one the README tells
+        # consumers to use, so the CI uses it too.
+        #
+        # This check lives here, after the publish, because the release it
+        # reads has to be the one this run wrote: a check that ran while the
+        # release was still the previous one would test the wrong artifacts.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          dir=$(sh packages/rust/scripts/fetch-native.sh x86_64-linux)
+          ls -l "$dir"
+          OPENTUI_LIB_DIR="$dir" sh packages/rust/scripts/consumer-smoke.sh

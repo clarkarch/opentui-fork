@@ -320,6 +320,18 @@ impl Node {
         })
     }
 
+    /// Keeps the image placements a translucent fill covers instead of deleting
+    /// them (tfm fork).
+    ///
+    /// The fill records the covered rectangle and its alpha as a dimming region
+    /// and blends the backdrop under the images, so an image under a scrim stays
+    /// visible and dimmed. Only a box node accepts this.
+    pub fn set_fill_dims_images(&self, on: bool) -> Result<()> {
+        check("ot_scene_set_fill_dims_images", unsafe {
+            sys::ot_scene_set_fill_dims_images(self.context(), &self.handle, u32::from(on))
+        })
+    }
+
     /// Replaces the text of a text node. Native code copies the bytes and rejects invalid UTF-8.
     pub fn set_text(&self, text: impl AsRef<[u8]>) -> Result<()> {
         let bytes = text.as_ref();

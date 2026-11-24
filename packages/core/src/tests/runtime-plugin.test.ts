@@ -3,7 +3,8 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import * as coreRuntime from "../index.js"
-import { createRuntimePlugin, runtimeModuleIdForSpecifier } from "../runtime-plugin.js"
+import { createRuntimePlugin, isCoreRuntimeModuleSpecifier, runtimeModuleIdForSpecifier } from "../runtime-plugin.js"
+import { PUBLISHED_CORE_NAME } from "../published-package.js"
 
 type ResolveResult = { path: string; namespace?: string } | void
 type ResolveCallback = (args: { path: string; importer: string }) => ResolveResult | Promise<ResolveResult>
@@ -102,6 +103,37 @@ describe("runtime plugin", () => {
 
     expect(coreTestingModule.loader).toBe("object")
     expect(typeof coreTestingModule.exports.createTestRenderer).toBe("function")
+  })
+
+  it("shares the host instance under the published package name too", async () => {
+    // The fork is published as `@clarkarch/opentui-fork`, so a plugin that
+    // imports it by that name must reach the HOST's core instance — not a
+    // second copy of it.
+    const { build, resolveHandlers, modules } = createMockBuild()
+    createRuntimePlugin().setup(build as any)
+
+    const publishedResolution = await resolveSpecifier(resolveHandlers, PUBLISHED_CORE_NAME)
+    const publishedTestingResolution = await resolveSpecifier(resolveHandlers, `${PUBLISHED_CORE_NAME}/testing`)
+
+    expect(publishedResolution).toEqual({ path: runtimeModuleIdForSpecifier(PUBLISHED_CORE_NAME) })
+    expect(publishedTestingResolution).toEqual({
+      path: runtimeModuleIdForSpecifier(`${PUBLISHED_CORE_NAME}/testing`),
+    })
+
+    const publishedModuleFactory = publishedResolution ? modules.get(publishedResolution.path) : undefined
+    expect(publishedModuleFactory).toBeDefined()
+
+    if (!publishedModuleFactory) {
+      throw new Error("Expected a runtime module factory for the published package name")
+    }
+
+    expect(await publishedModuleFactory()).toEqual({
+      exports: coreRuntime as Record<string, unknown>,
+      loader: "object",
+    })
+
+    expect(isCoreRuntimeModuleSpecifier(PUBLISHED_CORE_NAME)).toBe(true)
+    expect(isCoreRuntimeModuleSpecifier(`${PUBLISHED_CORE_NAME}/testing`)).toBe(true)
   })
 
   it("registers @opentui/three only when added explicitly", async () => {

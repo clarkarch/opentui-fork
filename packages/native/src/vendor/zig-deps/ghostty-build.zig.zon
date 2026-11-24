@@ -10,5 +10,12 @@
         },
         .apple_sdk = .{ .path = "./pkg/apple-sdk" },
         .android_ndk = .{ .path = "./pkg/android-ndk" },
+        // tfm fork: the embedded terminal renders Kitty images, so the VT
+        // build keeps the Kitty graphics protocol enabled -- and Ghostty
+        // requires a `wuffs` module for it. This is the fork's own pure Zig
+        // package (see zig-deps/wuffs/), not Ghostty's C-translated one.
+        .wuffs = .{
+            .path = "../wuffs",
+        },
     },
 }

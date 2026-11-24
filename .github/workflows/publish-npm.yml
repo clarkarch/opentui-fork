@@ -1,0 +1,272 @@
+name: publish-npm
+
+# Publishes the fork to npm: the native platform packages first, then the core
+# package that depends on them.
+#
+# The native libraries are built per target (the same matrix as
+# native-artifacts.yml) and downloaded into the layout the publish script
+# expects: <native-dir>/<zig-target>/<library>.
+#
+# Authentication: npm's TRUSTED PUBLISHING (OIDC) when the packages have a
+# trusted publisher configured on npmjs.com — the workflow asks for
+# `id-token: write` and the npm CLI exchanges the GitHub token for a
+# short-lived one. The `NPM_TOKEN` repository secret is the fallback: when it
+# is set, it is written to ~/.npmrc and used instead. The token needs publish
+# rights on the @clarkarch scope.
+#
+# The workflow publishes the version in packages/core/package.json; bump it
+# before running.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tfm]
+    paths:
+      - "packages/core/src/**"
+      - "packages/core/scripts/**"
+      - "packages/core/package.json"
+      - "packages/native/**"
+      # The committed native artifacts are the native-artifacts workflow's
+      # output, copied back into the tree. Publishing on them would try to
+      # publish the same npm version again.
+      - "!packages/native/lib/**"
+      # Prose cannot change a binary or a package.
+      - "!packages/native/**.md"
+      - "!packages/core/src/**.md"
+      - "scripts/publish-fork.ts"
+      - "scripts/npm-publish.ts"
+      - "scripts/*.test.ts"
+      - ".github/workflows/publish-npm.yml"
+
+permissions:
+  contents: read
+  # npm's trusted publishing: the npm CLI exchanges this OIDC token for a
+  # short-lived publish token.
+  id-token: write
+
+jobs:
+  build:
+    name: ${{ matrix.output }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - output: x86_64-linux
+            targets: x86_64-linux-gnu.2.17
+            dirs: x86_64-linux
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: aarch64-linux
+            targets: aarch64-linux-gnu.2.17
+            dirs: aarch64-linux
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: x86_64-linux-musl
+            targets: x86_64-linux-musl
+            dirs: x86_64-linux-musl
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: aarch64-linux-musl
+            targets: aarch64-linux-musl
+            dirs: aarch64-linux-musl
+            os: ubuntu-latest
+            file: libopentui.so
+          - output: x86_64-windows
+            targets: x86_64-windows-gnu
+            dirs: x86_64-windows
+            os: ubuntu-latest
+            file: opentui.dll
+          - output: aarch64-windows
+            targets: aarch64-windows-gnu
+            dirs: aarch64-windows
+            os: ubuntu-latest
+            file: opentui.dll
+          # macOS needs the macOS SDK to link CoreAudio; Zig cannot cross to
+          # Darwin without it, so these build on a macOS host. Both arches
+          # build in one job: the macOS runner pool is small, and two jobs
+          # waiting for it is how a whole publish gets cancelled.
+          #
+          # The Intel runner, not macos-latest: the arm64 macOS pool is the
+          # most contended one on GitHub, and a job that cannot be acquired
+          # takes the whole publish down with it. The job builds both
+          # arches anyway, so the host's architecture does not matter.
+          - output: macos
+            targets: x86_64-macos.13.0 aarch64-macos.13.0
+            dirs: x86_64-macos aarch64-macos
+            os: macos-15-intel
+            file: libopentui.dylib
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      # The repository's own action: the Zig version comes from
+      # packages/native/build.zig.zon.
+      - uses: ./.github/actions/setup-zig
+
+      # Native video statically links FFmpeg. Its static libraries depend only on the pinned build script.
+      - name: Restore FFmpeg build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/native/.cache/ffmpeg/prefix
+            packages/native/.cache/ffmpeg/downloads
+          key: ffmpeg-v1-${{ runner.os }}-${{ matrix.output }}-${{ hashFiles('packages/native/scripts/build-ffmpeg.ts', '.zig-version') }}
+
+      - name: Prepare zig dependencies
+        working-directory: packages/native
+        run: sh scripts/prepare-zig-deps.sh
+
+      - name: Build FFmpeg
+        working-directory: packages/native
+        run: |
+          # The build graph also compiles the host module and its musl test
+          # executable, so their prefixes must exist even when the published
+          # library targets another platform.
+          bun scripts/build-ffmpeg.ts
+          for target in ${{ matrix.dirs }}; do
+            bun scripts/build-ffmpeg.ts --target="$target"
+          done
+
+      - name: Build
+        working-directory: packages/native
+        run: |
+          for target in ${{ matrix.targets }}; do
+            zig build -Doptimize=ReleaseFast -Dlibrary-target="$target" -Drequire-video
+          done
+
+      - name: Verify and strip
+        working-directory: packages/native
+        run: |
+          # The published packages ship without debug symbols: the library is
+          # what every consumer downloads.
+          #
+          # llvm-strip, not strip: the host's strip only understands the host
+          # architecture, so the aarch64 libraries kept every symbol (29 MB
+          # instead of 5 MB) — and the failure was swallowed, so nobody saw
+          # it. llvm-strip is multi-target, and a failed strip now fails the
+          # build instead of shipping a fat library.
+          for dir in ${{ matrix.dirs }}; do
+            lib="lib/$dir/${{ matrix.file }}"
+            if [ ! -f "$lib" ]; then
+              echo "expected $lib to exist after the build"
+              ls -R lib || true
+              exit 1
+            fi
+            if [ "${{ runner.os }}" = "Linux" ]; then
+              if ! command -v llvm-strip >/dev/null; then
+                sudo apt-get update -qq
+                sudo apt-get install -y -qq llvm
+              fi
+              llvm-strip --strip-unneeded "$lib"
+            else
+              strip -x "$lib"
+            fi
+            ls -l "$lib"
+          done
+
+      - name: Stage what this job built
+        # Only the library this job built, with a manifest of it.
+        #
+        # The checkout carries the committed Linux libraries, and the build
+        # writes to the same paths, so uploading the whole tree would mix
+        # them in: the x86_64 job's artifact would carry the committed
+        # aarch64 library, and the publish job copies the artifacts into one
+        # directory — so the committed library could land over the fresh one.
+        # The manifest says what this job produced, so the publish job can
+        # copy that and nothing else.
+        working-directory: packages/native
+        run: |
+          rm -rf out
+          for dir in ${{ matrix.dirs }}; do
+            mkdir -p "out/$dir"
+            cp "lib/$dir/${{ matrix.file }}" "out/$dir/"
+          done
+          cd out
+          : > manifest.txt
+          for file in */*; do
+            printf '%s %s %s\n' "${file%%/*}" "${file##*/}" "$(sha256sum "$file" | cut -d' ' -f1)" >> manifest.txt
+          done
+          cat manifest.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          # One directory per target, so the publish job reads the target from
+          # the directory.
+          name: native-${{ matrix.output }}
+          path: packages/native/out/
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      # The repository's own action: the Zig version comes from
+      # packages/native/build.zig.zon.
+      - uses: ./.github/actions/setup-zig
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Collect the libraries
+        run: |
+          mkdir -p native
+          for artifact in artifacts/native-*; do
+            # Each artifact carries a manifest of what its job built, and the
+            # publish job copies exactly those files. The checkout holds
+            # committed Linux libraries, so an artifact can carry a file its
+            # job never built: copying the manifest's files only keeps a
+            # committed library from overwriting another target's fresh one,
+            # and the check below fails on the extra rather than shipping it.
+            while read -r dir file sha; do
+              source="$artifact/$dir/$file"
+              [ -f "$source" ] || { echo "the artifact is missing $source"; exit 1; }
+              actual=$(sha256sum "$source" | cut -d' ' -f1)
+              [ "$actual" = "$sha" ] || { echo "the checksum of $source does not match its manifest"; exit 1; }
+              mkdir -p "native/$dir"
+              cp "$source" "native/$dir/"
+            done < "$artifact/manifest.txt"
+          done
+          ls -lR native
+
+      - name: Install the workspace
+        run: bun install --frozen-lockfile
+
+      - name: Use an npm CLI that speaks trusted publishing
+        # npm 11.5.1 added OIDC trusted publishing; older CLIs ignore the
+        # workflow's id-token and fall back to a token that may not exist.
+        # Pinned to the 11.x line on purpose: a brand-new major in the publish
+        # path is an untested change, and the script reads the CLI's reports
+        # in both the npm 11 and npm 12 shapes.
+        # The install goes to a user-writable prefix: the runner's global
+        # prefix (/usr/local) is not writable, so a plain `npm install -g`
+        # fails with EACCES.
+        run: |
+          npm install -g --prefix "$HOME/.npm-local" "npm@^11.5.1"
+          "$HOME/.npm-local/bin/npm" --version
+          echo "$HOME/.npm-local/bin" >> "$GITHUB_PATH"
+
+      - name: Test the publish scripts
+        run: bun test scripts/npm-publish.test.ts
+
+      - name: Publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # With no token, the npm CLI uses the workflow's OIDC token (trusted
+          # publishing). With one, the token wins.
+          if [ -n "$NPM_TOKEN" ]; then
+            printf '//registry.npmjs.org/:_authToken=%s\n' "$NPM_TOKEN" > ~/.npmrc
+          fi
+          bun scripts/publish-fork.ts --native-dir native
