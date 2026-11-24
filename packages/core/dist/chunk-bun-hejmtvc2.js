@@ -1,0 +1,24537 @@
+// @bun
+import {
+  nativeLayouts,
+  nativeConstants,
+  toArrayBuffer,
+  singleton,
+  getSingleton,
+  destroySingleton,
+  registerEnvVar2,
+  env2,
+  stringWidth,
+  Worker,
+  getBaseAttributes2,
+  DEFAULT_FOREGROUND_RGB2,
+  DEFAULT_BACKGROUND_RGB2,
+  ansi256IndexToRgb2,
+  RGBA2,
+  parseColor2,
+  createTextAttributes2,
+  isStyledText2,
+  StyledText2,
+  stringToStyledText2,
+  YogaEnumKind,
+  YogaFloatKind,
+  YogaValueKind,
+  sceneSetEnum,
+  sceneGetEnum,
+  sceneSetFloat,
+  sceneGetFloat,
+  sceneSetValue,
+  sceneGetValue,
+  sceneSetDimension,
+  UNDEFINED_VALUE,
+  parseYogaValue,
+  isBunfsPath,
+  normalizeBunfsPath,
+  resolveDefaultParserAsset,
+  resolveDefaultTreeSitterWorkerPath,
+  resolveTreeSitterWasm,
+  NativeEditAtomic,
+  NativeStyleGroup,
+  NativeStyleFlags,
+  NATIVE_EDGE_NONE2,
+  NativeBorder2,
+  NativeSceneHook2,
+  NativeSceneFrame2,
+  NativeScenePaintPhase2,
+  emptySceneScrollState,
+  NativeError2,
+  NativeClipboardOperationStatus2,
+  NativeClipboardStartStatus2,
+  NativeClipboardCopyStatus2,
+  NativeClipboardDestroyStatus2,
+  NativeClipboardShutdownStatus2,
+  SceneStaging,
+  NativePaintRecorder,
+  resolveRenderLib2,
+  Align2,
+  BoxSizing2,
+  Dimension2,
+  Direction2,
+  Display2,
+  Edge2,
+  FlexDirection2,
+  Gutter2,
+  Justify2,
+  LogLevel3,
+  MeasureMode2,
+  Overflow2,
+  PositionType2,
+  Unit2,
+  Wrap2
+} from "./chunk-bun-h6x8mp7b.js";
+
+// src/lib/border.ts
+var VALID_BORDER_STYLES = ["single", "double", "rounded", "heavy"];
+function isValidBorderStyle2(value) {
+  return typeof value === "string" && VALID_BORDER_STYLES.includes(value);
+}
+function parseBorderStyle2(value, fallback = "single") {
+  if (isValidBorderStyle2(value)) {
+    return value;
+  }
+  if (value !== undefined && value !== null) {
+    console.warn(`Invalid borderStyle "${value}", falling back to "${fallback}". Valid values are: ${VALID_BORDER_STYLES.join(", ")}`);
+  }
+  return fallback;
+}
+var BorderChars2 = {
+  single: {
+    topLeft: "\u250C",
+    topRight: "\u2510",
+    bottomLeft: "\u2514",
+    bottomRight: "\u2518",
+    horizontal: "\u2500",
+    vertical: "\u2502",
+    topT: "\u252C",
+    bottomT: "\u2534",
+    leftT: "\u251C",
+    rightT: "\u2524",
+    cross: "\u253C"
+  },
+  double: {
+    topLeft: "\u2554",
+    topRight: "\u2557",
+    bottomLeft: "\u255A",
+    bottomRight: "\u255D",
+    horizontal: "\u2550",
+    vertical: "\u2551",
+    topT: "\u2566",
+    bottomT: "\u2569",
+    leftT: "\u2560",
+    rightT: "\u2563",
+    cross: "\u256C"
+  },
+  rounded: {
+    topLeft: "\u256D",
+    topRight: "\u256E",
+    bottomLeft: "\u2570",
+    bottomRight: "\u256F",
+    horizontal: "\u2500",
+    vertical: "\u2502",
+    topT: "\u252C",
+    bottomT: "\u2534",
+    leftT: "\u251C",
+    rightT: "\u2524",
+    cross: "\u253C"
+  },
+  heavy: {
+    topLeft: "\u250F",
+    topRight: "\u2513",
+    bottomLeft: "\u2517",
+    bottomRight: "\u251B",
+    horizontal: "\u2501",
+    vertical: "\u2503",
+    topT: "\u2533",
+    bottomT: "\u253B",
+    leftT: "\u2523",
+    rightT: "\u252B",
+    cross: "\u254B"
+  }
+};
+function getBorderFromSides2(sides) {
+  const result = [];
+  if (sides.top)
+    result.push("top");
+  if (sides.right)
+    result.push("right");
+  if (sides.bottom)
+    result.push("bottom");
+  if (sides.left)
+    result.push("left");
+  return result.length > 0 ? result : false;
+}
+function getBorderSides2(border) {
+  return border === true ? { top: true, right: true, bottom: true, left: true } : Array.isArray(border) ? {
+    top: border.includes("top"),
+    right: border.includes("right"),
+    bottom: border.includes("bottom"),
+    left: border.includes("left")
+  } : { top: false, right: false, bottom: false, left: false };
+}
+function borderCharsToArray2(chars) {
+  const array = new Uint32Array(11);
+  array[0] = chars.topLeft.codePointAt(0) ?? 32;
+  array[1] = chars.topRight.codePointAt(0) ?? 32;
+  array[2] = chars.bottomLeft.codePointAt(0) ?? 32;
+  array[3] = chars.bottomRight.codePointAt(0) ?? 32;
+  array[4] = chars.horizontal.codePointAt(0) ?? 32;
+  array[5] = chars.vertical.codePointAt(0) ?? 32;
+  array[6] = chars.topT.codePointAt(0) ?? 32;
+  array[7] = chars.bottomT.codePointAt(0) ?? 32;
+  array[8] = chars.leftT.codePointAt(0) ?? 32;
+  array[9] = chars.rightT.codePointAt(0) ?? 32;
+  array[10] = chars.cross.codePointAt(0) ?? 32;
+  return array;
+}
+var BorderCharArrays2 = {
+  single: borderCharsToArray2(BorderChars2.single),
+  double: borderCharsToArray2(BorderChars2.double),
+  rounded: borderCharsToArray2(BorderChars2.rounded),
+  heavy: borderCharsToArray2(BorderChars2.heavy)
+};
+
+// src/lib/KeyHandler.ts
+import { EventEmitter } from "events";
+
+class KeyEvent2 {
+  name;
+  ctrl;
+  meta;
+  shift;
+  option;
+  sequence;
+  number;
+  raw;
+  eventType;
+  source;
+  code;
+  super;
+  hyper;
+  capsLock;
+  numLock;
+  baseCode;
+  repeated;
+  _defaultPrevented = false;
+  _propagationStopped = false;
+  constructor(key) {
+    this.name = key.name;
+    this.ctrl = key.ctrl;
+    this.meta = key.meta;
+    this.shift = key.shift;
+    this.option = key.option;
+    this.sequence = key.sequence;
+    this.number = key.number;
+    this.raw = key.raw;
+    this.eventType = key.eventType;
+    this.source = key.source;
+    this.code = key.code;
+    this.super = key.super;
+    this.hyper = key.hyper;
+    this.capsLock = key.capsLock;
+    this.numLock = key.numLock;
+    this.baseCode = key.baseCode;
+    this.repeated = key.repeated;
+  }
+  get defaultPrevented() {
+    return this._defaultPrevented;
+  }
+  get propagationStopped() {
+    return this._propagationStopped;
+  }
+  preventDefault() {
+    this._defaultPrevented = true;
+  }
+  stopPropagation() {
+    this._propagationStopped = true;
+  }
+}
+
+class PasteEvent2 {
+  type = "paste";
+  bytes;
+  metadata;
+  _defaultPrevented = false;
+  _propagationStopped = false;
+  constructor(bytes, metadata) {
+    this.bytes = bytes;
+    this.metadata = metadata;
+  }
+  get defaultPrevented() {
+    return this._defaultPrevented;
+  }
+  get propagationStopped() {
+    return this._propagationStopped;
+  }
+  preventDefault() {
+    this._defaultPrevented = true;
+  }
+  stopPropagation() {
+    this._propagationStopped = true;
+  }
+}
+
+class KeyHandler2 extends EventEmitter {
+  processParsedKey(parsedKey) {
+    try {
+      switch (parsedKey.eventType) {
+        case "press":
+          this.emit("keypress", new KeyEvent2(parsedKey));
+          break;
+        case "release":
+          this.emit("keyrelease", new KeyEvent2(parsedKey));
+          break;
+        default:
+          this.emit("keypress", new KeyEvent2(parsedKey));
+          break;
+      }
+    } catch (error) {
+      console.error(`[KeyHandler] Error processing parsed key:`, error);
+      return true;
+    }
+    return true;
+  }
+  processPaste(bytes, metadata) {
+    try {
+      this.emit("paste", new PasteEvent2(bytes, metadata));
+    } catch (error) {
+      console.error(`[KeyHandler] Error processing paste:`, error);
+    }
+  }
+}
+
+class InternalKeyHandler2 extends KeyHandler2 {
+  renderableHandlers = new Map;
+  emit(event, ...args) {
+    return this.emitWithPriority(event, ...args);
+  }
+  emitWithPriority(event, ...args) {
+    let hasGlobalListeners = false;
+    const globalListeners = this.listeners(event);
+    if (globalListeners.length > 0) {
+      hasGlobalListeners = true;
+      for (const listener of globalListeners) {
+        try {
+          listener(...args);
+        } catch (error) {
+          console.error(`[KeyHandler] Error in global ${event} handler:`, error);
+        }
+        if (event === "keypress" || event === "keyrelease" || event === "paste") {
+          const keyEvent = args[0];
+          if (keyEvent.propagationStopped) {
+            return hasGlobalListeners;
+          }
+        }
+      }
+    }
+    const renderableSet = this.renderableHandlers.get(event);
+    const renderableHandlers = renderableSet && renderableSet.size > 0 ? [...renderableSet] : [];
+    let hasRenderableListeners = false;
+    if (renderableSet && renderableSet.size > 0) {
+      hasRenderableListeners = true;
+      if (event === "keypress" || event === "keyrelease" || event === "paste") {
+        const keyEvent = args[0];
+        if (keyEvent.defaultPrevented)
+          return hasGlobalListeners || hasRenderableListeners;
+        if (keyEvent.propagationStopped)
+          return hasGlobalListeners || hasRenderableListeners;
+      }
+      for (const handler of renderableHandlers) {
+        try {
+          handler(...args);
+        } catch (error) {
+          console.error(`[KeyHandler] Error in renderable ${event} handler:`, error);
+        }
+        if (event === "keypress" || event === "keyrelease" || event === "paste") {
+          const keyEvent = args[0];
+          if (keyEvent.propagationStopped) {
+            return hasGlobalListeners || hasRenderableListeners;
+          }
+        }
+      }
+    }
+    return hasGlobalListeners || hasRenderableListeners;
+  }
+  onInternal(event, handler) {
+    if (!this.renderableHandlers.has(event)) {
+      this.renderableHandlers.set(event, new Set);
+    }
+    this.renderableHandlers.get(event).add(handler);
+  }
+  offInternal(event, handler) {
+    const handlers = this.renderableHandlers.get(event);
+    if (handlers) {
+      handlers.delete(handler);
+    }
+  }
+}
+// src/lib/fonts/block.json
+var block_default = {
+  name: "block",
+  version: "0.2.0",
+  homepage: "https://github.com/dominikwilkowski/cfonts",
+  colors: 2,
+  lines: 6,
+  buffer: ["", "", "", "", "", ""],
+  letterspace: [" ", " ", " ", " ", " ", " "],
+  letterspace_size: 1,
+  chars: {
+    A: [
+      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2> ",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
+    ],
+    B: [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    C: [
+      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
+    ],
+    D: [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    E: [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557  </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u255D  </c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
+    ],
+    F: [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557  </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u255D  </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
+      "<c2>\u255A\u2550\u255D     </c2>"
+    ],
+    G: [
+      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    H: [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
+    ],
+    I: [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u255D</c2>"
+    ],
+    J: [
+      "<c1>     \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>     \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>     \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    K: [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1> \u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
+    ],
+    L: [
+      "<c1>\u2588\u2588</c1><c2>\u2557     </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
+    ],
+    M: [
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551\u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551 \u255A\u2550\u255D</c2><c1> \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u255D     \u255A\u2550\u255D</c2>"
+    ],
+    N: [
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551 \u255A</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u255D  \u255A\u2550\u2550\u2550\u255D</c2>"
+    ],
+    O: [
+      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    P: [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u255D </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551     </c2>",
+      "<c2>\u255A\u2550\u255D     </c2>"
+    ],
+    Q: [
+      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2584\u2584 \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550</c2><c1>\u2580\u2580</c1><c2>\u2550\u255D </c2>"
+    ],
+    R: [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
+    ],
+    S: [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
+    ],
+    T: [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u255D</c2>",
+      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
+      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
+      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
+      "<c2>   \u255A\u2550\u255D   </c2>"
+    ],
+    U: [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    V: [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>   \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
+      "<c2>  \u255A\u2550\u2550\u2550\u255D  </c2>"
+    ],
+    W: [
+      "<c1>\u2588\u2588</c1><c2>\u2557    </c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551    </c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1> \u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588\u2588</c1><c2>\u2557</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u255D\u255A\u2550\u2550\u255D </c2>"
+    ],
+    X: [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A</c2><c1>\u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
+      " <c1>\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u255D</c2><c1> \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u255D  \u255A\u2550\u255D</c2>"
+    ],
+    Y: [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>   \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
+      "<c2>  \u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D  </c2>",
+      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
+      "<c2>   \u255A\u2550\u255D   </c2>"
+    ],
+    Z: [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550</c2><c1>\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>  \u2588\u2588\u2588</c1><c2>\u2554\u255D </c2>",
+      " <c1>\u2588\u2588\u2588</c1><c2>\u2554\u255D  </c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
+    ],
+    "0": [
+      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588</c1><c2>\u2554</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    "1": [
+      " <c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      " <c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      " <c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2> \u255A\u2550\u255D</c2>"
+    ],
+    "2": [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u255D </c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
+    ],
+    "3": [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    "4": [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1>  \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>  \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>     \u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>     \u255A\u2550\u255D</c2>"
+    ],
+    "5": [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"
+    ],
+    "6": [
+      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D </c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    "7": [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>    \u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>   \u2588\u2588</c1><c2>\u2554\u255D </c2>",
+      "<c1>   \u2588\u2588</c1><c2>\u2551  </c2>",
+      "<c2>   \u255A\u2550\u255D  </c2>"
+    ],
+    "8": [
+      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    "9": [
+      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2> \u255A\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      " <c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u2550\u2550\u2550\u255D </c2>"
+    ],
+    "!": [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550\u255D</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u255D</c2>"
+    ],
+    "?": [
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>  \u2584\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>  \u2580\u2580</c1><c2>\u2550\u2550\u255D </c2>",
+      "<c1>  \u2588\u2588</c1><c2>\u2557   </c2>",
+      "<c2>  \u255A\u2550\u255D   </c2>"
+    ],
+    ".": ["   ", "   ", "   ", "   ", "<c1>\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u255D</c2>"],
+    "+": [
+      "       ",
+      "<c1>  \u2588\u2588</c1><c2>\u2557  </c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2> \u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550\u255D</c2>",
+      "<c2>  \u255A\u2550\u255D  </c2>",
+      "       "
+    ],
+    "-": ["      ", "      ", "<c1>\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u2550\u2550\u2550\u255D</c2>", "      ", "      "],
+    _: ["        ", "        ", "        ", "        ", "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u255D</c2>"],
+    "=": [
+      "       ",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D</c2>",
+      "       "
+    ],
+    "@": [
+      " <c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588</c1><c2>\u2557</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A</c2><c1>\u2588</c1><c2>\u2551</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u255D\u255A\u2550\u2550\u2550\u255D </c2>"
+    ],
+    "#": [
+      " <c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2> \u255A\u2550\u255D \u255A\u2550\u255D </c2>"
+    ],
+    $: [
+      "<c1>\u2584\u2584\u2588\u2588\u2588\u2584\u2584</c1><c2>\xB7</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550\u2550\u2550\u2550\u255D</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550</c2><c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c2>\u255A\u2550</c2><c1>\u2580\u2580\u2580</c1><c2>\u2550\u2550\u255D</c2>"
+    ],
+    "%": [
+      "<c1>\u2588\u2588</c1><c2>\u2557</c2><c1> \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u255D</c2><c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>  \u2588\u2588</c1><c2>\u2554\u255D </c2>",
+      " <c1>\u2588\u2588</c1><c2>\u2554\u255D  </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u255D</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2>\u255A\u2550\u255D \u255A\u2550\u255D</c2>"
+    ],
+    "&": [
+      "<c1>   \u2588\u2588</c1><c2>\u2557   </c2>",
+      "<c1>   \u2588\u2588</c1><c2>\u2551   </c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u2550</c2><c1>\u2588\u2588</c1><c2>\u2554\u2550\u255D</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2551  </c2>",
+      "<c2>\u255A\u2550\u2550\u2550\u2550\u2550\u255D  </c2>"
+    ],
+    "(": [
+      " <c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2551 ",
+      "<c1>\u2588\u2588</c1><c2>\u2551 ",
+      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      "<c2> \u255A\u2550\u255D</c2>"
+    ],
+    ")": [
+      "<c1>\u2588\u2588</c1><c2>\u2557 </c2>",
+      "<c2>\u255A</c2><c1>\u2588\u2588</c1><c2>\u2557</c2>",
+      " <c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      " <c1>\u2588\u2588</c1><c2>\u2551</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c2>\u255A\u2550\u255D </c2>"
+    ],
+    "/": [
+      "<c1>    \u2588\u2588</c1><c2>\u2557</c2>",
+      "<c1>   \u2588\u2588</c1><c2>\u2554\u255D</c2>",
+      "<c1>  \u2588\u2588</c1><c2>\u2554\u255D </c2>",
+      " <c1>\u2588\u2588</c1><c2>\u2554\u255D  </c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2554\u255D   </c2>",
+      "<c2>\u255A\u2550\u255D    </c2>"
+    ],
+    ":": ["   ", "<c1>\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u255D</c2>", "<c1>\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u255D</c2>", "   "],
+    ";": ["   ", "   ", "<c1>\u2588\u2588</c1><c2>\u2557</c2>", "<c2>\u255A\u2550\u255D</c2>", "<c1>\u2584\u2588</c1><c2>\u2557</c2>", "<c1>\u2580</c1><c2>\u2550\u255D</c2>"],
+    ",": ["   ", "   ", "   ", "   ", "<c1>\u2584\u2588</c1><c2>\u2557</c2>", "<c1>\u2580</c1><c2>\u2550\u255D</c2>"],
+    "'": ["<c1>\u2588</c1><c2>\u2557</c2> ", "<c2>\u255A\u255D</c2> ", "   ", "   ", "   ", "   "],
+    '"': ["<c1>\u2588</c1><c2>\u2557</c2><c1>\u2588</c1><c2>\u2557</c2> ", "<c2>\u255A\u255D\u255A\u255D</c2> ", "     ", "     ", "     ", "     "],
+    " ": ["   ", "   ", "   ", "   ", "   ", "   "]
+  }
+};
+// src/lib/fonts/shade.json
+var shade_default = {
+  name: "shade",
+  version: "0.2.0",
+  homepage: "https://github.com/dominikwilkowski/cfonts",
+  colors: 2,
+  lines: 8,
+  buffer: ["", "", "", "", "", "", "", ""],
+  letterspace: [
+    "<c2>\u2591</c2>",
+    "<c2>\u2591</c2>",
+    "<c2>\u2591</c2>",
+    "<c2>\u2591</c2>",
+    "<c2>\u2591</c2>",
+    "<c2>\u2591</c2>",
+    "<c2>\u2591</c2>",
+    "<c2>\u2591</c2>"
+  ],
+  letterspace_size: 1,
+  chars: {
+    A: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c2>\u2591\u2591</c2> ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    B: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "   <c2>\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    C: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "<c1>\u2588</c1>   ",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    D: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "   <c2>\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    E: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "<c1>\u2588</c1>   ",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588</c1>  <c2>\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    F: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "<c1>\u2588</c1>   ",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588</c1>  <c2>\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      " <c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    G: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
+      "<c1>\u2588</c1>   ",
+      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591</c2> <c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "   <c2>\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    H: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c2>\u2591\u2591</c2> ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    I: [
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1>",
+      " <c1>\u2588</c1> ",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1>",
+      "   ",
+      "<c2>\u2591\u2591\u2591</c2>"
+    ],
+    J: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "  <c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "   <c2>\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    K: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c2>\u2591\u2591</c2> ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    L: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    M: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c2>\u2591\u2591</c2> ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    N: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588\u2588</c1><c2>\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588 \u2588\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591</c2> <c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c2>\u2591\u2591</c2> ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    O: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c1>\u2588\u2588</c1> ",
+      "<c2>\u2591  \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    P: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "<c1>\u2588</c1>  <c2>\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      " <c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    Q: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c1>\u2588\u2588\u2588</c1>",
+      "<c2>\u2591</c2>   ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    R: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c2>\u2591\u2591</c2> ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    S: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
+      "<c1>\u2588</c1>   ",
+      " <c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2>  <c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "   <c2>\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    T: [
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1>",
+      " <c1>\u2588</c1> ",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591 \u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2>"
+    ],
+    U: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c1>\u2588\u2588</c1> ",
+      "<c2>\u2591  \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    V: [
+      "<c2>\u2591\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1> ",
+      "<c2>\u2591</c2> <c1>\u2588</c1> <c2>\u2591</c2>",
+      "<c2>\u2591\u2591 \u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591\u2591</c2>"
+    ],
+    W: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "<c1>\u2588  \u2588</c1>",
+      " <c2>\u2591\u2591</c2> ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    X: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c1>\u2588\u2588</c1> ",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588</c1>",
+      " <c2>\u2591\u2591</c2> ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    Y: [
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1>",
+      " <c1>\u2588</c1> ",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591 \u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2>"
+    ],
+    Z: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "  <c1>\u2588</c1> ",
+      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
+      "<c1>\u2588</c1> <c2>\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "0": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u258C\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591</c2> <c1>\u2588</c1>",
+      " <c1>\u2588\u2588</c1> ",
+      "<c2>\u2591  \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "1": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588</c1><c2>\u2591\u2591</c2>",
+      " <c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "   <c2>\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "2": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2590\u2588\u2588</c1><c2>\u2591</c2>",
+      "   <c1>\u2588</c1>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
+      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "3": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "   <c1>\u2588</c1>",
+      "<c2>\u2591\u2591</c2><c1>\u2588\u2588</c1>",
+      "<c2>\u2591\u2591</c2> <c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "4": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "   <c1>\u2588</c1>",
+      "<c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c2>\u2591\u2591\u2591</c2> ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "5": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "<c1>\u2588</c1>   ",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "   <c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "   <c2>\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "6": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
+      "<c1>\u2588</c1>   ",
+      "<c1>\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      " <c1>\u2588\u2588</c1> ",
+      "<c2>\u2591  \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "7": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "   <c1>\u2588</c1>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      " <c1>\u2588</c1>  ",
+      "<c1>\u2588</c1> <c2>\u2591\u2591</c2>",
+      " <c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "8": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      " <c1>\u2588\u2588</c1> ",
+      "<c1>\u2588  \u2588</c1>",
+      " <c1>\u2588\u2588</c1> ",
+      "<c2>\u2591  \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "9": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      " <c1>\u2588\u2588\u2588</c1>",
+      "<c2>\u2591</c2>  <c1>\u2588</c1>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
+      "<c2>\u2591\u2591 \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "!": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591  \u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591  \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "?": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2590\u2588\u2588</c1><c2>\u2591</c2>",
+      "   <c1>\u2588</c1>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
+      "<c2>\u2591\u2591 \u2591</c2>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591\u2591 \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    ".": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591\u2591 \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "+": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
+      "<c2>\u2591</c2> <c1>\u2588</c1> ",
+      "<c2>\u2591\u2591 \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "-": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    _: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    "
+    ],
+    "=": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "@": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c1>\u2588  \u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u258C\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1> ",
+      " <c1>\u2588\u2588\u2588</c1>",
+      "    ",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "#": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      " <c1>\u258C\u2590</c1> ",
+      "<c1>\u2588\u2588\u2588\u2588</c1>",
+      " <c1>\u258C\u2590</c1> ",
+      "<c2>\u2591  \u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    $: [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591</c2><c1>\u258C</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588\u2588\u2588</c1>",
+      "<c1>\u2588 \u2588</c1> ",
+      " <c1>\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591\u2591</c2><c1>\u258C\u2588</c1>",
+      "<c1>\u2588\u2588\u2588</c1> ",
+      "   <c2>\u2591</c2>"
+    ],
+    "%": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1> ",
+      " <c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1>",
+      "<c1>\u2588</c1> <c2>\u2591</c2> ",
+      " <c2>\u2591\u2591\u2591</c2>"
+    ],
+    "&": [
+      "<c2>\u2591\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      "<c1>\u2588\u2588\u2588\u2588\u2588</c1>",
+      "<c1>\u2588  \u2588</c1> ",
+      "<c1>\u2588\u2588\u2588\u2588</c1><c2>\u2591</c2>",
+      "<c2>    </c2> ",
+      "<c2>\u2591\u2591\u2591\u2591\u2591</c2>"
+    ],
+    "(": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
+      "<c1>\u2588</c1> <c2>\u2591\u2591</c2>",
+      "<c1>\u2588</c1><c2>\u2591\u2591\u2591</c2>",
+      " <c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591</c2> <c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591\u2591 \u2591</c2>"
+    ],
+    ")": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591</c2> <c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591\u2591</c2> <c1>\u2588</c1>",
+      "<c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
+      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
+      "<c2>\u2591 \u2591\u2591</c2>"
+    ],
+    "/": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2><c1>\u2588</c1>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1> ",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c1>\u2588</c1> <c2>\u2591\u2591</c2>",
+      " <c2>\u2591\u2591\u2591</c2>"
+    ],
+    ":": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591 \u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591 \u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    ";": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591 \u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>"
+    ],
+    ",": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591</c2><c1>\u2588</c1><c2>\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1> <c2>\u2591</c2>"
+    ],
+    "'": [
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591 \u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591</c2>"
+    ],
+    '"': [
+      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591\u2591</c2>",
+      "<c2>\u2591 \u2591 \u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2>"
+    ],
+    " ": [
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2>",
+      "<c2>\u2591\u2591\u2591</c2>"
+    ]
+  }
+};
+// src/lib/fonts/slick.json
+var slick_default = {
+  name: "slick",
+  version: "0.1.0",
+  homepage: "https://github.com/dominikwilkowski/cfonts",
+  colors: 2,
+  lines: 6,
+  buffer: ["", "", "", "", "", ""],
+  letterspace: ["<c2>\u2571</c2>", "<c2>\u2571</c2>", "<c2>\u2571</c2>", "<c2>\u2571</c2>", "<c2>\u2571</c2>", "<c2>\u2571</c2>"],
+  letterspace_size: 1,
+  chars: {
+    A: [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2570\u256F</c1><c2>\u2571</c2><c1>\u2570\u256F</c1>"
+    ],
+    B: [
+      "<c1>\u256D\u2501\u2501\u256E</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u256D\u256E\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u2570\u256F\u2570\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
+    ],
+    C: [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2570\u256F</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
+    ],
+    D: [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2570\u256E\u256D\u256E\u2503</c1>",
+      "<c2>\u2571</c2><c1>\u2503\u2503\u2503\u2503</c1>",
+      "<c2>\u2571</c2><c1>\u2503\u2503\u2503\u2503</c1>",
+      "<c1>\u256D\u256F\u2570\u256F\u2503</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
+    ],
+    E: ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u2501\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u2501\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    F: [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u2501\u256F</c1>",
+      "<c1>\u2503\u2570\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u2501\u256F</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571\u2571\u2571</c2>",
+      "<c1>\u2570\u256F</c1><c2>\u2571\u2571\u2571</c2>"
+    ],
+    G: [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2570\u256F</c1>",
+      "<c1>\u2503\u2503\u256D\u2501\u256E</c1>",
+      "<c1>\u2503\u2570\u253B\u2501\u2503</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
+    ],
+    H: [
+      "<c1>\u256D\u256E</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2570\u256F</c1><c2>\u2571</c2><c1>\u2570\u256F</c1>"
+    ],
+    I: [
+      "<c1>\u256D\u2501\u2501\u256E</c1>",
+      "<c1>\u2570\u252B\u2523\u256F</c1>",
+      "<c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
+      "<c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u256D\u252B\u2523\u256E</c1>",
+      "<c1>\u2570\u2501\u2501\u256F</c1>"
+    ],
+    J: [
+      "<c2>\u2571\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u256D\u256E\u2503\u2503</c1>",
+      "<c1>\u2503\u2570\u256F\u2503</c1>",
+      "<c1>\u2570\u2501\u2501\u256F</c1>"
+    ],
+    K: [
+      "<c1>\u256D\u256E\u256D\u2501\u256E</c1>",
+      "<c1>\u2503\u2503\u2503\u256D\u256F</c1>",
+      "<c1>\u2503\u2570\u256F\u256F</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u256D\u256E\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u2503\u2503\u2570\u256E</c1>",
+      "<c1>\u2570\u256F\u2570\u2501\u256F</c1>"
+    ],
+    L: [
+      "<c1>\u256D\u256E</c1><c2>\u2571\u2571\u2571</c2>",
+      "<c1>\u2503\u2503</c1><c2>\u2571\u2571\u2571</c2>",
+      "<c1>\u2503\u2503</c1><c2>\u2571\u2571\u2571</c2>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
+    ],
+    M: [
+      "<c1>\u256D\u2501\u256E\u256D\u2501\u256E</c1>",
+      "<c1>\u2503\u2503\u2570\u256F\u2503\u2503</c1>",
+      "<c1>\u2503\u256D\u256E\u256D\u256E\u2503</c1>",
+      "<c1>\u2503\u2503\u2503\u2503\u2503\u2503</c1>",
+      "<c1>\u2503\u2503\u2503\u2503\u2503\u2503</c1>",
+      "<c1>\u2570\u256F\u2570\u256F\u2570\u256F</c1>"
+    ],
+    N: [
+      "<c1>\u256D\u2501\u256E</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c1>\u2503\u2503\u2570\u256E\u2503\u2503</c1>",
+      "<c1>\u2503\u256D\u256E\u2570\u256F\u2503</c1>",
+      "<c1>\u2503\u2503\u2570\u256E\u2503\u2503</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503\u2503</c1>",
+      "<c1>\u2570\u256F</c1><c2>\u2571</c2><c1>\u2570\u2501\u256F</c1>"
+    ],
+    O: [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
+    ],
+    P: [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
+      "<c1>\u2503\u256D\u2501\u2501\u256F</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571\u2571\u2571</c2>",
+      "<c1>\u2570\u256F</c1><c2>\u2571\u2571\u2571</c2>"
+    ],
+    Q: [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503\u256E</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u2501\u256F</c1>"
+    ],
+    R: ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2503\u256D\u256E\u256D\u256F</c1>", "<c1>\u2503\u2503\u2503\u2570\u256E</c1>", "<c1>\u2570\u256F\u2570\u2501\u256F</c1>"],
+    S: ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    T: [
+      "<c1>\u256D\u2501\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u256E\u256D\u256E\u2503</c1>",
+      "<c1>\u2570\u256F\u2503\u2503\u2570\u256F</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571\u2571</c2>",
+      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571\u2571</c2>",
+      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571\u2571</c2>"
+    ],
+    U: [
+      "<c1>\u256D\u256E</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
+    ],
+    V: [
+      "<c1>\u256D\u256E</c1><c2>\u2571\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c1>\u2503\u2570\u256E\u256D\u256F\u2503</c1>",
+      "<c1>\u2570\u256E\u2503\u2503\u256D\u256F</c1>",
+      "<c2>\u2571</c2><c1>\u2503\u2570\u256F\u2503</c1><c2>\u2571</c2>",
+      "<c2>\u2571</c2><c1>\u2570\u256E\u256D\u256F</c1><c2>\u2571</c2>",
+      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571\u2571</c2>"
+    ],
+    W: [
+      "<c1>\u256D\u256E\u256D\u256E\u256D\u256E</c1>",
+      "<c1>\u2503\u2503\u2503\u2503\u2503\u2503</c1>",
+      "<c1>\u2503\u2503\u2503\u2503\u2503\u2503</c1>",
+      "<c1>\u2503\u2570\u256F\u2570\u256F\u2503</c1>",
+      "<c1>\u2570\u256E\u256D\u256E\u256D\u256F</c1>",
+      "<c2>\u2571</c2><c1>\u2570\u256F\u2570\u256F</c1><c2>\u2571</c2>"
+    ],
+    X: [
+      "<c1>\u256D\u2501\u256E\u256D\u2501\u256E</c1>",
+      "<c1>\u2570\u256E\u2570\u256F\u256D\u256F</c1>",
+      "<c2>\u2571</c2><c1>\u2570\u256E\u256D\u256F</c1><c2>\u2571</c2>",
+      "<c2>\u2571</c2><c1>\u256D\u256F\u2570\u256E</c1><c2>\u2571</c2>",
+      "<c1>\u256D\u256F\u256D\u256E\u2570\u256E</c1>",
+      "<c1>\u2570\u2501\u256F\u2570\u2501\u256F</c1>"
+    ],
+    Y: [
+      "<c1>\u256D\u256E</c1><c2>\u2571\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c1>\u2503\u2570\u256E\u256D\u256F\u2503</c1>",
+      "<c1>\u2570\u256E\u2570\u256F\u256D\u256F</c1>",
+      "<c2>\u2571</c2><c1>\u2570\u256E\u256D\u256F</c1><c2>\u2571</c2>",
+      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571\u2571</c2>",
+      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571\u2571</c2>"
+    ],
+    Z: [
+      "<c1>\u256D\u2501\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2570\u2501\u2501\u256E\u2501\u2503</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
+      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
+      "<c1>\u256D\u256F\u2501\u2570\u2501\u256E</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u2501\u256F</c1>"
+    ],
+    "0": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    "1": [
+      "<c2>\u2571</c2><c1>\u256D\u256E</c1><c2>\u2571</c2>",
+      "<c1>\u256D\u256F\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2570\u256E\u2503</c1><c2>\u2571</c2>",
+      "<c2>\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u256D\u256F\u2570\u256E</c1>",
+      "<c1>\u2570\u2501\u2501\u256F</c1>"
+    ],
+    "2": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2570\u256F\u256D\u256F\u2503</c1>", "<c1>\u256D\u2501\u256F\u256D\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    "3": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2570\u256F\u256D\u256F\u2503</c1>", "<c1>\u256D\u256E\u2570\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    "4": [
+      "<c1>\u256D\u256E</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2503\u2570\u2501\u256F\u2503</c1>",
+      "<c1>\u2570\u2501\u2501\u256E\u2503</c1>",
+      "<c2>\u2571\u2571\u2571</c2><c1>\u2503\u2503</c1>",
+      "<c2>\u2571\u2571\u2571</c2><c1>\u2570\u256F</c1>"
+    ],
+    "5": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u2501\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u256E\u2503</c1>", "<c1>\u256D\u2501\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    "6": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u2501\u256F</c1>", "<c1>\u2503\u2570\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    "7": [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2570\u256F\u256D\u256F\u2503</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u2503\u256D\u256F</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u2503\u2503</c1><c2>\u2571</c2>",
+      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571</c2>"
+    ],
+    "8": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    "9": ["<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2503\u256D\u2501\u256E\u2503</c1>", "<c1>\u2503\u2570\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u256E\u2503</c1>", "<c1>\u256D\u2501\u2501\u256F\u2503</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    "!": ["<c1>\u256D\u256E</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2570\u256F</c1>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>"],
+    "?": [
+      "<c1>\u256D\u2501\u2501\u2501\u256E</c1>",
+      "<c1>\u2503\u256D\u2501\u256E\u2503</c1>",
+      "<c1>\u2570\u256F\u256D\u256F\u2503</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u2503\u256D\u256F</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u256D\u256E</c1><c2>\u2571</c2>",
+      "<c2>\u2571\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571</c2>"
+    ],
+    ".": ["<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>"],
+    "+": [
+      "<c2>\u2571\u2571\u2571\u2571</c2>",
+      "<c2>\u2571\u2571\u2571\u2571</c2>",
+      "<c2>\u2571</c2><c1>\u256D\u256E</c1><c2>\u2571</c2>",
+      "<c1>\u256D\u256F\u2570\u256E</c1>",
+      "<c1>\u2570\u256E\u256D\u256F</c1>",
+      "<c2>\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571</c2>"
+    ],
+    "-": ["<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c1>\u256D\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u256F</c1>", "<c2>\u2571\u2571\u2571\u2571</c2>"],
+    _: ["<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c1>\u256D\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u256F</c1>"],
+    "=": ["<c2>\u2571\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571\u2571</c2>", "<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>", "<c1>\u256D\u2501\u2501\u2501\u256E</c1>", "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"],
+    "@": [
+      "<c1>\u256D\u2501\u2501\u2501\u2501\u256E</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u256D\u2501\u2501\u256E\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u2503\u256D\u2501\u2503\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u2503\u2570\u256F\u2503\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u2570\u2501\u2501\u256F\u2501\u256E</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u2501\u2501\u256F</c1>"
+    ],
+    "#": [
+      "<c2>\u2571</c2><c1>\u256D\u2501\u2501\u256E</c1><c2>\u2571</c2>",
+      "<c1>\u256D\u256F\u256D\u256E\u2570\u256E</c1>",
+      "<c1>\u2570\u256E\u2503\u2503\u256D\u256F</c1>",
+      "<c1>\u256D\u256F\u2503\u2503\u2570\u256E</c1>",
+      "<c1>\u2570\u256E\u2570\u256F\u256D\u256F</c1>",
+      "<c2>\u2571</c2><c1>\u2570\u2501\u2501\u256F</c1><c2>\u2571</c2>"
+    ],
+    $: [
+      "<c2>\u2571\u2571</c2><c1>\u256D\u256E</c1><c2>\u2571</c2>",
+      "<c1>\u256D\u2501\u256F\u2570\u256E</c1>",
+      "<c1>\u2503\u2570\u2501\u2501\u256E</c1>",
+      "<c1>\u2570\u2501\u2501\u256E\u2503</c1>",
+      "<c1>\u2570\u256E\u256D\u2501\u256F</c1>",
+      "<c2>\u2571</c2><c1>\u2570\u256F</c1><c2>\u2571\u2571</c2>"
+    ],
+    "%": [
+      "<c1>\u256D\u256E</c1><c2>\u2571\u2571</c2><c1>\u256D\u2501\u256E</c1>",
+      "<c1>\u2570\u256F</c1><c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
+      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571\u2571</c2>",
+      "<c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2><c1>\u256D\u256E</c1>",
+      "<c1>\u2570\u2501\u256F</c1><c2>\u2571\u2571</c2><c1>\u2570\u256F</c1>"
+    ],
+    "&": [
+      "<c2>\u2571</c2><c1>\u256D\u2501\u2501\u256E</c1>",
+      "<c2>\u2571</c2><c1>\u2503\u256D\u2501\u256F</c1>",
+      "<c1>\u256D\u256F\u2570\u256E</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u256D\u256E\u2503</c1><c2>\u2571</c2>",
+      "<c1>\u2503\u2570\u256F\u2503\u256E</c1>",
+      "<c1>\u2570\u2501\u2501\u2501\u256F</c1>"
+    ],
+    "(": [
+      "<c2>\u2571\u2571</c2><c1>\u256D\u2501\u256E</c1>",
+      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
+      "<c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
+      "<c1>\u2570\u256E\u2570\u256E</c1><c2>\u2571</c2>",
+      "<c2>\u2571</c2><c1>\u2570\u256E\u2570\u256E</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u2570\u2501\u256F</c1>"
+    ],
+    ")": [
+      "<c1>\u256D\u2501\u256E</c1><c2>\u2571\u2571</c2>",
+      "<c1>\u2570\u256E\u2570\u256E</c1><c2>\u2571</c2>",
+      "<c2>\u2571</c2><c1>\u2570\u256E\u2570\u256E</c1>",
+      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
+      "<c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
+      "<c1>\u2570\u2501\u256F</c1><c2>\u2571\u2571</c2>"
+    ],
+    "/": [
+      "<c2>\u2571\u2571\u2571\u2571</c2><c1>\u256D\u2501\u256E</c1>",
+      "<c2>\u2571\u2571\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1>",
+      "<c2>\u2571\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571</c2>",
+      "<c2>\u2571</c2><c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571\u2571</c2>",
+      "<c1>\u256D\u256F\u256D\u256F</c1><c2>\u2571\u2571\u2571</c2>",
+      "<c1>\u2570\u2501\u256F</c1><c2>\u2571\u2571\u2571\u2571</c2>"
+    ],
+    ":": ["<c2>\u2571\u2571</c2>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>", "<c2>\u2571\u2571</c2>"],
+    ";": ["<c1>\u256D\u256E</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2570\u256F</c1>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u252B</c1>", "<c2>\u2571</c2><c1>\u256F</c1>"],
+    ",": ["<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c1>\u256D\u256E</c1>", "<c1>\u2570\u252B</c1>", "<c2>\u2571</c2><c1>\u256F</c1>"],
+    "'": ["<c1>\u256D\u256E</c1>", "<c1>\u2570\u256F</c1>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>", "<c2>\u2571\u2571</c2>"],
+    '"': ["<c1>\u256D\u256E\u256D\u256E</c1>", "<c1>\u2570\u256F\u2570\u256F</c1>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571\u2571</c2>"],
+    " ": ["<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>", "<c2>\u2571\u2571\u2571</c2>"]
+  }
+};
+// src/lib/fonts/tiny.json
+var tiny_default = {
+  name: "tiny",
+  version: "0.2.0",
+  homepage: "https://github.com/dominikwilkowski/cfonts",
+  colors: 1,
+  lines: 2,
+  buffer: ["", ""],
+  letterspace: [" ", " "],
+  letterspace_size: 1,
+  chars: {
+    A: ["\u2584\u2580\u2588", "\u2588\u2580\u2588"],
+    B: ["\u2588\u2584\u2584", "\u2588\u2584\u2588"],
+    C: ["\u2588\u2580\u2580", "\u2588\u2584\u2584"],
+    D: ["\u2588\u2580\u2584", "\u2588\u2584\u2580"],
+    E: ["\u2588\u2580\u2580", "\u2588\u2588\u2584"],
+    F: ["\u2588\u2580\u2580", "\u2588\u2580 "],
+    G: ["\u2588\u2580\u2580", "\u2588\u2584\u2588"],
+    H: ["\u2588 \u2588", "\u2588\u2580\u2588"],
+    I: ["\u2588", "\u2588"],
+    J: ["  \u2588", "\u2588\u2584\u2588"],
+    K: ["\u2588\u2584\u2580", "\u2588 \u2588"],
+    L: ["\u2588  ", "\u2588\u2584\u2584"],
+    M: ["\u2588\u2580\u2584\u2580\u2588", "\u2588 \u2580 \u2588"],
+    N: ["\u2588\u2584 \u2588", "\u2588 \u2580\u2588"],
+    O: ["\u2588\u2580\u2588", "\u2588\u2584\u2588"],
+    P: ["\u2588\u2580\u2588", "\u2588\u2580\u2580"],
+    Q: ["\u2588\u2580\u2588", "\u2580\u2580\u2588"],
+    R: ["\u2588\u2580\u2588", "\u2588\u2580\u2584"],
+    S: ["\u2588\u2580\u2580", "\u2584\u2584\u2588"],
+    T: ["\u2580\u2588\u2580", " \u2588 "],
+    U: ["\u2588 \u2588", "\u2588\u2584\u2588"],
+    V: ["\u2588 \u2588", "\u2580\u2584\u2580"],
+    W: ["\u2588 \u2588 \u2588", "\u2580\u2584\u2580\u2584\u2580"],
+    X: ["\u2580\u2584\u2580", "\u2588 \u2588"],
+    Y: ["\u2588\u2584\u2588", " \u2588 "],
+    Z: ["\u2580\u2588", "\u2588\u2584"],
+    "0": ["\u259E\u2588\u259A", "\u259A\u2588\u259E"],
+    "1": ["\u2584\u2588", " \u2588"],
+    "2": ["\u2580\u2588", "\u2588\u2584"],
+    "3": ["\u2580\u2580\u2588", "\u2584\u2588\u2588"],
+    "4": ["\u2588 \u2588", "\u2580\u2580\u2588"],
+    "5": ["\u2588\u2580", "\u2584\u2588"],
+    "6": ["\u2588\u2584\u2584", "\u2588\u2584\u2588"],
+    "7": ["\u2580\u2580\u2588", "  \u2588"],
+    "8": ["\u2588\u2588\u2588", "\u2588\u2584\u2588"],
+    "9": ["\u2588\u2580\u2588", "\u2580\u2580\u2588"],
+    "!": ["\u2588", "\u2584"],
+    "?": ["\u2580\u2588", " \u2584"],
+    ".": [" ", "\u2584"],
+    "+": ["\u2584\u2588\u2584", " \u2580 "],
+    "-": ["\u2584\u2584", "  "],
+    _: ["  ", "\u2584\u2584"],
+    "=": ["\u2580\u2580", "\u2580\u2580"],
+    "@": ["\u259B\u2588\u259C", "\u2599\u259F\u2583"],
+    "#": ["\u259F\u2584\u2599", "\u259C\u2580\u259B"],
+    $: ["\u2596\u2588\u2597", "\u2598\u2588\u259D"],
+    "%": ["\u2580 \u2584\u2580", "\u2584\u2580 \u2584"],
+    "&": ["\u2584\u2584\u2588", "\u2588\u2584\u2588"],
+    "(": ["\u2584\u2580", "\u2580\u2584"],
+    ")": ["\u2580\u2584", "\u2584\u2580"],
+    "/": ["  \u2584\u2580", "\u2584\u2580  "],
+    ":": ["\u2580", "\u2584"],
+    ";": ["  ", "\u2584\u2580"],
+    ",": [" ", "\u2588"],
+    "'": ["\u2580", " "],
+    '"': ["\u259B \u259C", "   "],
+    " ": [" ", " "]
+  }
+};
+// src/lib/fonts/huge.json
+var huge_default = {
+  name: "huge",
+  version: "0.2.0",
+  homepage: "https://github.com/dominikwilkowski/cfonts",
+  colors: 2,
+  lines: 11,
+  buffer: ["", "", "", "", "", "", "", "", "", "", ""],
+  letterspace: [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+  letterspace_size: 1,
+  chars: {
+    A: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580         \u2580</c1> "
+    ],
+    B: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>  ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1>  "
+    ],
+    C: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    D: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>  ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1>  "
+    ],
+    E: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    F: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      " <c1>\u2580</c1>           "
+    ],
+    G: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    H: [
+      " <c1>\u2584         \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580         \u2580</c1> "
+    ],
+    I: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      " <c1>\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    J: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580</c1> ",
+      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>    ",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1>     "
+    ],
+    K: [
+      " <c1>\u2584    \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580    \u2580</c1> "
+    ],
+    L: [
+      " <c1>\u2584</c1>           ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    M: [
+      " <c1>\u2584\u2584       \u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2580   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580         \u2580</c1> "
+    ],
+    N: [
+      " <c1>\u2584\u2584        \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C      \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C    \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C    \u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C      \u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580        \u2580\u2580</c1> "
+    ],
+    O: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    P: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      " <c1>\u2580</c1>           "
+    ],
+    Q: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580</c1> ",
+      "        <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "         <c1>\u2580</c1>   "
+    ],
+    R: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C      \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580         \u2580</c1> "
+    ],
+    S: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    T: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "      <c1>\u2580</c1>      "
+    ],
+    U: [
+      " <c1>\u2584         \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    V: [
+      " <c1>\u2584               \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C             \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C           \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C         \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>      ",
+      "       <c1>\u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>       ",
+      "        <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>        ",
+      "         <c1>\u2580</c1>         "
+    ],
+    W: [
+      " <c1>\u2584         \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2584   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580       \u2580\u2580</c1> "
+    ],
+    X: [
+      " <c1>\u2584       \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580       \u2580</c1> "
+    ],
+    Y: [
+      " <c1>\u2584         \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "      <c1>\u2580</c1>      "
+    ],
+    Z: [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    "0": [
+      "  <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>  ",
+      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C    \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C    \u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      "  <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1>  "
+    ],
+    "1": [
+      "    <c1>\u2584\u2584\u2584\u2584</c1>     ",
+      "  <c1>\u2584\u2588</c1><c2>\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>    ",
+      " <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "  <c1>\u2580\u2580 \u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "     <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "     <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "     <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "     <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      " <c1>\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    "2": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    "3": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    "4": [
+      " <c1>\u2584         \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "           <c1>\u2580</c1> "
+    ],
+    "5": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    "6": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>          ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    "7": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "         <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "        <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "       <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>      ",
+      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>       ",
+      "    <c1>\u2580</c1>        "
+    ],
+    "8": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    "9": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "          <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    "!": [
+      " <c1>\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580</c1> ",
+      " <c1>\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580</c1> "
+    ],
+    "?": [
+      "    <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>  ",
+      "  <c1>\u2584\u2588</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u2588\u2584</c1> ",
+      " <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "  <c1>\u2580\u2580  \u2584\u2584\u2584\u2588</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "    <c1>\u2584\u2588</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u2588</c1> ",
+      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C\u2580\u2580\u2580\u2580</c1>  ",
+      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>      ",
+      "    <c1>\u2580\u2580</c1>       ",
+      "    <c1>\u2584\u2584</c1>       ",
+      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>      ",
+      "    <c1>\u2580\u2580</c1>       "
+    ],
+    ".": [
+      "    ",
+      "    ",
+      "    ",
+      "    ",
+      "    ",
+      "    ",
+      "    ",
+      "    ",
+      " <c1>\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580</c1> "
+    ],
+    "+": [
+      "          ",
+      "          ",
+      "    <c1>\u2584\u2584</c1>    ",
+      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>   ",
+      " <c1>\u2584\u2584\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2588</c1><c2>\u2591\u2591</c2><c1>\u2588\u2580\u2580</c1> ",
+      "   <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>   ",
+      "    <c1>\u2580\u2580</c1>    ",
+      "          ",
+      "          "
+    ],
+    "-": [
+      "       ",
+      "       ",
+      "       ",
+      "       ",
+      " <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "       ",
+      "       ",
+      "       ",
+      "       "
+    ],
+    _: [
+      "       ",
+      "       ",
+      "       ",
+      "       ",
+      "       ",
+      "       ",
+      "       ",
+      " <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "       "
+    ],
+    "=": [
+      "       ",
+      "       ",
+      " <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "       ",
+      " <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580</c1> ",
+      "       ",
+      "       "
+    ],
+    "@": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C        \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C  \u2584\u2584\u2584\u2584  \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2588</c1><c2>\u2591\u2591\u2591\u2591</c2><c1>\u2588 \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u2588\u2588\u2588\u2588</c1><c2>\u2591</c2><c1>\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C \u2588</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C\u2584\u2584\u2588\u2588\u2588\u2588\u2588\u2588\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    "#": [
+      "   <c1>\u2584         \u2584</c1>   ",
+      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      " <c1>\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580</c1> ",
+      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      " <c1>\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580</c1> ",
+      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C       \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "   <c1>\u2580         \u2580</c1>   "
+    ],
+    $: [
+      "      <c1>\u2584</c1>      ",
+      " <c1>\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580</c1> ",
+      "      <c1>\u2580</c1>      "
+    ],
+    "%": [
+      "         <c1>\u2584</c1> ",
+      "  <c1>\u2584     \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "  <c1>\u2580   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2584</c1>  ",
+      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2580</c1>  ",
+      " <c1>\u2580</c1>         "
+    ],
+    "&": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584\u2584\u2584</c1>     ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C   \u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2580\u2580\u2580\u2580\u2588</c1><c2>\u2591</c2><c1>\u258C \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C     \u2590</c1><c2>\u2591</c2><c1>\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2588\u2584\u2584\u2584\u2584\u2588</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      " <c1>\u2580\u2580\u2580\u2580\u2580\u2580  \u2580</c1>   "
+    ],
+    "(": [
+      "  <c1>\u2584\u2584\u2584\u2584\u2584</c1> ",
+      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u2588\u2580\u2580\u2580</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>    ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u2588\u2584\u2584\u2584</c1> ",
+      " <c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1>",
+      "  <c1>\u2580\u2580\u2580\u2580\u2580</c1> "
+    ],
+    ")": [
+      " <c1>\u2584\u2584\u2584\u2584\u2584</c1>  ",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      " <c1>\u2580\u2580\u2580\u2588</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "    <c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2584\u2584\u2584\u2588</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      "<c1>\u2590</c1><c2>\u2591\u2591\u2591\u2591\u2591</c2><c1>\u258C</c1> ",
+      " <c1>\u2580\u2580\u2580\u2580\u2580</c1>  "
+    ],
+    "/": [
+      "         <c1>\u2584</c1> ",
+      "        <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>",
+      "       <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1> ",
+      "      <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>  ",
+      "     <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>   ",
+      "    <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>    ",
+      "   <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>     ",
+      "  <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>      ",
+      " <c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>       ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u258C</c1>        ",
+      " <c1>\u2580</c1>         "
+    ],
+    ":": [
+      "    ",
+      "    ",
+      " <c1>\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580</c1> ",
+      "    ",
+      " <c1>\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580</c1> ",
+      "    ",
+      "    "
+    ],
+    ";": [
+      "    ",
+      "    ",
+      " <c1>\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u2580</c1> ",
+      "    ",
+      " <c1>\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u258C</c1> ",
+      " <c1>\u2580</c1>  ",
+      "    "
+    ],
+    ",": [
+      "    ",
+      "    ",
+      "    ",
+      "    ",
+      "    ",
+      "    ",
+      "    ",
+      " <c1>\u2584\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591\u2591</c2><c1>\u258C</c1>",
+      " <c1>\u2580\u258C</c1> ",
+      " <c1>\u2580</c1>  "
+    ],
+    "'": [
+      " <c1>\u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2590</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2590</c1>",
+      " <c1>\u2580</c1> ",
+      "   ",
+      "   ",
+      "   ",
+      "   ",
+      "   ",
+      "   ",
+      "   "
+    ],
+    '"': [
+      " <c1>\u2584  \u2584</c1> ",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2590\u2590</c1><c2>\u2591</c2><c1>\u2590</c1>",
+      "<c1>\u2590</c1><c2>\u2591</c2><c1>\u2590\u2590</c1><c2>\u2591</c2><c1>\u2590</c1>",
+      " <c1>\u2580  \u2580</c1> ",
+      "      ",
+      "      ",
+      "      ",
+      "      ",
+      "      ",
+      "      ",
+      "      "
+    ],
+    " ": ["    ", "    ", "    ", "    ", "    ", "    ", "    ", "    ", "    ", "    ", "    "]
+  }
+};
+// src/lib/fonts/grid.json
+var grid_default = {
+  name: "grid",
+  version: "0.1.0",
+  homepage: "https://github.com/dominikwilkowski/cfonts",
+  colors: 2,
+  lines: 6,
+  buffer: ["", "", "", "", "", ""],
+  letterspace: ["<c2>\u254B</c2>", "<c2>\u254B</c2>", "<c2>\u254B</c2>", "<c2>\u254B</c2>", "<c2>\u254B</c2>", "<c2>\u254B</c2>"],
+  letterspace_size: 1,
+  chars: {
+    A: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2513\u2503</c1>", "<c1>\u2503\u250F\u2513\u2503</c1>", "<c1>\u2517\u251B\u2517\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    B: [
+      "<c1>\u250F\u2513</c1><c2>\u254B\u254B</c2>",
+      "<c1>\u2503\u2517\u2501\u2513</c1>",
+      "<c1>\u2503\u250F\u2513\u2503</c1>",
+      "<c1>\u2503\u2517\u251B\u2503</c1>",
+      "<c1>\u2517\u2501\u2501\u251B</c1>",
+      "<c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    C: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u251B</c1>", "<c1>\u2503\u2517\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    D: [
+      "<c2>\u254B\u254B</c2><c1>\u250F\u2513</c1>",
+      "<c1>\u250F\u2501\u251B\u2503</c1>",
+      "<c1>\u2503\u250F\u2513\u2503</c1>",
+      "<c1>\u2503\u2517\u251B\u2503</c1>",
+      "<c1>\u2517\u2501\u2501\u251B</c1>",
+      "<c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    E: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u2503\u2501\u252B</c1>", "<c1>\u2503\u2503\u2501\u252B</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    F: [
+      "<c2>\u254B</c2><c1>\u250F\u2501\u2513</c1>",
+      "<c1>\u250F\u251B\u2517\u2513</c1>",
+      "<c1>\u2517\u2513\u250F\u251B</c1>",
+      "<c2>\u254B</c2><c1>\u2503\u2503</c1><c2>\u254B</c2>",
+      "<c2>\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>",
+      "<c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    G: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2513\u2503</c1>", "<c1>\u2503\u2517\u251B\u2503</c1>", "<c1>\u2517\u2501\u2513\u2503</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>"],
+    H: [
+      "<c1>\u250F\u2513</c1><c2>\u254B\u254B</c2>",
+      "<c1>\u2503\u2517\u2501\u2513</c1>",
+      "<c1>\u2503\u250F\u2513\u2503</c1>",
+      "<c1>\u2503\u2503\u2503\u2503</c1>",
+      "<c1>\u2517\u251B\u2517\u251B</c1>",
+      "<c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    I: ["<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c1>\u250F\u2513</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2517\u251B</c1>", "<c2>\u254B\u254B</c2>"],
+    J: [
+      "<c2>\u254B</c2><c1>\u250F\u2513</c1>",
+      "<c2>\u254B</c2><c1>\u2517\u251B</c1>",
+      "<c2>\u254B</c2><c1>\u250F\u2513</c1>",
+      "<c2>\u254B</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u250F\u251B\u2503</c1>",
+      "<c1>\u2517\u2501\u251B</c1>"
+    ],
+    K: [
+      "<c1>\u250F\u2513</c1><c2>\u254B\u254B</c2>",
+      "<c1>\u2503\u2503\u250F\u2513</c1>",
+      "<c1>\u2503\u2517\u251B\u251B</c1>",
+      "<c1>\u2503\u250F\u2513\u2513</c1>",
+      "<c1>\u2517\u251B\u2517\u251B</c1>",
+      "<c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    L: [
+      "<c1>\u250F\u2513</c1><c2>\u254B</c2>",
+      "<c1>\u2503\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u2503\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u2503\u2517\u2513</c1>",
+      "<c1>\u2517\u2501\u251B</c1>",
+      "<c2>\u254B\u254B\u254B</c2>"
+    ],
+    M: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2513\u250F\u2513</c1>", "<c1>\u2503\u2517\u251B\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503</c1>", "<c1>\u2517\u253B\u253B\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    N: [
+      "<c2>\u254B\u254B\u254B\u254B</c2>",
+      "<c1>\u250F\u2501\u2513</c1><c2>\u254B</c2>",
+      "<c1>\u2503\u250F\u2513\u2513</c1>",
+      "<c1>\u2503\u2503\u2503\u2503</c1>",
+      "<c1>\u2517\u251B\u2517\u251B</c1>",
+      "<c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    O: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2513\u2503</c1>", "<c1>\u2503\u2517\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    P: [
+      "<c2>\u254B\u254B\u254B\u254B</c2>",
+      "<c1>\u250F\u2501\u2501\u2513</c1>",
+      "<c1>\u2503\u250F\u2513\u2503</c1>",
+      "<c1>\u2503\u2517\u251B\u2503</c1>",
+      "<c1>\u2503\u250F\u2501\u251B</c1>",
+      "<c1>\u2517\u251B</c1><c2>\u254B\u254B</c2>"
+    ],
+    Q: [
+      "<c2>\u254B\u254B\u254B\u254B</c2>",
+      "<c1>\u250F\u2501\u2501\u2513</c1>",
+      "<c1>\u2503\u250F\u2513\u2503</c1>",
+      "<c1>\u2503\u2517\u251B\u2503</c1>",
+      "<c1>\u2517\u2501\u2513\u2503</c1>",
+      "<c2>\u254B\u254B</c2><c1>\u2517\u251B</c1>"
+    ],
+    R: [
+      "<c2>\u254B\u254B\u254B</c2>",
+      "<c1>\u250F\u2501\u2513</c1>",
+      "<c1>\u2503\u250F\u251B</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u2517\u251B</c1><c2>\u254B</c2>",
+      "<c2>\u254B\u254B\u254B</c2>"
+    ],
+    S: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2503\u2501\u2501\u252B</c1>", "<c1>\u2523\u2501\u2501\u2503</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    T: [
+      "<c2>\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
+      "<c1>\u250F\u251B\u2517\u2513</c1>",
+      "<c1>\u2517\u2513\u250F\u251B</c1>",
+      "<c2>\u254B</c2><c1>\u2503\u2517\u2513</c1>",
+      "<c2>\u254B</c2><c1>\u2517\u2501\u251B</c1>",
+      "<c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    U: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2513\u250F\u2513</c1>", "<c1>\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2517\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    V: [
+      "<c2>\u254B\u254B\u254B\u254B</c2>",
+      "<c1>\u250F\u2513\u250F\u2513</c1>",
+      "<c1>\u2503\u2517\u251B\u2503</c1>",
+      "<c1>\u2517\u2513\u250F\u251B</c1>",
+      "<c2>\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>",
+      "<c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    W: [
+      "<c2>\u254B\u254B\u254B\u254B\u254B\u254B</c2>",
+      "<c1>\u250F\u2513\u250F\u2513\u250F\u2513</c1>",
+      "<c1>\u2503\u2517\u251B\u2517\u251B\u2503</c1>",
+      "<c1>\u2517\u2513\u250F\u2513\u250F\u251B</c1>",
+      "<c2>\u254B</c2><c1>\u2517\u251B\u2517\u251B</c1><c2>\u254B</c2>",
+      "<c2>\u254B\u254B\u254B\u254B\u254B\u254B</c2>"
+    ],
+    X: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2513\u250F\u2513</c1>", "<c1>\u2517\u254B\u254B\u251B</c1>", "<c1>\u250F\u254B\u254B\u2513</c1>", "<c1>\u2517\u251B\u2517\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    Y: [
+      "<c2>\u254B\u254B\u254B\u254B\u254B</c2>",
+      "<c1>\u250F\u2513</c1><c2>\u254B</c2><c1>\u250F\u2513</c1>",
+      "<c1>\u2503\u2517\u2501\u251B\u2503</c1>",
+      "<c1>\u2517\u2501\u2513\u250F\u251B</c1>",
+      "<c1>\u2517\u2501\u2501\u251B</c1><c2>\u254B</c2>",
+      "<c2>\u254B\u254B\u254B\u254B\u254B</c2>"
+    ],
+    Z: ["<c2>\u254B\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2523\u2501\u2501\u2503\u2503</c1>", "<c1>\u2503\u2503\u2501\u2501\u252B</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B\u254B</c2>"],
+    "0": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2503\u2503\u2503\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
+    "1": [
+      "<c2>\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
+      "<c1>\u250F\u251B\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u2517\u2513\u2503</c1><c2>\u254B</c2>",
+      "<c2>\u254B</c2><c1>\u2503\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u250F\u251B\u2517\u2513</c1>",
+      "<c1>\u2517\u2501\u2501\u251B</c1>"
+    ],
+    "2": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2517\u251B\u250F\u251B\u2503</c1>", "<c1>\u250F\u2501\u251B\u250F\u251B</c1>", "<c1>\u2503\u2517\u2501\u253B\u2513</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
+    "3": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2517\u251B\u250F\u251B\u2503</c1>", "<c1>\u250F\u2513\u2517\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
+    "4": [
+      "<c1>\u250F\u2513</c1><c2>\u254B</c2><c1>\u250F\u2513</c1>",
+      "<c1>\u2503\u2503</c1><c2>\u254B</c2><c1>\u2503\u2503</c1>",
+      "<c1>\u2503\u2517\u2501\u251B\u2503</c1>",
+      "<c1>\u2517\u2501\u2501\u2513\u2503</c1>",
+      "<c2>\u254B\u254B\u254B</c2><c1>\u2503\u2503</c1>",
+      "<c2>\u254B\u254B\u254B</c2><c1>\u2517\u251B</c1>"
+    ],
+    "5": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2501\u251B</c1>", "<c1>\u2503\u2517\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u2513\u2503</c1>", "<c1>\u250F\u2501\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
+    "6": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2501\u251B</c1>", "<c1>\u2503\u2517\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
+    "7": [
+      "<c1>\u250F\u2501\u2501\u2501\u2513</c1>",
+      "<c1>\u2503\u250F\u2501\u2513\u2503</c1>",
+      "<c1>\u2517\u251B\u250F\u251B\u2503</c1>",
+      "<c2>\u254B\u254B</c2><c1>\u2503\u250F\u251B</c1>",
+      "<c2>\u254B\u254B</c2><c1>\u2503\u2503</c1><c2>\u254B</c2>",
+      "<c2>\u254B\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>"
+    ],
+    "8": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
+    "9": ["<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2503\u250F\u2501\u2513\u2503</c1>", "<c1>\u2503\u2517\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2513\u2503</c1>", "<c1>\u250F\u2501\u2501\u251B\u2503</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>"],
+    "!": ["<c1>\u250F\u2513</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2503\u2503</c1>", "<c1>\u2517\u251B</c1>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>"],
+    "?": [
+      "<c1>\u250F\u2501\u2501\u2501\u2513</c1>",
+      "<c1>\u2503\u250F\u2501\u2513\u2503</c1>",
+      "<c1>\u2517\u251B\u250F\u251B\u2503</c1>",
+      "<c2>\u254B\u254B</c2><c1>\u2503\u250F\u251B</c1>",
+      "<c2>\u254B\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
+      "<c2>\u254B\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>"
+    ],
+    ".": ["<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>"],
+    "+": [
+      "<c2>\u254B\u254B\u254B\u254B</c2>",
+      "<c2>\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
+      "<c1>\u250F\u251B\u2517\u2513</c1>",
+      "<c1>\u2517\u2513\u250F\u251B</c1>",
+      "<c2>\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>",
+      "<c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    "-": ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    _: ["<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u251B</c1>"],
+    "=": ["<c2>\u254B\u254B\u254B\u254B\u254B</c2>", "<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>", "<c1>\u250F\u2501\u2501\u2501\u2513</c1>", "<c1>\u2517\u2501\u2501\u2501\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B\u254B</c2>"],
+    "@": [
+      "<c1>\u250F\u2501\u2501\u2501\u2501\u2513</c1><c2>\u254B</c2>",
+      "<c1>\u2503\u250F\u2501\u2501\u2513\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u2503\u2503\u250F\u2501\u2503\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u2503\u2503\u2517\u251B\u2503\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u2503\u2517\u2501\u2501\u251B\u2517\u2513</c1>",
+      "<c1>\u2517\u2501\u2501\u2501\u2501\u2501\u251B</c1>"
+    ],
+    "#": [
+      "<c2>\u254B</c2><c1>\u250F\u2501\u2501\u2501\u2513</c1><c2>\u254B</c2>",
+      "<c1>\u250F\u251B\u250F\u2501\u2513\u2517\u2513</c1>",
+      "<c1>\u2517\u2513\u2503\u2503\u2503\u250F\u251B</c1>",
+      "<c1>\u250F\u251B\u2503\u2503\u2503\u2517\u2513</c1>",
+      "<c1>\u2517\u2513\u2517\u2501\u251B\u250F\u251B</c1>",
+      "<c2>\u254B</c2><c1>\u2517\u2501\u2501\u2501\u251B</c1><c2>\u254B</c2>"
+    ],
+    $: [
+      "<c2>\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
+      "<c1>\u250F\u251B\u2517\u2513</c1>",
+      "<c1>\u2503\u2501\u2501\u252B</c1>",
+      "<c1>\u2523\u2501\u2501\u2503</c1>",
+      "<c1>\u2517\u2513\u250F\u251B</c1>",
+      "<c2>\u254B</c2><c1>\u2517\u251B</c1><c2>\u254B</c2>"
+    ],
+    "%": [
+      "<c1>\u250F\u2513</c1><c2>\u254B\u254B</c2><c1>\u250F\u2501\u2513</c1>",
+      "<c1>\u2517\u251B</c1><c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1>",
+      "<c2>\u254B\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2>",
+      "<c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B\u254B</c2>",
+      "<c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2><c1>\u250F\u2513</c1>",
+      "<c1>\u2517\u2501\u251B</c1><c2>\u254B\u254B</c2><c1>\u2517\u251B</c1>"
+    ],
+    "&": [
+      "<c2>\u254B\u254B</c2><c1>\u250F\u2513</c1><c2>\u254B</c2>",
+      "<c2>\u254B\u254B</c2><c1>\u2503\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u250F\u2501\u251B\u2517\u2513</c1>",
+      "<c1>\u2503\u250F\u2513\u250F\u251B</c1>",
+      "<c1>\u2503\u2517\u251B\u2503</c1><c2>\u254B</c2>",
+      "<c1>\u2517\u2501\u2501\u251B</c1><c2>\u254B</c2>"
+    ],
+    "(": [
+      "<c2>\u254B\u254B</c2><c1>\u250F\u2501\u2513</c1>",
+      "<c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1>",
+      "<c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2>",
+      "<c1>\u2517\u2513\u2517\u2513</c1><c2>\u254B</c2>",
+      "<c2>\u254B</c2><c1>\u2517\u2513\u2517\u2513</c1>",
+      "<c2>\u254B\u254B</c2><c1>\u2517\u2501\u251B</c1>"
+    ],
+    ")": [
+      "<c1>\u250F\u2501\u2513</c1><c2>\u254B\u254B</c2>",
+      "<c1>\u2517\u2513\u2517\u2513</c1><c2>\u254B</c2>",
+      "<c2>\u254B</c2><c1>\u2517\u2513\u2517\u2513</c1>",
+      "<c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1>",
+      "<c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2>",
+      "<c1>\u2517\u2501\u251B</c1><c2>\u254B\u254B</c2>"
+    ],
+    "/": [
+      "<c2>\u254B\u254B\u254B\u254B</c2><c1>\u250F\u2501\u2513</c1>",
+      "<c2>\u254B\u254B\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1>",
+      "<c2>\u254B\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B</c2>",
+      "<c2>\u254B</c2><c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B\u254B</c2>",
+      "<c1>\u250F\u251B\u250F\u251B</c1><c2>\u254B\u254B\u254B</c2>",
+      "<c1>\u2517\u2501\u251B</c1><c2>\u254B\u254B\u254B\u254B</c2>"
+    ],
+    ":": ["<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c2>\u254B\u254B</c2>"],
+    ";": ["<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u252B</c1>"],
+    ",": ["<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c1>\u250F\u2513</c1>", "<c1>\u2517\u252B</c1>"],
+    "'": ["<c1>\u250F\u2513</c1>", "<c1>\u2517\u251B</c1>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>"],
+    '"': ["<c1>\u250F\u2513\u250F\u2513</c1>", "<c1>\u2517\u251B\u2517\u251B</c1>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>", "<c2>\u254B\u254B\u254B\u254B</c2>"],
+    " ": ["<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>", "<c2>\u254B\u254B</c2>"]
+  }
+};
+// src/lib/fonts/pallet.json
+var pallet_default = {
+  name: "pallet",
+  version: "0.1.0",
+  homepage: "https://github.com/dominikwilkowski/cfonts",
+  colors: 2,
+  lines: 6,
+  buffer: ["", "", "", "", "", ""],
+  letterspace: ["<c2>\u2500</c2>", "<c2>\u2500</c2>", "<c2>\u2500</c2>", "<c2>\u2500</c2>", "<c2>\u2500</c2>", "<c2>\u2500</c2>"],
+  letterspace_size: 1,
+  chars: {
+    A: [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u255A\u255D</c1><c2>\u2500</c2><c1>\u255A\u255D</c1>"
+    ],
+    B: [
+      "<c1>\u2554\u2550\u2550\u2557</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u2554\u2557\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u255A\u255D\u255A\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
+    ],
+    C: [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u255A\u255D</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
+    ],
+    D: [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u255A\u2557\u2554\u2557\u2551</c1>",
+      "<c2>\u2500</c2><c1>\u2551\u2551\u2551\u2551</c1>",
+      "<c2>\u2500</c2><c1>\u2551\u2551\u2551\u2551</c1>",
+      "<c1>\u2554\u255D\u255A\u255D\u2551</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
+    ],
+    E: ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2550\u255D</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2550\u255D</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
+    F: [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2550\u255D</c1>",
+      "<c1>\u2551\u255A\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2550\u255D</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500\u2500\u2500</c2>",
+      "<c1>\u255A\u255D</c1><c2>\u2500\u2500\u2500</c2>"
+    ],
+    G: [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u255A\u255D</c1>",
+      "<c1>\u2551\u2551\u2554\u2550\u2557</c1>",
+      "<c1>\u2551\u255A\u2569\u2550\u2551</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
+    ],
+    H: [
+      "<c1>\u2554\u2557</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u255A\u255D</c1><c2>\u2500</c2><c1>\u255A\u255D</c1>"
+    ],
+    I: [
+      "<c1>\u2554\u2550\u2550\u2557</c1>",
+      "<c1>\u255A\u2563\u2560\u255D</c1>",
+      "<c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
+      "<c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2554\u2563\u2560\u2557</c1>",
+      "<c1>\u255A\u2550\u2550\u255D</c1>"
+    ],
+    J: [
+      "<c2>\u2500\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u2554\u2557\u2551\u2551</c1>",
+      "<c1>\u2551\u255A\u255D\u2551</c1>",
+      "<c1>\u255A\u2550\u2550\u255D</c1>"
+    ],
+    K: [
+      "<c1>\u2554\u2557\u2554\u2550\u2557</c1>",
+      "<c1>\u2551\u2551\u2551\u2554\u255D</c1>",
+      "<c1>\u2551\u255A\u255D\u255D</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u2554\u2557\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u2551\u2551\u255A\u2557</c1>",
+      "<c1>\u255A\u255D\u255A\u2550\u255D</c1>"
+    ],
+    L: [
+      "<c1>\u2554\u2557</c1><c2>\u2500\u2500\u2500</c2>",
+      "<c1>\u2551\u2551</c1><c2>\u2500\u2500\u2500</c2>",
+      "<c1>\u2551\u2551</c1><c2>\u2500\u2500\u2500</c2>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
+    ],
+    M: [
+      "<c1>\u2554\u2550\u2557\u2554\u2550\u2557</c1>",
+      "<c1>\u2551\u2551\u255A\u255D\u2551\u2551</c1>",
+      "<c1>\u2551\u2554\u2557\u2554\u2557\u2551</c1>",
+      "<c1>\u2551\u2551\u2551\u2551\u2551\u2551</c1>",
+      "<c1>\u2551\u2551\u2551\u2551\u2551\u2551</c1>",
+      "<c1>\u255A\u255D\u255A\u255D\u255A\u255D</c1>"
+    ],
+    N: [
+      "<c1>\u2554\u2550\u2557</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c1>\u2551\u2551\u255A\u2557\u2551\u2551</c1>",
+      "<c1>\u2551\u2554\u2557\u255A\u255D\u2551</c1>",
+      "<c1>\u2551\u2551\u255A\u2557\u2551\u2551</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551\u2551</c1>",
+      "<c1>\u255A\u255D</c1><c2>\u2500</c2><c1>\u255A\u2550\u255D</c1>"
+    ],
+    O: [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
+    ],
+    P: [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
+      "<c1>\u2551\u2554\u2550\u2550\u255D</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500\u2500\u2500</c2>",
+      "<c1>\u255A\u255D</c1><c2>\u2500\u2500\u2500</c2>"
+    ],
+    Q: [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u255A\u2550\u255D\u2560\u2557</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u2550\u255D</c1>"
+    ],
+    R: ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u2551\u2554\u2557\u2554\u255D</c1>", "<c1>\u2551\u2551\u2551\u255A\u2557</c1>", "<c1>\u255A\u255D\u255A\u2550\u255D</c1>"],
+    S: ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
+    T: [
+      "<c1>\u2554\u2550\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2557\u2554\u2557\u2551</c1>",
+      "<c1>\u255A\u255D\u2551\u2551\u255A\u255D</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500\u2500</c2>",
+      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500\u2500</c2>",
+      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500\u2500</c2>"
+    ],
+    U: [
+      "<c1>\u2554\u2557</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"
+    ],
+    V: [
+      "<c1>\u2554\u2557</c1><c2>\u2500\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c1>\u2551\u255A\u2557\u2554\u255D\u2551</c1>",
+      "<c1>\u255A\u2557\u2551\u2551\u2554\u255D</c1>",
+      "<c2>\u2500</c2><c1>\u2551\u255A\u255D\u2551</c1><c2>\u2500</c2>",
+      "<c2>\u2500</c2><c1>\u255A\u2557\u2554\u255D</c1><c2>\u2500</c2>",
+      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500\u2500</c2>"
+    ],
+    W: [
+      "<c1>\u2554\u2557\u2554\u2557\u2554\u2557</c1>",
+      "<c1>\u2551\u2551\u2551\u2551\u2551\u2551</c1>",
+      "<c1>\u2551\u2551\u2551\u2551\u2551\u2551</c1>",
+      "<c1>\u2551\u255A\u255D\u255A\u255D\u2551</c1>",
+      "<c1>\u255A\u2557\u2554\u2557\u2554\u255D</c1>",
+      "<c2>\u2500</c2><c1>\u255A\u255D\u255A\u255D</c1><c2>\u2500</c2>"
+    ],
+    X: [
+      "<c1>\u2554\u2550\u2557\u2554\u2550\u2557</c1>",
+      "<c1>\u255A\u2557\u255A\u255D\u2554\u255D</c1>",
+      "<c2>\u2500</c2><c1>\u255A\u2557\u2554\u255D</c1><c2>\u2500</c2>",
+      "<c2>\u2500</c2><c1>\u2554\u255D\u255A\u2557</c1><c2>\u2500</c2>",
+      "<c1>\u2554\u255D\u2554\u2557\u255A\u2557</c1>",
+      "<c1>\u255A\u2550\u255D\u255A\u2550\u255D</c1>"
+    ],
+    Y: [
+      "<c1>\u2554\u2557</c1><c2>\u2500\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c1>\u2551\u255A\u2557\u2554\u255D\u2551</c1>",
+      "<c1>\u255A\u2557\u255A\u255D\u2554\u255D</c1>",
+      "<c2>\u2500</c2><c1>\u255A\u2557\u2554\u255D</c1><c2>\u2500</c2>",
+      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500\u2500</c2>",
+      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500\u2500</c2>"
+    ],
+    Z: [
+      "<c1>\u2554\u2550\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u255A\u2550\u2550\u2557\u2550\u2551</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
+      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
+      "<c1>\u2554\u255D\u2550\u255A\u2550\u2557</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u2550\u255D</c1>"
+    ],
+    "0": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u2551\u2551\u2551\u2551</c1>", "<c1>\u2551\u2551\u2551\u2551\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
+    "1": [
+      "<c2>\u2500</c2><c1>\u2554\u2557</c1><c2>\u2500</c2>",
+      "<c1>\u2554\u255D\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u255A\u2557\u2551</c1><c2>\u2500</c2>",
+      "<c2>\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2554\u255D\u255A\u2557</c1>",
+      "<c1>\u255A\u2550\u2550\u255D</c1>"
+    ],
+    "2": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u255A\u255D\u2554\u255D\u2551</c1>", "<c1>\u2554\u2550\u255D\u2554\u255D</c1>", "<c1>\u2551\u2551\u255A\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
+    "3": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u255A\u255D\u2554\u255D\u2551</c1>", "<c1>\u2554\u2557\u255A\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
+    "4": [
+      "<c1>\u2554\u2557</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c1>\u2551\u2551</c1><c2>\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c1>\u2551\u255A\u2550\u255D\u2551</c1>",
+      "<c1>\u255A\u2550\u2550\u2557\u2551</c1>",
+      "<c2>\u2500\u2500\u2500</c2><c1>\u2551\u2551</c1>",
+      "<c2>\u2500\u2500\u2500</c2><c1>\u255A\u255D</c1>"
+    ],
+    "5": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2550\u255D</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2557\u2551</c1>", "<c1>\u2554\u2550\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
+    "6": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2550\u255D</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
+    "7": [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u255A\u255D\u2554\u255D\u2551</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2551\u2554\u255D</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
+      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500</c2>"
+    ],
+    "8": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
+    "9": ["<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2557\u2551</c1>", "<c1>\u2554\u2550\u2550\u255D\u2551</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>"],
+    "!": ["<c1>\u2554\u2557</c1>", "<c1>\u2551\u2551</c1>", "<c1>\u2551\u2551</c1>", "<c1>\u255A\u255D</c1>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u255D</c1>"],
+    "?": [
+      "<c1>\u2554\u2550\u2550\u2550\u2557</c1>",
+      "<c1>\u2551\u2554\u2550\u2557\u2551</c1>",
+      "<c1>\u255A\u255D\u2554\u255D\u2551</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2551\u2554\u255D</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2554\u2557</c1><c2>\u2500</c2>",
+      "<c2>\u2500\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500</c2>"
+    ],
+    ".": ["<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u255D</c1>"],
+    "+": [
+      "<c2>\u2500\u2500\u2500\u2500</c2>",
+      "<c2>\u2500\u2500\u2500\u2500</c2>",
+      "<c2>\u2500</c2><c1>\u2554\u2557</c1><c2>\u2500</c2>",
+      "<c1>\u2554\u255D\u255A\u2557</c1>",
+      "<c1>\u255A\u2557\u2554\u255D</c1>",
+      "<c2>\u2500</c2><c1>\u255A\u255D</c1><c2>\u2500</c2>"
+    ],
+    "-": ["<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c1>\u2554\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u255D</c1>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>"],
+    _: ["<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c1>\u2554\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u255D</c1>"],
+    "=": ["<c2>\u2500\u2500\u2500\u2500\u2500</c2>", "<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>", "<c1>\u2554\u2550\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2550\u255D</c1>", "<c2>\u2500\u2500\u2500\u2500\u2500</c2>"],
+    "@": [
+      "<c1>\u2554\u2550\u2550\u2550\u2550\u2557</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u2554\u2550\u2550\u2557\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u2551\u2554\u2550\u2551\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u2551\u255A\u255D\u2551\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2551\u255A\u2550\u2550\u255D\u2560\u2557</c1>",
+      "<c1>\u255A\u2550\u2550\u2550\u2550\u2550\u255D</c1>"
+    ],
+    "#": [
+      "<c2>\u2500</c2><c1>\u2554\u2569\u2569\u2569\u2557</c1><c2>\u2500</c2>",
+      "<c1>\u2554\u255D\u2554\u2550\u2557\u255A\u2557</c1>",
+      "<c1>\u255A\u2557\u2560\u2550\u2563\u2554\u255D</c1>",
+      "<c1>\u2554\u255D\u2560\u2550\u2563\u255A\u2557</c1>",
+      "<c1>\u255A\u2557\u255A\u2550\u255D\u2554\u255D</c1>",
+      "<c2>\u2500</c2><c1>\u255A\u2566\u2566\u2566\u255D</c1><c2>\u2500</c2>"
+    ],
+    $: ["<c1>\u2554\u255D\u2569\u255A\u2557</c1>", "<c1>\u2551\u2554\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u2550\u2557</c1>", "<c1>\u255A\u2550\u2550\u2557\u2551</c1>", "<c1>\u2551\u255A\u2550\u255D\u2551</c1>", "<c1>\u255A\u2557\u2566\u2554\u255D</c1>"],
+    "%": [
+      "<c1>\u2554\u2557</c1><c2>\u2500\u2500</c2><c1>\u2554\u2550\u2557</c1>",
+      "<c1>\u255A\u255D</c1><c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
+      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500\u2500</c2>",
+      "<c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2><c1>\u2554\u2557</c1>",
+      "<c1>\u255A\u2550\u255D</c1><c2>\u2500\u2500</c2><c1>\u255A\u255D</c1>"
+    ],
+    "&": [
+      "<c2>\u2500\u2500</c2><c1>\u2554\u2557</c1><c2>\u2500</c2>",
+      "<c2>\u2500\u2500</c2><c1>\u2551\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u2554\u2550\u255D\u255A\u2557</c1>",
+      "<c1>\u2551\u2554\u2557\u2554\u255D</c1>",
+      "<c1>\u2551\u255A\u255D\u2551</c1><c2>\u2500</c2>",
+      "<c1>\u255A\u2550\u2550\u255D</c1><c2>\u2500</c2>"
+    ],
+    "(": [
+      "<c2>\u2500\u2500</c2><c1>\u2554\u2550\u2557</c1>",
+      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
+      "<c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
+      "<c1>\u255A\u2557\u255A\u2557</c1><c2>\u2500</c2>",
+      "<c2>\u2500</c2><c1>\u255A\u2557\u255A\u2557</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u255A\u2550\u255D</c1>"
+    ],
+    ")": [
+      "<c1>\u2554\u2550\u2557</c1><c2>\u2500\u2500</c2>",
+      "<c1>\u255A\u2557\u255A\u2557</c1><c2>\u2500</c2>",
+      "<c2>\u2500</c2><c1>\u255A\u2557\u255A\u2557</c1>",
+      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
+      "<c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
+      "<c1>\u255A\u2550\u255D</c1><c2>\u2500\u2500</c2>"
+    ],
+    "/": [
+      "<c2>\u2500\u2500\u2500\u2500</c2><c1>\u2554\u2550\u2557</c1>",
+      "<c2>\u2500\u2500\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1>",
+      "<c2>\u2500\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500</c2>",
+      "<c2>\u2500</c2><c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500\u2500</c2>",
+      "<c1>\u2554\u255D\u2554\u255D</c1><c2>\u2500\u2500\u2500</c2>",
+      "<c1>\u255A\u2550\u255D</c1><c2>\u2500\u2500\u2500\u2500</c2>"
+    ],
+    ":": ["<c2>\u2500\u2500</c2>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u255D</c1>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u255D</c1>", "<c2>\u2500\u2500</c2>"],
+    ";": ["<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u2563</c1>", "<c2>\u2500</c2><c1>\u255D</c1>"],
+    ",": ["<c1>\u2554\u2557</c1>", "<c1>\u2551\u2551</c1>", "<c1>\u255A\u255D</c1>", "<c1>\u2554\u2557</c1>", "<c1>\u255A\u2563</c1>", "<c2>\u2500</c2><c1>\u255D</c1>"],
+    "'": ["<c1>\u2554\u2557</c1>", "<c1>\u2551\u2551</c1>", "<c1>\u255A\u255D</c1>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>", "<c2>\u2500\u2500</c2>"],
+    '"': ["<c1>\u2554\u2557\u2554\u2557</c1>", "<c1>\u2551\u2551\u2551\u2551</c1>", "<c1>\u255A\u255D\u255A\u255D</c1>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500\u2500</c2>"],
+    " ": ["<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>", "<c2>\u2500\u2500\u2500</c2>"]
+  }
+};
+
+// src/lib/ascii.font.ts
+var fonts2 = {
+  tiny: tiny_default,
+  block: block_default,
+  shade: shade_default,
+  slick: slick_default,
+  huge: huge_default,
+  grid: grid_default,
+  pallet: pallet_default
+};
+var parsedFonts = {};
+function parseColorTags(text) {
+  const segments = [];
+  let currentIndex = 0;
+  const colorTagRegex = /<c(\d+)>(.*?)<\/c\d+>/g;
+  let lastIndex = 0;
+  let match;
+  while ((match = colorTagRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      const plainText = text.slice(lastIndex, match.index);
+      if (plainText) {
+        segments.push({ text: plainText, colorIndex: 0 });
+      }
+    }
+    const colorIndex = parseInt(match[1]) - 1;
+    const taggedText = match[2];
+    segments.push({ text: taggedText, colorIndex: Math.max(0, colorIndex) });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    const remainingText = text.slice(lastIndex);
+    if (remainingText) {
+      segments.push({ text: remainingText, colorIndex: 0 });
+    }
+  }
+  return segments;
+}
+function getParsedFont(fontKey) {
+  if (!parsedFonts[fontKey]) {
+    const fontDef = fonts2[fontKey];
+    const parsedChars = {};
+    for (const [char, lines] of Object.entries(fontDef.chars)) {
+      parsedChars[char] = lines.map((line) => parseColorTags(line));
+    }
+    parsedFonts[fontKey] = {
+      ...fontDef,
+      colors: fontDef.colors || 1,
+      chars: parsedChars
+    };
+  }
+  return parsedFonts[fontKey];
+}
+function measureText2({ text, font = "tiny" }) {
+  const fontDef = getParsedFont(font);
+  if (!fontDef) {
+    console.warn(`Font '${font}' not found`);
+    return { width: 0, height: 0 };
+  }
+  let currentX = 0;
+  for (let i = 0;i < text.length; i++) {
+    const char = text[i].toUpperCase();
+    const charDef = fontDef.chars[char];
+    if (!charDef) {
+      const spaceChar = fontDef.chars[" "];
+      if (spaceChar && spaceChar[0]) {
+        let spaceWidth = 0;
+        for (const segment of spaceChar[0]) {
+          spaceWidth += segment.text.length;
+        }
+        currentX += spaceWidth;
+      } else {
+        currentX += 1;
+      }
+      continue;
+    }
+    let charWidth = 0;
+    if (charDef[0]) {
+      for (const segment of charDef[0]) {
+        charWidth += segment.text.length;
+      }
+    }
+    currentX += charWidth;
+    if (i < text.length - 1) {
+      currentX += fontDef.letterspace_size;
+    }
+  }
+  return {
+    width: currentX,
+    height: fontDef.lines
+  };
+}
+function getCharacterPositions2(text, font = "tiny") {
+  const fontDef = getParsedFont(font);
+  if (!fontDef) {
+    return [0];
+  }
+  const positions = [0];
+  let currentX = 0;
+  for (let i = 0;i < text.length; i++) {
+    const char = text[i].toUpperCase();
+    const charDef = fontDef.chars[char];
+    let charWidth = 0;
+    if (!charDef) {
+      const spaceChar = fontDef.chars[" "];
+      if (spaceChar && spaceChar[0]) {
+        for (const segment of spaceChar[0]) {
+          charWidth += segment.text.length;
+        }
+      } else {
+        charWidth = 1;
+      }
+    } else if (charDef[0]) {
+      for (const segment of charDef[0]) {
+        charWidth += segment.text.length;
+      }
+    }
+    currentX += charWidth;
+    if (i < text.length - 1) {
+      currentX += fontDef.letterspace_size;
+    }
+    positions.push(currentX);
+  }
+  return positions;
+}
+function coordinateToCharacterIndex2(x, text, font = "tiny") {
+  const positions = getCharacterPositions2(text, font);
+  if (x < 0) {
+    return 0;
+  }
+  for (let i = 0;i < positions.length - 1; i++) {
+    const currentPos = positions[i];
+    const nextPos = positions[i + 1];
+    if (x >= currentPos && x < nextPos) {
+      const charMidpoint = currentPos + (nextPos - currentPos) / 2;
+      return x < charMidpoint ? i : i + 1;
+    }
+  }
+  if (positions.length > 0 && x >= positions[positions.length - 1]) {
+    return text.length;
+  }
+  return 0;
+}
+function renderFontToFrameBuffer2(buffer, {
+  text,
+  x = 0,
+  y = 0,
+  color = [RGBA2.fromInts(255, 255, 255, 255)],
+  backgroundColor = RGBA2.fromInts(0, 0, 0, 255),
+  font = "tiny"
+}) {
+  const width = buffer.width;
+  const height = buffer.height;
+  const fontDef = getParsedFont(font);
+  if (!fontDef) {
+    console.warn(`Font '${font}' not found`);
+    return { width: 0, height: 0 };
+  }
+  const colors = Array.isArray(color) ? color : [color];
+  let currentX = x;
+  const startX = x;
+  for (let i = 0;i < text.length; i++) {
+    const char = text[i].toUpperCase();
+    const charDef = fontDef.chars[char];
+    if (!charDef) {
+      const spaceChar = fontDef.chars[" "];
+      if (spaceChar && spaceChar[0]) {
+        let spaceWidth = 0;
+        for (const segment of spaceChar[0]) {
+          spaceWidth += segment.text.length;
+        }
+        currentX += spaceWidth;
+      } else {
+        currentX += 1;
+      }
+      continue;
+    }
+    let charWidth = 0;
+    if (charDef[0]) {
+      for (const segment of charDef[0]) {
+        charWidth += segment.text.length;
+      }
+    }
+    if (currentX >= width)
+      break;
+    if (currentX + charWidth < 0) {
+      currentX += charWidth + fontDef.letterspace_size;
+      continue;
+    }
+    for (let lineIdx = 0;lineIdx < fontDef.lines && lineIdx < charDef.length; lineIdx++) {
+      const segments = charDef[lineIdx];
+      const renderY = y + lineIdx;
+      if (renderY >= 0 && renderY < height) {
+        let segmentX = currentX;
+        for (const segment of segments) {
+          const segmentColor = colors[segment.colorIndex] || colors[0];
+          for (let charIdx = 0;charIdx < segment.text.length; charIdx++) {
+            const renderX = segmentX + charIdx;
+            if (renderX >= 0 && renderX < width) {
+              const fontChar = segment.text[charIdx];
+              if (fontChar !== " ") {
+                buffer.setCellWithAlphaBlending(renderX, renderY, fontChar, parseColor2(segmentColor), parseColor2(backgroundColor));
+              }
+            }
+          }
+          segmentX += segment.text.length;
+        }
+      }
+    }
+    currentX += charWidth;
+    if (i < text.length - 1) {
+      currentX += fontDef.letterspace_size;
+    }
+  }
+  return {
+    width: currentX - startX,
+    height: fontDef.lines
+  };
+}
+
+// src/lib/hast-styled-text.ts
+function hastToTextChunks(node, syntaxStyle, parentStyles = []) {
+  const chunks = [];
+  if (node.type === "text") {
+    const stylesToMerge = parentStyles.length > 0 ? parentStyles : ["default"];
+    const mergedStyle = syntaxStyle.mergeStyles(...stylesToMerge);
+    chunks.push({
+      __isChunk: true,
+      text: node.value,
+      fg: mergedStyle.fg,
+      bg: mergedStyle.bg,
+      attributes: mergedStyle.attributes
+    });
+  } else if (node.type === "element") {
+    let currentStyles = [...parentStyles];
+    if (node.properties?.className) {
+      const classes = node.properties.className.split(" ");
+      for (const cls of classes) {
+        currentStyles.push(cls);
+      }
+    }
+    for (const child of node.children) {
+      chunks.push(...hastToTextChunks(child, syntaxStyle, currentStyles));
+    }
+  }
+  return chunks;
+}
+function hastToStyledText2(hast, syntaxStyle) {
+  const chunks = hastToTextChunks(hast, syntaxStyle);
+  return new StyledText2(chunks);
+}
+
+// src/lib/clock.ts
+class SystemClock2 {
+  now() {
+    if (!globalThis.performance || typeof globalThis.performance.now !== "function") {
+      throw new Error("SystemClock requires globalThis.performance.now()");
+    }
+    return globalThis.performance.now();
+  }
+  setTimeout(fn, delayMs) {
+    return globalThis.setTimeout(fn, delayMs);
+  }
+  clearTimeout(handle) {
+    globalThis.clearTimeout(handle);
+  }
+  setInterval(fn, delayMs) {
+    return globalThis.setInterval(fn, delayMs);
+  }
+  clearInterval(handle) {
+    globalThis.clearInterval(handle);
+  }
+}
+
+// src/lib/parse.keypress.ts
+import { Buffer as Buffer3 } from "buffer";
+
+// src/lib/kitty-keys.ts
+var keypadKeyNames = "0123456789./*-+=,";
+var kittyKeyMap = {
+  27: "escape",
+  9: "tab",
+  13: "return",
+  127: "backspace",
+  57344: "escape",
+  57345: "return",
+  57346: "tab",
+  57347: "backspace",
+  57348: "insert",
+  57349: "delete",
+  57350: "left",
+  57351: "right",
+  57352: "up",
+  57353: "down",
+  57354: "pageup",
+  57355: "pagedown",
+  57356: "home",
+  57357: "end",
+  57358: "capslock",
+  57359: "scrolllock",
+  57360: "numlock",
+  57361: "printscreen",
+  57362: "pause",
+  57363: "menu",
+  57364: "f1",
+  57365: "f2",
+  57366: "f3",
+  57367: "f4",
+  57368: "f5",
+  57369: "f6",
+  57370: "f7",
+  57371: "f8",
+  57372: "f9",
+  57373: "f10",
+  57374: "f11",
+  57375: "f12",
+  57376: "f13",
+  57377: "f14",
+  57378: "f15",
+  57379: "f16",
+  57380: "f17",
+  57381: "f18",
+  57382: "f19",
+  57383: "f20",
+  57384: "f21",
+  57385: "f22",
+  57386: "f23",
+  57387: "f24",
+  57388: "f25",
+  57389: "f26",
+  57390: "f27",
+  57391: "f28",
+  57392: "f29",
+  57393: "f30",
+  57394: "f31",
+  57395: "f32",
+  57396: "f33",
+  57397: "f34",
+  57398: "f35",
+  57399: "kp0",
+  57400: "kp1",
+  57401: "kp2",
+  57402: "kp3",
+  57403: "kp4",
+  57404: "kp5",
+  57405: "kp6",
+  57406: "kp7",
+  57407: "kp8",
+  57408: "kp9",
+  57409: "kpdecimal",
+  57410: "kpdivide",
+  57411: "kpmultiply",
+  57412: "kpminus",
+  57413: "kpplus",
+  57414: "kpenter",
+  57415: "kpequal",
+  57416: "kpseparator",
+  57417: "kpleft",
+  57418: "kpright",
+  57419: "kpup",
+  57420: "kpdown",
+  57421: "kppageup",
+  57422: "kppagedown",
+  57423: "kphome",
+  57424: "kpend",
+  57425: "kpinsert",
+  57426: "kpdelete",
+  57427: "clear",
+  57428: "mediaplay",
+  57429: "mediapause",
+  57430: "mediaplaypause",
+  57431: "mediareverse",
+  57432: "mediastop",
+  57433: "mediafastforward",
+  57434: "mediarewind",
+  57435: "medianext",
+  57436: "mediaprev",
+  57437: "mediarecord",
+  57438: "volumedown",
+  57439: "volumeup",
+  57440: "mute",
+  57441: "leftshift",
+  57442: "leftctrl",
+  57443: "leftalt",
+  57444: "leftsuper",
+  57445: "lefthyper",
+  57446: "leftmeta",
+  57447: "rightshift",
+  57448: "rightctrl",
+  57449: "rightalt",
+  57450: "rightsuper",
+  57451: "righthyper",
+  57452: "rightmeta",
+  57453: "iso_level3_shift",
+  57454: "iso_level5_shift"
+};
+
+// src/lib/stdin-parser-native.ts
+import { Buffer as Buffer2 } from "buffer";
+var RECORD_CAPACITY = 64;
+var PAYLOAD_CAPACITY = 16 * 1024;
+var RECORD = nativeLayouts.ot_input_event;
+var FIELD = {
+  kind: RECORD.fields.kind.offset,
+  action: RECORD.fields.action.offset,
+  modifiers: RECORD.fields.modifiers.offset,
+  flags: RECORD.fields.flags.offset,
+  code: RECORD.fields.code.offset / 4,
+  baseCode: RECORD.fields.base_code.offset / 4,
+  x: RECORD.fields.x.offset / 2,
+  y: RECORD.fields.y.offset / 2,
+  rawOffset: RECORD.fields.raw_offset.offset / 4,
+  rawLength: RECORD.fields.raw_len.offset / 4,
+  textOffset: RECORD.fields.text_offset.offset / 4,
+  textLength: RECORD.fields.text_len.offset / 4
+};
+var C = nativeConstants;
+var EMPTY = new Uint8Array(0);
+var UTF8 = new TextDecoder("utf-8", { ignoreBOM: true });
+var MOUSE_TYPES = {
+  [C.OT_INPUT_MOUSE_DOWN]: "down",
+  [C.OT_INPUT_MOUSE_UP]: "up",
+  [C.OT_INPUT_MOUSE_MOVE]: "move",
+  [C.OT_INPUT_MOUSE_DRAG]: "drag",
+  [C.OT_INPUT_MOUSE_SCROLL]: "scroll"
+};
+var SCROLL_DIRECTIONS = ["up", "down", "left", "right"];
+var NO_EXPECTATIONS = {
+  kittyKeyboardEnabled: false,
+  privateCapabilityRepliesActive: false,
+  pixelResolutionQueryActive: false,
+  explicitWidthCprActive: false,
+  startupCursorCprActive: false,
+  replySentinelActive: false
+};
+var REPLY_PROTOCOLS = {
+  [C.OT_INPUT_REPLY_CSI]: "csi",
+  [C.OT_INPUT_REPLY_SS3]: "unknown",
+  [C.OT_INPUT_REPLY_OSC]: "osc",
+  [C.OT_INPUT_REPLY_DCS]: "dcs",
+  [C.OT_INPUT_REPLY_APC]: "apc"
+};
+var LEGACY_CODE_RE = /^\x1b+(O|\[\[?)(?:(\d+)(?:;\d+)?([~^$])|(?:1;)?\d*([a-zA-Z]))/;
+var LEGACY_SEQUENCE_RE = /^\x1b\x1b?[[O]./s;
+function concat(parts) {
+  let length = 0;
+  for (const part of parts)
+    length += part.length;
+  const bytes = new Uint8Array(length);
+  let offset = 0;
+  for (const part of parts) {
+    bytes.set(part, offset);
+    offset += part.length;
+  }
+  return bytes;
+}
+function latin1(bytes) {
+  return Buffer2.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString("latin1");
+}
+function expectationFlags(context) {
+  const cursorPosition = context.explicitWidthCprActive || context.startupCursorCprActive;
+  const replies = context.privateCapabilityRepliesActive || context.pixelResolutionQueryActive || cursorPosition;
+  return (replies ? C.OT_INPUT_EXPECT_REPLIES : 0) | (context.kittyKeyboardEnabled ? C.OT_INPUT_EXPECT_KITTY_KEYBOARD : 0) | (cursorPosition ? C.OT_INPUT_EXPECT_CURSOR_POSITION : 0) | (context.replySentinelActive ? C.OT_INPUT_EXPECT_SENTINEL : 0);
+}
+
+class NativeStdinParser {
+  lib;
+  context;
+  session;
+  ownsContext;
+  records = new Uint8Array(RECORD_CAPACITY * RECORD.size);
+  words = new Uint32Array(this.records.buffer);
+  halves = new Uint16Array(this.records.buffer);
+  payload = new Uint8Array(PAYLOAD_CAPACITY);
+  events = [];
+  clock;
+  armTimeouts;
+  onTimeoutFlush;
+  protocolContext;
+  appliedExpectations = 0;
+  timeoutId = null;
+  deadlineNs = null;
+  lastNs = 0n;
+  paste = null;
+  suspended = false;
+  sessionGone = false;
+  destroyed = false;
+  constructor(options = {}) {
+    this.clock = options.clock ?? new SystemClock2;
+    this.armTimeouts = options.armTimeouts ?? true;
+    this.onTimeoutFlush = options.onTimeoutFlush ?? null;
+    this.protocolContext = { ...NO_EXPECTATIONS, ...options.protocolContext };
+    if (options.session) {
+      this.lib = options.session.lib;
+      this.context = options.session.context;
+      this.session = options.session.session;
+      this.ownsContext = false;
+    } else {
+      this.lib = resolveRenderLib2();
+      this.context = this.lib.createContext({ objectCapacity: 4, renderCellsMax: 1 });
+      try {
+        this.session = this.lib.createSession(this.context, { chunkSize: 4096, spanCapacity: 2, maxBytes: 8192n });
+      } catch (error) {
+        this.destroyContext();
+        throw error;
+      }
+      this.ownsContext = true;
+    }
+    try {
+      this.applyExpectations();
+    } catch (error) {
+      if (this.ownsContext)
+        this.destroyContext();
+      throw error;
+    }
+  }
+  updateProtocolContext(patch) {
+    this.ensureAlive();
+    this.protocolContext = { ...this.protocolContext, ...patch };
+    this.native(() => {
+      this.applyExpectations();
+      this.feed(EMPTY, this.nowNs());
+    });
+    this.reconcileTimeout(this.events.length > 0);
+  }
+  get pasting() {
+    return this.paste !== null;
+  }
+  push(data) {
+    this.ensureAlive();
+    this.native(() => this.feed(data, this.nowNs()));
+    this.reconcileTimeout();
+  }
+  read() {
+    this.ensureAlive();
+    return this.events.shift() ?? null;
+  }
+  drain(onEvent) {
+    this.ensureAlive();
+    while (!this.destroyed) {
+      const event = this.events.shift();
+      if (!event)
+        return;
+      onEvent(event);
+    }
+  }
+  flushTimeout(nowMsValue = this.clock.now()) {
+    this.ensureAlive();
+    this.native(() => this.feed(EMPTY, this.toNs(nowMsValue)));
+    this.reconcileTimeout();
+  }
+  suspend() {
+    this.ensureAlive();
+    this.suspended = true;
+    this.clearTimeout();
+  }
+  resume() {
+    this.ensureAlive();
+    this.suspended = false;
+    this.native(() => this.lib.sessionInputReset(this.context, this.session, C.OT_INPUT_RESET_KEEP_REPLY));
+    this.paste = null;
+    this.deadlineNs = null;
+  }
+  reset() {
+    if (this.destroyed)
+      return;
+    this.clearTimeout();
+    this.native(() => this.lib.sessionInputReset(this.context, this.session, 0));
+    this.events.length = 0;
+    this.paste = null;
+    this.deadlineNs = null;
+  }
+  destroy() {
+    if (this.destroyed)
+      return;
+    this.clearTimeout();
+    this.destroyed = true;
+    this.events.length = 0;
+    this.paste = null;
+    if (this.ownsContext)
+      this.destroyContext();
+  }
+  ensureAlive() {
+    if (this.destroyed)
+      throw new Error("StdinParser has been destroyed");
+  }
+  native(call) {
+    if (this.sessionGone)
+      return;
+    try {
+      call();
+    } catch (error) {
+      if (!(error instanceof NativeError2) || error.status !== -12 /* SessionClosed */ && error.status !== -15 /* OutputFailed */ && error.status !== -9 /* StaleHandle */ && error.status !== -7 /* WrongContext */) {
+        throw error;
+      }
+      this.sessionGone = true;
+      this.deadlineNs = null;
+      this.paste = null;
+      this.clearTimeout();
+    }
+  }
+  destroyContext() {
+    this.lib.getYogaHost().runMutation(() => this.lib.destroyContext(this.context));
+  }
+  applyExpectations() {
+    const flags = expectationFlags(this.protocolContext);
+    if (flags === this.appliedExpectations)
+      return;
+    this.lib.sessionInputExpect(this.context, this.session, flags);
+    this.appliedExpectations = flags;
+  }
+  toNs(ms) {
+    const ns = BigInt(Math.max(0, Math.round(ms * 1e6)));
+    return ns > this.lastNs ? ns : this.lastNs;
+  }
+  nowNs() {
+    return this.suspended ? this.lastNs : this.toNs(this.clock.now());
+  }
+  feed(bytes, nowNs) {
+    this.lastNs = nowNs;
+    let offset = 0;
+    do {
+      const rest = offset === 0 ? bytes : bytes.subarray(offset);
+      const drain = this.lib.sessionInputFeed(this.context, this.session, rest, nowNs, this.records, this.payload);
+      this.deadlineNs = drain.deadlineNs;
+      for (let index = 0;index < drain.count; index++)
+        this.translate(index);
+      if (drain.consumed === 0 && drain.count === 0 && offset < bytes.length) {
+        throw new Error("native input parser made no progress");
+      }
+      offset += drain.consumed;
+    } while (offset < bytes.length);
+  }
+  reconcileTimeout(flushNow = false) {
+    if (!this.armTimeouts)
+      return;
+    this.clearTimeout();
+    const deadline = flushNow ? null : this.deadlineNs;
+    if (deadline === null && !flushNow || this.suspended || this.sessionGone)
+      return;
+    const delayMs = deadline === null ? 0 : Number((deadline - this.lastNs + 999999n) / 1000000n);
+    this.timeoutId = this.clock.setTimeout(() => {
+      this.timeoutId = null;
+      if (this.destroyed)
+        return;
+      try {
+        const now = this.nowNs();
+        this.native(() => this.feed(EMPTY, deadline !== null && now < deadline ? deadline : now));
+        this.reconcileTimeout();
+        this.onTimeoutFlush?.();
+      } catch (error) {
+        console.error("stdin parser timeout flush failed", error);
+      }
+    }, delayMs);
+  }
+  clearTimeout() {
+    if (this.timeoutId === null)
+      return;
+    this.clock.clearTimeout(this.timeoutId);
+    this.timeoutId = null;
+  }
+  span(offset, length) {
+    return this.payload.subarray(offset, offset + length);
+  }
+  translate(index) {
+    const base = index * RECORD.size;
+    const word = base / 4;
+    const half = base / 2;
+    const kind = this.records[base + FIELD.kind];
+    const action = this.records[base + FIELD.action];
+    const modifiers = this.records[base + FIELD.modifiers];
+    const flags = this.records[base + FIELD.flags];
+    const code = this.words[word + FIELD.code];
+    const raw = this.span(this.words[word + FIELD.rawOffset], this.words[word + FIELD.rawLength]);
+    const text = this.span(this.words[word + FIELD.textOffset], this.words[word + FIELD.textLength]);
+    switch (kind) {
+      case C.OT_INPUT_KEY: {
+        const key = parsedKey(code, this.words[word + FIELD.baseCode], action, modifiers, flags, raw, text);
+        this.events.push({ type: "key", raw: key.raw, key });
+        return;
+      }
+      case C.OT_INPUT_MOUSE: {
+        const sequence = latin1(raw);
+        const encoding = raw[2] === 60 ? "sgr" : "x10";
+        const event = rawMouseEvent(action, code, this.halves[half + FIELD.x], this.halves[half + FIELD.y], modifiers, encoding);
+        this.events.push({ type: "mouse", raw: sequence, encoding, event });
+        return;
+      }
+      case C.OT_INPUT_PASTE: {
+        if (flags & C.OT_INPUT_PASTE_START)
+          this.paste = [];
+        if (text.length > 0)
+          this.paste.push(Uint8Array.from(text));
+        if (flags & C.OT_INPUT_PASTE_END) {
+          const parts = this.paste;
+          this.paste = null;
+          this.events.push({ type: "paste", bytes: parts.length === 1 ? parts[0] : concat(parts) });
+        }
+        return;
+      }
+      case C.OT_INPUT_FOCUS:
+        this.events.push({ type: "response", protocol: "csi", sequence: latin1(raw) });
+        return;
+      case C.OT_INPUT_REPLY: {
+        const protocol = flags & C.OT_INPUT_REPLY_CURSOR_POSITION ? "cpr" : flags & C.OT_INPUT_REPLY_FRAGMENT ? "unknown" : REPLY_PROTOCOLS[code];
+        this.events.push({ type: "response", protocol, sequence: latin1(raw) });
+        return;
+      }
+    }
+    throw new Error(`Unknown native input event kind: ${kind}`);
+  }
+}
+function keyRaw(raw) {
+  if (raw.length === 1 && raw[0] >= 128)
+    return "\x1B" + String.fromCharCode(raw[0] & 127);
+  return UTF8.decode(raw);
+}
+function compatCode(raw, code, kitty) {
+  if (kitty) {
+    if (!raw.endsWith("u") || kittyKeyMap[code] === undefined)
+      return;
+    return `[${/^\x1b+\[(\d+)/.exec(raw)[1]}u`;
+  }
+  const match = LEGACY_CODE_RE.exec(raw);
+  return match ? [match[1], match[2], match[3], match[4]].filter(Boolean).join("") : undefined;
+}
+function parsedKey(code, baseCode, action, modifiers, flags, rawBytes, textBytes) {
+  const kitty = (flags & C.OT_INPUT_KEY_KITTY) !== 0;
+  const raw = keyRaw(rawBytes);
+  const text = textBytes.length === 0 ? "" : UTF8.decode(textBytes);
+  const alt = (modifiers & C.OT_INPUT_MOD_ALT) !== 0;
+  const sequence = kitty || LEGACY_SEQUENCE_RE.test(raw);
+  let shift = (modifiers & C.OT_INPUT_MOD_SHIFT) !== 0;
+  let name;
+  if (code === 0) {
+    name = text;
+  } else if (kittyKeyMap[code] !== undefined && !(flags & C.OT_INPUT_KEY_TYPED)) {
+    name = code === C.OT_INPUT_KEY_ENTER && !kitty && raw.endsWith(`
+`) ? "linefeed" : kittyKeyMap[code];
+  } else if (code === 32) {
+    name = "space";
+  } else {
+    name = String.fromCodePoint(code);
+    if (!sequence && code >= 65 && code <= 90) {
+      shift = true;
+      if (!alt)
+        name = name.toLowerCase();
+    }
+  }
+  const key = {
+    name,
+    ctrl: (modifiers & C.OT_INPUT_MOD_CTRL) !== 0,
+    meta: alt || (modifiers & C.OT_INPUT_MOD_META) !== 0,
+    shift,
+    option: alt && sequence,
+    sequence: text || raw,
+    number: /^[0-9]$/.test(name),
+    raw,
+    eventType: action === C.OT_INPUT_KEY_RELEASE ? "release" : "press",
+    source: kitty ? "kitty" : "raw",
+    super: (modifiers & C.OT_INPUT_MOD_SUPER) !== 0,
+    hyper: (modifiers & C.OT_INPUT_MOD_HYPER) !== 0,
+    capsLock: (modifiers & C.OT_INPUT_MOD_CAPS_LOCK) !== 0,
+    numLock: (modifiers & C.OT_INPUT_MOD_NUM_LOCK) !== 0
+  };
+  if (action === C.OT_INPUT_KEY_REPEAT)
+    key.repeated = true;
+  if (baseCode !== 0)
+    key.baseCode = baseCode;
+  const legacy = compatCode(raw, code, kitty);
+  if (legacy !== undefined)
+    key.code = legacy;
+  return key;
+}
+function rawMouseEvent(action, code, x, y, modifiers, encoding) {
+  const type = MOUSE_TYPES[action];
+  if (!type)
+    throw new Error(`Unknown native mouse action: ${action}`);
+  let button = code;
+  if (code === C.OT_INPUT_MOUSE_BUTTON_NONE)
+    button = encoding === "x10" ? -1 : 0;
+  if (type === "scroll")
+    button = encoding === "x10" || code === 3 ? 0 : code;
+  const event = {
+    type,
+    button,
+    x,
+    y,
+    modifiers: {
+      shift: (modifiers & C.OT_INPUT_MOD_SHIFT) !== 0,
+      alt: (modifiers & C.OT_INPUT_MOD_ALT) !== 0,
+      ctrl: (modifiers & C.OT_INPUT_MOD_CTRL) !== 0
+    }
+  };
+  if (type === "scroll")
+    event.scroll = { direction: SCROLL_DIRECTIONS[code & 3], delta: 1 };
+  return event;
+}
+
+// src/lib/parse.keypress.ts
+var terminalNamedSingleStrokeKeys2 = [
+  ...new Set(["linefeed", "space", ...Object.values(kittyKeyMap), ...keypadKeyNames])
+];
+function parseKeypress2(s = "", options = {}) {
+  const parser = new NativeStdinParser({
+    armTimeouts: false,
+    protocolContext: { kittyKeyboardEnabled: options.useKittyKeyboard === true }
+  });
+  try {
+    parser.push(typeof s === "string" ? Buffer3.from(s) : s);
+    parser.flushTimeout(1000000000000);
+    const event = parser.read();
+    return event?.type === "key" ? event.key : null;
+  } finally {
+    parser.destroy();
+  }
+}
+
+// src/lib/scroll-acceleration.ts
+class LinearScrollAccel2 {
+  tick(_now) {
+    return 1;
+  }
+  reset() {}
+}
+
+class MacOSScrollAccel2 {
+  opts;
+  lastTickTime = 0;
+  velocityHistory = [];
+  historySize = 3;
+  streakTimeout = 150;
+  minTickInterval = 6;
+  constructor(opts = {}) {
+    this.opts = opts;
+  }
+  tick(now = Date.now()) {
+    const A = this.opts.A ?? 0.8;
+    const tau = this.opts.tau ?? 3;
+    const maxMultiplier = this.opts.maxMultiplier ?? 6;
+    const dt = this.lastTickTime ? now - this.lastTickTime : Infinity;
+    if (dt === Infinity || dt > this.streakTimeout) {
+      this.lastTickTime = now;
+      this.velocityHistory = [];
+      return 1;
+    }
+    if (dt < this.minTickInterval) {
+      return 1;
+    }
+    this.lastTickTime = now;
+    this.velocityHistory.push(dt);
+    if (this.velocityHistory.length > this.historySize) {
+      this.velocityHistory.shift();
+    }
+    const avgInterval = this.velocityHistory.reduce((a, b) => a + b, 0) / this.velocityHistory.length;
+    const referenceInterval = 100;
+    const velocity = referenceInterval / avgInterval;
+    const x = velocity / tau;
+    const multiplier = 1 + A * (Math.exp(x) - 1);
+    return Math.min(multiplier, maxMultiplier);
+  }
+  reset() {
+    this.lastTickTime = 0;
+    this.velocityHistory = [];
+  }
+}
+
+// src/lib/yoga.options.ts
+function parseAlignment(value, fallback) {
+  switch (value?.toLowerCase()) {
+    case "auto":
+      return Align2.Auto;
+    case "flex-start":
+      return Align2.FlexStart;
+    case "center":
+      return Align2.Center;
+    case "flex-end":
+      return Align2.FlexEnd;
+    case "stretch":
+      return Align2.Stretch;
+    case "baseline":
+      return Align2.Baseline;
+    case "space-between":
+      return Align2.SpaceBetween;
+    case "space-around":
+      return Align2.SpaceAround;
+    case "space-evenly":
+      return Align2.SpaceEvenly;
+    default:
+      return fallback;
+  }
+}
+function parseAlign2(value) {
+  return parseAlignment(value, Align2.Auto);
+}
+function parseAlignItems2(value) {
+  return parseAlignment(value, Align2.Stretch);
+}
+function parseAlignContent2(value) {
+  return parseAlignment(value, Align2.FlexStart);
+}
+function parseBoxSizing2(value) {
+  return value?.toLowerCase() === "content-box" ? BoxSizing2.ContentBox : BoxSizing2.BorderBox;
+}
+function parseDimension2(value) {
+  if (value == null) {
+    return Dimension2.Width;
+  }
+  switch (value.toLowerCase()) {
+    case "width":
+      return Dimension2.Width;
+    case "height":
+      return Dimension2.Height;
+    default:
+      return Dimension2.Width;
+  }
+}
+function parseDirection2(value) {
+  if (value == null) {
+    return Direction2.LTR;
+  }
+  switch (value.toLowerCase()) {
+    case "inherit":
+      return Direction2.Inherit;
+    case "ltr":
+      return Direction2.LTR;
+    case "rtl":
+      return Direction2.RTL;
+    default:
+      return Direction2.LTR;
+  }
+}
+function parseDisplay2(value) {
+  if (value == null) {
+    return Display2.Flex;
+  }
+  switch (value.toLowerCase()) {
+    case "flex":
+      return Display2.Flex;
+    case "none":
+      return Display2.None;
+    case "contents":
+      return Display2.Contents;
+    default:
+      return Display2.Flex;
+  }
+}
+function parseEdge2(value) {
+  if (value == null) {
+    return Edge2.All;
+  }
+  switch (value.toLowerCase()) {
+    case "left":
+      return Edge2.Left;
+    case "top":
+      return Edge2.Top;
+    case "right":
+      return Edge2.Right;
+    case "bottom":
+      return Edge2.Bottom;
+    case "start":
+      return Edge2.Start;
+    case "end":
+      return Edge2.End;
+    case "horizontal":
+      return Edge2.Horizontal;
+    case "vertical":
+      return Edge2.Vertical;
+    case "all":
+      return Edge2.All;
+    default:
+      return Edge2.All;
+  }
+}
+function parseFlexDirection2(value) {
+  if (value == null) {
+    return FlexDirection2.Column;
+  }
+  switch (value.toLowerCase()) {
+    case "column":
+      return FlexDirection2.Column;
+    case "column-reverse":
+      return FlexDirection2.ColumnReverse;
+    case "row":
+      return FlexDirection2.Row;
+    case "row-reverse":
+      return FlexDirection2.RowReverse;
+    default:
+      return FlexDirection2.Column;
+  }
+}
+function parseGutter2(value) {
+  if (value == null) {
+    return Gutter2.All;
+  }
+  switch (value.toLowerCase()) {
+    case "column":
+      return Gutter2.Column;
+    case "row":
+      return Gutter2.Row;
+    case "all":
+      return Gutter2.All;
+    default:
+      return Gutter2.All;
+  }
+}
+function parseJustify2(value) {
+  if (value == null) {
+    return Justify2.FlexStart;
+  }
+  switch (value.toLowerCase()) {
+    case "flex-start":
+      return Justify2.FlexStart;
+    case "center":
+      return Justify2.Center;
+    case "flex-end":
+      return Justify2.FlexEnd;
+    case "space-between":
+      return Justify2.SpaceBetween;
+    case "space-around":
+      return Justify2.SpaceAround;
+    case "space-evenly":
+      return Justify2.SpaceEvenly;
+    default:
+      return Justify2.FlexStart;
+  }
+}
+function parseLayoutMode2(value) {
+  return value?.toLowerCase() === "list" ? nativeConstants.OT_LAYOUT_MODE_LIST : nativeConstants.OT_LAYOUT_MODE_FLEX;
+}
+function parseLogLevel2(value) {
+  if (value == null) {
+    return LogLevel3.Info;
+  }
+  switch (value.toLowerCase()) {
+    case "error":
+      return LogLevel3.Error;
+    case "warn":
+      return LogLevel3.Warn;
+    case "info":
+      return LogLevel3.Info;
+    case "debug":
+      return LogLevel3.Debug;
+    case "verbose":
+      return LogLevel3.Verbose;
+    case "fatal":
+      return LogLevel3.Fatal;
+    default:
+      return LogLevel3.Info;
+  }
+}
+function parseMeasureMode2(value) {
+  if (value == null) {
+    return MeasureMode2.Undefined;
+  }
+  switch (value.toLowerCase()) {
+    case "undefined":
+      return MeasureMode2.Undefined;
+    case "exactly":
+      return MeasureMode2.Exactly;
+    case "at-most":
+      return MeasureMode2.AtMost;
+    default:
+      return MeasureMode2.Undefined;
+  }
+}
+function parseOverflow2(value) {
+  if (value == null) {
+    return Overflow2.Visible;
+  }
+  switch (value.toLowerCase()) {
+    case "visible":
+      return Overflow2.Visible;
+    case "hidden":
+      return Overflow2.Hidden;
+    case "scroll":
+      return Overflow2.Scroll;
+    default:
+      return Overflow2.Visible;
+  }
+}
+function parsePositionType2(value) {
+  if (value == null) {
+    return PositionType2.Relative;
+  }
+  switch (value.toLowerCase()) {
+    case "static":
+      return PositionType2.Static;
+    case "relative":
+      return PositionType2.Relative;
+    case "absolute":
+      return PositionType2.Absolute;
+    default:
+      return PositionType2.Static;
+  }
+}
+function parseUnit2(value) {
+  if (value == null) {
+    return Unit2.Point;
+  }
+  switch (value.toLowerCase()) {
+    case "undefined":
+      return Unit2.Undefined;
+    case "point":
+      return Unit2.Point;
+    case "percent":
+      return Unit2.Percent;
+    case "auto":
+      return Unit2.Auto;
+    default:
+      return Unit2.Point;
+  }
+}
+function parseWrap2(value) {
+  if (value == null) {
+    return Wrap2.NoWrap;
+  }
+  switch (value.toLowerCase()) {
+    case "no-wrap":
+      return Wrap2.NoWrap;
+    case "wrap":
+      return Wrap2.Wrap;
+    case "wrap-reverse":
+      return Wrap2.WrapReverse;
+    default:
+      return Wrap2.NoWrap;
+  }
+}
+
+// src/lib/selection.ts
+class SelectionAnchor {
+  renderable;
+  relativeX;
+  relativeY;
+  constructor(renderable, absoluteX, absoluteY) {
+    this.renderable = renderable;
+    this.relativeX = absoluteX - Math.trunc(this.renderable.x);
+    this.relativeY = absoluteY - Math.trunc(this.renderable.y);
+  }
+  get x() {
+    return Math.trunc(this.renderable.x) + this.relativeX;
+  }
+  get y() {
+    return Math.trunc(this.renderable.y) + this.relativeY;
+  }
+}
+
+class Selection2 {
+  _anchor;
+  _focus;
+  _selectedRenderables = [];
+  _touchedRenderables = [];
+  _isActive = true;
+  _isDragging = true;
+  _isStart = false;
+  behavior;
+  constructor(anchorRenderable, anchor, focus, behavior = "cell") {
+    this._anchor = new SelectionAnchor(anchorRenderable, anchor.x, anchor.y);
+    this._focus = { ...focus };
+    this.behavior = behavior;
+  }
+  get isStart() {
+    return this._isStart;
+  }
+  set isStart(value) {
+    this._isStart = value;
+  }
+  get anchor() {
+    return { x: this._anchor.x, y: this._anchor.y };
+  }
+  get focus() {
+    return { ...this._focus };
+  }
+  set focus(value) {
+    this._focus = { ...value };
+  }
+  get isActive() {
+    return this._isActive;
+  }
+  set isActive(value) {
+    this._isActive = value;
+  }
+  get isDragging() {
+    return this._isDragging;
+  }
+  set isDragging(value) {
+    this._isDragging = value;
+  }
+  get bounds() {
+    const minX = Math.min(this._anchor.x, this._focus.x);
+    const maxX = Math.max(this._anchor.x, this._focus.x);
+    const minY = Math.min(this._anchor.y, this._focus.y);
+    const maxY = Math.max(this._anchor.y, this._focus.y);
+    const width = maxX - minX + 1;
+    const height = maxY - minY + 1;
+    return {
+      x: minX,
+      y: minY,
+      width,
+      height
+    };
+  }
+  updateSelectedRenderables(selectedRenderables) {
+    this._selectedRenderables = selectedRenderables;
+  }
+  get selectedRenderables() {
+    return this._selectedRenderables;
+  }
+  updateTouchedRenderables(touchedRenderables) {
+    this._touchedRenderables = touchedRenderables;
+  }
+  get touchedRenderables() {
+    return this._touchedRenderables;
+  }
+  getSelectedText() {
+    const selectedTextsByLine = new Map;
+    const selectedRenderables = this._selectedRenderables.sort((a, b) => {
+      const aY = a.y;
+      const bY = b.y;
+      if (aY !== bY) {
+        return aY - bY;
+      }
+      return a.x - b.x;
+    }).filter((renderable) => !renderable.isDestroyed);
+    for (const renderable of selectedRenderables) {
+      const text = renderable.getSelectedText();
+      if (!text)
+        continue;
+      const lines = text.split(`
+`);
+      for (let index = 0;index < lines.length; index += 1) {
+        const y = renderable.y + index;
+        const line = selectedTextsByLine.get(y) ?? [];
+        line.push({ x: renderable.x, text: lines[index] });
+        selectedTextsByLine.set(y, line);
+      }
+    }
+    return [...selectedTextsByLine.entries()].sort(([leftY], [rightY]) => leftY - rightY).map(([, line]) => line.sort((left, right) => left.x - right.x).map((segment) => segment.text).join("")).join(`
+`);
+  }
+}
+function convertGlobalToLocalSelection2(globalSelection, localX, localY) {
+  if (!globalSelection?.isActive) {
+    return null;
+  }
+  return {
+    anchorX: globalSelection.anchor.x - localX,
+    anchorY: globalSelection.anchor.y - localY,
+    focusX: globalSelection.focus.x - localX,
+    focusY: globalSelection.focus.y - localY,
+    isActive: true,
+    behavior: globalSelection.behavior
+  };
+}
+
+class ASCIIFontSelectionHelper2 {
+  getText;
+  getFont;
+  localSelection = null;
+  constructor(getText, getFont) {
+    this.getText = getText;
+    this.getFont = getFont;
+  }
+  hasSelection() {
+    return this.localSelection !== null;
+  }
+  getSelection() {
+    return this.localSelection;
+  }
+  shouldStartSelection(localX, localY, width, height) {
+    if (localX < 0 || localX >= width || localY < 0 || localY >= height) {
+      return false;
+    }
+    const text = this.getText();
+    const font = this.getFont();
+    const charIndex = coordinateToCharacterIndex2(localX, text, font);
+    return charIndex >= 0 && charIndex <= text.length;
+  }
+  onLocalSelectionChanged(localSelection, width, height) {
+    const previousSelection = this.localSelection;
+    if (!localSelection?.isActive) {
+      this.localSelection = null;
+      return previousSelection !== null;
+    }
+    const text = this.getText();
+    const font = this.getFont();
+    const positions = getCharacterPositions2(text, font);
+    const minY = Math.min(localSelection.anchorY, localSelection.focusY);
+    const maxY = Math.max(localSelection.anchorY, localSelection.focusY);
+    if (maxY < 0 || minY > height - 1) {
+      this.localSelection = null;
+      return previousSelection !== null;
+    }
+    const indexAt = (x, y) => {
+      if (y < 0)
+        return 0;
+      if (y > height - 1)
+        return text.length;
+      if (x < 0)
+        return 0;
+      if (x >= width)
+        return text.length;
+      for (let index = 1;index < positions.length; index += 1) {
+        if (x < positions[index])
+          return index - 1;
+      }
+      return text.length;
+    };
+    const anchorIndex = indexAt(localSelection.anchorX, localSelection.anchorY);
+    const focusIndex = indexAt(localSelection.focusX, localSelection.focusY);
+    const start = Math.min(anchorIndex, focusIndex);
+    const end = Math.min(Math.max(anchorIndex, focusIndex) + 1, text.length);
+    const samePoint = localSelection.anchorX === localSelection.focusX && localSelection.anchorY === localSelection.focusY;
+    if (samePoint || start >= end) {
+      this.localSelection = null;
+    } else {
+      this.localSelection = { start, end };
+    }
+    return previousSelection?.start !== this.localSelection?.start || previousSelection?.end !== this.localSelection?.end;
+  }
+}
+
+// src/lib/tree-sitter/client.ts
+import { EventEmitter as EventEmitter2 } from "events";
+
+// src/lib/tree-sitter/default-parsers.ts
+var defaultParserDescriptors = [
+  {
+    filetype: "javascript",
+    aliases: ["javascriptreact"],
+    queries: { highlights: ["assets/javascript/highlights.scm"] },
+    wasm: "assets/javascript/tree-sitter-javascript.wasm"
+  },
+  {
+    filetype: "typescript",
+    queries: { highlights: ["assets/typescript/highlights.scm"] },
+    wasm: "assets/typescript/tree-sitter-typescript.wasm"
+  },
+  {
+    filetype: "typescriptreact",
+    queries: { highlights: ["assets/typescriptreact/highlights.scm"] },
+    wasm: "assets/typescriptreact/tree-sitter-tsx.wasm"
+  },
+  {
+    filetype: "markdown",
+    queries: {
+      highlights: ["assets/markdown/highlights.scm"],
+      injections: ["assets/markdown/injections.scm"]
+    },
+    wasm: "assets/markdown/tree-sitter-markdown.wasm",
+    injectionMapping: {
+      nodeTypes: { inline: "markdown_inline", pipe_table_cell: "markdown_inline" },
+      infoStringMap: {
+        javascript: "javascript",
+        js: "javascript",
+        jsx: "javascriptreact",
+        javascriptreact: "javascriptreact",
+        typescript: "typescript",
+        ts: "typescript",
+        tsx: "typescriptreact",
+        typescriptreact: "typescriptreact",
+        markdown: "markdown",
+        md: "markdown"
+      }
+    }
+  },
+  {
+    filetype: "markdown_inline",
+    queries: { highlights: ["assets/markdown_inline/highlights.scm"] },
+    wasm: "assets/markdown_inline/tree-sitter-markdown_inline.wasm"
+  },
+  {
+    filetype: "zig",
+    queries: { highlights: ["assets/zig/highlights.scm"] },
+    wasm: "assets/zig/tree-sitter-zig.wasm"
+  }
+];
+var defaultParserAssetPaths = [
+  ...new Set(defaultParserDescriptors.flatMap((parser) => [
+    ...parser.queries.highlights,
+    parser.wasm,
+    ...parser.queries.injections ?? []
+  ]))
+];
+var cachedParsers;
+function getParsers() {
+  cachedParsers ??= Promise.all(defaultParserDescriptors.map(resolveDefaultParser));
+  return cachedParsers;
+}
+async function resolveDefaultParser(parser) {
+  const queries = {
+    highlights: await Promise.all(parser.queries.highlights.map(resolveParserAsset))
+  };
+  if (parser.queries.injections) {
+    queries.injections = await Promise.all(parser.queries.injections.map(resolveParserAsset));
+  }
+  return {
+    filetype: parser.filetype,
+    ...parser.aliases ? { aliases: [...parser.aliases] } : {},
+    queries,
+    wasm: await resolveParserAsset(parser.wasm),
+    ...parser.injectionMapping ? { injectionMapping: parser.injectionMapping } : {}
+  };
+}
+function resolveParserAsset(relativePath) {
+  return resolveDefaultParserAsset(relativePath, new URL(`./${relativePath}`, import.meta.url));
+}
+
+// src/lib/tree-sitter/client.ts
+import { resolve, isAbsolute, parse } from "path";
+import { existsSync } from "fs";
+registerEnvVar2({
+  name: "OTUI_TREE_SITTER_WORKER_PATH",
+  description: "Path to the TreeSitter worker entry script",
+  type: "string",
+  default: ""
+});
+var DEFAULT_PARSER_OVERRIDES = [];
+function addDefaultParsers2(parsers) {
+  for (const parser of parsers) {
+    DEFAULT_PARSER_OVERRIDES = [
+      ...DEFAULT_PARSER_OVERRIDES.filter((existingParser) => existingParser.filetype !== parser.filetype),
+      parser
+    ];
+  }
+}
+var isUrl = (path) => path.startsWith("http://") || path.startsWith("https://");
+
+class TreeSitterClient2 extends EventEmitter2 {
+  initialized = false;
+  worker;
+  buffers = new Map;
+  initializePromise;
+  initializeResolvers;
+  messageCallbacks = new Map;
+  messageIdCounter = 0;
+  resetVersions = new Map;
+  options;
+  destroyCallbacks = new Set;
+  lifecycleGeneration = 0;
+  rejectInitialization;
+  destroyPromise;
+  workerTerminationFailed = false;
+  constructor(options, internalOptions = {}) {
+    super();
+    this.options = options;
+    if (internalOptions.autoStartWorker ?? true) {
+      this.startWorker();
+    }
+  }
+  onDestroy(callback) {
+    this.destroyCallbacks.add(callback);
+    return () => {
+      this.destroyCallbacks.delete(callback);
+    };
+  }
+  emitError(error, bufferId) {
+    if (this.listenerCount("error") > 0) {
+      this.emit("error", error, bufferId);
+    }
+  }
+  emitWarning(warning, bufferId) {
+    if (this.listenerCount("warning") > 0) {
+      this.emit("warning", warning, bufferId);
+    }
+  }
+  startWorker() {
+    if (this.worker) {
+      return;
+    }
+    const workerPath = this.resolveWorkerPath();
+    const worker = new Worker(workerPath);
+    this.worker = worker;
+    worker.onmessage = (event) => {
+      if (this.worker !== worker) {
+        return;
+      }
+      this.handleWorkerMessage(event);
+    };
+    worker.onerror = (error) => {
+      if (this.worker !== worker) {
+        return;
+      }
+      console.error("TreeSitter worker error:", error.message);
+      const workerError = new Error(`Worker error: ${error.message}`, { cause: error.error });
+      this.handleWorkerFailure(worker, workerError);
+      this.emitError(`Worker error: ${error.message}`);
+    };
+  }
+  sendWorkerMessage(message) {
+    if (!this.worker) {
+      throw new Error("TreeSitter worker is not available");
+    }
+    this.worker.postMessage(message);
+  }
+  rejectPendingRequests(error) {
+    const requests = Array.from(this.messageCallbacks.values());
+    this.messageCallbacks.clear();
+    for (const request of requests) {
+      request.reject(error);
+    }
+  }
+  rejectActiveInitialization(error) {
+    if (this.initializeResolvers) {
+      clearTimeout(this.initializeResolvers.timeoutId);
+      this.initializeResolvers.reject(error);
+      this.initializeResolvers = undefined;
+    }
+    this.rejectInitialization?.(error);
+    this.rejectInitialization = undefined;
+  }
+  handleWorkerFailure(worker, error) {
+    if (this.worker !== worker) {
+      return;
+    }
+    worker.onmessage = null;
+    worker.onerror = null;
+    this.worker = undefined;
+    this.lifecycleGeneration++;
+    this.initialized = false;
+    this.initializePromise = undefined;
+    this.rejectActiveInitialization(error);
+    this.rejectPendingRequests(error);
+    this.resetVersions.clear();
+    this.buffers.clear();
+    try {
+      Promise.resolve(worker.terminate()).catch(() => {});
+    } catch {}
+  }
+  resolveWorkerPath() {
+    if (this.options.workerPath) {
+      return this.options.workerPath;
+    }
+    if (env2.OTUI_TREE_SITTER_WORKER_PATH) {
+      return env2.OTUI_TREE_SITTER_WORKER_PATH;
+    }
+    if (typeof OTUI_TREE_SITTER_WORKER_PATH !== "undefined") {
+      return OTUI_TREE_SITTER_WORKER_PATH;
+    }
+    let workerPath = resolveDefaultTreeSitterWorkerPath(new URL("./parser.worker.js", import.meta.url));
+    if (!process.env.OTUI_ASSET_ROOT && !existsSync(workerPath)) {
+      workerPath = new URL("./parser.worker.ts", import.meta.url).href;
+    }
+    return workerPath;
+  }
+  async stopWorker() {
+    const worker = this.worker;
+    if (!worker) {
+      return;
+    }
+    const onmessage = worker.onmessage;
+    const onerror = worker.onerror;
+    worker.onmessage = null;
+    worker.onerror = null;
+    this.worker = undefined;
+    try {
+      const termination = worker.terminate();
+      if (termination && typeof termination.then === "function") {
+        await termination;
+      }
+    } catch (error) {
+      if (!this.worker) {
+        worker.onmessage = onmessage;
+        worker.onerror = onerror;
+        this.worker = worker;
+      }
+      throw error;
+    }
+  }
+  async handleReset() {
+    this.buffers.clear();
+    await this.stopWorker();
+    this.startWorker();
+    this.initialized = false;
+    this.initializePromise = undefined;
+    this.initializeResolvers = undefined;
+    return this.initialize();
+  }
+  async initialize() {
+    if (this.destroyPromise) {
+      throw new Error("Cannot initialize while client is being destroyed");
+    }
+    if (this.workerTerminationFailed) {
+      throw new Error("Cannot initialize after worker termination failed; retry destroy()");
+    }
+    if (this.initializePromise) {
+      return this.initializePromise;
+    }
+    if (!this.worker) {
+      this.startWorker();
+    }
+    const worker = this.worker;
+    const generation = this.lifecycleGeneration;
+    let rejectCancellation;
+    const cancellation = new Promise((_, reject) => {
+      rejectCancellation = reject;
+    });
+    const initialization = Promise.race([this.initializeClient(generation, worker), cancellation]);
+    this.rejectInitialization = rejectCancellation;
+    this.initializePromise = initialization;
+    initialization.then(() => {
+      if (this.initializePromise === initialization) {
+        this.rejectInitialization = undefined;
+      }
+    }, () => {
+      if (this.initializePromise === initialization) {
+        this.rejectInitialization = undefined;
+      }
+    });
+    return this.initializePromise;
+  }
+  assertCurrentInitialization(generation, worker) {
+    if (this.lifecycleGeneration !== generation || this.worker !== worker || this.destroyPromise) {
+      throw new Error("TreeSitter initialization was invalidated");
+    }
+  }
+  async initializeClient(generation, worker) {
+    const treeSitterWasmPath = await resolveTreeSitterWasm();
+    this.assertCurrentInitialization(generation, worker);
+    await new Promise((resolve, reject) => {
+      const timeoutMs = this.options.initTimeout ?? 1e4;
+      const timeoutId = setTimeout(() => {
+        const error = new Error("Worker initialization timed out");
+        console.error("TreeSitter client:", error.message);
+        this.initializeResolvers = undefined;
+        reject(error);
+      }, timeoutMs);
+      this.initializeResolvers = { resolve, reject, timeoutId };
+      this.sendWorkerMessage({
+        type: "INIT",
+        dataPath: this.options.dataPath,
+        treeSitterWasmPath
+      });
+    });
+    this.assertCurrentInitialization(generation, worker);
+    await this.registerDefaultParsers(generation, worker);
+    this.assertCurrentInitialization(generation, worker);
+    this.initialized = true;
+  }
+  async registerDefaultParsers(generation = this.lifecycleGeneration, worker = this.worker) {
+    const defaultParsers = await getParsers();
+    this.assertCurrentInitialization(generation, worker);
+    const overriddenFiletypes = new Set(DEFAULT_PARSER_OVERRIDES.map((parser) => parser.filetype));
+    for (const parser of [
+      ...defaultParsers.filter((parser) => !overriddenFiletypes.has(parser.filetype)),
+      ...DEFAULT_PARSER_OVERRIDES
+    ]) {
+      worker.postMessage({ type: "ADD_FILETYPE_PARSER", filetypeParser: this.resolveFiletypeParser(parser) });
+    }
+  }
+  resolvePath(path) {
+    if (isUrl(path)) {
+      return path;
+    }
+    if (isBunfsPath(path)) {
+      return normalizeBunfsPath(parse(path).base);
+    }
+    if (!isAbsolute(path)) {
+      return resolve(path);
+    }
+    return path;
+  }
+  addFiletypeParser(filetypeParser) {
+    this.sendWorkerMessage({ type: "ADD_FILETYPE_PARSER", filetypeParser: this.resolveFiletypeParser(filetypeParser) });
+  }
+  resolveFiletypeParser(filetypeParser) {
+    return {
+      ...filetypeParser,
+      aliases: filetypeParser.aliases ? [...new Set(filetypeParser.aliases.filter((alias) => alias !== filetypeParser.filetype))] : undefined,
+      wasm: this.resolvePath(filetypeParser.wasm),
+      queries: {
+        highlights: filetypeParser.queries.highlights.map((path) => this.resolvePath(path)),
+        injections: filetypeParser.queries.injections?.map((path) => this.resolvePath(path))
+      }
+    };
+  }
+  async getPerformance() {
+    const messageId = `performance_${this.messageIdCounter++}`;
+    return new Promise((resolve, reject) => {
+      this.messageCallbacks.set(messageId, { resolve, reject });
+      try {
+        this.sendWorkerMessage({ type: "GET_PERFORMANCE", messageId });
+      } catch (error) {
+        this.messageCallbacks.delete(messageId);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    });
+  }
+  async highlightOnce(content, filetype) {
+    return this.request({
+      type: "ONESHOT_HIGHLIGHT",
+      content,
+      filetype,
+      messageId: `oneshot_${this.messageIdCounter++}`
+    });
+  }
+  async highlightAppend(copyId, offset, text, filetype) {
+    const messageId = `append_${this.messageIdCounter++}`;
+    return this.request({ type: "APPEND_HIGHLIGHT", copyId, offset, text, filetype, messageId });
+  }
+  async removeCopy(copyId) {
+    if (!this.initialized) {
+      if (!this.initializePromise)
+        return;
+      await this.initialize().catch(() => {});
+    }
+    if (this.worker)
+      this.sendWorkerMessage({ type: "DISPOSE_COPY", copyId });
+  }
+  async request(message) {
+    if (!this.initialized) {
+      try {
+        await this.initialize();
+      } catch (error) {
+        return { error: "Could not highlight because of initialization error" };
+      }
+    }
+    const messageId = message.messageId;
+    return new Promise((resolve, reject) => {
+      this.messageCallbacks.set(messageId, { resolve, reject });
+      try {
+        this.sendWorkerMessage(message);
+      } catch (error) {
+        this.messageCallbacks.delete(messageId);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    });
+  }
+  handleWorkerMessage(event) {
+    const message = event.data;
+    switch (message.type) {
+      case "HIGHLIGHT_RESPONSE": {
+        const buffer = this.buffers.get(message.bufferId);
+        if (!buffer || !buffer.hasParser) {
+          return;
+        }
+        if (buffer.version !== message.version) {
+          if ((this.resetVersions.get(message.bufferId) ?? -Infinity) <= message.version) {
+            this.resetBuffer(message.bufferId, buffer.version, buffer.content);
+          }
+          return;
+        }
+        this.emit("highlights:response", message.bufferId, message.version, message.highlights);
+        return;
+      }
+      case "INIT_RESPONSE": {
+        if (!this.initializeResolvers) {
+          return;
+        }
+        clearTimeout(this.initializeResolvers.timeoutId);
+        if (message.error) {
+          console.error("TreeSitter client initialization failed:", message.error);
+          this.initializeResolvers.reject(new Error(message.error));
+        } else {
+          this.initializeResolvers.resolve();
+        }
+        this.initializeResolvers = undefined;
+        return;
+      }
+      case "PARSER_INIT_RESPONSE": {
+        const callback = this.messageCallbacks.get(message.messageId);
+        if (callback) {
+          this.messageCallbacks.delete(message.messageId);
+          callback.resolve({ hasParser: message.hasParser, warning: message.warning, error: message.error });
+        }
+        return;
+      }
+      case "PRELOAD_PARSER_RESPONSE": {
+        const callback = this.messageCallbacks.get(message.messageId);
+        if (callback) {
+          this.messageCallbacks.delete(message.messageId);
+          callback.resolve({ hasParser: message.hasParser });
+        }
+        return;
+      }
+      case "BUFFER_DISPOSED": {
+        const callback = this.messageCallbacks.get(`dispose_${message.bufferId}`);
+        if (callback) {
+          this.messageCallbacks.delete(`dispose_${message.bufferId}`);
+          callback.resolve(true);
+        }
+        this.emit("buffer:disposed", message.bufferId);
+        return;
+      }
+      case "PERFORMANCE_RESPONSE": {
+        const callback = this.messageCallbacks.get(message.messageId);
+        if (callback) {
+          this.messageCallbacks.delete(message.messageId);
+          callback.resolve(message.performance);
+        }
+        return;
+      }
+      case "ONESHOT_HIGHLIGHT_RESPONSE": {
+        const callback = this.messageCallbacks.get(message.messageId);
+        if (callback) {
+          this.messageCallbacks.delete(message.messageId);
+          callback.resolve({ highlights: message.highlights, warning: message.warning, error: message.error });
+        }
+        return;
+      }
+      case "UPDATE_DATA_PATH_RESPONSE": {
+        const callback = this.messageCallbacks.get(message.messageId);
+        if (callback) {
+          this.messageCallbacks.delete(message.messageId);
+          callback.resolve({ error: message.error });
+        }
+        return;
+      }
+      case "CLEAR_CACHE_RESPONSE": {
+        const callback = this.messageCallbacks.get(message.messageId);
+        if (callback) {
+          this.messageCallbacks.delete(message.messageId);
+          callback.resolve({ error: message.error });
+        }
+        return;
+      }
+      case "WARNING": {
+        this.emitWarning(message.warning, message.bufferId);
+        return;
+      }
+      case "ERROR": {
+        if (message.messageId) {
+          const callback = this.messageCallbacks.get(message.messageId);
+          if (callback) {
+            this.messageCallbacks.delete(message.messageId);
+            callback.reject(new Error(message.error));
+          }
+        }
+        this.emitError(message.error, message.bufferId);
+        return;
+      }
+      case "WORKER_LOG": {
+        this.emit("worker:log", message.logType, message.data.join(" "));
+        return;
+      }
+    }
+  }
+  async preloadParser(filetype) {
+    const messageId = `has_parser_${this.messageIdCounter++}`;
+    const response = await new Promise((resolve, reject) => {
+      this.messageCallbacks.set(messageId, { resolve, reject });
+      try {
+        this.sendWorkerMessage({
+          type: "PRELOAD_PARSER",
+          filetype,
+          messageId
+        });
+      } catch (error) {
+        this.messageCallbacks.delete(messageId);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    });
+    return response.hasParser;
+  }
+  async createBuffer(id, content, filetype, version = 1, autoInitialize = true) {
+    if (!this.initialized && !autoInitialize) {
+      this.emitError("Could not create buffer because client is not initialized");
+      return false;
+    }
+    if (this.buffers.has(id)) {
+      throw new Error(`Buffer with id ${id} already exists`);
+    }
+    const created = { id, content, filetype, version, hasParser: false };
+    this.buffers.set(id, created);
+    const drop = () => this.buffers.get(id) === created && this.buffers.delete(id);
+    if (!this.initialized) {
+      try {
+        await this.initialize();
+      } catch (error) {
+        drop();
+        this.emitError("Could not create buffer because of initialization error");
+        return false;
+      }
+      if (this.buffers.get(id) !== created)
+        return false;
+    }
+    const messageId = `init_${this.messageIdCounter++}`;
+    const response = await new Promise((resolve, reject) => {
+      this.messageCallbacks.set(messageId, { resolve, reject });
+      try {
+        this.sendWorkerMessage({
+          type: "INITIALIZE_PARSER",
+          bufferId: id,
+          version,
+          content,
+          filetype,
+          messageId
+        });
+      } catch (error) {
+        this.messageCallbacks.delete(messageId);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    }).catch((error) => (drop(), Promise.reject(error)));
+    if (this.buffers.get(id) !== created)
+      return false;
+    if (!response.hasParser) {
+      this.emit("buffer:initialized", id, false);
+      if (filetype !== "plaintext") {
+        this.emitWarning(response.warning || response.error || "Buffer has no parser", id);
+      }
+      return false;
+    }
+    this.buffers.set(id, { id, content, filetype, version, hasParser: true });
+    this.emit("buffer:initialized", id, true);
+    return true;
+  }
+  async updateBuffer(id, edits, newContent, version) {
+    if (!this.initialized) {
+      return;
+    }
+    const buffer = this.buffers.get(id);
+    if (!buffer || !buffer.hasParser) {
+      return;
+    }
+    this.buffers.set(id, { ...buffer, content: newContent, version });
+    this.sendWorkerMessage({ type: "HANDLE_EDITS", bufferId: id, version, content: newContent, edits });
+  }
+  async removeBuffer(bufferId) {
+    this.buffers.delete(bufferId);
+    this.resetVersions.delete(bufferId);
+    if (!this.initialized) {
+      return;
+    }
+    if (this.worker) {
+      await new Promise((resolve, reject) => {
+        const messageId = `dispose_${bufferId}`;
+        const previous = this.messageCallbacks.get(messageId);
+        const callback = {
+          resolve: (disposed) => (previous?.resolve(disposed), resolve(disposed)),
+          reject: (error) => (previous?.reject(error), reject(error))
+        };
+        this.messageCallbacks.set(messageId, callback);
+        try {
+          this.sendWorkerMessage({
+            type: "DISPOSE_BUFFER",
+            bufferId
+          });
+        } catch (error) {
+          console.error("Error disposing buffer", error);
+          this.messageCallbacks.delete(messageId);
+          callback.resolve(false);
+        }
+        setTimeout(() => {
+          if (this.messageCallbacks.get(messageId) === callback) {
+            this.messageCallbacks.delete(messageId);
+            console.warn({ bufferId }, "Timed out waiting for buffer to be disposed");
+            callback.resolve(false);
+          }
+        }, 3000);
+      });
+    }
+  }
+  destroy() {
+    if (this.destroyPromise) {
+      return this.destroyPromise;
+    }
+    let resolveDestroy;
+    let rejectDestroy;
+    const destroyPromise = new Promise((resolve, reject) => {
+      resolveDestroy = resolve;
+      rejectDestroy = reject;
+    });
+    this.destroyPromise = destroyPromise;
+    const destroyError = new Error("Client destroyed during initialization");
+    this.lifecycleGeneration++;
+    this.initialized = false;
+    this.initializePromise = undefined;
+    this.rejectActiveInitialization(destroyError);
+    this.rejectPendingRequests(new Error("TreeSitter client destroyed"));
+    for (const callback of this.destroyCallbacks) {
+      try {
+        callback();
+      } catch (error) {
+        console.error("TreeSitter client destroy callback failed:", error);
+      }
+    }
+    this.destroyCallbacks.clear();
+    this.resetVersions.clear();
+    this.buffers.clear();
+    this.stopWorker().then(() => {
+      this.workerTerminationFailed = false;
+      if (this.destroyPromise === destroyPromise) {
+        this.destroyPromise = undefined;
+      }
+      resolveDestroy();
+    }, (error) => {
+      this.workerTerminationFailed = true;
+      if (this.destroyPromise === destroyPromise) {
+        this.destroyPromise = undefined;
+      }
+      rejectDestroy(error);
+    });
+    return destroyPromise;
+  }
+  async resetBuffer(bufferId, version, content) {
+    if (!this.initialized) {
+      return;
+    }
+    const buffer = this.buffers.get(bufferId);
+    if (!buffer || !buffer.hasParser) {
+      this.emitError("Cannot reset buffer with no parser", bufferId);
+      return;
+    }
+    this.buffers.set(bufferId, { ...buffer, content, version });
+    this.resetVersions.set(bufferId, version);
+    this.sendWorkerMessage({ type: "RESET_BUFFER", bufferId, version, content, edits: [] });
+  }
+  getBuffer(bufferId) {
+    return this.buffers.get(bufferId);
+  }
+  getAllBuffers() {
+    return Array.from(this.buffers.values());
+  }
+  isInitialized() {
+    return this.initialized;
+  }
+  async setDataPath(dataPath) {
+    if (this.options.dataPath === dataPath) {
+      return;
+    }
+    this.options.dataPath = dataPath;
+    if (this.initialized && this.worker) {
+      const messageId = `update_datapath_${this.messageIdCounter++}`;
+      return new Promise((resolve, reject) => {
+        this.messageCallbacks.set(messageId, {
+          resolve: (response) => {
+            if (response.error) {
+              reject(new Error(response.error));
+            } else {
+              resolve();
+            }
+          },
+          reject
+        });
+        try {
+          this.sendWorkerMessage({
+            type: "UPDATE_DATA_PATH",
+            dataPath,
+            messageId
+          });
+        } catch (error) {
+          this.messageCallbacks.delete(messageId);
+          reject(error instanceof Error ? error : new Error(String(error)));
+        }
+      });
+    }
+  }
+  async clearCache() {
+    if (!this.initialized || !this.worker) {
+      throw new Error("Cannot clear cache: client is not initialized");
+    }
+    const messageId = `clear_cache_${this.messageIdCounter++}`;
+    return new Promise((resolve, reject) => {
+      this.messageCallbacks.set(messageId, {
+        resolve: (response) => {
+          if (response.error) {
+            reject(new Error(response.error));
+          } else {
+            resolve();
+          }
+        },
+        reject
+      });
+      try {
+        this.sendWorkerMessage({
+          type: "CLEAR_CACHE",
+          messageId
+        });
+      } catch (error) {
+        this.messageCallbacks.delete(messageId);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    });
+  }
+}
+
+// src/lib/tree-sitter-styled-text.ts
+registerEnvVar2({ name: "OTUI_TS_STYLE_WARN", default: false, description: "Enable warnings for missing syntax styles" });
+function getSpecificity(group) {
+  return group.split(".").length;
+}
+function shouldSuppressInInjection(group, meta) {
+  if (meta?.isInjection) {
+    return false;
+  }
+  return group === "markup.raw.block";
+}
+function treeSitterToTextChunks2(content, highlights, syntaxStyle, options) {
+  const chunks = [];
+  const ranges = options?.ranges;
+  const defaultStyle = syntaxStyle.getStyle("default");
+  const concealEnabled = options?.enabled ?? true;
+  const baseStyle = options?.baseHighlight ? syntaxStyle.getStyle(options.baseHighlight) : undefined;
+  const injectionContainerRanges = [];
+  const boundaries = [];
+  for (let i = 0;i < highlights.length; i++) {
+    const [start, end, , meta] = highlights[i];
+    if (start === end)
+      continue;
+    if (meta?.containsInjection) {
+      injectionContainerRanges.push({ start, end });
+    }
+    boundaries.push({ offset: start, type: "start", highlightIndex: i });
+    boundaries.push({ offset: end, type: "end", highlightIndex: i });
+  }
+  boundaries.sort((a, b) => {
+    if (a.offset !== b.offset)
+      return a.offset - b.offset;
+    if (a.type === "end" && b.type === "start")
+      return -1;
+    if (a.type === "start" && b.type === "end")
+      return 1;
+    return 0;
+  });
+  const activeHighlights = new Set;
+  let currentOffset = 0;
+  for (let i = 0;i < boundaries.length; i++) {
+    const boundary = boundaries[i];
+    if (currentOffset < boundary.offset && activeHighlights.size > 0) {
+      const segmentText = content.slice(currentOffset, boundary.offset);
+      const activeGroups = [];
+      for (const idx of activeHighlights) {
+        const [, , group, meta] = highlights[idx];
+        activeGroups.push({ group, meta, index: idx });
+      }
+      const concealHighlight = concealEnabled ? activeGroups.find((h) => h.meta?.conceal !== undefined || h.group === "conceal" || h.group.startsWith("conceal.")) : undefined;
+      if (concealHighlight) {
+        let replacementText = "";
+        if (concealHighlight.meta?.conceal !== undefined) {
+          replacementText = concealHighlight.meta.conceal;
+        } else if (concealHighlight.group === "conceal.with.space") {
+          replacementText = " ";
+        }
+        if (replacementText) {
+          chunks.push({
+            __isChunk: true,
+            text: replacementText,
+            fg: defaultStyle?.fg,
+            bg: defaultStyle?.bg,
+            attributes: createTextAttributes2(defaultStyle)
+          });
+          ranges?.push({ start: currentOffset, end: boundary.offset });
+        }
+      } else {
+        const insideInjectionContainer = injectionContainerRanges.some((range) => currentOffset >= range.start && currentOffset < range.end);
+        const validGroups = activeGroups.filter((h) => {
+          if (insideInjectionContainer && shouldSuppressInInjection(h.group, h.meta)) {
+            return false;
+          }
+          return true;
+        });
+        const sortedGroups = validGroups.sort((a, b) => {
+          const aSpec = getSpecificity(a.group);
+          const bSpec = getSpecificity(b.group);
+          if (aSpec !== bSpec)
+            return aSpec - bSpec;
+          return a.index - b.index;
+        });
+        const mergedStyle = baseStyle ? { ...baseStyle } : {};
+        for (const { group } of sortedGroups) {
+          let styleForGroup = syntaxStyle.getStyle(group);
+          if (!styleForGroup && group.includes(".")) {
+            const baseName = group.split(".")[0];
+            styleForGroup = syntaxStyle.getStyle(baseName);
+          }
+          if (styleForGroup) {
+            for (const [field, value] of Object.entries(styleForGroup)) {
+              if (value !== undefined)
+                Reflect.set(mergedStyle, field, value);
+            }
+          } else {
+            if (group.includes(".")) {
+              const baseName = group.split(".")[0];
+              if (env2.OTUI_TS_STYLE_WARN) {
+                console.warn(`Syntax style not found for group "${group}" or base scope "${baseName}", using default style`);
+              }
+            } else {
+              if (env2.OTUI_TS_STYLE_WARN) {
+                console.warn(`Syntax style not found for group "${group}", using default style`);
+              }
+            }
+          }
+        }
+        const merged = Object.keys(mergedStyle).length > 0;
+        const finalStyle = merged ? mergedStyle : defaultStyle;
+        const strikes = (group) => group === "markup.strikethrough" && !syntaxStyle.getRegisteredNames().some((name) => name === group || name === "markup");
+        options?.names?.push(merged ? sortedGroups.flatMap(({ group }) => strikes(group) ? ["default", group] : [group]) : ["default"]);
+        chunks.push({
+          __isChunk: true,
+          text: segmentText,
+          fg: finalStyle?.fg,
+          bg: finalStyle?.bg,
+          attributes: createTextAttributes2(finalStyle)
+        });
+        ranges?.push({ start: currentOffset, end: boundary.offset });
+      }
+    } else if (currentOffset < boundary.offset) {
+      const text = content.slice(currentOffset, boundary.offset);
+      const style = baseStyle ?? defaultStyle;
+      options?.names?.push(["default"]);
+      chunks.push({
+        __isChunk: true,
+        text,
+        fg: style?.fg,
+        bg: style?.bg,
+        attributes: createTextAttributes2(style)
+      });
+      ranges?.push({ start: currentOffset, end: boundary.offset });
+    }
+    if (boundary.type === "start") {
+      activeHighlights.add(boundary.highlightIndex);
+    } else {
+      activeHighlights.delete(boundary.highlightIndex);
+      if (concealEnabled) {
+        const [, , group, meta] = highlights[boundary.highlightIndex];
+        if (meta?.concealLines !== undefined) {
+          if (boundary.offset < content.length && content[boundary.offset] === `
+`) {
+            currentOffset = boundary.offset + 1;
+            continue;
+          }
+        }
+        if (meta?.conceal !== undefined) {
+          if (meta.conceal === " ") {
+            if (boundary.offset < content.length && content[boundary.offset] === " ") {
+              currentOffset = boundary.offset + 1;
+              continue;
+            }
+          } else if (meta.conceal === "" && group === "conceal" && !meta.isInjection) {
+            if (boundary.offset < content.length && content[boundary.offset] === " ") {
+              currentOffset = boundary.offset + 1;
+              continue;
+            }
+          }
+        }
+      }
+    }
+    currentOffset = boundary.offset;
+  }
+  if (currentOffset < content.length) {
+    const text = content.slice(currentOffset);
+    const style = baseStyle ?? defaultStyle;
+    options?.names?.push(["default"]);
+    chunks.push({
+      __isChunk: true,
+      text,
+      fg: style?.fg,
+      bg: style?.bg,
+      attributes: createTextAttributes2(style)
+    });
+    ranges?.push({ start: currentOffset, end: content.length });
+  }
+  return chunks;
+}
+async function treeSitterToStyledText2(content, filetype, syntaxStyle, client, options) {
+  const result = await client.highlightOnce(content, filetype);
+  if (result.highlights && result.highlights.length > 0 || options?.baseHighlight) {
+    const chunks = treeSitterToTextChunks2(content, result.highlights ?? [], syntaxStyle, {
+      enabled: options?.conceal?.enabled ?? true,
+      baseHighlight: options?.baseHighlight
+    });
+    return new StyledText2(chunks);
+  } else {
+    const defaultStyle = syntaxStyle.mergeStyles("default");
+    const chunks = [
+      {
+        __isChunk: true,
+        text: content,
+        fg: defaultStyle.fg,
+        bg: defaultStyle.bg,
+        attributes: defaultStyle.attributes
+      }
+    ];
+    return new StyledText2(chunks);
+  }
+}
+
+// src/lib/data-paths.ts
+import os from "os";
+import path from "path";
+import { EventEmitter as EventEmitter3 } from "events";
+
+// src/lib/validate-dir-name.ts
+function isValidDirectoryName(name) {
+  if (!name || typeof name !== "string") {
+    return false;
+  }
+  if (name.trim().length === 0) {
+    return false;
+  }
+  const reservedNames = [
+    "CON",
+    "PRN",
+    "AUX",
+    "NUL",
+    "COM1",
+    "COM2",
+    "COM3",
+    "COM4",
+    "COM5",
+    "COM6",
+    "COM7",
+    "COM8",
+    "COM9",
+    "LPT1",
+    "LPT2",
+    "LPT3",
+    "LPT4",
+    "LPT5",
+    "LPT6",
+    "LPT7",
+    "LPT8",
+    "LPT9"
+  ];
+  if (reservedNames.includes(name.toUpperCase())) {
+    return false;
+  }
+  const invalidChars = /[<>:"|?*/\\\x00-\x1f]/;
+  if (invalidChars.test(name)) {
+    return false;
+  }
+  if (name.endsWith(".") || name.endsWith(" ")) {
+    return false;
+  }
+  if (name === "." || name === "..") {
+    return false;
+  }
+  return true;
+}
+
+// src/lib/data-paths.ts
+registerEnvVar2({
+  name: "XDG_CONFIG_HOME",
+  description: "Base directory for user-specific configuration files",
+  type: "string",
+  default: ""
+});
+registerEnvVar2({
+  name: "XDG_DATA_HOME",
+  description: "Base directory for user-specific data files",
+  type: "string",
+  default: ""
+});
+
+class DataPathsManager2 extends EventEmitter3 {
+  _appName;
+  _globalConfigPath;
+  _globalConfigFile;
+  _localConfigFile;
+  _globalDataPath;
+  constructor() {
+    super();
+    this._appName = "opentui";
+  }
+  get appName() {
+    return this._appName;
+  }
+  set appName(value) {
+    if (!isValidDirectoryName(value)) {
+      throw new Error(`Invalid app name "${value}": must be a valid directory name`);
+    }
+    if (this._appName !== value) {
+      this._appName = value;
+      this._globalConfigPath = undefined;
+      this._globalConfigFile = undefined;
+      this._localConfigFile = undefined;
+      this._globalDataPath = undefined;
+      this.emit("paths:changed", this.toObject());
+    }
+  }
+  get globalConfigPath() {
+    if (this._globalConfigPath === undefined) {
+      const homeDir = os.homedir();
+      const xdgConfigHome = env2.XDG_CONFIG_HOME;
+      const baseConfigDir = xdgConfigHome || path.join(homeDir, ".config");
+      this._globalConfigPath = path.join(baseConfigDir, this._appName);
+    }
+    return this._globalConfigPath;
+  }
+  get globalConfigFile() {
+    if (this._globalConfigFile === undefined) {
+      this._globalConfigFile = path.join(this.globalConfigPath, "init.ts");
+    }
+    return this._globalConfigFile;
+  }
+  get localConfigFile() {
+    if (this._localConfigFile === undefined) {
+      this._localConfigFile = path.join(process.cwd(), `.${this._appName}.ts`);
+    }
+    return this._localConfigFile;
+  }
+  get globalDataPath() {
+    if (this._globalDataPath === undefined) {
+      const homeDir = os.homedir();
+      const xdgDataHome = env2.XDG_DATA_HOME;
+      const baseDataDir = xdgDataHome || path.join(homeDir, ".local/share");
+      this._globalDataPath = path.join(baseDataDir, this._appName);
+    }
+    return this._globalDataPath;
+  }
+  toObject() {
+    return {
+      globalConfigPath: this.globalConfigPath,
+      globalConfigFile: this.globalConfigFile,
+      localConfigFile: this.localConfigFile,
+      globalDataPath: this.globalDataPath
+    };
+  }
+}
+function getDataPaths2() {
+  return singleton("data-paths-opentui", () => new DataPathsManager2);
+}
+
+// src/lib/tree-sitter/resolve-ft.ts
+import path2 from "path";
+var extensionToFiletype2 = new Map([
+  ["astro", "astro"],
+  ["bash", "bash"],
+  ["c", "c"],
+  ["cc", "cpp"],
+  ["cjs", "javascript"],
+  ["clj", "clojure"],
+  ["cljs", "clojure"],
+  ["cljc", "clojure"],
+  ["cpp", "cpp"],
+  ["cxx", "cpp"],
+  ["cs", "csharp"],
+  ["cts", "typescript"],
+  ["ctsx", "typescriptreact"],
+  ["dart", "dart"],
+  ["diff", "diff"],
+  ["edn", "clojure"],
+  ["go", "go"],
+  ["gemspec", "ruby"],
+  ["groovy", "groovy"],
+  ["h", "c"],
+  ["handlebars", "handlebars"],
+  ["hbs", "handlebars"],
+  ["hpp", "cpp"],
+  ["hxx", "cpp"],
+  ["h++", "cpp"],
+  ["hh", "cpp"],
+  ["hrl", "erlang"],
+  ["hs", "haskell"],
+  ["htm", "html"],
+  ["html", "html"],
+  ["ini", "ini"],
+  ["js", "javascript"],
+  ["jsx", "javascriptreact"],
+  ["jl", "julia"],
+  ["json", "json"],
+  ["ksh", "bash"],
+  ["kt", "kotlin"],
+  ["kts", "kotlin"],
+  ["latex", "latex"],
+  ["less", "less"],
+  ["lua", "lua"],
+  ["markdown", "markdown"],
+  ["md", "markdown"],
+  ["mdown", "markdown"],
+  ["mkd", "markdown"],
+  ["mjs", "javascript"],
+  ["ml", "ocaml"],
+  ["mli", "ocaml"],
+  ["mts", "typescript"],
+  ["mtsx", "typescriptreact"],
+  ["patch", "diff"],
+  ["php", "php"],
+  ["pl", "perl"],
+  ["pm", "perl"],
+  ["ps1", "powershell"],
+  ["psm1", "powershell"],
+  ["py", "python"],
+  ["pyi", "python"],
+  ["r", "r"],
+  ["rb", "ruby"],
+  ["rake", "ruby"],
+  ["rs", "rust"],
+  ["ru", "ruby"],
+  ["sass", "sass"],
+  ["sc", "scala"],
+  ["scala", "scala"],
+  ["scss", "scss"],
+  ["sh", "bash"],
+  ["sql", "sql"],
+  ["svelte", "svelte"],
+  ["swift", "swift"],
+  ["ts", "typescript"],
+  ["tsx", "typescriptreact"],
+  ["tex", "latex"],
+  ["toml", "toml"],
+  ["vue", "vue"],
+  ["vim", "vim"],
+  ["xml", "xml"],
+  ["xsl", "xsl"],
+  ["yaml", "yaml"],
+  ["yml", "yaml"],
+  ["zig", "zig"],
+  ["zon", "zig"],
+  ["zsh", "bash"],
+  ["c++", "cpp"],
+  ["erl", "erlang"],
+  ["exs", "elixir"],
+  ["ex", "elixir"],
+  ["elm", "elm"],
+  ["fsharp", "fsharp"],
+  ["fs", "fsharp"],
+  ["fsx", "fsharp"],
+  ["fsscript", "fsharp"],
+  ["fsi", "fsharp"],
+  ["java", "java"],
+  ["css", "css"]
+]);
+var basenameToFiletype2 = new Map([
+  [".bash_aliases", "bash"],
+  [".bash_logout", "bash"],
+  [".bash_profile", "bash"],
+  [".bashrc", "bash"],
+  [".kshrc", "bash"],
+  [".profile", "bash"],
+  [".vimrc", "vim"],
+  [".zlogin", "bash"],
+  [".zlogout", "bash"],
+  [".zprofile", "bash"],
+  [".zshenv", "bash"],
+  [".zshrc", "bash"],
+  ["appfile", "ruby"],
+  ["berksfile", "ruby"],
+  ["brewfile", "ruby"],
+  ["cheffile", "ruby"],
+  ["containerfile", "dockerfile"],
+  ["dockerfile", "dockerfile"],
+  ["fastfile", "ruby"],
+  ["gemfile", "ruby"],
+  ["gnumakefile", "make"],
+  ["gvimrc", "vim"],
+  ["guardfile", "ruby"],
+  ["makefile", "make"],
+  ["podfile", "ruby"],
+  ["rakefile", "ruby"],
+  ["thorfile", "ruby"],
+  ["vagrantfile", "ruby"]
+]);
+function normalizeFiletypeToken(value) {
+  const normalizedValue = value.trim().replace(/^\./, "").toLowerCase();
+  return normalizedValue || undefined;
+}
+function getBasename(value) {
+  const normalizedValue = value.trim().replaceAll("\\", "/");
+  if (!normalizedValue)
+    return;
+  const basename = path2.posix.basename(normalizedValue).toLowerCase();
+  return basename || undefined;
+}
+function extToFiletype2(extension) {
+  const normalizedExtension = normalizeFiletypeToken(extension);
+  if (!normalizedExtension)
+    return;
+  return extensionToFiletype2.get(normalizedExtension);
+}
+function pathToFiletype2(path) {
+  if (typeof path !== "string")
+    return;
+  const basename = getBasename(path);
+  if (!basename)
+    return;
+  const basenameFiletype = basenameToFiletype2.get(basename);
+  if (basenameFiletype) {
+    return basenameFiletype;
+  }
+  const lastDot = basename.lastIndexOf(".");
+  if (lastDot === -1 || lastDot === basename.length - 1) {
+    return;
+  }
+  const extension = basename.substring(lastDot + 1);
+  return extToFiletype2(extension);
+}
+function infoStringToFiletype2(infoString) {
+  if (typeof infoString !== "string")
+    return;
+  const token = infoString.trim().split(/\s+/, 1)[0];
+  const directBasenameMatch = basenameToFiletype2.get(token.toLowerCase());
+  if (directBasenameMatch)
+    return directBasenameMatch;
+  const normalizedToken = normalizeFiletypeToken(token);
+  if (!normalizedToken)
+    return;
+  return basenameToFiletype2.get(normalizedToken) ?? pathToFiletype2(normalizedToken) ?? extToFiletype2(normalizedToken) ?? normalizedToken;
+}
+
+// src/lib/tree-sitter/index.ts
+var TREE_SITTER_CLIENT_KEY = "tree-sitter-client";
+var TREE_SITTER_CLIENT_LISTENER_STATE_KEY = "tree-sitter-client-listener-state";
+function getTreeSitterClientListenerState() {
+  return singleton(TREE_SITTER_CLIENT_LISTENER_STATE_KEY, () => ({}));
+}
+function getTreeSitterClient2() {
+  const existingClient = getSingleton(TREE_SITTER_CLIENT_KEY);
+  if (existingClient) {
+    return existingClient;
+  }
+  const dataPathsManager = getDataPaths2();
+  const defaultOptions = {
+    dataPath: dataPathsManager.globalDataPath
+  };
+  return singleton(TREE_SITTER_CLIENT_KEY, () => {
+    const client2 = new TreeSitterClient2(defaultOptions);
+    const listenerState = getTreeSitterClientListenerState();
+    const handlePathsChanged = (paths) => {
+      client2.setDataPath(paths.globalDataPath).catch((error) => {
+        console.warn("Failed to update tree-sitter data path:", error);
+      });
+    };
+    const removeListener = () => {
+      dataPathsManager.off("paths:changed", handlePathsChanged);
+      if (listenerState.removeListener === removeListener) {
+        listenerState.removeListener = undefined;
+      }
+      if (getSingleton(TREE_SITTER_CLIENT_KEY) === client2) {
+        destroySingleton(TREE_SITTER_CLIENT_KEY);
+      }
+    };
+    listenerState.removeListener = removeListener;
+    client2.onDestroy(removeListener);
+    dataPathsManager.on("paths:changed", handlePathsChanged);
+    return client2;
+  });
+}
+async function destroyTreeSitterClient2() {
+  const client2 = getSingleton(TREE_SITTER_CLIENT_KEY);
+  if (!client2) {
+    const listenerState = getSingleton(TREE_SITTER_CLIENT_LISTENER_STATE_KEY);
+    listenerState?.removeListener?.();
+    if (listenerState) {
+      listenerState.removeListener = undefined;
+    }
+    return;
+  }
+  destroySingleton(TREE_SITTER_CLIENT_KEY);
+  await client2.destroy();
+}
+
+// src/lib/extmarks.ts
+var states = new WeakMap;
+function bufferState(editBuffer) {
+  let state = states.get(editBuffer);
+  if (state)
+    return state;
+  state = { payloads: new Map, typeNameToId: new Map, typeIdToName: new Map, nextTypeId: 1, controllers: [] };
+  states.set(editBuffer, state);
+  const payloads = state.payloads;
+  editBuffer._onHistoryReset = () => payloads.clear();
+  return state;
+}
+function isU32(value) {
+  return Number.isInteger(value) && value >= 0 && value <= 4294967295;
+}
+
+class ExtmarksController2 {
+  editBuffer;
+  editorView;
+  state;
+  destroyed = false;
+  atomic = () => !this.editorView.hasSelection();
+  constructor(editBuffer, editorView) {
+    this.editBuffer = editBuffer;
+    this.editorView = editorView;
+    this.state = bufferState(editBuffer);
+    this.state.controllers.push(this);
+    editBuffer._atomic = this.atomic;
+    editorView._atomic = true;
+  }
+  toExtmark(mark) {
+    return {
+      id: mark.id,
+      start: mark.start,
+      end: mark.end,
+      virtual: mark.atomic,
+      styleId: mark.style || undefined,
+      priority: mark.priority,
+      data: this.state.payloads.get(mark.id)?.data,
+      typeId: mark.kind
+    };
+  }
+  create(options) {
+    if (this.destroyed) {
+      throw new Error("ExtmarksController is destroyed");
+    }
+    const { start, end, typeId = 0, styleId = 0, priority = 0 } = options;
+    const offset = (value) => Number.isInteger(value) && value >= 0 ? Math.min(value, 4294967295) : -1;
+    const [from, to] = [offset(start), offset(end)];
+    if (from < 0 || to < from || !isU32(typeId) || !isU32(styleId) || !isU32(priority))
+      return 0;
+    const id = this.editBuffer._mark(0 /* Add */, {
+      kind: typeId,
+      atomic: options.virtual ?? false,
+      style: styleId,
+      priority,
+      start: from,
+      end: to
+    });
+    if (options.data !== undefined || options.metadata !== undefined) {
+      this.state.payloads.set(id, { data: options.data, metadata: options.metadata });
+    }
+    return id;
+  }
+  delete(id) {
+    if (this.destroyed) {
+      throw new Error("ExtmarksController is destroyed");
+    }
+    return isU32(id) && id !== 0 && this.editBuffer._mark(1 /* Remove */, { id }) !== 0;
+  }
+  get(id) {
+    if (this.gone || !isU32(id) || id === 0)
+      return null;
+    const [mark] = this.editBuffer._getMarks(id);
+    return mark ? this.toExtmark(mark) : null;
+  }
+  getAll() {
+    if (this.gone)
+      return [];
+    return this.editBuffer._getMarks().map((mark) => this.toExtmark(mark));
+  }
+  getVirtual() {
+    return this.getAll().filter((e) => e.virtual);
+  }
+  getAtOffset(offset) {
+    return this.getAll().filter((e) => offset >= e.start && offset < e.end);
+  }
+  getAllForTypeId(typeId) {
+    if (this.gone || !isU32(typeId))
+      return [];
+    return this.editBuffer._getMarks(0, typeId).filter((mark) => mark.kind === typeId).map((mark) => this.toExtmark(mark));
+  }
+  clear() {
+    if (this.gone)
+      return;
+    this.editBuffer._mark(2 /* Clear */);
+  }
+  registerType(typeName) {
+    if (this.destroyed) {
+      throw new Error("ExtmarksController is destroyed");
+    }
+    const state = this.state;
+    const existing = state.typeNameToId.get(typeName);
+    if (existing !== undefined) {
+      return existing;
+    }
+    const typeId = state.nextTypeId++;
+    state.typeNameToId.set(typeName, typeId);
+    state.typeIdToName.set(typeId, typeName);
+    return typeId;
+  }
+  getTypeId(typeName) {
+    if (this.destroyed)
+      return null;
+    return this.state.typeNameToId.get(typeName) ?? null;
+  }
+  getTypeName(typeId) {
+    if (this.destroyed)
+      return null;
+    return this.state.typeIdToName.get(typeId) ?? null;
+  }
+  getMetadataFor(extmarkId) {
+    if (!this.get(extmarkId))
+      return;
+    return this.state.payloads.get(extmarkId)?.metadata;
+  }
+  get gone() {
+    return this.destroyed || this.editBuffer.isDestroyed;
+  }
+  destroy() {
+    if (this.destroyed)
+      return;
+    const controllers = this.state.controllers;
+    controllers.splice(controllers.indexOf(this), 1);
+    this.editorView._atomic = controllers.some((controller) => controller.editorView === this.editorView);
+    this.editBuffer._atomic = controllers.at(-1)?.atomic;
+    this.destroyed = true;
+  }
+}
+function createExtmarksController2(editBuffer, editorView) {
+  return new ExtmarksController2(editBuffer, editorView);
+}
+
+// src/lib/terminal-palette.ts
+var SYSTEM_CLOCK = new SystemClock2;
+registerEnvVar2({
+  name: "OTUI_PALETTE_IDLE_TIMEOUT_MS",
+  description: "Milliseconds of silence after palette queries before using fallback colors.",
+  type: "number",
+  default: 300
+});
+var OSC4_RESPONSE = /\x1b]4;(\d+);(?:(?:rgb:)([0-9a-fA-F]+)\/([0-9a-fA-F]+)\/([0-9a-fA-F]+)|#([0-9a-fA-F]{6}))(?:\x07|\x1b\\)/g;
+var OSC_SPECIAL_RESPONSE = /\x1b](\d+);(?:(?:rgb:)([0-9a-fA-F]+)\/([0-9a-fA-F]+)\/([0-9a-fA-F]+)|#([0-9a-fA-F]{6}))(?:\x07|\x1b\\)/g;
+function scaleComponent(comp) {
+  const val = parseInt(comp, 16);
+  const maxIn = (1 << 4 * comp.length) - 1;
+  return Math.round(val / maxIn * 255).toString(16).padStart(2, "0");
+}
+function toHex(r, g, b, hex6) {
+  if (hex6)
+    return `#${hex6.toLowerCase()}`;
+  if (r && g && b)
+    return `#${scaleComponent(r)}${scaleComponent(g)}${scaleComponent(b)}`;
+  return "#000000";
+}
+var SPECIAL_COLORS = {
+  10: "defaultForeground",
+  11: "defaultBackground",
+  12: "cursorColor",
+  13: "mouseForeground",
+  14: "mouseBackground",
+  15: "tekForeground",
+  16: "tekBackground",
+  17: "highlightBackground",
+  19: "highlightForeground"
+};
+function emptyTerminalColors(size) {
+  const colors = { palette: Array(size).fill(null) };
+  for (const key of Object.values(SPECIAL_COLORS))
+    colors[key] = null;
+  return colors;
+}
+function applyPaletteReplies(colors, sequence) {
+  let changed = false;
+  let m;
+  OSC4_RESPONSE.lastIndex = 0;
+  while (m = OSC4_RESPONSE.exec(sequence)) {
+    const index = parseInt(m[1], 10);
+    const hex = toHex(m[2], m[3], m[4], m[5]);
+    if (index >= colors.palette.length || colors.palette[index] === hex)
+      continue;
+    colors.palette[index] = hex;
+    changed = true;
+  }
+  OSC_SPECIAL_RESPONSE.lastIndex = 0;
+  while (m = OSC_SPECIAL_RESPONSE.exec(sequence)) {
+    const key = SPECIAL_COLORS[parseInt(m[1], 10)];
+    const hex = toHex(m[2], m[3], m[4], m[5]);
+    if (!key || colors[key] === hex)
+      continue;
+    colors[key] = hex;
+    changed = true;
+  }
+  return changed;
+}
+function wrapForTmux(osc) {
+  const escaped = osc.replace(/\x1b/g, "\x1B\x1B");
+  return `\x1BPtmux;${escaped}\x1B\\`;
+}
+
+class TerminalPalette2 {
+  stdin;
+  stdout;
+  writeFn;
+  activeQuerySessions = [];
+  inLegacyTmux;
+  inTmux;
+  oscSource;
+  clock;
+  constructor(options) {
+    const { stdin, stdout, writeFn, isLegacyTmux, isTmux, oscSource, clock } = options;
+    this.stdin = stdin;
+    this.stdout = stdout;
+    this.writeFn = writeFn || ((data) => stdout.write(data));
+    this.inLegacyTmux = isLegacyTmux ?? false;
+    this.inTmux = isTmux ?? this.inLegacyTmux;
+    this.oscSource = oscSource;
+    this.clock = clock ?? SYSTEM_CLOCK;
+  }
+  writeOsc(osc, wrapForLegacyTmux = false) {
+    const data = wrapForLegacyTmux && this.inLegacyTmux ? wrapForTmux(osc) : osc;
+    return this.writeFn(data);
+  }
+  cleanup() {
+    for (const cleanupSession of [...this.activeQuerySessions]) {
+      cleanupSession();
+    }
+    this.activeQuerySessions = [];
+  }
+  subscribeInput(handler) {
+    if (this.oscSource) {
+      return this.oscSource.subscribeOsc((sequence) => {
+        handler(sequence);
+      });
+    }
+    this.stdin.on("data", handler);
+    return () => {
+      this.stdin.removeListener("data", handler);
+    };
+  }
+  createQuerySession() {
+    const timers = new Set;
+    const subscriptions = new Set;
+    let closed = false;
+    const cleanup = () => {
+      if (closed)
+        return;
+      closed = true;
+      for (const timer of timers) {
+        this.clock.clearTimeout(timer);
+      }
+      timers.clear();
+      for (const unsubscribe of subscriptions) {
+        unsubscribe();
+      }
+      subscriptions.clear();
+      const idx = this.activeQuerySessions.indexOf(cleanup);
+      if (idx !== -1)
+        this.activeQuerySessions.splice(idx, 1);
+    };
+    this.activeQuerySessions.push(cleanup);
+    return {
+      setTimer: (fn, ms) => {
+        const timer = this.clock.setTimeout(fn, ms);
+        timers.add(timer);
+        return timer;
+      },
+      resetTimer: (existing, fn, ms) => {
+        if (existing) {
+          this.clock.clearTimeout(existing);
+          timers.delete(existing);
+        }
+        const timer = this.clock.setTimeout(fn, ms);
+        timers.add(timer);
+        return timer;
+      },
+      subscribeInput: (handler) => {
+        const unsubscribe = this.subscribeInput(handler);
+        subscriptions.add(unsubscribe);
+        return () => {
+          if (!subscriptions.has(unsubscribe))
+            return;
+          subscriptions.delete(unsubscribe);
+          unsubscribe();
+        };
+      },
+      cleanup
+    };
+  }
+  async detectOSCSupport(timeoutMs = 300) {
+    const out = this.stdout;
+    if (!out.isTTY || !this.stdin.isTTY)
+      return false;
+    return new Promise((resolve) => {
+      const session = this.createQuerySession();
+      let buffer = "";
+      let settled = false;
+      const finish = (supported) => {
+        if (settled)
+          return;
+        settled = true;
+        session.cleanup();
+        resolve(supported);
+      };
+      const onData = (chunk) => {
+        buffer += chunk.toString();
+        OSC4_RESPONSE.lastIndex = 0;
+        if (OSC4_RESPONSE.test(buffer)) {
+          finish(true);
+        }
+      };
+      session.setTimer(() => {
+        finish(false);
+      }, timeoutMs);
+      session.subscribeInput(onData);
+      this.writeOsc("\x1B]4;0;?\x07", true);
+    });
+  }
+  async queryPalette(indices, timeoutMs = 1200, idleTimeoutMs = env2.OTUI_PALETTE_IDLE_TIMEOUT_MS) {
+    const out = this.stdout;
+    const results = new Map;
+    indices.forEach((i) => results.set(i, null));
+    if (!out.isTTY || !this.stdin.isTTY) {
+      return results;
+    }
+    return new Promise((resolve) => {
+      const session = this.createQuerySession();
+      let buffer = "";
+      let idleTimer = null;
+      let settled = false;
+      const finish = () => {
+        if (settled)
+          return;
+        settled = true;
+        session.cleanup();
+        resolve(results);
+      };
+      const onData = (chunk) => {
+        buffer += chunk.toString();
+        let m;
+        OSC4_RESPONSE.lastIndex = 0;
+        while (m = OSC4_RESPONSE.exec(buffer)) {
+          const idx = parseInt(m[1], 10);
+          if (results.has(idx))
+            results.set(idx, toHex(m[2], m[3], m[4], m[5]));
+        }
+        if (buffer.length > 8192)
+          buffer = buffer.slice(-4096);
+        const done = [...results.values()].filter((v) => v !== null).length;
+        if (done === results.size) {
+          finish();
+          return;
+        }
+        idleTimer = session.resetTimer(idleTimer, finish, idleTimeoutMs);
+      };
+      session.setTimer(finish, timeoutMs);
+      session.subscribeInput(onData);
+      this.writeOsc(indices.map((i) => `\x1B]4;${i};?\x07`).join(""), true);
+      idleTimer = session.resetTimer(idleTimer, finish, idleTimeoutMs);
+    });
+  }
+  async querySpecialColors(timeoutMs = 1200, idleTimeoutMs = env2.OTUI_PALETTE_IDLE_TIMEOUT_MS) {
+    const out = this.stdout;
+    const results = Object.fromEntries(Object.keys(SPECIAL_COLORS).map((osc) => [osc, null]));
+    const queries = this.inTmux ? [10, 11, 12] : [10, 11, 12, 13, 14, 15, 16, 17, 19];
+    if (!out.isTTY || !this.stdin.isTTY) {
+      return results;
+    }
+    return new Promise((resolve) => {
+      const session = this.createQuerySession();
+      let buffer = "";
+      let idleTimer = null;
+      let settled = false;
+      const finish = () => {
+        if (settled)
+          return;
+        settled = true;
+        session.cleanup();
+        resolve(results);
+      };
+      const onData = (chunk) => {
+        buffer += chunk.toString();
+        let updated = false;
+        let m;
+        OSC_SPECIAL_RESPONSE.lastIndex = 0;
+        while (m = OSC_SPECIAL_RESPONSE.exec(buffer)) {
+          const idx = parseInt(m[1], 10);
+          if (idx in results) {
+            results[idx] = toHex(m[2], m[3], m[4], m[5]);
+            updated = true;
+          }
+        }
+        if (buffer.length > 8192)
+          buffer = buffer.slice(-4096);
+        if (queries.every((idx) => results[idx] !== null)) {
+          finish();
+          return;
+        }
+        if (!updated)
+          return;
+        idleTimer = session.resetTimer(idleTimer, finish, idleTimeoutMs);
+      };
+      session.setTimer(finish, timeoutMs);
+      session.subscribeInput(onData);
+      this.writeOsc(queries.map((idx) => `\x1B]${idx};?\x07`).join(""));
+      idleTimer = session.resetTimer(idleTimer, finish, idleTimeoutMs);
+    });
+  }
+  async detect(options) {
+    const { timeout = 5000, size = 16 } = options || {};
+    const supported = await this.detectOSCSupport();
+    if (!supported)
+      return emptyTerminalColors(size);
+    const indicesToQuery = [...Array(size).keys()];
+    const idleTimeout = env2.OTUI_PALETTE_IDLE_TIMEOUT_MS;
+    const [paletteResults, specialColors] = await Promise.all([
+      this.queryPalette(indicesToQuery, timeout, idleTimeout),
+      this.querySpecialColors(timeout, idleTimeout)
+    ]);
+    const colors = emptyTerminalColors(size);
+    colors.palette = colors.palette.map((_, i) => paletteResults.get(i) ?? null);
+    for (const [osc, key] of Object.entries(SPECIAL_COLORS))
+      colors[key] = specialColors[Number(osc)];
+    return colors;
+  }
+}
+function createTerminalPalette2(options) {
+  return new TerminalPalette2(options);
+}
+var DEFAULT_FOREGROUND_FALLBACK = RGBA2.fromInts(...DEFAULT_FOREGROUND_RGB2);
+var DEFAULT_BACKGROUND_FALLBACK = RGBA2.fromInts(...DEFAULT_BACKGROUND_RGB2);
+var fallbackAnsi256Palette = null;
+function getFallbackAnsi256Palette() {
+  if (!fallbackAnsi256Palette) {
+    fallbackAnsi256Palette = Array.from({ length: 256 }, (_, index) => {
+      const [r, g, b] = ansi256IndexToRgb2(index);
+      return RGBA2.fromInts(r, g, b);
+    });
+  }
+  return fallbackAnsi256Palette;
+}
+function normalizeTerminalPalette2(colors) {
+  const fallbackPalette = getFallbackAnsi256Palette();
+  return {
+    palette: Array.from({ length: 256 }, (_, index) => {
+      const detected = colors?.palette[index];
+      return detected ? RGBA2.fromHex(detected) : RGBA2.clone(fallbackPalette[index]);
+    }),
+    defaultForeground: colors?.defaultForeground ? RGBA2.fromHex(colors.defaultForeground) : RGBA2.clone(DEFAULT_FOREGROUND_FALLBACK),
+    defaultBackground: colors?.defaultBackground ? RGBA2.fromHex(colors.defaultBackground) : RGBA2.clone(DEFAULT_BACKGROUND_FALLBACK)
+  };
+}
+function buildTerminalPaletteSignature2(colors) {
+  const normalized = normalizeTerminalPalette2(colors);
+  const paletteSignature = normalized.palette.map((color) => color.toInts().join(",")).join(";");
+  return [
+    paletteSignature,
+    normalized.defaultForeground.toInts().join(","),
+    normalized.defaultBackground.toInts().join(",")
+  ].join("|");
+}
+
+// src/lib/paste.ts
+var PASTE_TEXT_DECODER = new TextDecoder;
+var ANSI_SEQUENCES = /(?:\x1b\[|\x9b)[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]?|(?:\x1b[P\]X^_]|[\x90\x98\x9d-\x9f])[^\x07\x1b\x9c]*(?:\x07|\x1b\\|\x9c)?|\x1b[\x20-\x2f]*[\x30-\x7e]?/g;
+function decodePasteBytes2(bytes) {
+  return PASTE_TEXT_DECODER.decode(bytes);
+}
+function stripAnsiSequences2(text) {
+  return text.replace(ANSI_SEQUENCES, "");
+}
+
+// src/lib/host-clipboard.internal.ts
+var DEFAULT_CLIPBOARD_TIMEOUT_MS = 1000;
+var DEFAULT_CLIPBOARD_MAX_BYTES = 8 * 1024 * 1024;
+var DEFAULT_CLIPBOARD_MAX_IMAGE_PIXELS = 64 * 1024 * 1024;
+var DEFAULT_CLIPBOARD_MAX_CONVERSION_BYTES = 512 * 1024 * 1024;
+var DEFAULT_CLIPBOARD_MAX_CONCURRENT_OPERATIONS = 16;
+var DEFAULT_CLIPBOARD_MAX_PROVIDER_TRANSFERS = 16;
+var MAX_U32 = 4294967295;
+var MIME_ESSENCE_PATTERN = /^[a-z0-9!#$%&'*+.^_`|~-]+\/[a-z0-9!#$%&'*+.^_`|~-]+$/i;
+var HOST_CLIPBOARD_MIME_PREFERENCE_COUNT_MAX = 64;
+var HOST_CLIPBOARD_MIME_ESSENCE_BYTES_MAX = 255;
+var validateU32 = (name, value) => {
+  if (!Number.isInteger(value) || value < 0 || value > MAX_U32) {
+    throw new RangeError(`${name} must be an integer from 0 through ${MAX_U32}`);
+  }
+  return value;
+};
+var validatePositiveU32 = (name, value) => {
+  const validated = validateU32(name, value);
+  if (validated === 0)
+    throw new RangeError(`${name} must be greater than zero`);
+  return validated;
+};
+var normalizeOptions = (options) => {
+  const waylandSeat = options.waylandSeat;
+  if (waylandSeat !== undefined && (typeof waylandSeat !== "string" || waylandSeat.length === 0 || waylandSeat.includes("\x00"))) {
+    throw new TypeError("waylandSeat must be a non-empty string without NUL characters");
+  }
+  return {
+    timeoutMs: validateU32("timeoutMs", options.timeoutMs ?? DEFAULT_CLIPBOARD_TIMEOUT_MS),
+    maxReadBytes: validateU32("maxReadBytes", options.maxReadBytes ?? DEFAULT_CLIPBOARD_MAX_BYTES),
+    maxWriteBytes: validateU32("maxWriteBytes", options.maxWriteBytes ?? DEFAULT_CLIPBOARD_MAX_BYTES),
+    maxImagePixels: validateU32("maxImagePixels", options.maxImagePixels ?? DEFAULT_CLIPBOARD_MAX_IMAGE_PIXELS),
+    maxConversionBytes: validateU32("maxConversionBytes", options.maxConversionBytes ?? DEFAULT_CLIPBOARD_MAX_CONVERSION_BYTES),
+    maxConcurrentOperations: validatePositiveU32("maxConcurrentOperations", options.maxConcurrentOperations ?? DEFAULT_CLIPBOARD_MAX_CONCURRENT_OPERATIONS),
+    maxProviderTransfers: validatePositiveU32("maxProviderTransfers", options.maxProviderTransfers ?? DEFAULT_CLIPBOARD_MAX_PROVIDER_TRANSFERS),
+    waylandSeat
+  };
+};
+var normalizePreferredTypes = (preferredTypes) => {
+  if (!Array.isArray(preferredTypes) || preferredTypes.length === 0) {
+    throw new TypeError("preferredTypes must contain at least one MIME essence type");
+  }
+  if (preferredTypes.length > HOST_CLIPBOARD_MIME_PREFERENCE_COUNT_MAX) {
+    throw new RangeError(`preferredTypes must contain at most ${HOST_CLIPBOARD_MIME_PREFERENCE_COUNT_MAX} MIME essence types`);
+  }
+  const normalized = preferredTypes.map((mimeType) => {
+    if (typeof mimeType !== "string") {
+      throw new TypeError("preferredTypes must contain valid MIME essence types without parameters");
+    }
+    if (mimeType.length > HOST_CLIPBOARD_MIME_ESSENCE_BYTES_MAX) {
+      throw new RangeError(`preferredTypes MIME essences must be at most ${HOST_CLIPBOARD_MIME_ESSENCE_BYTES_MAX} ASCII bytes`);
+    }
+    if (!MIME_ESSENCE_PATTERN.test(mimeType)) {
+      throw new TypeError("preferredTypes must contain valid MIME essence types without parameters");
+    }
+    return mimeType.toLowerCase();
+  });
+  return normalized;
+};
+var normalizeSelection = (selection) => {
+  const normalized = selection ?? "clipboard";
+  if (normalized !== "clipboard" && normalized !== "primary") {
+    throw new TypeError("selection must be clipboard or primary");
+  }
+  return normalized;
+};
+var validateClipboardText = (text, maxWriteBytes) => {
+  if (typeof text !== "string" || text.length === 0)
+    throw new TypeError("writeText requires non-empty text");
+  if (text.includes("\x00"))
+    throw new TypeError("writeText does not support NUL characters");
+  const byteLimit = Math.min(maxWriteBytes, MAX_U32);
+  let byteLength = 0;
+  for (const character of text) {
+    const codePoint = character.codePointAt(0);
+    if (codePoint >= 55296 && codePoint <= 57343) {
+      throw new TypeError("writeText does not support unpaired UTF-16 surrogates");
+    }
+    if (codePoint <= 127) {
+      byteLength += 1;
+    } else if (codePoint <= 2047) {
+      byteLength += 2;
+    } else if (codePoint <= 65535) {
+      byteLength += 3;
+    } else {
+      byteLength += 4;
+    }
+    if (byteLength > byteLimit) {
+      throw new RangeError(`writeText exceeds the configured ${maxWriteBytes} byte limit`);
+    }
+  }
+};
+var createActiveOperation = (callerSignal) => {
+  const controller = new AbortController;
+  let settle = () => {};
+  const settled = new Promise((resolve) => {
+    settle = resolve;
+  });
+  if (callerSignal) {
+    callerSignal.addEventListener("abort", () => controller.abort(callerSignal.reason), {
+      once: true,
+      signal: controller.signal
+    });
+  }
+  return { controller, settled, settle };
+};
+var runTrackedOperation = (active, callerSignal, operation) => {
+  const state = createActiveOperation(callerSignal);
+  active.add(state);
+  let result;
+  try {
+    result = operation(state.controller.signal);
+  } catch (error) {
+    result = Promise.reject(error);
+  }
+  return result.finally(() => {
+    active.delete(state);
+    state.controller.abort();
+    state.settle();
+  });
+};
+var createHostClipboardWithBackend = (options, createBackend) => {
+  const config = normalizeOptions(options);
+  const backend = createBackend(config);
+  const active = new Set;
+  let disposed = false;
+  let disposePromise;
+  const assertUsable = () => {
+    if (disposed)
+      throw new Error("Host clipboard service is disposed");
+  };
+  return {
+    maxWriteBytes: config.maxWriteBytes,
+    read(readOptions) {
+      try {
+        assertUsable();
+        const preferredTypes = normalizePreferredTypes(readOptions.preferredTypes);
+        const selection = normalizeSelection(readOptions.selection);
+        if (readOptions.signal?.aborted)
+          return Promise.resolve({ status: "cancelled" });
+        if (config.timeoutMs === 0)
+          return Promise.resolve({ status: "timed-out" });
+        return runTrackedOperation(active, readOptions.signal, async (signal) => {
+          const result = await backend.read({
+            preferredTypes,
+            selection,
+            maxBytes: config.maxReadBytes,
+            timeoutMs: config.timeoutMs,
+            signal
+          });
+          if (result.status !== "read")
+            return result;
+          if (result.representation.bytes.byteLength > config.maxReadBytes)
+            return { status: "limit-exceeded" };
+          return { status: "read", representation: result.representation };
+        });
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    writeText(text, operationOptions = {}) {
+      try {
+        assertUsable();
+        validateClipboardText(text, config.maxWriteBytes);
+        const selection = normalizeSelection(operationOptions.selection);
+        if (operationOptions.signal?.aborted)
+          return Promise.resolve({ status: "cancelled" });
+        if (config.timeoutMs === 0)
+          return Promise.resolve({ status: "timed-out" });
+        return runTrackedOperation(active, operationOptions.signal, (signal) => backend.writeText(text, { selection, timeoutMs: config.timeoutMs, signal }));
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    clear(operationOptions = {}) {
+      try {
+        assertUsable();
+        const selection = normalizeSelection(operationOptions.selection);
+        if (operationOptions.signal?.aborted)
+          return Promise.resolve({ status: "cancelled" });
+        if (config.timeoutMs === 0)
+          return Promise.resolve({ status: "timed-out" });
+        return runTrackedOperation(active, operationOptions.signal, (signal) => backend.clear({ selection, timeoutMs: config.timeoutMs, signal }));
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    dispose() {
+      if (disposePromise)
+        return disposePromise;
+      disposed = true;
+      for (const operation of active)
+        operation.controller.abort();
+      disposePromise = (async () => {
+        await Promise.all([...active].map((operation) => operation.settled));
+        await backend.dispose();
+      })();
+      return disposePromise;
+    }
+  };
+};
+
+// src/lib/host-clipboard.native.ts
+var SHUTDOWN_POLL_INTERVAL_MS = 1;
+var OPERATION_POLL_INTERVAL_MS = 1;
+var PROVIDER_POLL_INTERVAL_MS = 8;
+var MAX_WORK_UNITS_PER_DRAIN = 64;
+var selectionValue = (selection) => selection === "clipboard" ? 0 : 1;
+var encodeReadRequest = (preferredTypes) => {
+  const encoder = new TextEncoder;
+  const encoded = preferredTypes.map((mimeType) => encoder.encode(mimeType));
+  const size = encoded.reduce((total, mimeType) => total + 4 + mimeType.byteLength, 4);
+  const request = new Uint8Array(size);
+  const view = new DataView(request.buffer);
+  view.setUint32(0, encoded.length, true);
+  let offset = 4;
+  for (const mimeType of encoded) {
+    view.setUint32(offset, mimeType.byteLength, true);
+    offset += 4;
+    request.set(mimeType, offset);
+    offset += mimeType.byteLength;
+  }
+  return request;
+};
+var startFailure = (status) => ({
+  status: "failed",
+  error: new Error(`Native clipboard operation failed to start (${NativeClipboardStartStatus2[status]})`)
+});
+
+class NativeClipboardBackend {
+  maxImagePixels;
+  maxConversionBytes;
+  library;
+  service;
+  pending = new Map;
+  pollTimer;
+  pollTimerForOperation = false;
+  providerActive = false;
+  disposed = false;
+  disposePromise;
+  constructor(maxImagePixels, maxConversionBytes, maxConcurrentOperations, maxProviderTransfers, waylandSeat) {
+    this.maxImagePixels = maxImagePixels;
+    this.maxConversionBytes = maxConversionBytes;
+    this.library = resolveRenderLib2();
+    const service = this.library.clipboardServiceCreate(maxConcurrentOperations, maxProviderTransfers, waylandSeat);
+    if (!service)
+      throw new Error("Failed to create native clipboard service");
+    this.service = service;
+  }
+  read(options) {
+    const request = encodeReadRequest(options.preferredTypes);
+    const started = this.library.clipboardReadOperationStart(this.service, request, selectionValue(options.selection), options.maxBytes, this.maxImagePixels, this.maxConversionBytes, options.timeoutMs);
+    return this.track(started, options.signal, "read");
+  }
+  writeText(text, options) {
+    const started = this.library.clipboardWriteOperationStart(this.service, new TextEncoder().encode(text), selectionValue(options.selection), options.timeoutMs);
+    return this.track(started, options.signal, "write");
+  }
+  clear(options) {
+    const started = this.library.clipboardClearOperationStart(this.service, selectionValue(options.selection), options.timeoutMs);
+    return this.track(started, options.signal, "clear");
+  }
+  dispose() {
+    if (this.disposePromise)
+      return this.disposePromise;
+    this.disposed = true;
+    this.disposePromise = this.shutdown();
+    return this.disposePromise;
+  }
+  track(started, signal, kind) {
+    if (this.disposed)
+      return Promise.reject(new Error("Native clipboard backend is disposed"));
+    if (started.status !== NativeClipboardStartStatus2.Ok || !started.operation) {
+      return Promise.resolve(startFailure(started.status));
+    }
+    return new Promise((resolve, reject) => {
+      const operation = { handle: started.operation, kind, signal, resolve, reject };
+      this.pending.set(operation.handle, operation);
+      signal.addEventListener("abort", () => this.requestCancel(operation), { once: true });
+      this.ensureScheduled();
+      this.drain();
+    });
+  }
+  requestCancel(operation) {
+    if (!this.pending.has(operation.handle))
+      return;
+    try {
+      this.library.clipboardOperationCancel(operation.handle);
+    } catch (error) {
+      operation.cleanupError ??= error;
+    }
+    this.ensureScheduled();
+  }
+  ensureScheduled() {
+    const hasPendingOperation = this.pending.size > 0;
+    if (!hasPendingOperation && !this.providerActive) {
+      this.clearPollTimer();
+      return;
+    }
+    if (this.pollTimer !== undefined) {
+      if (hasPendingOperation && !this.pollTimerForOperation)
+        this.clearPollTimer();
+      else {
+        if (hasPendingOperation)
+          this.pollTimer.ref();
+        else
+          this.pollTimer.unref();
+        return;
+      }
+    }
+    this.pollTimerForOperation = hasPendingOperation;
+    this.pollTimer = setTimeout(() => {
+      this.pollTimer = undefined;
+      this.pollTimerForOperation = false;
+      this.drain();
+    }, hasPendingOperation ? OPERATION_POLL_INTERVAL_MS : PROVIDER_POLL_INTERVAL_MS);
+    if (!hasPendingOperation)
+      this.pollTimer.unref();
+  }
+  clearPollTimer() {
+    if (this.pollTimer === undefined)
+      return;
+    clearTimeout(this.pollTimer);
+    this.pollTimer = undefined;
+    this.pollTimerForOperation = false;
+  }
+  drain() {
+    this.providerActive = false;
+    try {
+      this.providerActive = this.library.clipboardServiceDrain(this.service) === 1;
+    } catch (error) {
+      for (const operation of this.pending.values()) {
+        operation.cleanupError ??= error;
+        try {
+          this.library.clipboardOperationCancel(operation.handle);
+        } catch {}
+      }
+    }
+    let workUnits = 0;
+    while (workUnits < MAX_WORK_UNITS_PER_DRAIN && this.pending.size > 0) {
+      const operation = this.pending.values().next().value;
+      if (!operation)
+        break;
+      workUnits += 1;
+      try {
+        if (operation.cleanupError !== undefined) {
+          try {
+            this.library.clipboardOperationCancel(operation.handle);
+          } catch {}
+          const status = this.library.clipboardOperationPoll(operation.handle);
+          if (status === NativeClipboardOperationStatus2.Pending) {
+            this.rotate(operation);
+            continue;
+          }
+          this.providerActive = true;
+          const destroyed = this.library.clipboardOperationDestroy(operation.handle);
+          if (destroyed === NativeClipboardDestroyStatus2.NotReady) {
+            this.rotate(operation);
+            continue;
+          }
+          this.pending.delete(operation.handle);
+          operation.reject(operation.cleanupError);
+          continue;
+        }
+        if (operation.signal.aborted)
+          this.library.clipboardOperationCancel(operation.handle);
+        const status = this.library.clipboardOperationPoll(operation.handle);
+        if (status === NativeClipboardOperationStatus2.Pending) {
+          this.rotate(operation);
+          continue;
+        }
+        this.providerActive = true;
+        const result = this.readResult(operation.handle, operation.kind, status);
+        const destroyed = this.library.clipboardOperationDestroy(operation.handle);
+        if (destroyed === NativeClipboardDestroyStatus2.NotReady) {
+          this.rotate(operation);
+          continue;
+        }
+        this.pending.delete(operation.handle);
+        operation.resolve(destroyed === NativeClipboardDestroyStatus2.Destroyed ? result : { status: "failed", error: new Error("Native clipboard operation became invalid before destruction") });
+      } catch (error) {
+        operation.cleanupError ??= error;
+        try {
+          this.library.clipboardOperationCancel(operation.handle);
+        } catch {}
+        this.rotate(operation);
+      }
+    }
+    this.ensureScheduled();
+  }
+  rotate(operation) {
+    this.pending.delete(operation.handle);
+    this.pending.set(operation.handle, operation);
+  }
+  readResult(handle, kind, status) {
+    switch (status) {
+      case NativeClipboardOperationStatus2.Read:
+        return kind === "read" ? this.readRepresentation(handle) : this.invalidResult(kind, status);
+      case NativeClipboardOperationStatus2.Empty:
+        return kind === "read" ? { status: "empty" } : this.invalidResult(kind, status);
+      case NativeClipboardOperationStatus2.Written:
+        return kind === "write" ? { status: "written" } : this.invalidResult(kind, status);
+      case NativeClipboardOperationStatus2.Cleared:
+        return kind === "clear" ? { status: "cleared" } : this.invalidResult(kind, status);
+      case NativeClipboardOperationStatus2.Unsupported:
+        return { status: "unsupported" };
+      case NativeClipboardOperationStatus2.Cancelled:
+        return { status: "cancelled" };
+      case NativeClipboardOperationStatus2.TimedOut:
+        return { status: "timed-out" };
+      case NativeClipboardOperationStatus2.LimitExceeded:
+        return kind === "read" ? { status: "limit-exceeded" } : this.invalidResult(kind, status);
+      case NativeClipboardOperationStatus2.Failed:
+        return { status: "failed", error: this.readError(handle) };
+      default:
+        return { status: "failed", error: new Error("Native clipboard operation returned an invalid status") };
+    }
+  }
+  invalidResult(kind, status) {
+    return {
+      status: "failed",
+      error: new Error(`Native clipboard ${kind} returned inapplicable status ${NativeClipboardOperationStatus2[status]}`)
+    };
+  }
+  readRepresentation(handle) {
+    const mimeLength = this.library.clipboardOperationResultMimeLength(handle);
+    const dataLength = this.library.clipboardOperationResultDataLength(handle);
+    if (mimeLength.status !== NativeClipboardCopyStatus2.Ok || dataLength.status !== NativeClipboardCopyStatus2.Ok) {
+      return { status: "failed", error: new Error("Failed to read native clipboard result lengths") };
+    }
+    const mime = new Uint8Array(mimeLength.length);
+    const bytes = new Uint8Array(dataLength.length);
+    if (this.library.clipboardOperationResultMimeCopy(handle, mime) !== NativeClipboardCopyStatus2.Ok || this.library.clipboardOperationResultDataCopy(handle, bytes) !== NativeClipboardCopyStatus2.Ok) {
+      return { status: "failed", error: new Error("Failed to copy native clipboard result") };
+    }
+    return { status: "read", representation: { mimeType: new TextDecoder().decode(mime), bytes } };
+  }
+  readError(handle) {
+    const code = this.library.clipboardOperationResultErrorCode(handle);
+    const length = this.library.clipboardOperationResultDiagnosticLength(handle);
+    if (code.status !== NativeClipboardCopyStatus2.Ok || length.status !== NativeClipboardCopyStatus2.Ok) {
+      return new Error("Native clipboard operation failed without a readable diagnostic");
+    }
+    const diagnostic = new Uint8Array(length.length);
+    if (this.library.clipboardOperationResultDiagnosticCopy(handle, diagnostic) !== NativeClipboardCopyStatus2.Ok) {
+      return new Error("Native clipboard operation failed without a readable diagnostic");
+    }
+    return Object.assign(new Error(new TextDecoder().decode(diagnostic)), { code: code.errorCode });
+  }
+  async shutdown() {
+    this.clearPollTimer();
+    let status = this.library.clipboardServiceBeginShutdown(this.service);
+    while (status === NativeClipboardShutdownStatus2.Pending) {
+      await new Promise((resolve) => setTimeout(resolve, SHUTDOWN_POLL_INTERVAL_MS));
+      status = this.library.clipboardServicePollShutdown(this.service);
+    }
+    if (status !== NativeClipboardShutdownStatus2.Ready)
+      throw new Error("Native clipboard service became invalid");
+    if (this.library.clipboardServiceDestroy(this.service) !== NativeClipboardDestroyStatus2.Destroyed) {
+      throw new Error("Failed to destroy native clipboard service");
+    }
+  }
+}
+var createNativeHostClipboardBackend = (options) => new NativeClipboardBackend(options.maxImagePixels, options.maxConversionBytes, options.maxConcurrentOperations, options.maxProviderTransfers, options.waylandSeat);
+
+// src/lib/clipboard.ts
+var NOT_ATTEMPTED_TERMINAL = {
+  status: "not-attempted",
+  capability: "unknown"
+};
+var validateSelection = (selection) => {
+  const normalized = selection ?? "clipboard";
+  if (normalized !== "clipboard" && normalized !== "primary") {
+    throw new TypeError("selection must be clipboard or primary");
+  }
+  return normalized;
+};
+var createHostClipboard2 = (options = {}) => createHostClipboardWithBackend(options, createNativeHostClipboardBackend);
+var validateDestination = (destination) => {
+  if (destination !== "terminal-only" && destination !== "host-only" && destination !== "best-available" && destination !== "all-available") {
+    throw new TypeError("destination is not a supported clipboard policy");
+  }
+};
+var createClipboard2 = ({ host, terminal }) => {
+  const active = new Set;
+  let disposed = false;
+  let disposePromise;
+  const assertUsable = () => {
+    if (disposed)
+      throw new Error("Clipboard service is disposed");
+  };
+  const canUseRemoteHost = (options) => !terminal.remote || options.allowRemoteHost === true;
+  const inFlight = new Map;
+  const replace = (selection, newest) => {
+    const pending = inFlight.get(selection);
+    if (pending) {
+      pending.newest = newest;
+      pending.sent = undefined;
+    }
+    return pending;
+  };
+  const sendNewest = (pending) => {
+    const newest = pending.newest;
+    if (!newest.write)
+      return NOT_ATTEMPTED_TERMINAL;
+    if (pending.sent)
+      return pending.sent;
+    const result = newest.write();
+    if (pending.newest === newest && result.status === "attempted")
+      pending.sent = result;
+    return result;
+  };
+  const composeMutation = async (options, signal, selection, hostOperation, terminalOperation) => {
+    const now = () => {
+      const pending = replace(selection, { write: terminalOperation });
+      return { host: { status: "not-attempted" }, terminal: pending ? sendNewest(pending) : terminalOperation() };
+    };
+    if (options.destination === "terminal-only")
+      return now();
+    if (options.destination === "host-only") {
+      if (!canUseRemoteHost(options))
+        return { host: { status: "not-attempted" }, terminal: NOT_ATTEMPTED_TERMINAL };
+      replace(selection, { write: null });
+      return { host: await hostOperation(), terminal: NOT_ATTEMPTED_TERMINAL };
+    }
+    const bestAvailable = options.destination === "best-available";
+    if (bestAvailable ? terminal.remote : !canUseRemoteHost(options))
+      return now();
+    const newest = { write: bestAvailable ? undefined : terminalOperation };
+    const pending = replace(selection, newest) ?? { count: 0, newest };
+    pending.count++;
+    inFlight.set(selection, pending);
+    let hostResult;
+    let terminalResult;
+    try {
+      hostResult = await hostOperation();
+    } finally {
+      if (--pending.count === 0)
+        inFlight.delete(selection);
+      const status = hostResult?.status;
+      if (status === undefined || status === "written" || status === "cleared")
+        pending.sent = undefined;
+      if (newest.write === undefined) {
+        newest.write = !signal.aborted && (status === "unsupported" || status === "failed") ? terminalOperation : null;
+      }
+      terminalResult = sendNewest(pending);
+    }
+    return { host: hostResult, terminal: terminalResult };
+  };
+  return {
+    read(options) {
+      try {
+        assertUsable();
+        return host.read(options);
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    writeText(text, options) {
+      try {
+        assertUsable();
+        validateDestination(options.destination);
+        validateClipboardText(text, host.maxWriteBytes);
+        const selection = validateSelection(options.selection);
+        if (options.signal?.aborted) {
+          return Promise.resolve({ host: { status: "not-attempted" }, terminal: NOT_ATTEMPTED_TERMINAL });
+        }
+        return runTrackedOperation(active, options.signal, (signal) => {
+          const operationOptions = { selection, signal };
+          return composeMutation(options, signal, selection, () => host.writeText(text, operationOptions), () => terminal.writeText(text, selection));
+        });
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    clear(options) {
+      try {
+        assertUsable();
+        validateDestination(options.destination);
+        const selection = validateSelection(options.selection);
+        if (options.signal?.aborted) {
+          return Promise.resolve({ host: { status: "not-attempted" }, terminal: NOT_ATTEMPTED_TERMINAL });
+        }
+        return runTrackedOperation(active, options.signal, (signal) => {
+          const operationOptions = { selection, signal };
+          return composeMutation(options, signal, selection, () => host.clear(operationOptions), () => terminal.clear(selection));
+        });
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    dispose() {
+      if (disposePromise)
+        return disposePromise;
+      disposed = true;
+      for (const operation of active)
+        operation.controller.abort();
+      disposePromise = (async () => {
+        await Promise.all([...active].map((operation) => operation.settled));
+        await host.dispose();
+      })();
+      return disposePromise;
+    }
+  };
+};
+var ClipboardTarget2;
+((ClipboardTarget) => {
+  ClipboardTarget[ClipboardTarget["Clipboard"] = 0] = "Clipboard";
+  ClipboardTarget[ClipboardTarget["Primary"] = 1] = "Primary";
+  ClipboardTarget[ClipboardTarget["Select"] = 2] = "Select";
+  ClipboardTarget[ClipboardTarget["Secondary"] = 3] = "Secondary";
+})(ClipboardTarget2 ||= {});
+var createRendererClipboardAdapter2 = (renderer) => {
+  const targetFor = (selection) => selection === "primary" ? 1 /* Primary */ : 0 /* Clipboard */;
+  const capability = () => renderer.capabilities?.osc52_support ?? "unknown";
+  return {
+    get remote() {
+      return renderer.capabilities?.remote ?? true;
+    },
+    writeText(text, selection) {
+      const currentCapability = capability();
+      if (currentCapability === "unsupported")
+        return { status: "not-attempted", capability: currentCapability };
+      return {
+        status: renderer.copyToClipboardOSC52(text, targetFor(selection)) ? "attempted" : "local-failure",
+        capability: currentCapability
+      };
+    },
+    clear(selection) {
+      const currentCapability = capability();
+      if (currentCapability === "unsupported")
+        return { status: "not-attempted", capability: currentCapability };
+      return {
+        status: renderer.clearClipboardOSC52(targetFor(selection)) ? "attempted" : "local-failure",
+        capability: currentCapability
+      };
+    }
+  };
+};
+
+// src/lib/detect-links.ts
+var URL_SCOPES = ["markup.link.url", "string.special.url"];
+var HTTP_URL_PREFIX = /https?:\/\//i;
+var BARE_URL = /https?:\/\/[^\s<>"`]+/gi;
+function normalizeMarkdownLinkTarget(destination) {
+  return destination.replace(/\\([!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~])/g, "$1");
+}
+function detectLinks2(chunks, context) {
+  const content = context.content;
+  const highlights = context.highlights;
+  const hasBareUrl = HTTP_URL_PREFIX.test(content);
+  if (!hasBareUrl && !highlights.some(([, , group]) => URL_SCOPES.includes(group)))
+    return chunks;
+  const ranges = [];
+  const rawRanges = [];
+  const labels = new Map;
+  const concealedDelimiters = new Map;
+  for (let i = 0;i < highlights.length; i++) {
+    const [start, end, group, meta] = highlights[i];
+    if (group === "conceal" && meta?.conceal === "" && /^[*_~]+$/.test(content.slice(start, end))) {
+      concealedDelimiters.set(end, start);
+    }
+    if (group === "markup.raw" || group.startsWith("markup.raw.")) {
+      rawRanges.push({ start, end });
+    }
+    if (group === "markup.link.label") {
+      const existing = labels.get(end);
+      if (!existing || start < existing.start)
+        labels.set(end, { start, end });
+    }
+    if (!URL_SCOPES.includes(group))
+      continue;
+    const url = content.slice(start, end);
+    if (!url)
+      continue;
+    ranges.push({ start, end, url });
+  }
+  const highlightedCount = ranges.length;
+  for (let index = 0;index < highlightedCount; index++) {
+    const range = ranges[index];
+    let labelEnd = range.start;
+    if (content[labelEnd - 1] === "<")
+      labelEnd--;
+    while (labelEnd > 0 && /\s/.test(content[labelEnd - 1]))
+      labelEnd--;
+    if (content[labelEnd - 1] !== "(" || content[labelEnd - 2] !== "]")
+      continue;
+    const label = labels.get(labelEnd - 2);
+    if (!label)
+      continue;
+    range.url = normalizeMarkdownLinkTarget(range.url);
+    ranges.push({ ...label, url: range.url, label: true });
+  }
+  if (hasBareUrl) {
+    rawRanges.sort((a, b) => a.start - b.start || b.end - a.end);
+    ranges.sort((a, b) => a.start - b.start || b.end - a.end);
+    let rawIndex = 0;
+    let highlightedIndex = 0;
+    for (const match of content.matchAll(BARE_URL)) {
+      const start = match.index;
+      let url = match[0];
+      let openParens = 0;
+      let closeParens = 0;
+      for (const character of url) {
+        if (character === "(")
+          openParens++;
+        if (character === ")")
+          closeParens++;
+      }
+      while (url.length > 0) {
+        const delimiterStart = concealedDelimiters.get(start + url.length);
+        if (delimiterStart !== undefined && delimiterStart >= start) {
+          url = url.slice(0, delimiterStart - start);
+          continue;
+        }
+        const last = url[url.length - 1];
+        if (last === ")" && closeParens > openParens) {
+          closeParens--;
+        } else if (!".,!?;:]}'".includes(last)) {
+          break;
+        }
+        url = url.slice(0, -1);
+      }
+      const end = start + url.length;
+      if (!url)
+        continue;
+      while (rawIndex < rawRanges.length && rawRanges[rawIndex].end <= start)
+        rawIndex++;
+      if (rawIndex < rawRanges.length && rawRanges[rawIndex].start < end)
+        continue;
+      while (highlightedIndex < ranges.length && ranges[highlightedIndex].end <= start)
+        highlightedIndex++;
+      if (highlightedIndex < ranges.length && ranges[highlightedIndex].start < end)
+        continue;
+      ranges.push({ start, end, url, bare: true });
+    }
+  }
+  if (ranges.length === 0)
+    return chunks;
+  ranges.sort((a, b) => a.start - b.start || b.end - a.end || Number(b.label ?? false) - Number(a.label ?? false));
+  const bareStyle = context.syntaxStyle?.mergeStyles("markup.link.label");
+  const linkedChunks = [];
+  let contentPos = 0;
+  let rangeIndex = 0;
+  for (let index = 0;index < chunks.length; index++) {
+    const chunk = chunks[index];
+    if (!chunk.text || chunk.link) {
+      linkedChunks.push(chunk);
+      continue;
+    }
+    const providedRange = context.sourceRanges?.[index];
+    const start = providedRange?.start ?? content.indexOf(chunk.text, contentPos);
+    if (start < 0) {
+      linkedChunks.push(chunk);
+      continue;
+    }
+    const end = providedRange?.end ?? start + chunk.text.length;
+    contentPos = end;
+    while (rangeIndex < ranges.length && ranges[rangeIndex].end <= start)
+      rangeIndex++;
+    if (content.slice(start, end) !== chunk.text) {
+      const range = ranges[rangeIndex];
+      if (range?.label && range.start < end)
+        chunk.link = { url: range.url };
+      linkedChunks.push(chunk);
+      continue;
+    }
+    let position = start;
+    for (;rangeIndex < ranges.length; rangeIndex++) {
+      const range = ranges[rangeIndex];
+      if (range.end <= position)
+        continue;
+      if (range.start >= end)
+        break;
+      const linkStart = Math.max(position, range.start);
+      const linkEnd = Math.min(end, range.end);
+      if (linkStart > position) {
+        linkedChunks.push({ ...chunk, text: chunk.text.slice(position - start, linkStart - start) });
+      }
+      const linked = linkStart === start && linkEnd === end ? chunk : { ...chunk, text: chunk.text.slice(linkStart - start, linkEnd - start) };
+      linked.link = { url: range.url };
+      if (range.bare && bareStyle) {
+        if (bareStyle.fg)
+          linked.fg = bareStyle.fg;
+        if (bareStyle.bg)
+          linked.bg = bareStyle.bg;
+        linked.attributes = (linked.attributes ?? 0) | bareStyle.attributes;
+      }
+      linkedChunks.push(linked);
+      position = linkEnd;
+      if (position === end)
+        break;
+    }
+    if (position === start) {
+      linkedChunks.push(chunk);
+    } else if (position < end) {
+      linkedChunks.push({ ...chunk, text: chunk.text.slice(position - start) });
+    }
+  }
+  return linkedChunks;
+}
+// src/session-buffer.ts
+function acquireSessionBufferLease2(lib, context, session, which, frame = null) {
+  return frame ? lib.sceneFrameAcquireBufferLease(context, session, frame, which) : lib.sessionAcquireBufferLease(context, session, which);
+}
+
+// src/lib/buffer-access.ts
+function withBufferAccess(lib, context, lease, callback) {
+  try {
+    return withLazyBufferAccess(lease, (getCells) => callback(getCells()), () => lib.contextValidateBufferLease(context, lease.handle));
+  } finally {
+    lib.contextReleaseBufferLease(context, lease.handle);
+  }
+}
+function withLazyBufferAccess(snapshot, callback, validate) {
+  let active = true;
+  let cells;
+  const getCells = () => {
+    if (!active)
+      throw new Error("Buffer access scope has ended");
+    if (cells)
+      return cells;
+    const value = typeof snapshot === "function" ? snapshot() : snapshot;
+    let char;
+    let fg;
+    let bg;
+    let attributes;
+    const guard = () => {
+      if (!active)
+        throw new Error("Buffer access scope has ended");
+    };
+    cells = {
+      width: value.width,
+      height: value.height,
+      generation: value.generation,
+      get char() {
+        guard();
+        return char ??= new Uint32Array(toArrayBuffer(value.char, 0, value.width * value.height * 4));
+      },
+      get fg() {
+        guard();
+        return fg ??= new Uint16Array(toArrayBuffer(value.fg, 0, value.width * value.height * 8));
+      },
+      get bg() {
+        guard();
+        return bg ??= new Uint16Array(toArrayBuffer(value.bg, 0, value.width * value.height * 8));
+      },
+      get attributes() {
+        guard();
+        return attributes ??= new Uint32Array(toArrayBuffer(value.attributes, 0, value.width * value.height * 4));
+      }
+    };
+    return cells;
+  };
+  try {
+    const result = callback(getCells);
+    if (result !== null && (typeof result === "object" || typeof result === "function") && "then" in result && typeof result.then === "function") {
+      Promise.resolve(result).catch(() => {});
+      throw new TypeError("Buffer access callbacks must be synchronous");
+    }
+    validate();
+    return result;
+  } finally {
+    active = false;
+  }
+}
+
+// src/buffer.ts
+function requireInteger(value, name, min, max) {
+  if (!Number.isSafeInteger(value) || value < min || value > max) {
+    throw new RangeError(`${name} must be an integer from ${min} to ${max}`);
+  }
+}
+function packDrawOptions(border, shouldFill, titleAlignment, bottomTitleAlignment, fillDimsImages = false) {
+  let packed = 0;
+  if (border === true) {
+    packed |= 15;
+  } else if (Array.isArray(border)) {
+    if (border.includes("top"))
+      packed |= 8;
+    if (border.includes("right"))
+      packed |= 4;
+    if (border.includes("bottom"))
+      packed |= 2;
+    if (border.includes("left"))
+      packed |= 1;
+  }
+  if (shouldFill) {
+    packed |= 1 << 4;
+  }
+  const alignmentMap = {
+    left: 0,
+    center: 1,
+    right: 2
+  };
+  const alignment = alignmentMap[titleAlignment];
+  const bottomAlignment = alignmentMap[bottomTitleAlignment];
+  packed |= alignment << 5;
+  packed |= bottomAlignment << 7;
+  if (fillDimsImages) {
+    packed |= 1 << 9;
+  }
+  return packed;
+}
+var recordedFrameAccess = "Paint hooks record drawing and cannot read the frame. Draw into an owned buffer and compose it instead.";
+
+class ResourceContext2 {
+  renderLib = resolveRenderLib2();
+  context;
+  _disposed = false;
+  constructor(options) {
+    this.context = this.renderLib.createContext(options);
+  }
+  get disposed() {
+    return this._disposed;
+  }
+  get resourceContext() {
+    return this;
+  }
+  assertAlive() {
+    if (this._disposed)
+      throw new Error("Resource Context is destroyed");
+  }
+  destroy() {
+    if (this._disposed)
+      return;
+    this.renderLib.getYogaHost().runMutation(() => {
+      this.renderLib.destroyContext(this.context);
+      this._disposed = true;
+    });
+  }
+}
+var contextUnicode = new WeakMap;
+var contextUnicodeChars = new WeakMap;
+var nextUnicodeChar = 4294967296;
+
+class OptimizedBuffer2 {
+  static fbIdCounter = 0;
+  id;
+  lib;
+  source;
+  _width;
+  _height;
+  _widthMethod;
+  respectAlpha = false;
+  _destroyed = false;
+  _nativePaintAccess = null;
+  _bufferTarget;
+  guard() {
+    if (this._destroyed)
+      throw new Error(`Buffer ${this.id} is destroyed`);
+    if ("buffer" in this.source)
+      this.source.owner.assertAlive();
+  }
+  get recorder() {
+    return "recorder" in this.source ? this.source.recorder : null;
+  }
+  checkedTarget() {
+    const source = this.source;
+    if ("buffer" in source) {
+      return this._bufferTarget ??= Object.freeze({ context: source.context, target: source.buffer, frame: null });
+    }
+    if ("recorder" in source)
+      throw new Error(recordedFrameAccess);
+    const frame = source.getFrame?.();
+    if (source.which !== "next" || !frame)
+      throw new Error("Session scene drawing requires an active next frame");
+    return { context: source.context, target: source.session, frame };
+  }
+  _getSceneHandle(scene) {
+    this.guard();
+    const source = this.source;
+    if (!("buffer" in source) || source.owner !== scene.resourceContext || this.lib !== scene.resourceContext.renderLib) {
+      throw new Error("Scene binding requires a buffer owned by the same Context");
+    }
+    return source.buffer;
+  }
+  _getSceneDrawTarget(scene) {
+    this.guard();
+    scene.assertAlive();
+    const target = this.checkedTarget();
+    if (target.context !== scene.driver.context || this.lib !== scene.driver.renderLib) {
+      throw new Error("Scene drawing requires a buffer owned by the same Context");
+    }
+    return target;
+  }
+  drawChecked(options) {
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.draw(options);
+    this.lib.contextDrawBuffer(this.checkedTarget(), options);
+  }
+  _drawSceneBody(scene, node, x, y) {
+    this.guard();
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.view("scene", node, x, y);
+    this.lib.contextDrawSceneBody(this._getSceneDrawTarget(scene), node, x, y);
+  }
+  get buffers() {
+    this.guard();
+    if (this._nativePaintAccess !== null)
+      return this._nativePaintAccess();
+    if (this.recorder)
+      throw new Error(recordedFrameAccess);
+    throw new Error("Use withBuffers() for Context-owned framebuffer access");
+  }
+  withBuffers(callback) {
+    this.guard();
+    const lib = this.lib;
+    const source = this.source;
+    if ("recorder" in source)
+      throw new Error(recordedFrameAccess);
+    const lease = "session" in source ? acquireSessionBufferLease2(lib, source.context, source.session, source.which, source.getFrame?.()) : lib.contextAcquireBufferLease(source.context, source.buffer);
+    return withBufferAccess(lib, source.context, lease, callback);
+  }
+  _withNativePaint(callback) {
+    const source = this.source;
+    if ("recorder" in source)
+      throw new Error(recordedFrameAccess);
+    const lib = this.lib;
+    let lease;
+    const previous = this._nativePaintAccess;
+    try {
+      withLazyBufferAccess(() => lease ??= ("session" in source) ? acquireSessionBufferLease2(lib, source.context, source.session, source.which, source.getFrame?.()) : lib.contextAcquireBufferLease(source.context, source.buffer), (getCells) => {
+        this._nativePaintAccess = getCells;
+        callback();
+      }, () => {
+        if (lease)
+          lib.contextValidateBufferLease(source.context, lease.handle);
+      });
+    } finally {
+      this._nativePaintAccess = previous;
+      if (lease)
+        lib.contextReleaseBufferLease(source.context, lease.handle);
+    }
+  }
+  constructor(lib, source, width, height, options) {
+    this.id = options.id || `fb_${OptimizedBuffer2.fbIdCounter++}`;
+    this.lib = lib;
+    this.respectAlpha = options.respectAlpha || false;
+    this._width = width;
+    this._height = height;
+    this._widthMethod = options.widthMethod || "unicode";
+    this.source = source;
+  }
+  static fromRecorder(lib, context, session, recorder) {
+    const { width, height } = lib.sessionGetRendererState(context, session);
+    return new OptimizedBuffer2(lib, { context, session, recorder }, width, height, { id: "scene-recording" });
+  }
+  static fromSession(lib, context, session, which, getFrame) {
+    const { width, height } = lib.sessionGetRendererState(context, session);
+    return new OptimizedBuffer2(lib, { context, session, which, getFrame }, width, height, { id: `scene-${which}` });
+  }
+  static create(width, height, widthMethod, options) {
+    const owner = options?.owner?.resourceContext;
+    if (!owner)
+      throw new Error("OptimizedBuffer requires an explicit resource owner: pass { owner: renderer.nativeScene }, or a ResourceContext when there is no renderer");
+    owner.assertAlive();
+    const { renderLib: lib, context } = owner;
+    const buffer = lib.createContextBuffer(context, {
+      width,
+      height,
+      widthMethod,
+      respectAlpha: options.respectAlpha
+    });
+    try {
+      return new OptimizedBuffer2(lib, { context, buffer, owner }, width, height, { ...options, widthMethod });
+    } catch (error) {
+      try {
+        lib.destroyContextBuffer(context, buffer);
+      } catch {}
+      throw error;
+    }
+  }
+  get widthMethod() {
+    if ("session" in this.source) {
+      this.guard();
+      this._widthMethod = this.lib.sessionGetCapabilities(this.source.context, this.source.session).unicode;
+    }
+    return this._widthMethod;
+  }
+  get width() {
+    this.guard();
+    if ("session" in this.source)
+      return this.lib.sessionGetRendererState(this.source.context, this.source.session).width;
+    return this._width;
+  }
+  get height() {
+    this.guard();
+    if ("session" in this.source)
+      return this.lib.sessionGetRendererState(this.source.context, this.source.session).height;
+    return this._height;
+  }
+  setRespectAlpha(respectAlpha) {
+    this.guard();
+    this.drawChecked({ operation: "respectAlpha", enabled: respectAlpha });
+    this.respectAlpha = respectAlpha;
+  }
+  getRealCharBytes(addLineBreaks = false) {
+    return this.withResolvedChars({ addLineBreaks }, (bytes) => bytes);
+  }
+  withResolvedChars({ addLineBreaks, cellLengths }, callback) {
+    this.guard();
+    const lib = this.lib;
+    const source = this.source;
+    if ("recorder" in source)
+      throw new Error(recordedFrameAccess);
+    const lease = "session" in source ? acquireSessionBufferLease2(lib, source.context, source.session, source.which, source.getFrame?.()) : lib.contextAcquireBufferLease(source.context, source.buffer);
+    return withBufferAccess(lib, source.context, lease, (cells) => {
+      const size = lib.contextBufferLeaseGetRealCharSize(source.context, lease.handle, addLineBreaks);
+      const output = new Uint8Array(size);
+      const lengths = cellLengths ? new Uint8Array(cells.width * cells.height) : undefined;
+      const written = lib.contextBufferLeaseWriteResolvedChars(source.context, lease.handle, output, addLineBreaks, lengths);
+      return callback(output.subarray(0, written), cells, lengths);
+    });
+  }
+  getSpanLines() {
+    return this.withResolvedChars({ addLineBreaks: false, cellLengths: true }, (bytes, cells, lengths) => {
+      const { fg, bg, attributes, width, height } = cells;
+      const lines = [];
+      const decoder = new TextDecoder("utf-8", { ignoreBOM: true });
+      let offset = 0;
+      for (let y = 0;y < height; y++) {
+        const spans = [];
+        let currentSpan = null;
+        for (let x = 0;x < width; x++) {
+          const i = y * width + x;
+          const cellFg = RGBA2.fromArray(fg.subarray(i * 4, i * 4 + 4));
+          const cellBg = RGBA2.fromArray(bg.subarray(i * 4, i * 4 + 4));
+          const cellAttrs = getBaseAttributes2(attributes[i]);
+          const end = offset + lengths[i];
+          const cellChar = decoder.decode(bytes.subarray(offset, end));
+          offset = end;
+          if (currentSpan && currentSpan.fg.equals(cellFg) && currentSpan.bg.equals(cellBg) && currentSpan.attributes === cellAttrs) {
+            currentSpan.text += cellChar;
+            currentSpan.width += 1;
+          } else {
+            if (currentSpan) {
+              spans.push(currentSpan);
+            }
+            currentSpan = {
+              text: cellChar,
+              fg: cellFg,
+              bg: cellBg,
+              attributes: cellAttrs,
+              width: 1
+            };
+          }
+        }
+        if (currentSpan) {
+          spans.push(currentSpan);
+        }
+        lines.push({ spans });
+      }
+      return lines;
+    });
+  }
+  clear(bg = RGBA2.fromValues(0, 0, 0, 1)) {
+    this.guard();
+    this.drawChecked({ operation: "clear", background: bg });
+  }
+  setCell(x, y, char, fg, bg, attributes = 0) {
+    this.guard();
+    this.drawChecked({
+      operation: "cell",
+      x,
+      y,
+      char: char.codePointAt(0) ?? 32,
+      foreground: fg,
+      background: bg,
+      attributes
+    });
+  }
+  setCellWithAlphaBlending(x, y, char, fg, bg, attributes = 0) {
+    this.guard();
+    this.drawChecked({
+      operation: "cellBlend",
+      x,
+      y,
+      char: char.codePointAt(0) ?? 32,
+      foreground: fg,
+      background: bg,
+      attributes
+    });
+  }
+  drawText(text, x, y, fg, bg, attributes = 0, selection) {
+    this.guard();
+    if (!selection) {
+      this.drawChecked({ operation: "text", text, x, y, foreground: fg, background: bg, attributes });
+      return;
+    }
+    const { start, end } = selection;
+    let selectionBg;
+    let selectionFg;
+    if (selection.bgColor) {
+      selectionBg = selection.bgColor;
+      selectionFg = selection.fgColor || fg;
+    } else {
+      const defaultBg = bg || RGBA2.fromValues(0, 0, 0, 0);
+      selectionFg = defaultBg.a > 0 ? defaultBg : RGBA2.fromValues(0, 0, 0, 1);
+      selectionBg = fg;
+    }
+    if (start > 0) {
+      const beforeText = text.slice(0, start);
+      this.drawText(beforeText, x, y, fg, bg, attributes);
+    }
+    if (end > start) {
+      const selectedText = text.slice(start, end);
+      this.drawText(selectedText, x + start, y, selectionFg, selectionBg, attributes);
+    }
+    if (end < text.length) {
+      const afterText = text.slice(end);
+      this.drawText(afterText, x + end, y, fg, bg, attributes);
+    }
+  }
+  drawTextFit(text, x, y, maxWidth, fg, bg, ellipsis = false) {
+    this.guard();
+    if (maxWidth < 1)
+      return;
+    this.drawChecked({ operation: "text", text, x, y, maxWidth, ellipsis, foreground: fg, background: bg });
+  }
+  fillRect(x, y, width, height, bg) {
+    this.guard();
+    if (width <= 0 || height <= 0)
+      return;
+    this.drawChecked({ operation: "fill", x, y, width, height, background: bg });
+  }
+  colorMatrix(matrix, cellMask, strength = 1, target = 3 /* Both */) {
+    this.guard();
+    if (matrix.length !== 16)
+      throw new RangeError(`colorMatrix matrix must have length 16, got ${matrix.length}`);
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.colorMatrix(matrix, cellMask, strength, target);
+    const destination = this.checkedTarget();
+    this.lib.contextColorMatrixBuffer(destination, matrix, cellMask, strength, target);
+  }
+  colorMatrixUniform(matrix, strength = 1, target = 3 /* Both */) {
+    this.guard();
+    if (matrix.length !== 16)
+      throw new RangeError(`colorMatrixUniform matrix must have length 16, got ${matrix.length}`);
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.colorMatrix(matrix, null, strength, target);
+    const destination = this.checkedTarget();
+    this.lib.contextColorMatrixBuffer(destination, matrix, null, strength, target);
+  }
+  drawFrameBuffer(destX, destY, frameBuffer, sourceX, sourceY, sourceWidth, sourceHeight) {
+    this.guard();
+    frameBuffer.guard();
+    const destination = this.source;
+    const source = frameBuffer.source;
+    if (!("buffer" in source) || source.context !== destination.context || frameBuffer.lib !== this.lib) {
+      throw new Error("Scene composition requires a buffer owned by the same Context");
+    }
+    this.drawChecked({
+      operation: "compose",
+      source: source.buffer,
+      x: destX,
+      y: destY,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight
+    });
+  }
+  destroy() {
+    if (this._destroyed)
+      return;
+    const source = this.source;
+    if ("buffer" in source && !source.owner.disposed) {
+      const release = () => {
+        if (!source.owner.disposed)
+          this.lib.destroyContextBuffer(source.context, source.buffer);
+      };
+      this.lib.releaseAfterPaint(source.context, release);
+    }
+    this._destroyed = true;
+  }
+  drawTextBuffer(textBufferView, x, y) {
+    this.guard();
+    const owner = textBufferView._getOwner();
+    if (owner.renderLib !== this.lib || owner.context !== this.source.context) {
+      throw new Error("Text drawing requires a view owned by the same Context");
+    }
+    const view = textBufferView._getSceneHandle(owner);
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.view("text", view, x, y);
+    this.lib.contextDrawTextBufferView(this.checkedTarget(), view, x, y);
+  }
+  drawEditorView(editorView, x, y) {
+    this.guard();
+    const owner = editorView._getOwner();
+    if (owner.renderLib !== this.lib || owner.context !== this.source.context) {
+      throw new Error("Editor drawing requires a view owned by the same Context");
+    }
+    const view = editorView._getSceneHandle(owner);
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.view("editor", view, x, y);
+    this.lib.contextDrawEditorView(this.checkedTarget(), view, x, y);
+  }
+  drawSuperSampleBuffer(x, y, pixelData, pixelDataLength, format, alignedBytesPerRow) {
+    this.guard();
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.supersample(pixelData, pixelDataLength, x, y, format, alignedBytesPerRow);
+    const target = this.checkedTarget();
+    this.lib.contextDrawSuperSampleBuffer(target, pixelData, pixelDataLength, x, y, format, alignedBytesPerRow);
+  }
+  drawImage(image, x, y, width, height, pixelWidth = 0, pixelHeight = 0, sourceX = 0, sourceY = 0, sourceWidth = image.width, sourceHeight = image.height, protocol = "auto", opacityOverride, preserveAspect) {
+    this.guard();
+    requireInteger(x, "x", -2147483648, 2147483647);
+    requireInteger(y, "y", -2147483648, 2147483647);
+    requireInteger(width, "width", 1, 2147483647);
+    requireInteger(height, "height", 1, 2147483647);
+    requireInteger(pixelWidth, "pixelWidth", 0, 2147483647);
+    requireInteger(pixelHeight, "pixelHeight", 0, 2147483647);
+    requireInteger(sourceX, "sourceX", 0, 4294967295);
+    requireInteger(sourceY, "sourceY", 0, 4294967295);
+    requireInteger(sourceWidth, "sourceWidth", 1, 4294967295);
+    requireInteger(sourceHeight, "sourceHeight", 1, 4294967295);
+    if (x + width > 2147483647 || y + height > 2147483647) {
+      throw new RangeError("image destination coordinates and dimensions exceed i32 bounds");
+    }
+    const options = {
+      x,
+      y,
+      width,
+      height,
+      pixelWidth,
+      pixelHeight,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      protocol,
+      opacityOverride: opacityOverride ?? null,
+      preserveAspect: preserveAspect === true
+    };
+    const handle = image._getContextHandle(this.lib, this.source.context);
+    const recorder = this.recorder;
+    if (recorder) {
+      recorder.image(handle, options);
+      return true;
+    }
+    return this.lib.contextDrawImage(this.checkedTarget(), handle, options);
+  }
+  drawPackedBuffer(data, dataLen, posX, posY, terminalWidthCells, terminalHeightCells) {
+    this.guard();
+    if (dataLen <= 0 || terminalWidthCells <= 0 || terminalHeightCells <= 0)
+      return;
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.packed(data, dataLen, posX, posY, terminalWidthCells, terminalHeightCells);
+    const target = this.checkedTarget();
+    this.lib.contextDrawPackedBuffer(target, data, dataLen, posX, posY, terminalWidthCells, terminalHeightCells);
+  }
+  drawGrayscaleBuffer(posX, posY, intensities, srcWidth, srcHeight, fg = null, bg = null) {
+    this.guard();
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.grayscale(intensities, posX, posY, srcWidth, srcHeight, fg, bg, false);
+    const target = this.checkedTarget();
+    this.lib.contextDrawGrayscaleBuffer(target, intensities, posX, posY, srcWidth, srcHeight, fg, bg, false);
+  }
+  drawGrayscaleBufferSupersampled(posX, posY, intensities, srcWidth, srcHeight, fg = null, bg = null) {
+    this.guard();
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.grayscale(intensities, posX, posY, srcWidth, srcHeight, fg, bg, true);
+    const target = this.checkedTarget();
+    this.lib.contextDrawGrayscaleBuffer(target, intensities, posX, posY, srcWidth, srcHeight, fg, bg, true);
+  }
+  resize(width, height) {
+    this.guard();
+    const source = this.source;
+    if (!("buffer" in source)) {
+      throw new Error("Resizing a Session scene framebuffer is unsupported");
+    }
+    if (this._width === width && this._height === height)
+      return;
+    this.lib.contextResizeBuffer(source.context, source.buffer, width, height);
+    this._width = width;
+    this._height = height;
+  }
+  drawBox(options) {
+    this.guard();
+    if (options.width <= 0 || options.height <= 0)
+      return;
+    const style = parseBorderStyle2(options.borderStyle, "single");
+    const borderChars = options.customBorderChars ?? BorderCharArrays2[style];
+    const packedOptions = packDrawOptions(options.border, options.shouldFill ?? false, options.titleAlignment || "left", options.bottomTitleAlignment || "left", options.fillDimsImages ?? false);
+    this.drawChecked({
+      operation: "box",
+      x: options.x,
+      y: options.y,
+      width: options.width,
+      height: options.height,
+      borderChars,
+      packedOptions,
+      foreground: options.borderColor,
+      background: options.backgroundColor,
+      titleColor: options.titleColor ?? options.borderColor,
+      text: options.title,
+      bottomTitle: options.bottomTitle
+    });
+  }
+  pushScissorRect(x, y, width, height) {
+    this.guard();
+    this.stackChecked({ operation: "pushScissor", x, y, width: Math.max(0, width), height: Math.max(0, height) });
+  }
+  popScissorRect() {
+    this.guard();
+    this.stackChecked({ operation: "popScissor" });
+  }
+  clearScissorRects() {
+    this.guard();
+    this.stackChecked({ operation: "clearScissors" });
+  }
+  pushOpacity(opacity) {
+    this.guard();
+    this.stackChecked({ operation: "pushOpacity", opacity });
+  }
+  popOpacity() {
+    this.guard();
+    this.stackChecked({ operation: "popOpacity" });
+  }
+  getCurrentOpacity() {
+    this.guard();
+    return this.stackChecked({ operation: "getOpacity" });
+  }
+  clearOpacity() {
+    this.guard();
+    this.stackChecked({ operation: "clearOpacity" });
+  }
+  stackChecked(options) {
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.stack(options);
+    return this.lib.contextBufferStack(this.checkedTarget(), options);
+  }
+  encodeUnicode(text) {
+    this.guard();
+    const context = this.source.context;
+    const handle = this.lib.createContextUnicode(context, text, this.widthMethod);
+    const owner = { lib: this.lib, handle, tokens: [] };
+    let chars = contextUnicodeChars.get(context);
+    if (!chars)
+      contextUnicodeChars.set(context, chars = new Map);
+    try {
+      const data = this.lib.getContextUnicode(context, handle);
+      if (data.length > Number.MAX_SAFE_INTEGER - nextUnicodeChar)
+        throw new RangeError("Unicode token limit reached");
+      data.forEach((glyph, index) => {
+        if (glyph.char <= 1114111)
+          return;
+        glyph.char = nextUnicodeChar++;
+        owner.tokens.push(glyph.char);
+        chars.set(glyph.char, { owner, index });
+      });
+      const encoded = { data };
+      contextUnicode.set(encoded, owner);
+      return encoded;
+    } catch (error) {
+      for (const token of owner.tokens)
+        chars.delete(token);
+      try {
+        this.lib.destroyContextUnicode(context, handle);
+      } catch {}
+      throw error;
+    }
+  }
+  freeUnicode(encoded) {
+    this.guard();
+    const native = contextUnicode.get(encoded);
+    if (!native || native.lib !== this.lib || native.handle.context !== this.source.context) {
+      throw new Error("Encoded Unicode must be live and owned by the same Context");
+    }
+    const context = this.source.context;
+    const release = () => this.lib.destroyContextUnicode(context, native.handle);
+    this.lib.releaseAfterPaint(context, release);
+    const chars = contextUnicodeChars.get(this.source.context);
+    for (const token of native.tokens)
+      chars.delete(token);
+    contextUnicode.delete(encoded);
+  }
+  drawGrid(options) {
+    this.guard();
+    const recorder = this.recorder;
+    if (recorder)
+      return recorder.grid(options);
+    const target = this.checkedTarget();
+    this.lib.contextDrawGrid(target, options);
+  }
+  drawChar(char, x, y, fg, bg, attributes = 0) {
+    this.guard();
+    if (char > 4294967295) {
+      const glyph = contextUnicodeChars.get(this.source.context)?.get(char);
+      if (!glyph || glyph.owner.lib !== this.lib) {
+        throw new Error("Encoded Unicode must be live and owned by the same Context");
+      }
+      const recorder = this.recorder;
+      if (recorder)
+        return recorder.unicode(glyph.owner.handle, glyph.index, x, y, fg, bg, attributes);
+      this.lib.contextBufferDrawUnicode(this.checkedTarget(), glyph.owner.handle, glyph.index, x, y, fg, bg, attributes);
+      return;
+    }
+    this.drawChecked({ operation: "char", char, x, y, foreground: fg, background: bg, attributes });
+  }
+}
+
+// src/Renderable.ts
+import { EventEmitter as EventEmitter4 } from "events";
+import util from "util";
+
+// src/lib/renderable.validations.ts
+function validateOptions(id, options) {
+  if (typeof options.width === "number") {
+    if (options.width < 0) {
+      throw new TypeError(`Invalid width for Renderable ${id}: ${options.width}`);
+    }
+  }
+  if (typeof options.height === "number") {
+    if (options.height < 0) {
+      throw new TypeError(`Invalid height for Renderable ${id}: ${options.height}`);
+    }
+  }
+}
+function isValidPercentage(value) {
+  if (typeof value === "string" && value.endsWith("%")) {
+    const numPart = value.slice(0, -1);
+    const num = parseFloat(numPart);
+    return !Number.isNaN(num);
+  }
+  return false;
+}
+function isMarginType(value) {
+  if (typeof value === "number" && !Number.isNaN(value)) {
+    return true;
+  }
+  if (value === "auto") {
+    return true;
+  }
+  return isValidPercentage(value);
+}
+function isPaddingType(value) {
+  if (typeof value === "number" && !Number.isNaN(value)) {
+    return true;
+  }
+  return isValidPercentage(value);
+}
+function isPositionType(value) {
+  if (typeof value === "number" && !Number.isNaN(value)) {
+    return true;
+  }
+  if (value === "auto") {
+    return true;
+  }
+  return isValidPercentage(value);
+}
+function isPositionTypeType(value) {
+  return value === "relative" || value === "absolute";
+}
+function isOverflowType(value) {
+  return value === "visible" || value === "hidden" || value === "scroll";
+}
+function isDimensionType(value) {
+  return isPositionType(value);
+}
+function isFlexBasisType(value) {
+  if (typeof value === "string" && value.endsWith("%")) {
+    const percent = Number(value.slice(0, -1));
+    return percent === Number.parseFloat(value) && Math.abs(percent) <= 340282346638528860000000000000000000000;
+  }
+  return value === undefined || isPositionType(value);
+}
+function isSizeType(value) {
+  if (value === undefined) {
+    return true;
+  }
+  if (typeof value === "number" && !Number.isNaN(value)) {
+    return true;
+  }
+  return isValidPercentage(value);
+}
+
+// src/Renderable.ts
+var BrandedRenderable = Symbol.for("@opentui/core/Renderable");
+var hookNames = [
+  "renderSelf",
+  "onResize",
+  "onLayoutResize",
+  "onUpdate",
+  "renderBefore",
+  "renderAfter",
+  "onLifecyclePass"
+];
+var nativeSceneHookBeforeAfter = nativeConstants.OT_SCENE_HOOK_RENDER_BEFORE | nativeConstants.OT_SCENE_HOOK_RENDER_AFTER;
+function isRowFlexDirection(direction) {
+  return direction === FlexDirection2.Row || direction === FlexDirection2.RowReverse;
+}
+function clampOpacity(value) {
+  return value === undefined ? 1 : Math.max(0, Math.min(1, value));
+}
+var LayoutEvents2;
+((LayoutEvents) => {
+  LayoutEvents["LAYOUT_CHANGED"] = "layout-changed";
+  LayoutEvents["RESIZED"] = "resized";
+})(LayoutEvents2 ||= {});
+var RenderableEvents2;
+((RenderableEvents) => {
+  RenderableEvents["FOCUSED"] = "focused";
+  RenderableEvents["BLURRED"] = "blurred";
+  RenderableEvents["DESTROYED"] = "destroyed";
+})(RenderableEvents2 ||= {});
+var positionKeys = ["left", "top", "right", "bottom"];
+function isRenderable2(obj) {
+  return !!obj?.[BrandedRenderable];
+}
+
+class BaseRenderable2 extends EventEmitter4 {
+  [BrandedRenderable] = true;
+  static renderableNumber = 1;
+  _id;
+  num;
+  _dirty = false;
+  parent = null;
+  _visible = true;
+  constructor(options) {
+    super();
+    this.num = BaseRenderable2.renderableNumber++;
+    this._id = options.id ?? `renderable-${this.num}`;
+  }
+  get id() {
+    return this._id;
+  }
+  set id(value) {
+    this._id = value;
+  }
+  get isDirty() {
+    return this._dirty;
+  }
+  markClean() {
+    this._dirty = false;
+  }
+  markDirty() {
+    this._dirty = true;
+  }
+  destroy() {}
+  destroyRecursively() {}
+  get visible() {
+    return this._visible;
+  }
+  set visible(value) {
+    this._visible = value;
+  }
+}
+
+class Renderable2 extends BaseRenderable2 {
+  static defaultFocusable = false;
+  static renderablesByNumber = new Map;
+  static nativeIntegration = {
+    kind: "custom",
+    body: { native: this.prototype.renderSelf }
+  };
+  static baseHooks = {
+    renderSelf: this.prototype.renderSelf,
+    onResize: this.prototype.onResize,
+    onLayoutResize: this.prototype.onLayoutResize,
+    onUpdate: this.prototype.onUpdate,
+    renderBefore: undefined,
+    renderAfter: undefined,
+    onLifecyclePass: null
+  };
+  nativeIntegration;
+  _isDestroyed = false;
+  _cleanupInProgress = false;
+  _childCleanupInProgress = false;
+  _deferredCleanup;
+  _ctx;
+  _sceneHandle;
+  _yogaFreed = false;
+  _translateX = 0;
+  _translateY = 0;
+  _width;
+  _height;
+  _destroyedLayout;
+  _zIndex;
+  buffered;
+  frameBuffer = null;
+  _focusable = this.constructor.defaultFocusable;
+  _focused = false;
+  keypressHandler = null;
+  pasteHandler = null;
+  _live = false;
+  _animationFps;
+  stopAnimationTick;
+  animationDrawnFrame = -1;
+  _liveCount = 0;
+  _sizeChangeListener = undefined;
+  _hooks = Renderable2.baseHooks;
+  _nativeSceneHookGeneration = 0n;
+  _nativeSceneHooksRegistered = false;
+  _nativeSceneResize = false;
+  _paintLayout;
+  _observedLayout;
+  _observedLayoutRevision = -1;
+  _selectable = false;
+  _mouseListener = null;
+  _mouseListeners = {};
+  _pasteListener = undefined;
+  _keyListeners = {};
+  _positionType = "relative";
+  _overflow = "visible";
+  _position = {};
+  _opacity = 1;
+  _flexShrink = 1;
+  _childrenInLayoutOrder = [];
+  parent = null;
+  get onLifecyclePass() {
+    return this._hooks.onLifecyclePass;
+  }
+  set onLifecyclePass(value) {
+    this.setHook("onLifecyclePass", value);
+  }
+  get renderBefore() {
+    return this._hooks.renderBefore;
+  }
+  set renderBefore(value) {
+    this.setHook("renderBefore", value);
+  }
+  get renderAfter() {
+    return this._hooks.renderAfter;
+  }
+  set renderAfter(value) {
+    this.setHook("renderAfter", value);
+  }
+  constructor(ctx, options) {
+    super(options);
+    this._ctx = ctx;
+    this.nativeIntegration = new.target.nativeIntegration;
+    Renderable2.renderablesByNumber.set(this.num, this);
+    try {
+      validateOptions(this.id, options);
+      this._width = options.width ?? "auto";
+      this._height = options.height ?? "auto";
+      this._zIndex = options.zIndex ?? 0;
+      this._visible = options.visible !== false;
+      this.buffered = options.buffered ?? false;
+      this._live = options.live ?? false;
+      this._liveCount = this._live && this._visible ? 1 : 0;
+      this._opacity = clampOpacity(options.opacity);
+      ctx.nativeScene.createNode(this, options);
+      const hooks = {};
+      for (const name of hookNames)
+        hooks[name] = this[name];
+      for (const name of ["renderBefore", "renderAfter"]) {
+        if (options[name] !== undefined)
+          hooks[name] = Renderable2.normalizeHook(name, options[name]);
+      }
+      this.publishHooks(hooks);
+      this.setDisplay(this._visible ? Display2.Flex : Display2.None);
+      this.setupYogaProperties(options);
+      if (this.nativeIntegration.measure)
+        this.setMeasureFunc(this.nativeIntegration.measure.bind(this));
+      if (this._zIndex !== 0 || this._opacity !== 1 || this._focusable) {
+        ctx.nativeScene.setPaint(this, Renderable2.prototype.getNativeScenePaint.call(this));
+      }
+      this.applyEventOptions(options);
+      if (this.buffered) {
+        this.createFrameBuffer();
+      }
+      this.animationFps = options.animationFps;
+    } catch (error) {
+      try {
+        this.destroyLayoutBacking();
+      } catch {}
+      Renderable2.renderablesByNumber.delete(this.num);
+      throw error;
+    }
+  }
+  abortConstruction(error, cleanup) {
+    try {
+      this.destroyLayoutBacking((run) => {
+        this._isDestroyed = true;
+        this.updateAnimationTick();
+        Renderable2.renderablesByNumber.delete(this.num);
+        if (cleanup)
+          run(() => cleanup(run));
+        if (this.frameBuffer) {
+          const frameBuffer = this.frameBuffer;
+          this.frameBuffer = null;
+          run(() => frameBuffer.destroy());
+        }
+      });
+    } catch {}
+    throw error;
+  }
+  rollbackConstruction(error) {
+    try {
+      Renderable2.prototype.destroy.call(this);
+    } catch {}
+    throw error;
+  }
+  runCleanup(steps) {
+    let failure;
+    const run = (step) => {
+      try {
+        step();
+      } catch (error) {
+        failure ??= { error };
+      }
+    };
+    try {
+      steps(run);
+    } catch (error) {
+      if (!failure)
+        throw error;
+    }
+    if (failure)
+      throw failure.error;
+  }
+  assignOptions(target, options) {
+    if (options == null || this._isDestroyed || target._isDestroyed)
+      return;
+    this.assertMutable();
+    for (const key of Reflect.ownKeys(options)) {
+      if (!Object.getOwnPropertyDescriptor(options, key)?.enumerable)
+        continue;
+      const value = Reflect.get(options, key);
+      if (this._isDestroyed || target._isDestroyed)
+        return;
+      target[key] = value;
+    }
+  }
+  get focusable() {
+    return this._focusable;
+  }
+  set focusable(value) {
+    value ??= this.constructor.defaultFocusable;
+    if (this._focusable === value)
+      return;
+    this.setNativeScenePaint({ focusable: value });
+    this._focusable = value;
+    this.runCleanup((run) => {
+      if (!value)
+        run(() => this.blur());
+      run(() => this.requestRender());
+    });
+  }
+  get ctx() {
+    return this._ctx;
+  }
+  get visible() {
+    return this._visible;
+  }
+  get primaryAxis() {
+    const list = this.yogaGetEnum(YogaEnumKind.LayoutMode, nativeConstants.OT_LAYOUT_MODE_FLEX) === nativeConstants.OT_LAYOUT_MODE_LIST;
+    return !list && isRowFlexDirection(this.getFlexDirection()) ? "row" : "column";
+  }
+  set visible(value) {
+    value ??= true;
+    if (this._visible === value)
+      return;
+    this.runMutation(() => {
+      const wasVisible = this._visible;
+      this.setDisplay(value ? Display2.Flex : Display2.None);
+      this._visible = value;
+      if (this._live) {
+        if (!wasVisible && value) {
+          this.propagateLiveCount(1);
+        } else if (wasVisible && !value) {
+          this.propagateLiveCount(-1);
+        }
+      }
+      this.updateAnimationTick();
+      if (this._focused) {
+        this.blur();
+      }
+      this.requestRender();
+    });
+  }
+  get opacity() {
+    return this._opacity;
+  }
+  set opacity(value) {
+    const clamped = clampOpacity(value);
+    if (this._opacity !== clamped) {
+      this.setNativeScenePaint({ opacity: clamped });
+      this._opacity = clamped;
+      this.requestRender();
+    }
+  }
+  hasSelection() {
+    return false;
+  }
+  onSelectionChanged(selection) {
+    return false;
+  }
+  getSelectedText() {
+    return "";
+  }
+  shouldStartSelection(x, y) {
+    return false;
+  }
+  focus() {
+    if (this._isDestroyed || this._focused || !this._focusable)
+      return;
+    this._ctx.nativeScene.setFocus(this, true);
+    this._focused = true;
+    this.runCleanup((run) => {
+      run(() => this._ctx.focusRenderable(this));
+      run(() => this.requestRender());
+      if (this._isDestroyed || !this._focused || this._ctx.currentFocusedRenderable !== this)
+        return;
+      if (this.keypressHandler)
+        return;
+      this.keypressHandler = (key) => {
+        if (this._isDestroyed || !this._focused || this._ctx.currentFocusedRenderable !== this)
+          return;
+        this._keyListeners["down"]?.(key);
+        if (this._isDestroyed)
+          return;
+        if (!key.defaultPrevented && this.handleKeyPress) {
+          this.handleKeyPress(key);
+        }
+      };
+      this.pasteHandler = (event) => {
+        if (this._isDestroyed || !this._focused || this._ctx.currentFocusedRenderable !== this)
+          return;
+        this._pasteListener?.call(this, event);
+        if (this._isDestroyed)
+          return;
+        if (!event.defaultPrevented && this.handlePaste) {
+          this.handlePaste(event);
+        }
+      };
+      this.ctx._internalKeyInput.onInternal("keypress", this.keypressHandler);
+      this.ctx._internalKeyInput.onInternal("paste", this.pasteHandler);
+      run(() => this.propagateFocusChange(true));
+      run(() => this.emit("focused" /* FOCUSED */));
+    });
+  }
+  propagateFocusChange(_hasFocus) {
+    for (let parent = this.parent;parent; parent = parent.parent)
+      parent.markDirty();
+    this.requestRender();
+  }
+  blur() {
+    if (!this._focused)
+      return;
+    this._focused = false;
+    const keypress = this.keypressHandler;
+    const paste = this.pasteHandler;
+    this.keypressHandler = null;
+    this.pasteHandler = null;
+    this.runCleanup((run) => {
+      run(() => this._ctx.nativeScene.setFocus(this, false));
+      if (keypress)
+        run(() => this.ctx._internalKeyInput.offInternal("keypress", keypress));
+      if (paste)
+        run(() => this.ctx._internalKeyInput.offInternal("paste", paste));
+      run(() => this.propagateFocusChange(false));
+      if (!this._focused)
+        run(() => this._ctx.blurRenderable(this));
+      if (!this._focused)
+        run(() => this.emit("blurred" /* BLURRED */));
+    });
+  }
+  get focused() {
+    return this._focused;
+  }
+  get hasFocusedDescendant() {
+    const focused = this._ctx.currentFocusedRenderable;
+    if (!focused?._focused || focused._isDestroyed)
+      return false;
+    for (let parent = focused.parent;parent; parent = parent.parent)
+      if (parent === this)
+        return true;
+    return false;
+  }
+  get live() {
+    return this._live;
+  }
+  get liveCount() {
+    return this._liveCount;
+  }
+  set live(value) {
+    value ??= false;
+    if (this._live === value)
+      return;
+    this._live = value;
+    if (this._visible) {
+      const delta = value ? 1 : -1;
+      this.propagateLiveCount(delta);
+    }
+  }
+  propagateLiveCount(delta) {
+    this._liveCount += delta;
+    this.parent?.propagateLiveCount(delta);
+  }
+  onLiveCountChanged(previous) {}
+  get animationFps() {
+    return this._animationFps;
+  }
+  set animationFps(value) {
+    value ??= undefined;
+    if (value !== undefined && !(value > 0 && value < Infinity)) {
+      throw new RangeError(`animationFps must be positive and finite, got ${value}`);
+    }
+    if (this._animationFps === value)
+      return;
+    const toggled = this._animationFps === undefined !== (value === undefined);
+    this._animationFps = value;
+    if (toggled)
+      this.refreshNativeSceneHooks();
+    this.updateAnimationTick();
+  }
+  updateAnimationTick() {
+    this.stopAnimationTick?.();
+    this.stopAnimationTick = undefined;
+    if (this._animationFps === undefined || !this._visible || this._isDestroyed)
+      return;
+    this.stopAnimationTick = this._ctx.onAnimationTick(this._animationFps, (deltaTime, ticks, time) => {
+      if (this.animationDrawnFrame < this._ctx.frameId - 1) {
+        this.stopAnimationTick?.();
+        this.stopAnimationTick = undefined;
+        return;
+      }
+      this.onAnimationTick(deltaTime, ticks, time);
+    });
+  }
+  onAnimationTick(deltaTime, ticks, time) {}
+  findDescendantById(id) {
+    for (const child of this._childrenInLayoutOrder) {
+      if (child.id === id)
+        return child;
+      if (isRenderable2(child)) {
+        const found = child.findDescendantById(id);
+        if (found)
+          return found;
+      }
+    }
+    return;
+  }
+  requestRender() {
+    this.markDirty();
+    this._ctx.requestRender();
+  }
+  _needsLifecyclePass() {
+    return this.onLifecyclePass !== null || this._builtinLifecyclePass !== null;
+  }
+  _builtinLifecyclePass = null;
+  setBuiltinLifecyclePass(pass) {
+    this._builtinLifecyclePass = pass;
+    this.syncLifecyclePass();
+  }
+  _runLifecyclePass() {
+    this._builtinLifecyclePass?.call(this);
+    if (!this._isDestroyed)
+      this._hooks.onLifecyclePass?.call(this);
+  }
+  get translateX() {
+    return this._translateX;
+  }
+  set translateX(value) {
+    value ??= 0;
+    if (this._translateX === value)
+      return;
+    this.setNativeScenePaint({ translateX: value });
+    this._translateX = value;
+    this.requestRender();
+  }
+  get translateY() {
+    return this._translateY;
+  }
+  set translateY(value) {
+    value ??= 0;
+    if (this._translateY === value)
+      return;
+    this.setNativeScenePaint({ translateY: value });
+    this._translateY = value;
+    this.requestRender();
+  }
+  get screenX() {
+    return this.isFreed() ? this._destroyedLayout?.screenX ?? 0 : this.getNativeSceneLayout().screenX;
+  }
+  get screenY() {
+    return this.isFreed() ? this._destroyedLayout?.screenY ?? 0 : this.getNativeSceneLayout().screenY;
+  }
+  get _screenX() {
+    return this._paintLayout?.screenX ?? this.screenX;
+  }
+  get _screenY() {
+    return this._paintLayout?.screenY ?? this.screenY;
+  }
+  _paintOrigin(buffer) {
+    return buffer === this.frameBuffer ? [0, 0] : [Math.trunc(this._screenX), Math.trunc(this._screenY)];
+  }
+  _drawNativeBody(buffer) {
+    this._ctx.nativeScene.drawBody(this, buffer, ...this._paintOrigin(buffer));
+  }
+  get _paintWidth() {
+    return this._paintLayout?.width ?? this.width;
+  }
+  get _paintHeight() {
+    return this._paintLayout?.height ?? this.height;
+  }
+  get x() {
+    if (!this.isFreed())
+      return this.getNativeSceneLayout().screenX;
+    const left = this._destroyedLayout?.x ?? 0;
+    if (this.parent) {
+      return this.parent.x + left + this._translateX;
+    }
+    return left + this._translateX;
+  }
+  set x(value) {
+    this.left = value;
+  }
+  get top() {
+    return this._position.top;
+  }
+  set top(value) {
+    if (isPositionType(value) || value == null) {
+      this.setPosition({ top: value ?? undefined });
+    }
+  }
+  get right() {
+    return this._position.right;
+  }
+  set right(value) {
+    if (isPositionType(value) || value == null) {
+      this.setPosition({ right: value ?? undefined });
+    }
+  }
+  get bottom() {
+    return this._position.bottom;
+  }
+  set bottom(value) {
+    if (isPositionType(value) || value == null) {
+      this.setPosition({ bottom: value ?? undefined });
+    }
+  }
+  get left() {
+    return this._position.left;
+  }
+  set left(value) {
+    if (isPositionType(value) || value == null) {
+      this.setPosition({ left: value ?? undefined });
+    }
+  }
+  get y() {
+    if (!this.isFreed())
+      return this.getNativeSceneLayout().screenY;
+    const top = this._destroyedLayout?.y ?? 0;
+    if (this.parent) {
+      return this.parent.y + top + this._translateY;
+    }
+    return top + this._translateY;
+  }
+  set y(value) {
+    this.top = value;
+  }
+  get width() {
+    if (!this.isFreed()) {
+      const layout = this.getNativeSceneLayout();
+      return layout.width === 0 ? this.styledDimension("width") : layout.width;
+    }
+    return this._destroyedLayout?.width ?? this.styledDimension("width");
+  }
+  set width(value) {
+    this.setDimension("width", value);
+  }
+  get height() {
+    if (!this.isFreed()) {
+      const layout = this.getNativeSceneLayout();
+      return layout.height === 0 ? this.styledDimension("height") : layout.height;
+    }
+    return this._destroyedLayout?.height ?? this.styledDimension("height");
+  }
+  defaultDimension(_kind) {
+    return "auto";
+  }
+  styledDimension(kind) {
+    const value = kind === "width" ? this._width : this._height;
+    return typeof value === "number" ? value : 0;
+  }
+  getNativeSceneLayout() {
+    const revision = this._ctx.nativeScene.observedLayoutRevision;
+    if (revision !== undefined && this._observedLayoutRevision === revision)
+      return this._observedLayout;
+    return this.observeLayout(this._ctx.nativeScene.getLayout(this));
+  }
+  observeLayout(layout) {
+    const revision = this._ctx.nativeScene.observedLayoutRevision;
+    if (layout && revision !== undefined) {
+      this._observedLayout = layout;
+      this._observedLayoutRevision = revision;
+    }
+    return layout;
+  }
+  set height(value) {
+    this.setDimension("height", value);
+  }
+  setDimension(kind, input) {
+    if (this.isFreed())
+      return;
+    const value = input ?? this.defaultDimension(kind);
+    const key = kind === "width" ? "_width" : "_height";
+    if (!isDimensionType(value) || this[key] === value)
+      return;
+    this.runMutation(() => {
+      const disableShrink = typeof value === "number" && this._flexShrink === 1;
+      const dimension = kind === "width" ? Dimension2.Width : Dimension2.Height;
+      sceneSetDimension(this._ctx.nativeScene, this, dimension, value, disableShrink);
+      this[key] = value;
+      if (disableShrink)
+        this._flexShrink = 0;
+      this.requestRender();
+    });
+  }
+  get zIndex() {
+    return this._zIndex;
+  }
+  set zIndex(value) {
+    value = value ?? 0;
+    if (this._zIndex !== value) {
+      this.setNativeScenePaint({ zIndex: value });
+      this._zIndex = value;
+      this.requestRender();
+    }
+  }
+  getChildrenSortedByPrimaryAxis() {
+    const axis = this.primaryAxis === "row" ? "screenX" : "screenY";
+    if (this._childrenInLayoutOrder.length < 2)
+      return [...this._childrenInLayoutOrder];
+    const children = this._childrenInLayoutOrder.map((child) => ({ child, coordinate: child[axis] }));
+    children.sort((a, b) => a.coordinate - b.coordinate);
+    return children.map(({ child }) => child);
+  }
+  _bindSceneHandle(handle) {
+    this._sceneHandle = handle;
+    this._yogaFreed = false;
+  }
+  _getSceneHandle(owner) {
+    if (this._ctx.nativeScene !== owner)
+      throw new Error("Yoga node belongs to a different native scene");
+    owner.assertAlive();
+    if (this._yogaFreed || !this._sceneHandle)
+      throw new Error("Native scene Yoga node is freed");
+    return this._sceneHandle;
+  }
+  _releaseSceneHandle() {
+    this._yogaFreed = true;
+    this._sceneHandle = undefined;
+  }
+  isFreed() {
+    return this._yogaFreed || !this._sceneHandle;
+  }
+  assertMutable() {
+    this._ctx.nativeScene.driver.renderLib.getYogaHost().assertMutable();
+    this._getSceneHandle(this._ctx.nativeScene);
+  }
+  runMutation(operation) {
+    if (this.isFreed())
+      return;
+    this.assertMutable();
+    return this._ctx.nativeScene.driver.renderLib.getYogaHost().runMutation(operation);
+  }
+  yogaSetEnum(kind, value) {
+    if (this.isFreed())
+      return;
+    sceneSetEnum(this._ctx.nativeScene, this, kind, value);
+  }
+  yogaGetEnum(kind, fallback) {
+    return this.isFreed() ? fallback : sceneGetEnum(this._ctx.nativeScene, this, kind);
+  }
+  yogaGetFloat(kind) {
+    return this.isFreed() ? NaN : sceneGetFloat(this._ctx.nativeScene, this, kind);
+  }
+  yogaSetFloat(kind, value) {
+    if (this.isFreed())
+      return;
+    sceneSetFloat(this._ctx.nativeScene, this, kind, value);
+  }
+  yogaSetValue(kind, edge, valueInput) {
+    if (this.isFreed())
+      return;
+    sceneSetValue(this._ctx.nativeScene, this, kind, edge, valueInput);
+  }
+  yogaGetValue(kind, edge) {
+    return this.isFreed() ? UNDEFINED_VALUE : sceneGetValue(this._ctx.nativeScene, this, kind, edge);
+  }
+  setDisplay(display) {
+    this.yogaSetEnum(YogaEnumKind.Display, display);
+  }
+  getFlexDirection() {
+    return this.yogaGetEnum(YogaEnumKind.FlexDirection, FlexDirection2.Column);
+  }
+  setFlexDirection(flexDirection) {
+    this.yogaSetEnum(YogaEnumKind.FlexDirection, flexDirection);
+  }
+  setFlexWrap(flexWrap) {
+    this.yogaSetEnum(YogaEnumKind.FlexWrap, flexWrap);
+  }
+  setAlignItems(alignItems) {
+    this.yogaSetEnum(YogaEnumKind.AlignItems, alignItems);
+  }
+  setJustifyContent(justifyContent) {
+    this.yogaSetEnum(YogaEnumKind.JustifyContent, justifyContent);
+  }
+  setAlignSelf(alignSelf) {
+    this.yogaSetEnum(YogaEnumKind.AlignSelf, alignSelf);
+  }
+  setPositionType(positionType) {
+    this.yogaSetEnum(YogaEnumKind.PositionType, positionType);
+  }
+  setOverflow(overflow) {
+    this.yogaSetEnum(YogaEnumKind.Overflow, overflow);
+  }
+  setFlexGrow(flexGrow) {
+    this.yogaSetFloat(YogaFloatKind.FlexGrow, flexGrow);
+  }
+  setFlexShrink(flexShrink) {
+    this.yogaSetFloat(YogaFloatKind.FlexShrink, flexShrink);
+  }
+  setFlexBasis(flexBasis) {
+    this.yogaSetValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE2, flexBasis);
+  }
+  setWidth(width) {
+    this.yogaSetValue(YogaValueKind.Width, NATIVE_EDGE_NONE2, width);
+  }
+  setHeight(height) {
+    this.yogaSetValue(YogaValueKind.Height, NATIVE_EDGE_NONE2, height);
+  }
+  setMinWidth(minWidth) {
+    this.yogaSetValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE2, minWidth);
+  }
+  setMaxWidth(maxWidth) {
+    this.yogaSetValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE2, maxWidth);
+  }
+  setMinHeight(minHeight) {
+    this.yogaSetValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE2, minHeight);
+  }
+  setMaxHeight(maxHeight) {
+    this.yogaSetValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE2, maxHeight);
+  }
+  setMargin(edge, margin) {
+    this.yogaSetValue(YogaValueKind.Margin, edge, margin);
+  }
+  getMargin(edge) {
+    return this.yogaGetValue(YogaValueKind.Margin, edge);
+  }
+  setPadding(edge, padding) {
+    this.yogaSetValue(YogaValueKind.Padding, edge, padding);
+  }
+  setGap(gutter, gap) {
+    this.yogaSetValue(YogaValueKind.Gap, gutter, gap);
+  }
+  getWidth() {
+    return this.yogaGetValue(YogaValueKind.Width, NATIVE_EDGE_NONE2);
+  }
+  getFlexWrap() {
+    return this.yogaGetEnum(YogaEnumKind.FlexWrap, Wrap2.NoWrap);
+  }
+  getAlignItems() {
+    return this.yogaGetEnum(YogaEnumKind.AlignItems, Align2.Stretch);
+  }
+  getAlignContent() {
+    return this.yogaGetEnum(YogaEnumKind.AlignContent, Align2.FlexStart);
+  }
+  getAspectRatio() {
+    return this.yogaGetFloat(YogaFloatKind.AspectRatio);
+  }
+  getBoxSizing() {
+    return this.yogaGetEnum(YogaEnumKind.BoxSizing, BoxSizing2.BorderBox);
+  }
+  getJustifyContent() {
+    return this.yogaGetEnum(YogaEnumKind.JustifyContent, Justify2.FlexStart);
+  }
+  getAlignSelf() {
+    return this.yogaGetEnum(YogaEnumKind.AlignSelf, Align2.Auto);
+  }
+  getPositionType() {
+    return this.yogaGetEnum(YogaEnumKind.PositionType, PositionType2.Relative);
+  }
+  getFlexGrow() {
+    return this.yogaGetFloat(YogaFloatKind.FlexGrow);
+  }
+  getFlexShrink() {
+    return this.yogaGetFloat(YogaFloatKind.FlexShrink);
+  }
+  getFlexBasis() {
+    return this.yogaGetValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE2);
+  }
+  getHeight() {
+    return this.yogaGetValue(YogaValueKind.Height, NATIVE_EDGE_NONE2);
+  }
+  getMinWidth() {
+    return this.yogaGetValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE2);
+  }
+  getMinHeight() {
+    return this.yogaGetValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE2);
+  }
+  getMaxWidth() {
+    return this.yogaGetValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE2);
+  }
+  getMaxHeight() {
+    return this.yogaGetValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE2);
+  }
+  getPadding(edge) {
+    return this.yogaGetValue(YogaValueKind.Padding, edge);
+  }
+  getGap(gutter) {
+    return this.yogaGetValue(YogaValueKind.Gap, gutter);
+  }
+  getComputedLayout() {
+    const { left, top, right, bottom, width, height } = this._ctx.nativeScene.getLayout(this, true);
+    return { left, top, right, bottom, width, height };
+  }
+  setMeasureFunc(measure) {
+    this.assertMutable();
+    this._ctx.nativeScene.setMeasureFunc(this, measure);
+  }
+  hasMeasureFunc() {
+    return this._ctx.nativeScene.hasMeasureFunc(this);
+  }
+  setupYogaProperties(options) {
+    const node = this;
+    if (isFlexBasisType(options.flexBasis)) {
+      node.setFlexBasis(options.flexBasis);
+    }
+    if (isSizeType(options.minWidth)) {
+      node.setMinWidth(options.minWidth);
+    }
+    if (isSizeType(options.minHeight)) {
+      node.setMinHeight(options.minHeight);
+    }
+    if (options.flexGrow !== undefined) {
+      node.setFlexGrow(options.flexGrow);
+    } else {
+      node.setFlexGrow(0);
+    }
+    if (options.flexShrink !== undefined) {
+      this._flexShrink = options.flexShrink;
+      node.setFlexShrink(options.flexShrink);
+    } else {
+      const hasExplicitWidth = typeof options.width === "number";
+      const hasExplicitHeight = typeof options.height === "number";
+      this._flexShrink = hasExplicitWidth || hasExplicitHeight ? 0 : 1;
+      node.setFlexShrink(this._flexShrink);
+    }
+    node.setFlexDirection(parseFlexDirection2(options.flexDirection));
+    node.setFlexWrap(parseWrap2(options.flexWrap));
+    if (options.layoutMode !== undefined)
+      node.layoutMode = options.layoutMode;
+    if (options.alignContent !== undefined)
+      node.alignContent = options.alignContent;
+    if (options.aspectRatio !== undefined)
+      node.aspectRatio = options.aspectRatio;
+    if (options.boxSizing !== undefined)
+      node.boxSizing = options.boxSizing;
+    node.setAlignItems(parseAlignItems2(options.alignItems));
+    node.setJustifyContent(parseJustify2(options.justifyContent));
+    node.setAlignSelf(parseAlign2(options.alignSelf));
+    if (isDimensionType(options.width)) {
+      this._width = options.width;
+      node.setWidth(options.width);
+    }
+    if (isDimensionType(options.height)) {
+      this._height = options.height;
+      node.setHeight(options.height);
+    }
+    this._positionType = options.position === "absolute" ? "absolute" : "relative";
+    if (this._positionType !== "relative") {
+      node.setPositionType(parsePositionType2(this._positionType));
+    }
+    this._overflow = options.overflow === "hidden" ? "hidden" : options.overflow === "scroll" ? "scroll" : "visible";
+    if (this._overflow !== "visible") {
+      node.setOverflow(parseOverflow2(this._overflow));
+    }
+    const hasPositionProps = options.top !== undefined || options.right !== undefined || options.bottom !== undefined || options.left !== undefined;
+    if (hasPositionProps) {
+      this._position = {
+        top: options.top,
+        right: options.right,
+        bottom: options.bottom,
+        left: options.left
+      };
+      this.updateYogaPosition(this._position);
+      this.requestRender();
+    }
+    if (isSizeType(options.maxWidth)) {
+      node.setMaxWidth(options.maxWidth);
+    }
+    if (isSizeType(options.maxHeight)) {
+      node.setMaxHeight(options.maxHeight);
+    }
+    this.setupMarginAndPadding(options);
+  }
+  setupMarginAndPadding(options) {
+    const node = this;
+    if (isMarginType(options.margin)) {
+      node.setMargin(Edge2.All, options.margin);
+    }
+    if (isMarginType(options.marginX)) {
+      node.setMargin(Edge2.Horizontal, options.marginX);
+    }
+    if (isMarginType(options.marginY)) {
+      node.setMargin(Edge2.Vertical, options.marginY);
+    }
+    if (isMarginType(options.marginTop)) {
+      node.setMargin(Edge2.Top, options.marginTop);
+    }
+    if (isMarginType(options.marginRight)) {
+      node.setMargin(Edge2.Right, options.marginRight);
+    }
+    if (isMarginType(options.marginBottom)) {
+      node.setMargin(Edge2.Bottom, options.marginBottom);
+    }
+    if (isMarginType(options.marginLeft)) {
+      node.setMargin(Edge2.Left, options.marginLeft);
+    }
+    if (isPaddingType(options.padding)) {
+      node.setPadding(Edge2.All, options.padding);
+    }
+    if (isPaddingType(options.paddingX)) {
+      node.setPadding(Edge2.Horizontal, options.paddingX);
+    }
+    if (isPaddingType(options.paddingY)) {
+      node.setPadding(Edge2.Vertical, options.paddingY);
+    }
+    if (isPaddingType(options.paddingTop)) {
+      node.setPadding(Edge2.Top, options.paddingTop);
+    }
+    if (isPaddingType(options.paddingRight)) {
+      node.setPadding(Edge2.Right, options.paddingRight);
+    }
+    if (isPaddingType(options.paddingBottom)) {
+      node.setPadding(Edge2.Bottom, options.paddingBottom);
+    }
+    if (isPaddingType(options.paddingLeft)) {
+      node.setPadding(Edge2.Left, options.paddingLeft);
+    }
+  }
+  set position(positionType) {
+    positionType ??= "relative";
+    if (!isPositionTypeType(positionType) || this._positionType === positionType)
+      return;
+    this.runMutation(() => {
+      this.setPositionType(parsePositionType2(positionType));
+      this._positionType = positionType;
+      this.requestRender();
+    });
+  }
+  get overflow() {
+    return this._overflow;
+  }
+  set overflow(overflow) {
+    overflow ??= "visible";
+    if (!isOverflowType(overflow) || this._overflow === overflow)
+      return;
+    this.runMutation(() => {
+      this.setOverflow(parseOverflow2(overflow));
+      this._overflow = overflow;
+      this.requestRender();
+    });
+  }
+  setPosition(position) {
+    this.runMutation(() => {
+      this.updateYogaPosition(position);
+      this._position = { ...this._position, ...position };
+      this.requestRender();
+    });
+  }
+  updateYogaPosition(position) {
+    const units = new Uint32Array(positionKeys.length);
+    const values = new Float32Array(positionKeys.length);
+    let mask = 0;
+    for (let edge = 0;edge < positionKeys.length; edge++) {
+      const key = positionKeys[edge];
+      const input = position[key] ?? undefined;
+      if (!(key in position) || input !== undefined && !isPositionType(input))
+        continue;
+      const value = parseYogaValue(input);
+      mask |= 1 << edge;
+      units[edge] = value.unit;
+      values[edge] = value.value;
+    }
+    this._ctx.nativeScene.setPositions(this, mask, units, values);
+  }
+  set flexGrow(grow) {
+    if (grow == null) {
+      this.setFlexGrow(0);
+    } else {
+      this.setFlexGrow(grow);
+    }
+    this.requestRender();
+  }
+  set flexShrink(shrink) {
+    const value = shrink == null ? 1 : shrink;
+    this.runMutation(() => {
+      this.setFlexShrink(value);
+      this._flexShrink = value;
+      this.requestRender();
+    });
+  }
+  set flexDirection(direction) {
+    this.setFlexDirection(parseFlexDirection2(direction));
+    this.requestRender();
+  }
+  set flexWrap(wrap) {
+    this.setFlexWrap(parseWrap2(wrap));
+    this.requestRender();
+  }
+  set layoutMode(mode) {
+    this.yogaSetEnum(YogaEnumKind.LayoutMode, parseLayoutMode2(mode));
+    this.requestRender();
+  }
+  set alignItems(alignItems) {
+    this.setAlignItems(parseAlignItems2(alignItems));
+    this.requestRender();
+  }
+  set alignContent(alignContent) {
+    this.yogaSetEnum(YogaEnumKind.AlignContent, parseAlignContent2(alignContent));
+    this.requestRender();
+  }
+  set aspectRatio(aspectRatio) {
+    this.yogaSetFloat(YogaFloatKind.AspectRatio, aspectRatio ?? undefined);
+    this.requestRender();
+  }
+  set boxSizing(boxSizing) {
+    this.yogaSetEnum(YogaEnumKind.BoxSizing, parseBoxSizing2(boxSizing));
+    this.requestRender();
+  }
+  set justifyContent(justifyContent) {
+    this.setJustifyContent(parseJustify2(justifyContent));
+    this.requestRender();
+  }
+  set alignSelf(alignSelf) {
+    this.setAlignSelf(parseAlign2(alignSelf));
+    this.requestRender();
+  }
+  set flexBasis(basis) {
+    this.setStyleValue(YogaValueKind.FlexBasis, NATIVE_EDGE_NONE2, basis, isFlexBasisType);
+  }
+  set minWidth(minWidth) {
+    this.setStyleValue(YogaValueKind.MinWidth, NATIVE_EDGE_NONE2, minWidth, isSizeType);
+  }
+  set maxWidth(maxWidth) {
+    this.setStyleValue(YogaValueKind.MaxWidth, NATIVE_EDGE_NONE2, maxWidth, isSizeType);
+  }
+  set minHeight(minHeight) {
+    this.setStyleValue(YogaValueKind.MinHeight, NATIVE_EDGE_NONE2, minHeight, isSizeType);
+  }
+  set maxHeight(maxHeight) {
+    this.setStyleValue(YogaValueKind.MaxHeight, NATIVE_EDGE_NONE2, maxHeight, isSizeType);
+  }
+  set margin(margin) {
+    this.setStyleValue(YogaValueKind.Margin, Edge2.All, margin, isMarginType);
+  }
+  set marginX(marginX) {
+    this.setStyleValue(YogaValueKind.Margin, Edge2.Horizontal, marginX, isMarginType);
+  }
+  set marginY(marginY) {
+    this.setStyleValue(YogaValueKind.Margin, Edge2.Vertical, marginY, isMarginType);
+  }
+  set marginTop(margin) {
+    this.setStyleValue(YogaValueKind.Margin, Edge2.Top, margin, isMarginType);
+  }
+  get marginTop() {
+    return this.getMargin(Edge2.Top).value;
+  }
+  set marginRight(margin) {
+    this.setStyleValue(YogaValueKind.Margin, Edge2.Right, margin, isMarginType);
+  }
+  set marginBottom(margin) {
+    this.setStyleValue(YogaValueKind.Margin, Edge2.Bottom, margin, isMarginType);
+  }
+  set marginLeft(margin) {
+    this.setStyleValue(YogaValueKind.Margin, Edge2.Left, margin, isMarginType);
+  }
+  set padding(padding) {
+    this.setStyleValue(YogaValueKind.Padding, Edge2.All, padding, isPaddingType);
+  }
+  set paddingX(paddingX) {
+    this.setStyleValue(YogaValueKind.Padding, Edge2.Horizontal, paddingX, isPaddingType);
+  }
+  set paddingY(paddingY) {
+    this.setStyleValue(YogaValueKind.Padding, Edge2.Vertical, paddingY, isPaddingType);
+  }
+  set paddingTop(padding) {
+    this.setStyleValue(YogaValueKind.Padding, Edge2.Top, padding, isPaddingType);
+  }
+  set paddingRight(padding) {
+    this.setStyleValue(YogaValueKind.Padding, Edge2.Right, padding, isPaddingType);
+  }
+  set paddingBottom(padding) {
+    this.setStyleValue(YogaValueKind.Padding, Edge2.Bottom, padding, isPaddingType);
+  }
+  set paddingLeft(padding) {
+    this.setStyleValue(YogaValueKind.Padding, Edge2.Left, padding, isPaddingType);
+  }
+  setStyleValue(kind, edge, value, isValid) {
+    if (value != null && !isValid(value))
+      return;
+    this.yogaSetValue(kind, edge, value ?? undefined);
+    this.requestRender();
+  }
+  setMeasureProvider(provider) {
+    if (this.isFreed())
+      return;
+    const node = this;
+    node.runMutation(() => {
+      node.setMeasureFunc(provider);
+      this.requestRender();
+    });
+  }
+  invalidateIntrinsicSize() {
+    if (this.isFreed())
+      return;
+    const node = this;
+    node.assertMutable();
+    if (node.hasMeasureFunc())
+      this._ctx.nativeScene.markDirty(this);
+  }
+  getLayout() {
+    if (this.isFreed())
+      throw new Error("Renderable is destroyed");
+    return this.getComputedLayout();
+  }
+  onLayoutResize(width, height) {
+    if (this._visible) {
+      this.handleFrameBufferResize(width, height);
+      this._hooks.onResize.call(this, width, height);
+      this.requestRender();
+    }
+  }
+  handleFrameBufferResize(width, height) {
+    if (!this.buffered)
+      return;
+    if (width <= 0 || height <= 0) {
+      return;
+    }
+    if (this.frameBuffer) {
+      this.frameBuffer.resize(width, height);
+    } else {
+      this.createFrameBuffer();
+    }
+  }
+  createFrameBuffer() {
+    const w = this.width;
+    const h = this.height;
+    if (w <= 0 || h <= 0) {
+      return;
+    }
+    this.frameBuffer = OptimizedBuffer2.create(w, h, this._ctx.widthMethod, {
+      respectAlpha: true,
+      id: `framebuffer-${this.id}`,
+      owner: this._ctx.nativeScene
+    });
+  }
+  onResize(width, height) {
+    this.onSizeChange?.();
+    this.emit("resize");
+  }
+  placeChild(child, anchor) {
+    return this.runMutation(() => {
+      if (this._ctx.nativeScene !== child._ctx.nativeScene) {
+        throw new Error("Cannot move renderables between native scenes");
+      }
+      let previous = child.parent;
+      if (previous && previous !== this && previous.remove !== Renderable2.prototype.remove) {
+        previous.remove(child);
+        previous = child.parent;
+      }
+      if (this._isDestroyed || child.isDestroyed || anchor?.isDestroyed)
+        return -1;
+      const target = this;
+      const childNode = child;
+      const previousIndex = previous?._childrenInLayoutOrder.indexOf(child) ?? -1;
+      const anchorIndex = anchor ? target._childrenInLayoutOrder.indexOf(anchor) : target._childrenInLayoutOrder.length;
+      if (anchorIndex === -1)
+        return -1;
+      const index = anchorIndex - (previous === target && previousIndex !== -1 && previousIndex < anchorIndex ? 1 : 0);
+      let counts;
+      let lifecycle;
+      if (previous !== target) {
+        if (child._liveCount > 0) {
+          counts = new Map;
+          for (const [start, delta] of [
+            [previous, -child._liveCount],
+            [target, child._liveCount]
+          ]) {
+            for (let parent = start;parent; parent = parent.parent) {
+              const count = counts.get(parent) ?? { before: parent._liveCount, after: parent._liveCount };
+              count.after += delta;
+              counts.set(parent, count);
+            }
+          }
+        }
+        if (previous) {
+          const passes = previous._ctx.getLifecyclePasses();
+          lifecycle = new Map([[passes, false]]);
+        }
+        if (typeof child.onLifecyclePass === "function" || child._builtinLifecyclePass) {
+          const passes = target._ctx.getLifecyclePasses();
+          lifecycle ??= new Map;
+          lifecycle.set(passes, true);
+        }
+      }
+      this._ctx.nativeScene.moveNode(childNode, this, index);
+      if (previous && previousIndex !== -1)
+        previous._childrenInLayoutOrder.splice(previousIndex, 1);
+      target._childrenInLayoutOrder.splice(index, 0, child);
+      child.parent = target;
+      if (counts)
+        for (const [parent, count] of counts)
+          parent._liveCount = count.after;
+      if (lifecycle)
+        for (const [passes, active] of lifecycle) {
+          if (active)
+            passes.add(child);
+          else
+            passes.delete(child);
+        }
+      this.runCleanup((run) => {
+        if (previous !== target && (child._focused || child.hasFocusedDescendant))
+          for (const start of [previous, target])
+            for (let parent = start;parent; parent = parent.parent)
+              parent.markDirty();
+        if (counts)
+          for (const [parent, count] of counts)
+            run(() => parent.onLiveCountChanged(count.before));
+        if (previous && previous !== target)
+          run(() => child.onRemove());
+        if (previous && previous !== target)
+          run(() => previous.requestRender());
+        run(() => target.requestRender());
+      });
+      return index;
+    });
+  }
+  add(obj, index) {
+    if (!obj) {
+      return -1;
+    }
+    if (!isRenderable2(obj)) {
+      if (true) {
+        console.warn("add() received an invalid renderable", util.inspect(obj, { depth: 2 }));
+      }
+      return -1;
+    }
+    if (this._isDestroyed) {
+      if (true) {
+        console.warn(`Renderable with id ${this.id} was already destroyed, skipping add`);
+      }
+      return -1;
+    }
+    if (obj.isDestroyed) {
+      if (true) {
+        console.warn(`Renderable with id ${obj.id} was already destroyed, skipping add`);
+      }
+      return -1;
+    }
+    const anchorRenderable = index !== undefined ? this._childrenInLayoutOrder[index] : undefined;
+    if (anchorRenderable) {
+      return this.insertBefore(obj, anchorRenderable);
+    }
+    return this.placeChild(obj);
+  }
+  insertBefore(obj, anchor) {
+    if (!anchor) {
+      return this.add(obj);
+    }
+    if (!obj) {
+      return -1;
+    }
+    if (!isRenderable2(obj)) {
+      if (true) {
+        console.warn("insertBefore() received an invalid renderable", util.inspect(obj, { depth: 2 }));
+      }
+      return -1;
+    }
+    if (this._isDestroyed) {
+      if (true) {
+        console.warn(`Renderable with id ${this.id} was already destroyed, skipping insertBefore`);
+      }
+      return -1;
+    }
+    if (obj.isDestroyed) {
+      if (true) {
+        console.warn(`Renderable with id ${obj.id} was already destroyed, skipping insertBefore`);
+      }
+      return -1;
+    }
+    if (!isRenderable2(anchor)) {
+      throw new Error("Anchor must be a Renderable");
+    }
+    if (anchor.isDestroyed) {
+      if (true) {
+        console.warn(`Anchor with id ${anchor.id} was already destroyed, skipping insertBefore`);
+      }
+      return -1;
+    }
+    if (this._childrenInLayoutOrder.indexOf(anchor) === -1) {
+      if (true) {
+        console.warn(`Anchor with id ${anchor.id} does not exist within the parent ${this.id}, skipping insertBefore`);
+      }
+      return -1;
+    }
+    if (obj === anchor) {
+      if (true) {
+        console.warn(`Anchor is the same as the node ${obj.id} being inserted, skipping insertBefore`);
+      }
+      return -1;
+    }
+    return this.placeChild(obj, anchor);
+  }
+  getRenderable(id) {
+    return this._childrenInLayoutOrder.find((child) => child.id === id);
+  }
+  remove(child) {
+    if (!isRenderable2(child)) {
+      throw new Error("remove expects a renderable child object");
+    }
+    const index = this.layoutIndexOf(child);
+    if (index === -1) {
+      if (true) {
+        console.warn(`Renderable with id ${child.id} is not a child of ${this.id}, skipping remove`);
+      }
+      return;
+    }
+    const renderable = this._childrenInLayoutOrder[index];
+    this.runMutation(() => {
+      this._ctx.nativeScene.moveNode(renderable, null, 0);
+      this.removeLayoutChildAt(index);
+      this.runCleanup((run) => {
+        if (renderable._focused || renderable.hasFocusedDescendant) {
+          run(() => renderable.propagateFocusChange(false));
+        }
+        if (renderable._liveCount > 0)
+          run(() => this.propagateLiveCount(-renderable._liveCount));
+        run(() => this.requestRender());
+        run(() => renderable.onRemove());
+        renderable.parent = null;
+        run(() => this._ctx.unregisterLifecyclePass(renderable));
+      });
+    });
+  }
+  onRemove() {}
+  getChildren() {
+    return [...this._childrenInLayoutOrder];
+  }
+  getChildrenCount() {
+    return this._childrenInLayoutOrder.length;
+  }
+  onUpdate(deltaTime) {}
+  renderSelf(buffer, deltaTime) {}
+  getNativeScenePaint() {
+    return {
+      zIndex: this._zIndex,
+      opacity: this._opacity,
+      translateX: this._translateX,
+      translateY: this._translateY,
+      border: NativeBorder2.None,
+      shouldFill: false,
+      backgroundColor: RGBA2.fromValues(0, 0, 0, 0),
+      borderColor: RGBA2.fromValues(1, 1, 1, 1),
+      focusable: this._focusable,
+      focusedBorderColor: RGBA2.fromValues(0, 170 / 255, 1, 1),
+      borderStyle: "single"
+    };
+  }
+  setNativeScenePaint(paint = this.getNativeScenePaint()) {
+    if (this.isFreed())
+      return;
+    this._ctx.nativeScene.setPaint(this, paint);
+  }
+  static {
+    Object.defineProperty(this.prototype, "selectable", {
+      configurable: true,
+      get() {
+        return this._selectable;
+      },
+      set(value) {
+        if (this.isFreed())
+          return;
+        this.assertMutable();
+        this._selectable = value;
+      }
+    });
+  }
+  static normalizeHook(name, value) {
+    if (value == null && name !== "renderSelf" && name !== "onResize" && name !== "onLayoutResize") {
+      return name === "onUpdate" ? Renderable2.baseHooks.onUpdate : name === "onLifecyclePass" ? null : undefined;
+    }
+    if (typeof value !== "function")
+      throw new TypeError(`Invalid ${name} hook`);
+    return value;
+  }
+  setHook(name, value) {
+    value = Renderable2.normalizeHook(name, value);
+    if (value === this._hooks[name])
+      return;
+    const hooks = { ...this._hooks, [name]: value };
+    if (name !== "onLifecyclePass")
+      return this.publishHooks(hooks);
+    this._hooks = hooks;
+    this.syncLifecyclePass();
+  }
+  syncLifecyclePass() {
+    if (!this.onLifecyclePass && !this._builtinLifecyclePass)
+      this._ctx.unregisterLifecyclePass(this);
+    else if (this.parent)
+      this._ctx.registerLifecyclePass(this);
+    else
+      this._ctx.nativeScene.lifecyclePasses.refresh(this);
+  }
+  refreshHooks() {
+    if (this._isDestroyed)
+      return;
+    this.assertMutable();
+    const hooks = {};
+    for (const name of hookNames)
+      hooks[name] = Renderable2.normalizeHook(name, this[name]);
+    this.publishHooks(hooks);
+    for (const name of ["renderBefore", "renderAfter", "onLifecyclePass"]) {
+      if (!Object.hasOwn(this, name))
+        continue;
+      delete this[name];
+      if (this[name] !== hooks[name])
+        Reflect.set(this, name, hooks[name]);
+    }
+    this.syncLifecyclePass();
+    this._refreshNativeSceneSurface();
+    this.requestRender();
+  }
+  usesNativeDrawing(renderSelf) {
+    const body = this.nativeIntegration.body;
+    return typeof body === "object" && "native" in body && (!this.buffered || body.buffered === true) && renderSelf === body.native;
+  }
+  needsHostResize(onResize) {
+    const resize = this.nativeIntegration.lifecycle?.resize;
+    return onResize !== Renderable2.baseHooks.onResize && onResize !== resize?.native;
+  }
+  hostUpdateFlags(onUpdate) {
+    if (this._animationFps !== undefined)
+      return NativeSceneHook2.Update;
+    const update = this.nativeIntegration.lifecycle?.update;
+    if (update && onUpdate === update.idle) {
+      return update.active(this) ? NativeSceneHook2.Update : NativeSceneHook2.IdleUpdate;
+    }
+    return onUpdate === Renderable2.baseHooks.onUpdate ? 0 : NativeSceneHook2.Update;
+  }
+  refreshNativeSceneHooks() {
+    this.publishHooks(this._hooks);
+  }
+  _refreshNativeSceneSurface() {}
+  publishHooks(hooks, pending = {}) {
+    if (!this.isFreed()) {
+      const integration = this.nativeIntegration;
+      const resize = this.buffered || hooks.onLayoutResize !== Renderable2.baseHooks.onLayoutResize || this.needsHostResize(hooks.onResize);
+      const sizeChange = "sizeChange" in pending ? pending.sizeChange : this._sizeChangeListener;
+      const lineInfo = pending.lineInfo ?? (!!integration.lineInfo && this.listenerCount("line-info-change") > 0);
+      const flags = (hooks.renderBefore ? NativeSceneHook2.RenderBefore : 0) | (hooks.renderAfter ? NativeSceneHook2.RenderAfter : 0) | (this.usesNativeDrawing(hooks.renderSelf) ? 0 : NativeSceneHook2.RenderSelf) | this.hostUpdateFlags(hooks.onUpdate) | (integration.lifecycle?.scroll?.active(this) ? NativeSceneHook2.Scroll : 0) | (resize || sizeChange || (pending.resize ?? this.listenerCount("resize")) > 0 ? NativeSceneHook2.Resize : 0) | ((pending.layout ?? this.listenerCount("layout-changed" /* LAYOUT_CHANGED */)) > 0 ? NativeSceneHook2.LayoutChanged : 0);
+      const generation = this._nativeSceneHookGeneration + 1n;
+      if (flags !== 0 || lineInfo || this._nativeSceneHooksRegistered) {
+        let nativeFlags = flags;
+        if (integration.beforeAfter === false)
+          nativeFlags &= ~nativeSceneHookBeforeAfter;
+        if (!resize && integration.lifecycle?.resize) {
+          nativeFlags = nativeFlags & ~NativeSceneHook2.Resize | (lineInfo && integration.lineInfo ? NativeSceneHook2.Resize : 0);
+        }
+        if (nativeFlags & NativeSceneHook2.RenderSelf)
+          nativeFlags |= NativeSceneHook2.RenderAfter;
+        const scene = this._ctx.nativeScene;
+        scene.setHooks(this, nativeFlags, generation, this.styledDimension("width"), this.styledDimension("height"));
+        this._nativeSceneHooksRegistered = true;
+      }
+      this._nativeSceneResize = resize;
+      this._nativeSceneHookGeneration = generation;
+    }
+    this._hooks = hooks;
+  }
+  _runNativeSceneHook(request, deltaTime) {
+    if (this._isDestroyed || request.hookGeneration !== this._nativeSceneHookGeneration)
+      return;
+    this.observeLayout(request.publicLayout);
+    this._paintLayout = request.paintLayout;
+    try {
+      switch (request.kind) {
+        case NativeSceneFrame2.Update:
+          if (this._animationFps !== undefined) {
+            this.animationDrawnFrame = this._ctx.frameId;
+            if (!this.stopAnimationTick)
+              this.updateAnimationTick();
+          }
+          this._hooks.onUpdate.call(this, deltaTime);
+          break;
+        case NativeSceneFrame2.Resize:
+          if (this._nativeSceneResize) {
+            this._hooks.onLayoutResize.call(this, request.width, request.height);
+          } else {
+            const resize = this.nativeIntegration.lifecycle?.resize;
+            if (!resize) {
+              this.onSizeChange?.call(this);
+              if (!this._isDestroyed)
+                this.emit("resize");
+            }
+            if (!this._isDestroyed && this.nativeIntegration.lineInfo)
+              this.emit("line-info-change");
+          }
+          break;
+        case NativeSceneFrame2.LayoutChanged:
+          this.emit("layout-changed" /* LAYOUT_CHANGED */);
+          break;
+        case NativeSceneFrame2.Scroll:
+          this.nativeIntegration.lifecycle?.scroll?.notify(this);
+          break;
+      }
+    } finally {
+      this._paintLayout = undefined;
+    }
+  }
+  _recordNativeScenePaint(slot, index, deltaTime, frame, recorder, publicLayout) {
+    if (this._isDestroyed)
+      return;
+    this.observeLayout(publicLayout);
+    this._paintLayout = slot.paintLayout;
+    const buffer = this.nativeIntegration.paintBuffer !== "destination" && this.nativeIntegration.bufferComposition !== "native" && this.buffered && this.frameBuffer ? this.frameBuffer : frame;
+    try {
+      if (slot.hooks & NativeSceneHook2.RenderBefore) {
+        recorder.slot(index, NativeScenePaintPhase2.Before, slot.opacity);
+        this._hooks.renderBefore?.call(this, buffer, deltaTime);
+        if (this._isDestroyed)
+          return;
+      }
+      if (slot.hooks & NativeSceneHook2.RenderSelf) {
+        recorder.slot(index, NativeScenePaintPhase2.Self, slot.opacity);
+        if (this.nativeIntegration.beforeAfter === false)
+          this.markClean();
+        this._invokeNativePaint(buffer, deltaTime);
+        if (this._isDestroyed)
+          return;
+      }
+      if (slot.hooks & NativeSceneHook2.RenderAfter) {
+        recorder.slot(index, NativeScenePaintPhase2.After, slot.opacity);
+        if (this.nativeIntegration.beforeAfter !== false) {
+          this._hooks.renderAfter?.call(this, buffer, deltaTime);
+          this.markClean();
+        }
+        if (!this._isDestroyed && this.nativeIntegration.bufferComposition !== "native" && this.buffered && this.frameBuffer)
+          frame.drawFrameBuffer(Math.trunc(this._screenX), Math.trunc(this._screenY), this.frameBuffer);
+      }
+    } finally {
+      this._paintLayout = undefined;
+    }
+  }
+  _invokeNativePaint(buffer, deltaTime) {
+    this._hooks.renderSelf.call(this, buffer, deltaTime);
+  }
+  get isDestroyed() {
+    return this._isDestroyed;
+  }
+  destroy() {
+    if (this._isDestroyed || this._cleanupInProgress || this._childCleanupInProgress) {
+      return;
+    }
+    this.assertMutable();
+    this.destroyLayoutBacking((run) => {
+      run(() => this.destroyOwnedResources());
+      const heldFocus = this._focused || this.hasFocusedDescendant;
+      this._isDestroyed = true;
+      this.updateAnimationTick();
+      run(() => this.emit("destroyed" /* DESTROYED */));
+      if (heldFocus)
+        run(() => this.propagateFocusChange(false));
+      if (this.parent) {
+        const parent = this.parent;
+        run(() => parent.remove(this));
+        if (this.parent === parent) {
+          run(() => this.detachFromParent());
+        }
+      }
+      if (this.frameBuffer) {
+        const frameBuffer = this.frameBuffer;
+        this.frameBuffer = null;
+        run(() => frameBuffer.destroy());
+      }
+      for (const child of [...this._childrenInLayoutOrder]) {
+        run(() => this.remove(child));
+      }
+      this._childrenInLayoutOrder = [];
+      Renderable2.renderablesByNumber.delete(this.num);
+      run(() => this.blur());
+      run(() => this.removeAllListeners());
+      run(() => this.destroySelf());
+    });
+  }
+  destroyRecursively() {
+    if (this._isDestroyed || this._cleanupInProgress || this._childCleanupInProgress)
+      return;
+    this.assertMutable();
+    const children = [...this._childrenInLayoutOrder];
+    let index = 0;
+    this._childCleanupInProgress = true;
+    const cleanupOwners = this._ctx.nativeScene.cleanupOwners;
+    const ownsCompletion = !cleanupOwners.has(this);
+    cleanupOwners.add(this);
+    const resume = () => this.runCleanup((run) => {
+      while (index < children.length) {
+        const child = children[index++];
+        run(() => child.destroyRecursively());
+        if (child._cleanupInProgress || child._childCleanupInProgress) {
+          (child._deferredCleanup ??= []).push(resume);
+          return;
+        }
+      }
+      this._childCleanupInProgress = false;
+      run(() => this.destroy());
+      if (ownsCompletion)
+        this.completeCleanup(run);
+    });
+    resume();
+  }
+  _deferUntilCleanupComplete(resume) {
+    const pending = [this];
+    while (pending.length > 0) {
+      const node = pending.pop();
+      if (node._cleanupInProgress || node._childCleanupInProgress) {
+        (node._deferredCleanup ??= []).push(resume);
+        return true;
+      }
+      for (const child of node._childrenInLayoutOrder)
+        pending.push(child);
+    }
+    for (const node of this._ctx.nativeScene.cleanupOwners) {
+      (node._deferredCleanup ??= []).push(resume);
+      return true;
+    }
+    return false;
+  }
+  destroyOwnedResources() {}
+  destroySelf() {}
+  destroyLayoutBacking(cleanup) {
+    const scene = this._ctx.nativeScene;
+    const hasHandle = !!this._sceneHandle && !this._yogaFreed;
+    this._cleanupInProgress = true;
+    const cleanupOwners = scene.cleanupOwners;
+    const ownsCompletion = !cleanupOwners.has(this);
+    cleanupOwners.add(this);
+    this.runCleanup((run) => {
+      if (hasHandle && this.selectable) {
+        run(() => {
+          const layout = scene.getLayout(this);
+          this._destroyedLayout = {
+            x: layout.left,
+            y: layout.top,
+            screenX: layout.screenX,
+            screenY: layout.screenY,
+            width: layout.width === 0 ? this.styledDimension("width") : layout.width,
+            height: layout.height === 0 ? this.styledDimension("height") : layout.height
+          };
+        });
+      }
+      if (cleanup)
+        run(() => cleanup(run));
+      this._isDestroyed = true;
+      if (hasHandle)
+        run(() => scene.destroyNode(this));
+      this._cleanupInProgress = false;
+      if (ownsCompletion)
+        this.completeCleanup(run);
+    });
+  }
+  completeCleanup(run) {
+    this._ctx.nativeScene.cleanupOwners.delete(this);
+    const deferred = this._deferredCleanup;
+    this._deferredCleanup = undefined;
+    if (deferred)
+      for (const resume of deferred)
+        run(resume);
+  }
+  layoutIndexOf(child) {
+    const children = this._childrenInLayoutOrder;
+    return children.at(-1) === child ? children.length - 1 : children.indexOf(child);
+  }
+  removeLayoutChildAt(index) {
+    const children = this._childrenInLayoutOrder;
+    if (index === children.length - 1)
+      children.pop();
+    else
+      children.splice(index, 1);
+  }
+  detachFromParent() {
+    const parent = this.parent;
+    if (!parent)
+      return;
+    const layoutIndex = parent.layoutIndexOf(this);
+    if (layoutIndex !== -1) {
+      this._ctx.nativeScene.moveNode(this, null, 0);
+      parent.removeLayoutChildAt(layoutIndex);
+      if (this._liveCount > 0) {
+        parent.propagateLiveCount(-this._liveCount);
+      }
+    }
+    parent._ctx.unregisterLifecyclePass(this);
+    this.parent = null;
+  }
+  processMouseEvent(event) {
+    event.currentTarget = this;
+    this._mouseListener?.call(this, event);
+    if (this._isDestroyed)
+      return;
+    this._mouseListeners[event.type]?.call(this, event);
+    if (this._isDestroyed)
+      return;
+    this.onMouseEvent(event);
+    if (this.parent && !event.propagationStopped) {
+      this.parent.processMouseEvent(event);
+    }
+  }
+  assertSupportedEvent(event) {
+    if ((event === "resized" /* RESIZED */ || event === "layout-changed" /* LAYOUT_CHANGED */) && !(this instanceof RootRenderable2)) {
+      throw new Error(`Native scene does not support ${event} hooks`);
+    }
+  }
+  on(event, listener) {
+    return this.changeSceneListeners("add", event, listener);
+  }
+  addListener(event, listener) {
+    return this.changeSceneListeners("add", event, listener);
+  }
+  prependListener(event, listener) {
+    return this.changeSceneListeners("prepend", event, listener);
+  }
+  off(event, listener) {
+    return this.changeSceneListeners("remove", event, listener);
+  }
+  removeListener(event, listener) {
+    return this.changeSceneListeners("remove", event, listener);
+  }
+  removeAllListeners(event) {
+    if (arguments.length > 0 && event === undefined)
+      return super.removeAllListeners(event);
+    return this.changeSceneListeners("clear", event);
+  }
+  changeSceneListeners(operation, event, listener) {
+    if (operation === "add" || operation === "prepend")
+      this.assertSupportedEvent(event);
+    const change = () => {
+      switch (operation) {
+        case "add":
+          return super.addListener(event, listener);
+        case "prepend":
+          return super.prependListener(event, listener);
+        case "remove":
+          return super.removeListener(event, listener);
+        case "clear":
+          return event === undefined ? super.removeAllListeners() : super.removeAllListeners(event);
+      }
+    };
+    if (this._isDestroyed || event === "line-info-change" && !this.nativeIntegration.lineInfo || (operation !== "clear" || event !== undefined) && event !== "resize" && event !== "line-info-change" && event !== "layout-changed" /* LAYOUT_CHANGED */ || operation !== "clear" && typeof listener !== "function") {
+      return change();
+    }
+    let resize = this.listenerCount("resize");
+    const initialLineInfo = this.nativeIntegration.lineInfo ? this.listenerCount("line-info-change") : 0;
+    let lineInfo = initialLineInfo;
+    let layout = this.listenerCount("layout-changed" /* LAYOUT_CHANGED */);
+    if (operation === "clear") {
+      if (event === undefined || event === "resize")
+        resize = 0;
+      if (event === undefined || event === "line-info-change")
+        lineInfo = 0;
+      if (event === undefined || event === "layout-changed" /* LAYOUT_CHANGED */)
+        layout = 0;
+      const changed = resize !== this.listenerCount("resize") || lineInfo !== initialLineInfo || layout !== this.listenerCount("layout-changed" /* LAYOUT_CHANGED */);
+      if (!changed)
+        return change();
+    } else {
+      if (operation === "remove" && !this.rawListeners(event).some((entry) => entry === listener || entry.listener === listener)) {
+        return change();
+      }
+      const delta = operation === "remove" ? -1 : 1;
+      if (event === "resize")
+        resize += delta;
+      else if (event === "line-info-change")
+        lineInfo += delta;
+      else
+        layout += delta;
+    }
+    this.publishHooks(this._hooks, { resize, layout, lineInfo: lineInfo > 0 });
+    this.runCleanup((run) => {
+      run(change);
+      run(() => {
+        if (!this._isDestroyed)
+          this.publishHooks(this._hooks);
+      });
+    });
+    return this;
+  }
+  onMouseEvent(event) {}
+  set onMouse(handler) {
+    if (handler)
+      this._mouseListener = handler;
+    else
+      this._mouseListener = null;
+  }
+  set onMouseDown(handler) {
+    if (handler)
+      this._mouseListeners["down"] = handler;
+    else
+      delete this._mouseListeners["down"];
+  }
+  set onMouseUp(handler) {
+    if (handler)
+      this._mouseListeners["up"] = handler;
+    else
+      delete this._mouseListeners["up"];
+  }
+  set onMouseMove(handler) {
+    if (handler)
+      this._mouseListeners["move"] = handler;
+    else
+      delete this._mouseListeners["move"];
+  }
+  set onMouseDrag(handler) {
+    if (handler)
+      this._mouseListeners["drag"] = handler;
+    else
+      delete this._mouseListeners["drag"];
+  }
+  set onMouseDragEnd(handler) {
+    if (handler)
+      this._mouseListeners["drag-end"] = handler;
+    else
+      delete this._mouseListeners["drag-end"];
+  }
+  set onMouseDrop(handler) {
+    if (handler)
+      this._mouseListeners["drop"] = handler;
+    else
+      delete this._mouseListeners["drop"];
+  }
+  set onMouseOver(handler) {
+    if (handler)
+      this._mouseListeners["over"] = handler;
+    else
+      delete this._mouseListeners["over"];
+  }
+  set onMouseOut(handler) {
+    if (handler)
+      this._mouseListeners["out"] = handler;
+    else
+      delete this._mouseListeners["out"];
+  }
+  set onMouseScroll(handler) {
+    if (handler)
+      this._mouseListeners["scroll"] = handler;
+    else
+      delete this._mouseListeners["scroll"];
+  }
+  set onPaste(handler) {
+    this._pasteListener = handler;
+  }
+  get onPaste() {
+    return this._pasteListener;
+  }
+  set onKeyDown(handler) {
+    if (handler)
+      this._keyListeners["down"] = handler;
+    else
+      delete this._keyListeners["down"];
+  }
+  get onKeyDown() {
+    return this._keyListeners["down"];
+  }
+  set onSizeChange(handler) {
+    if (handler !== this._sizeChangeListener) {
+      if (handler != null && typeof handler !== "function")
+        throw new TypeError("Invalid size change hook");
+      this.publishHooks(this._hooks, { sizeChange: handler });
+    }
+    this._sizeChangeListener = handler;
+  }
+  get onSizeChange() {
+    return this._sizeChangeListener;
+  }
+  applyEventOptions(options) {
+    this.onMouse = options.onMouse;
+    this.onMouseDown = options.onMouseDown;
+    this.onMouseUp = options.onMouseUp;
+    this.onMouseMove = options.onMouseMove;
+    this.onMouseDrag = options.onMouseDrag;
+    this.onMouseDragEnd = options.onMouseDragEnd;
+    this.onMouseDrop = options.onMouseDrop;
+    this.onMouseOver = options.onMouseOver;
+    this.onMouseOut = options.onMouseOut;
+    this.onMouseScroll = options.onMouseScroll;
+    this.onPaste = options.onPaste;
+    this.onKeyDown = options.onKeyDown;
+    this.onSizeChange = options.onSizeChange;
+  }
+}
+
+class RootRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    ...Renderable2.nativeIntegration,
+    kind: "root"
+  };
+  _currentRenderable;
+  constructor(ctx) {
+    super(ctx, {
+      id: "__root__",
+      zIndex: 0,
+      visible: true,
+      width: ctx.width,
+      height: ctx.height,
+      enableLayout: true
+    });
+    try {
+      this.setNativeScenePaint();
+    } catch (error) {
+      this.abortConstruction(error);
+    }
+  }
+  get currentRenderable() {
+    return this._currentRenderable;
+  }
+  _setCurrentRenderable(renderable) {
+    this._currentRenderable = renderable;
+  }
+  takeCurrentRenderable() {
+    const renderable = this._currentRenderable;
+    this._currentRenderable = undefined;
+    return renderable;
+  }
+  propagateLiveCount(delta) {
+    const oldCount = this._liveCount;
+    this._liveCount += delta;
+    this.onLiveCountChanged(oldCount);
+  }
+  onLiveCountChanged(previous) {
+    if (previous === 0 && this._liveCount > 0) {
+      this._ctx.requestLive();
+    } else if (previous > 0 && this._liveCount === 0) {
+      this._ctx.dropLive();
+    }
+  }
+  resize(width, height) {
+    this.width = width;
+    this.height = height;
+    this.emit("resized" /* RESIZED */, { width, height });
+  }
+}
+
+// src/text-buffer.ts
+import { readFileSync } from "fs";
+class TextBuffer2 {
+  lib;
+  native;
+  _length = 0;
+  _byteSize = 0;
+  _destroyed = false;
+  _syntaxStyle;
+  constructor(lib, handle, source) {
+    const owner = source?.resourceContext;
+    if (!owner)
+      throw new Error("TextBuffer requires an explicit resource owner");
+    owner.assertAlive();
+    if (owner.renderLib !== lib || !handle || typeof handle !== "object" || handle.context !== owner.context) {
+      throw new Error("TextBuffer Context owner mismatch");
+    }
+    this.lib = lib;
+    this.native = { owner, handle };
+    this.updateLengths();
+  }
+  static create(widthMethod, source, followSessionWidth = false) {
+    const owner = source?.resourceContext;
+    if (!owner)
+      throw new Error("TextBuffer requires an explicit resource owner: pass renderer.nativeScene, or a ResourceContext when there is no renderer");
+    owner.assertAlive();
+    const lib = owner.renderLib;
+    const handle = lib.createContextTextBuffer(owner.context, { widthMethod, followSessionWidth });
+    try {
+      return new TextBuffer2(lib, handle, owner);
+    } catch (error) {
+      lib.destroyContextTextBuffer(owner.context, handle);
+      throw error;
+    }
+  }
+  guard() {
+    if (this._destroyed)
+      throw new Error("TextBuffer is destroyed");
+    this.native.owner.assertAlive();
+  }
+  _getOwner() {
+    this.guard();
+    return this.native.owner;
+  }
+  _getSceneHandle(scene) {
+    this.guard();
+    if (this.native.owner !== scene.resourceContext)
+      throw new Error("TextBuffer Context owner mismatch");
+    return this.native.handle;
+  }
+  updateLengths() {
+    const info = this.lib.contextTextBufferGetInfo(this.native.handle.context, this.native.handle);
+    this._length = info.textLength;
+    this._byteSize = info.byteLength;
+  }
+  setText(text) {
+    this.guard();
+    this.lib.getYogaHost().runMutation(() => {
+      const textBytes = this.lib.encoder.encode(text);
+      this.lib.contextTextBufferSetText(this.native.handle.context, this.native.handle, textBytes);
+      this.updateLengths();
+    });
+  }
+  append(text) {
+    this.guard();
+    this.lib.getYogaHost().runMutation(() => {
+      const textBytes = this.lib.encoder.encode(text);
+      this.lib.contextTextBufferAppend(this.native.handle.context, this.native.handle, textBytes);
+      this.updateLengths();
+    });
+  }
+  loadFile(path) {
+    this.guard();
+    this.lib.getYogaHost().runMutation(() => {
+      let bytes;
+      try {
+        bytes = readFileSync(path);
+      } catch (cause) {
+        throw new Error(`Failed to load file: ${path}`, { cause });
+      }
+      this.lib.contextTextBufferSetText(this.native.handle.context, this.native.handle, bytes);
+      this.updateLengths();
+    });
+  }
+  setStyledText(text) {
+    this.guard();
+    this.lib.getYogaHost().runMutation(() => {
+      const chunks = text.chunks;
+      if (Array.isArray(chunks) && chunks.length === 0) {
+        this.lib.contextTextBufferClear(this.native.handle.context, this.native.handle);
+      } else {
+        this.lib.contextTextBufferSetStyledText(this.native.handle.context, this.native.handle, new StyledText2(chunks));
+      }
+      this.updateLengths();
+    });
+  }
+  _setEncodedStyledText(text) {
+    this.guard();
+    this.lib.getYogaHost().runMutation(() => {
+      this.lib.contextTextBufferSetEncodedStyledText(this.native.handle.context, this.native.handle, text);
+      this.updateLengths();
+    });
+  }
+  static _replaceStyledTextBatch(replacements, beforeNative) {
+    if (replacements.length === 0) {
+      beforeNative();
+      return true;
+    }
+    const owner = replacements[0].textBuffer._getOwner();
+    const lib = owner.renderLib;
+    const entries = replacements.map(({ textBuffer, textBufferView, text }) => ({
+      buffer: textBuffer._getSceneHandle(owner),
+      view: textBufferView._getSceneHandle(owner),
+      text
+    }));
+    return lib.getYogaHost().runMutation(() => {
+      const info = lib.contextTextBufferReplaceStyledBatch(owner.context, entries, beforeNative);
+      if (info === null)
+        return false;
+      for (let index = 0;index < replacements.length; index++) {
+        replacements[index].textBuffer._length = info[index * 2];
+        replacements[index].textBuffer._byteSize = info[index * 2 + 1];
+      }
+      return true;
+    });
+  }
+  setDefaults(mask, style) {
+    this.guard();
+    this.lib.contextTextBufferSetDefaults(this.native.handle.context, this.native.handle, mask, style);
+  }
+  _setDefaults(fg, bg, attributes) {
+    this.setDefaults(7 /* All */, { fg, bg, attributes });
+  }
+  setDefaultFg(fg) {
+    this.setDefaults(1 /* Foreground */, { fg });
+  }
+  setDefaultBg(bg) {
+    this.setDefaults(2 /* Background */, { bg });
+  }
+  setDefaultAttributes(attributes) {
+    this.setDefaults(4 /* Attributes */, { attributes });
+  }
+  resetDefaults() {
+    this.setDefaults(7 /* All */, {});
+  }
+  getLineCount() {
+    this.guard();
+    return this.lib.contextTextBufferGetInfo(this.native.handle.context, this.native.handle).lineCount;
+  }
+  get length() {
+    this.guard();
+    return this._length;
+  }
+  get byteSize() {
+    this.guard();
+    return this._byteSize;
+  }
+  getPlainText() {
+    this.guard();
+    return this.lib.contextTextBufferGetText(this.native.handle.context, this.native.handle);
+  }
+  getTextRange(startOffset, endOffset) {
+    this.guard();
+    if (startOffset >= endOffset)
+      return "";
+    return this.lib.contextTextBufferGetRange(this.native.handle.context, this.native.handle, startOffset, endOffset);
+  }
+  highlight(operation, argument, highlight) {
+    this.guard();
+    this.lib.contextTextBufferHighlight(this.native.handle.context, this.native.handle, operation, argument, highlight);
+  }
+  addHighlightByCharRange(highlight) {
+    this.highlight(1 /* AddRange */, 0, highlight);
+  }
+  addHighlight(lineIdx, highlight) {
+    this.highlight(0 /* AddLine */, lineIdx, highlight);
+  }
+  removeHighlightsByRef(hlRef) {
+    this.highlight(2 /* RemoveRef */, hlRef);
+  }
+  clearLineHighlights(lineIdx) {
+    this.highlight(3 /* ClearLine */, lineIdx);
+  }
+  clearAllHighlights() {
+    this.highlight(4 /* ClearAll */);
+  }
+  _groupSet(names) {
+    this.guard();
+    return this.lib.contextGroupSet(this.native.handle.context, names);
+  }
+  _setLayer(layerId, start, end, runs) {
+    this.guard();
+    this.lib.contextTextBufferSetLayer(this.native.handle.context, this.native.handle, layerId, start, end, runs);
+  }
+  getLineHighlights(lineIdx) {
+    this.guard();
+    return this.lib.contextTextBufferGetHighlights(this.native.handle.context, this.native.handle, lineIdx);
+  }
+  getHighlightCount() {
+    this.guard();
+    return this.lib.contextTextBufferGetInfo(this.native.handle.context, this.native.handle).highlightCount;
+  }
+  setSyntaxStyle(style) {
+    this.guard();
+    this.lib.getYogaHost().runMutation(() => {
+      this.lib.contextTextBufferSetSyntaxStyle(this.native.handle.context, this.native.handle, style?._getSceneHandle(this.native.owner) ?? null);
+      this._syntaxStyle = style ?? undefined;
+    });
+  }
+  getSyntaxStyle() {
+    this.guard();
+    return this._syntaxStyle ?? null;
+  }
+  setTabWidth(width) {
+    this.guard();
+    this.lib.getYogaHost().runMutation(() => {
+      this.lib.contextTextBufferSetTabWidth(this.native.handle.context, this.native.handle, width);
+      this.updateLengths();
+    });
+  }
+  setWidthMethod(widthMethod) {
+    this.guard();
+    this.lib.contextTextBufferSetWidthMethod(this.native.handle.context, this.native.handle, widthMethod);
+  }
+  getTabWidth() {
+    this.guard();
+    return this.lib.contextTextBufferGetInfo(this.native.handle.context, this.native.handle).tabWidth;
+  }
+  clear() {
+    this.guard();
+    this.lib.getYogaHost().runMutation(() => {
+      this.lib.contextTextBufferClear(this.native.handle.context, this.native.handle);
+      this._length = 0;
+      this._byteSize = 0;
+    });
+  }
+  reset() {
+    this.guard();
+    this.lib.getYogaHost().runMutation(() => {
+      this.lib.contextTextBufferClear(this.native.handle.context, this.native.handle, true);
+      this._length = 0;
+      this._byteSize = 0;
+    });
+  }
+  destroy() {
+    if (this._destroyed)
+      return;
+    this.lib.getYogaHost().runMutation(() => {
+      if (!this.native.owner.disposed) {
+        try {
+          this.lib.releaseAfterPaint(this.native.handle.context, () => this.lib.destroyContextTextBuffer(this.native.handle.context, this.native.handle));
+        } catch (error) {
+          if (!(error instanceof NativeError2) || error.status !== -9 /* StaleHandle */)
+            throw error;
+        }
+      }
+      this._destroyed = true;
+      this._syntaxStyle = undefined;
+    });
+  }
+}
+
+// src/text-buffer-view.ts
+class TextBufferView2 {
+  lib;
+  native;
+  textBuffer;
+  _destroyed = false;
+  selectionClear = true;
+  constructor(lib, handle, textBuffer, source) {
+    const owner = source?.resourceContext;
+    if (!owner)
+      throw new Error("TextBufferView requires an explicit resource owner");
+    owner.assertAlive();
+    if (owner.renderLib !== lib)
+      throw new Error("TextBufferView library owner mismatch");
+    if (textBuffer._getOwner() !== owner || !handle || typeof handle !== "object" || handle.context !== owner.context) {
+      throw new Error("TextBufferView Context owner mismatch");
+    }
+    this.lib = lib;
+    this.native = { owner, handle };
+    this.textBuffer = textBuffer;
+  }
+  static create(textBuffer) {
+    const owner = textBuffer._getOwner();
+    const lib = owner.renderLib;
+    const handle = lib.createContextTextBufferView(owner.context, textBuffer._getSceneHandle(owner));
+    try {
+      return new TextBufferView2(lib, handle, textBuffer, owner);
+    } catch (error) {
+      lib.destroyContextTextBufferView(owner.context, handle);
+      throw error;
+    }
+  }
+  guard() {
+    if (this._destroyed)
+      throw new Error("TextBufferView is destroyed");
+    this.native.owner.assertAlive();
+    this.textBuffer._getSceneHandle(this.native.owner);
+  }
+  _getOwner() {
+    this.guard();
+    return this.native.owner;
+  }
+  _getSceneHandle(scene) {
+    this.guard();
+    if (this.native.owner !== scene.resourceContext)
+      throw new Error("TextBufferView Context owner mismatch");
+    return this.native.handle;
+  }
+  select(selection) {
+    this.guard();
+    this.selectionClear = false;
+    return this.lib.contextTextBufferViewSelect(this.native.handle.context, this.native.handle, selection);
+  }
+  reset(local) {
+    this.guard();
+    const { context } = this.native.handle;
+    this.lib.contextTextBufferViewResetSelection(context, this.native.handle, local, this.selectionClear);
+    this.selectionClear = true;
+  }
+  setSelection(start, end, bgColor, fgColor) {
+    this.select({ operation: 0 /* Set */, start, end, bg: bgColor, fg: fgColor });
+  }
+  _selectCharacter(offset) {
+    this.select({ operation: 8 /* Inclusive */, start: offset, end: offset });
+  }
+  updateSelection(end, bgColor, fgColor) {
+    this.select({ operation: 1 /* Update */, end, bg: bgColor, fg: fgColor });
+  }
+  resetSelection() {
+    this.reset(false);
+  }
+  getSelection() {
+    this.guard();
+    return this.lib.contextTextBufferViewGetInfo(this.native.handle.context, this.native.handle).selection;
+  }
+  hasSelection() {
+    this.guard();
+    return this.getSelection() !== null;
+  }
+  setLocalSelection(anchorX, anchorY, focusX, focusY, bgColor, fgColor, behavior = "cell") {
+    return this.select({
+      operation: 3 /* Local */,
+      anchorX,
+      anchorY,
+      focusX,
+      focusY,
+      bg: bgColor,
+      fg: fgColor,
+      behavior: behavior === "cell" ? 0 : behavior === "word" ? 1 : 2
+    });
+  }
+  updateLocalSelection(anchorX, anchorY, focusX, focusY, bgColor, fgColor, behavior = "cell") {
+    return this.select({
+      operation: 4 /* LocalUpdate */,
+      anchorX,
+      anchorY,
+      focusX,
+      focusY,
+      bg: bgColor,
+      fg: fgColor,
+      behavior: behavior === "cell" ? 0 : behavior === "word" ? 1 : 2
+    });
+  }
+  resetLocalSelection() {
+    this.reset(true);
+  }
+  setSelectionColors(bgColor, fgColor) {
+    this.select({ operation: 9 /* Colors */, bg: bgColor, fg: fgColor });
+  }
+  setSelectionOccupancy(occupancy) {
+    this.guard();
+    this.lib.contextTextBufferViewSelect(this.native.handle.context, this.native.handle, {
+      operation: 7 /* Occupancy */,
+      behavior: occupancy === "boundary" ? 1 : 0
+    });
+  }
+  getSelectionOccupancy() {
+    this.guard();
+    return this.lib.contextTextBufferViewGetInfo(this.native.handle.context, this.native.handle).selectionOccupancy;
+  }
+  command(command, argument) {
+    this.guard();
+    this.lib.contextTextBufferViewCommand(this.native.handle.context, this.native.handle, command, argument);
+  }
+  setWrapWidth(width) {
+    this.command(0 /* WrapWidth */, width ?? 0);
+  }
+  setWrapMode(mode) {
+    this.command(1 /* WrapMode */, mode === "none" ? 0 : mode === "char" ? 1 : 2);
+  }
+  setTextAlign(alignment) {
+    this.command(5 /* TextAlign */, alignment === "left" ? 0 : alignment === "center" ? 1 : 2);
+  }
+  setFirstLineOffset(offset) {
+    this.command(2 /* FirstLineOffset */, offset);
+  }
+  setViewportSize(width, height) {
+    this.guard();
+    return this.lib.contextTextBufferViewSetViewport(this.native.handle.context, this.native.handle, { x: 0, y: 0, width, height }, true);
+  }
+  setViewport(x, y, width, height) {
+    this.guard();
+    return this.lib.contextTextBufferViewSetViewport(this.native.handle.context, this.native.handle, {
+      x,
+      y,
+      width,
+      height
+    });
+  }
+  get lineInfo() {
+    this.guard();
+    return this.lib.contextTextBufferViewGetLines(this.native.handle.context, this.native.handle);
+  }
+  get logicalLineInfo() {
+    this.guard();
+    return this.lib.contextTextBufferViewGetLines(this.native.handle.context, this.native.handle, true);
+  }
+  getLineSources(startLine, lineCount) {
+    this.guard();
+    const { context } = this.native.handle;
+    return this.lib.contextTextBufferViewGetLines(context, this.native.handle, true, startLine, lineCount).lineSources;
+  }
+  getSelectedText() {
+    this.guard();
+    return this.lib.contextTextBufferViewGetSelectedText(this.native.handle.context, this.native.handle);
+  }
+  getPlainText() {
+    this.guard();
+    return this.textBuffer.getPlainText();
+  }
+  setTabIndicator(indicator) {
+    const codePoint = typeof indicator === "string" ? indicator.codePointAt(0) ?? 0 : indicator;
+    this.command(3 /* TabIndicator */, codePoint);
+  }
+  setTabIndicatorColor(color) {
+    this.guard();
+    return this.lib.contextTextBufferViewSetTabColor(this.native.handle.context, this.native.handle, color);
+  }
+  setTruncate(truncate) {
+    this.command(4 /* Truncate */, truncate ? 1 : 0);
+  }
+  measureForDimensions(width, height) {
+    this.guard();
+    return this.lib.contextTextBufferViewMeasure(this.native.handle.context, this.native.handle, width, height);
+  }
+  getVirtualLineCount() {
+    this.guard();
+    return this.lib.contextTextBufferViewGetInfo(this.native.handle.context, this.native.handle).virtualLineCount;
+  }
+  destroy() {
+    if (this._destroyed)
+      return;
+    this.lib.getYogaHost().runMutation(() => {
+      if (!this.native.owner.disposed) {
+        try {
+          this.lib.releaseAfterPaint(this.native.handle.context, () => this.lib.destroyContextTextBufferView(this.native.handle.context, this.native.handle));
+        } catch (error) {
+          if (!(error instanceof NativeError2) || error.status !== -9 /* StaleHandle */)
+            throw error;
+        }
+      }
+      this._destroyed = true;
+    });
+  }
+}
+
+// src/edit-buffer.ts
+import { EventEmitter as EventEmitter5 } from "events";
+
+class EditBuffer2 extends EventEmitter5 {
+  lib;
+  native;
+  unsubscribe;
+  id;
+  _destroyed = false;
+  _syntaxStyle;
+  constructor(lib, handle, source) {
+    super();
+    const owner = source?.resourceContext;
+    if (!owner)
+      throw new Error("EditBuffer requires an explicit resource owner");
+    owner.assertAlive();
+    if (owner.renderLib !== lib || !handle || typeof handle !== "object" || handle.context !== owner.context) {
+      throw new Error("EditBuffer Context owner mismatch");
+    }
+    this.lib = lib;
+    this.native = { owner, handle };
+    this.id = handle.slot;
+    this.unsubscribe = lib.onContextEditEvent(handle.context, handle, (name) => {
+      if (!this._destroyed && !owner.disposed)
+        this.emit(name);
+    });
+  }
+  static create(widthMethod, source, followSessionWidth = false) {
+    const owner = source?.resourceContext;
+    if (!owner)
+      throw new Error("EditBuffer requires an explicit resource owner: pass renderer.nativeScene, or a ResourceContext when there is no renderer");
+    owner.assertAlive();
+    const lib = owner.renderLib;
+    const handle = lib.createContextEditBuffer(owner.context, { widthMethod, followSessionWidth });
+    try {
+      return new EditBuffer2(lib, handle, owner);
+    } catch (error) {
+      lib.destroyContextEditBuffer(owner.context, handle);
+      throw error;
+    }
+  }
+  get isDestroyed() {
+    return this._destroyed;
+  }
+  guard() {
+    if (this._destroyed)
+      throw new Error("EditBuffer is destroyed");
+    this.native.owner.assertAlive();
+  }
+  _getOwner() {
+    this.guard();
+    return this.native.owner;
+  }
+  _getSceneHandle(scene) {
+    this.guard();
+    if (this.native.owner !== scene.resourceContext)
+      throw new Error("EditBuffer Context owner mismatch");
+    return this.native.handle;
+  }
+  runMutation(operation) {
+    this.guard();
+    return this.lib.getYogaHost().runMutation(operation);
+  }
+  command(command, argument) {
+    this.guard();
+    this.lib.contextEditBufferCommand(this.native.handle.context, this.native.handle, command, argument);
+  }
+  position(query, a, b) {
+    this.guard();
+    return this.lib.contextEditBufferGetPosition(this.native.handle.context, this.native.handle, query, a, b);
+  }
+  highlight(operation, argument, highlight) {
+    this.guard();
+    this.lib.contextEditBufferHighlight(this.native.handle.context, this.native.handle, operation, argument, highlight);
+  }
+  setDefaults(mask, style) {
+    this.guard();
+    this.lib.contextEditBufferSetDefaults(this.native.handle.context, this.native.handle, mask, style);
+  }
+  _onHistoryReset;
+  setNativeText(text, preserveHistory = false) {
+    const textBytes = this.lib.encoder.encode(text);
+    this.lib.contextEditBufferSetText(this.native.handle.context, this.native.handle, textBytes, preserveHistory);
+    if (!preserveHistory)
+      this._onHistoryReset?.();
+  }
+  setText(text) {
+    this.runMutation(() => this.setNativeText(text));
+  }
+  setTextOwned(text) {
+    this.guard();
+    this.setNativeText(text);
+  }
+  replaceText(text) {
+    this.runMutation(() => this.setNativeText(text, true));
+  }
+  replaceTextOwned(text) {
+    this.guard();
+    this.setNativeText(text, true);
+  }
+  getLineCount() {
+    this.guard();
+    return this.lib.contextEditBufferGetInfo(this.native.handle.context, this.native.handle).lineCount;
+  }
+  setTabWidth(width) {
+    this.runMutation(() => {
+      this.lib.contextEditBufferSetTabWidth(this.native.handle.context, this.native.handle, width);
+    });
+  }
+  getTabWidth() {
+    this.guard();
+    return this.lib.contextEditBufferGetInfo(this.native.handle.context, this.native.handle).tabWidth;
+  }
+  getText() {
+    this.guard();
+    return this.lib.contextEditBufferGetText(this.native.handle.context, this.native.handle);
+  }
+  insertChar(char) {
+    this.guard();
+    return this.lib.contextEditBufferInsertText(this.native.handle.context, this.native.handle, this.lib.encoder.encode(char));
+  }
+  insertText(text) {
+    this.guard();
+    return this.lib.contextEditBufferInsertText(this.native.handle.context, this.native.handle, this.lib.encoder.encode(text));
+  }
+  _atomic;
+  rules() {
+    return this._atomic?.() ? NativeEditAtomic : 0;
+  }
+  deleteChar() {
+    this.command(0 /* DeleteForward */, this.rules());
+  }
+  deleteCharBackward() {
+    this.command(1 /* Backspace */, this.rules());
+  }
+  deleteRange(startLine, startCol, endLine, endCol) {
+    this.guard();
+    return this.lib.contextEditBufferDeleteRange(this.native.handle.context, this.native.handle, startLine, startCol, endLine, endCol);
+  }
+  newLine() {
+    this.command(2 /* NewLine */);
+  }
+  deleteLine() {
+    this.command(3 /* DeleteLine */);
+  }
+  moveCursorLeft() {
+    this.command(4 /* MoveLeft */, this.rules());
+  }
+  moveCursorRight() {
+    this.command(5 /* MoveRight */, this.rules());
+  }
+  moveCursorUp() {
+    this.command(6 /* MoveUp */);
+  }
+  moveCursorDown() {
+    this.command(7 /* MoveDown */);
+  }
+  gotoLine(line) {
+    this.command(8 /* GotoLine */, line);
+  }
+  setCursor(line, col) {
+    this.guard();
+    return this.lib.contextEditBufferSetCursor(this.native.handle.context, this.native.handle, line, col);
+  }
+  setCursorToLineCol(line, col) {
+    this.guard();
+    return this.lib.contextEditBufferSetCursor(this.native.handle.context, this.native.handle, line, col);
+  }
+  setCursorByOffset(offset) {
+    this.command(this.rules() ? 13 /* CursorOffsetAtomic */ : 9 /* CursorOffset */, offset);
+  }
+  _keepOutside(direction) {
+    this.command(14 /* KeepOutside */, direction > 0 ? 1 : direction < 0 ? 2 : 0);
+  }
+  getCursorPosition() {
+    this.guard();
+    return this.lib.contextEditBufferGetInfo(this.native.handle.context, this.native.handle).cursor;
+  }
+  getNextWordBoundary() {
+    return this.position(1 /* NextWord */);
+  }
+  getPrevWordBoundary() {
+    return this.position(2 /* PrevWord */);
+  }
+  getEOL() {
+    return this.position(3 /* Eol */);
+  }
+  _mark(operation, mark) {
+    this.guard();
+    return this.lib.contextEditBufferMark(this.native.handle.context, this.native.handle, operation, mark);
+  }
+  _getMarks(id, kind) {
+    this.guard();
+    return this.lib.contextEditBufferGetMarks(this.native.handle.context, this.native.handle, id, kind);
+  }
+  offsetToPosition(offset) {
+    const result = this.position(4 /* Offset */, offset);
+    return result && { row: result.row, col: result.col };
+  }
+  positionToOffset(row, col) {
+    return this.position(5 /* Coords */, row, col)?.offset ?? 0;
+  }
+  getLineStartOffset(row) {
+    return this.position(6 /* LineStart */, row)?.offset ?? 0;
+  }
+  measureText(text) {
+    this.guard();
+    return this.lib.contextEditBufferMeasureText(this.native.handle.context, this.native.handle, this.lib.encoder.encode(text));
+  }
+  stringIndexToCellOffset(index) {
+    this.guard();
+    return this.lib.contextEditBufferConvertOffset(this.native.handle.context, this.native.handle, index, true);
+  }
+  cellOffsetToStringIndex(offset) {
+    this.guard();
+    return this.lib.contextEditBufferConvertOffset(this.native.handle.context, this.native.handle, offset, false);
+  }
+  getTextRange(startOffset, endOffset) {
+    this.guard();
+    if (startOffset >= endOffset)
+      return "";
+    return this.lib.contextEditBufferGetRange(this.native.handle.context, this.native.handle, false, 0, startOffset, 0, endOffset);
+  }
+  getTextRangeByCoords(startRow, startCol, endRow, endCol) {
+    this.guard();
+    return this.lib.contextEditBufferGetRange(this.native.handle.context, this.native.handle, true, startRow, startCol, endRow, endCol);
+  }
+  debugLogRope() {
+    this.command(12 /* DebugRope */);
+    this.lib.logContextDiagnostics(this.native.handle.context);
+  }
+  undo() {
+    this.guard();
+    return this.lib.contextEditBufferHistory(this.native.handle.context, this.native.handle, false);
+  }
+  redo() {
+    this.guard();
+    return this.lib.contextEditBufferHistory(this.native.handle.context, this.native.handle, true);
+  }
+  canUndo() {
+    this.guard();
+    return this.lib.contextEditBufferGetInfo(this.native.handle.context, this.native.handle).canUndo;
+  }
+  canRedo() {
+    this.guard();
+    return this.lib.contextEditBufferGetInfo(this.native.handle.context, this.native.handle).canRedo;
+  }
+  clearHistory() {
+    this.command(11 /* ClearHistory */);
+  }
+  setDefaultFg(fg) {
+    this.setDefaults(1 /* Foreground */, { fg });
+  }
+  setDefaultBg(bg) {
+    this.setDefaults(2 /* Background */, { bg });
+  }
+  setDefaultAttributes(attributes) {
+    this.setDefaults(4 /* Attributes */, { attributes });
+  }
+  resetDefaults() {
+    this.setDefaults(7 /* All */, {});
+  }
+  setSyntaxStyle(style) {
+    this.runMutation(() => {
+      this.lib.contextEditBufferSetSyntaxStyle(this.native.handle.context, this.native.handle, style?._getSceneHandle(this.native.owner) ?? null);
+      this._syntaxStyle = style ?? undefined;
+    });
+  }
+  getSyntaxStyle() {
+    this.guard();
+    return this._syntaxStyle ?? null;
+  }
+  addHighlight(lineIdx, highlight) {
+    this.highlight(0 /* AddLine */, lineIdx, highlight);
+  }
+  addHighlightByCharRange(highlight) {
+    this.highlight(1 /* AddRange */, 0, highlight);
+  }
+  removeHighlightsByRef(hlRef) {
+    this.highlight(2 /* RemoveRef */, hlRef);
+  }
+  clearLineHighlights(lineIdx) {
+    this.highlight(3 /* ClearLine */, lineIdx);
+  }
+  clearAllHighlights() {
+    this.highlight(4 /* ClearAll */);
+  }
+  getLineHighlights(lineIdx) {
+    this.guard();
+    return this.lib.contextEditBufferGetHighlights(this.native.handle.context, this.native.handle, lineIdx);
+  }
+  clear() {
+    this.command(10 /* Clear */);
+  }
+  destroy() {
+    if (this._destroyed)
+      return;
+    this.lib.getYogaHost().runMutation(() => {
+      if (!this.native.owner.disposed)
+        this.lib.releaseAfterPaint(this.native.handle.context, () => this.lib.destroyContextEditBuffer(this.native.handle.context, this.native.handle));
+      this._destroyed = true;
+      this._onHistoryReset?.();
+      this.unsubscribe?.();
+      this.unsubscribe = undefined;
+      this.removeAllListeners();
+      this._syntaxStyle = undefined;
+    });
+  }
+}
+function measureEditText2(text, options) {
+  const lib = resolveRenderLib2();
+  return lib.editMeasureText(lib.encoder.encode(text), options.widthMethod, options.tabWidth ?? 0);
+}
+
+// src/editor-view.ts
+class EditorView2 {
+  lib;
+  native;
+  editBuffer;
+  _destroyed = false;
+  _extmarksController;
+  constructor(lib, handle, editBuffer, source) {
+    const owner = source?.resourceContext;
+    if (!owner)
+      throw new Error("EditorView requires an explicit resource owner");
+    owner.assertAlive();
+    if (owner.renderLib !== lib)
+      throw new Error("EditorView library owner mismatch");
+    if (editBuffer._getOwner() !== owner || !handle || typeof handle !== "object" || handle.context !== owner.context) {
+      throw new Error("EditorView Context owner mismatch");
+    }
+    this.lib = lib;
+    this.native = { owner, handle };
+    this.editBuffer = editBuffer;
+  }
+  static create(editBuffer, viewportWidth, viewportHeight) {
+    const owner = editBuffer._getOwner();
+    const lib = owner.renderLib;
+    const handle = lib.createContextEditorView(owner.context, editBuffer._getSceneHandle(owner), viewportWidth, viewportHeight);
+    try {
+      return new EditorView2(lib, handle, editBuffer, owner);
+    } catch (error) {
+      lib.destroyContextEditorView(owner.context, handle);
+      throw error;
+    }
+  }
+  get isDestroyed() {
+    return this._destroyed;
+  }
+  guard() {
+    if (this._destroyed)
+      throw new Error("EditorView is destroyed");
+    this.native.owner.assertAlive();
+    this.editBuffer._getOwner();
+  }
+  _getOwner() {
+    this.guard();
+    return this.native.owner;
+  }
+  _getSceneHandle(scene) {
+    this.guard();
+    if (this.native.owner !== scene.resourceContext)
+      throw new Error("EditorView Context owner mismatch");
+    return this.native.handle;
+  }
+  command(command, argument) {
+    this.guard();
+    this.lib.contextEditorViewCommand(this.native.handle.context, this.native.handle, command, argument);
+  }
+  position(query) {
+    this.guard();
+    return this.lib.contextEditorViewGetPosition(this.native.handle.context, this.native.handle, query);
+  }
+  select(selection) {
+    this.guard();
+    return this.lib.contextEditorViewSelect(this.native.handle.context, this.native.handle, selection);
+  }
+  setViewportSize(width, height) {
+    this.guard();
+    return this.lib.contextEditorViewSetViewport(this.native.handle.context, this.native.handle, { x: 0, y: 0, width, height }, true);
+  }
+  setViewport(x, y, width, height, moveCursor = true) {
+    this.guard();
+    return this.lib.contextEditorViewSetViewport(this.native.handle.context, this.native.handle, { x, y, width, height }, false, moveCursor);
+  }
+  getViewport() {
+    this.guard();
+    const { x, y, width, height } = this.lib.contextEditorViewGetViewport(this.native.handle.context, this.native.handle);
+    return { offsetX: x, offsetY: y, width, height };
+  }
+  setScrollMargin(margin) {
+    this.guard();
+    return this.lib.contextEditorViewSetScrollMargin(this.native.handle.context, this.native.handle, margin);
+  }
+  setWrapMode(mode) {
+    this.command(5 /* WrapMode */, mode === "none" ? 0 : mode === "char" ? 1 : 2);
+  }
+  getVirtualLineCount() {
+    this.guard();
+    return this.lib.contextEditorViewGetInfo(this.native.handle.context, this.native.handle, true).virtualLineCount;
+  }
+  getTotalVirtualLineCount() {
+    this.guard();
+    return this.lib.contextEditorViewGetInfo(this.native.handle.context, this.native.handle).totalVirtualLineCount;
+  }
+  setSelection(start, end, bgColor, fgColor) {
+    this.select({ operation: 0 /* Set */, start, end, bg: bgColor, fg: fgColor });
+  }
+  updateSelection(end, bgColor, fgColor) {
+    this.select({ operation: 1 /* Update */, end, bg: bgColor, fg: fgColor });
+  }
+  resetSelection() {
+    this.select({ operation: 2 /* Reset */ });
+  }
+  getSelection() {
+    this.guard();
+    return this.lib.contextEditorViewGetSelection(this.native.handle.context, this.native.handle).selection;
+  }
+  hasSelection() {
+    return this.getSelection() !== null;
+  }
+  setLocalSelection(anchorX, anchorY, focusX, focusY, bgColor, fgColor, updateCursor, followCursor, behavior = "cell") {
+    return this.select({
+      operation: 3 /* Local */,
+      anchorX,
+      anchorY,
+      focusX,
+      focusY,
+      bg: bgColor,
+      fg: fgColor,
+      updateCursor,
+      followCursor,
+      behavior: behavior === "cell" ? 0 : behavior === "word" ? 1 : 2
+    });
+  }
+  updateLocalSelection(anchorX, anchorY, focusX, focusY, bgColor, fgColor, updateCursor, followCursor, behavior = "cell") {
+    return this.select({
+      operation: 4 /* LocalUpdate */,
+      anchorX,
+      anchorY,
+      focusX,
+      focusY,
+      bg: bgColor,
+      fg: fgColor,
+      updateCursor,
+      followCursor,
+      behavior: behavior === "cell" ? 0 : behavior === "word" ? 1 : 2
+    });
+  }
+  resetLocalSelection() {
+    this.select({ operation: 5 /* LocalReset */ });
+  }
+  convertSelectionToCell() {
+    return this.select({ operation: 6 /* Cell */ });
+  }
+  setSelectionOccupancy(occupancy) {
+    this.select({
+      operation: 7 /* Occupancy */,
+      behavior: occupancy === "boundary" ? 1 : 0
+    });
+  }
+  getSelectionOccupancy() {
+    this.guard();
+    return this.lib.contextEditorViewGetSelection(this.native.handle.context, this.native.handle).selectionOccupancy;
+  }
+  setSelectionInclusive(start, end, bgColor, fgColor) {
+    this.select({ operation: 8 /* Inclusive */, start, end, bg: bgColor, fg: fgColor });
+  }
+  setSelectionColors(bgColor, fgColor) {
+    this.select({ operation: 9 /* Colors */, bg: bgColor, fg: fgColor });
+  }
+  getSelectedText() {
+    this.guard();
+    return this.lib.contextEditorViewGetSelectedText(this.native.handle.context, this.native.handle);
+  }
+  getCursor() {
+    this.guard();
+    const { row, col } = this.editBuffer.getCursorPosition();
+    return { row, col };
+  }
+  getText() {
+    this.guard();
+    return this.editBuffer.getText();
+  }
+  getVisualCursor() {
+    return this.position(0 /* Cursor */);
+  }
+  _atomic = false;
+  rules() {
+    return this._atomic && !this.hasSelection() ? NativeEditAtomic : 0;
+  }
+  moveUpVisual() {
+    this.command(0 /* MoveUp */, this.rules());
+  }
+  moveDownVisual() {
+    this.command(1 /* MoveDown */, this.rules());
+  }
+  deleteSelectedText() {
+    this.command(3 /* DeleteSelection */);
+  }
+  _replaceSelectedText(text) {
+    this.guard();
+    return this.lib.contextEditorViewReplaceSelection(this.native.handle.context, this.native.handle, this.lib.encoder.encode(text));
+  }
+  setCursorByOffset(offset) {
+    this.command(4 /* CursorOffset */, offset);
+  }
+  getNextWordBoundary() {
+    return this.position(1 /* NextWord */);
+  }
+  getPrevWordBoundary() {
+    return this.position(2 /* PrevWord */);
+  }
+  getEOL() {
+    return this.position(3 /* Eol */);
+  }
+  getVisualSOL() {
+    return this.position(4 /* VisualSol */);
+  }
+  getVisualEOL() {
+    return this.position(5 /* VisualEol */);
+  }
+  gotoVisualLineEnd() {
+    this.command(2 /* GotoLineEnd */);
+  }
+  getLineInfo() {
+    this.guard();
+    return this.lib.contextEditorViewGetLines(this.native.handle.context, this.native.handle, false);
+  }
+  getLogicalLineInfo() {
+    this.guard();
+    return this.lib.contextEditorViewGetLines(this.native.handle.context, this.native.handle, true);
+  }
+  _keepCursorOutside(direction) {
+    if (this.rules())
+      this.editBuffer._keepOutside(direction);
+  }
+  get extmarks() {
+    this.guard();
+    if (!this._extmarksController) {
+      this._extmarksController = createExtmarksController2(this.editBuffer, this);
+    }
+    return this._extmarksController;
+  }
+  setPlaceholderStyledText(chunks) {
+    this.guard();
+    return this.lib.contextEditorViewSetPlaceholder(this.native.handle.context, this.native.handle, new StyledText2(chunks.map((chunk) => ({ ...chunk, __isChunk: true }))));
+  }
+  setTabIndicator(indicator) {
+    const codePoint = typeof indicator === "string" ? indicator.codePointAt(0) ?? 0 : indicator;
+    this.command(6 /* TabIndicator */, codePoint);
+  }
+  setTabIndicatorColor(color) {
+    this.guard();
+    return this.lib.contextEditorViewSetTabColor(this.native.handle.context, this.native.handle, color);
+  }
+  measureForDimensions(width, height) {
+    this.guard();
+    return this.lib.contextEditorViewMeasure(this.native.handle.context, this.native.handle, width, height);
+  }
+  destroy() {
+    if (this._destroyed)
+      return;
+    this.lib.getYogaHost().runMutation(() => {
+      if (!this.native.owner.disposed) {
+        try {
+          this.lib.releaseAfterPaint(this.native.handle.context, () => this.lib.destroyContextEditorView(this.native.handle.context, this.native.handle));
+        } catch (error) {
+          if (!(error instanceof NativeError2) || error.status !== -9 /* StaleHandle */)
+            throw error;
+        }
+      }
+      this._destroyed = true;
+      this._extmarksController?.destroy();
+      this._extmarksController = undefined;
+    });
+  }
+}
+
+// src/animation/Timeline.ts
+var easingFunctions = {
+  linear: (t) => t,
+  inQuad: (t) => t * t,
+  outQuad: (t) => t * (2 - t),
+  inOutQuad: (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+  inExpo: (t) => t === 0 ? 0 : Math.pow(2, 10 * (t - 1)),
+  outExpo: (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+  inOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
+  outBounce: (t) => {
+    const n1 = 7.5625;
+    const d1 = 2.75;
+    if (t < 1 / d1) {
+      return n1 * t * t;
+    } else if (t < 2 / d1) {
+      return n1 * (t -= 1.5 / d1) * t + 0.75;
+    } else if (t < 2.5 / d1) {
+      return n1 * (t -= 2.25 / d1) * t + 0.9375;
+    } else {
+      return n1 * (t -= 2.625 / d1) * t + 0.984375;
+    }
+  },
+  outElastic: (t) => {
+    const c4 = 2 * Math.PI / 3;
+    return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+  },
+  inBounce: (t) => 1 - easingFunctions.outBounce(1 - t),
+  inCirc: (t) => 1 - Math.sqrt(1 - t * t),
+  outCirc: (t) => Math.sqrt(1 - Math.pow(t - 1, 2)),
+  inOutCirc: (t) => {
+    if ((t *= 2) < 1)
+      return -0.5 * (Math.sqrt(1 - t * t) - 1);
+    return 0.5 * (Math.sqrt(1 - (t -= 2) * t) + 1);
+  },
+  inBack: (t, s = 1.70158) => t * t * ((s + 1) * t - s),
+  outBack: (t, s = 1.70158) => --t * t * ((s + 1) * t + s) + 1,
+  inOutBack: (t, s = 1.70158) => {
+    s *= 1.525;
+    if ((t *= 2) < 1)
+      return 0.5 * (t * t * ((s + 1) * t - s));
+    return 0.5 * ((t -= 2) * t * ((s + 1) * t + s) + 2);
+  }
+};
+function captureInitialValues(item) {
+  if (!item.properties)
+    return;
+  if (!item.initialValues || item.initialValues.length === 0) {
+    const initialValues = [];
+    for (let i = 0;i < item.target.length; i++) {
+      const target = item.target[i];
+      const targetInitialValues = {};
+      for (const key of Object.keys(item.properties)) {
+        if (typeof target[key] === "number") {
+          targetInitialValues[key] = target[key];
+        }
+      }
+      initialValues.push(targetInitialValues);
+    }
+    item.initialValues = initialValues;
+  }
+}
+function applyAnimationAtProgress(item, progress, reversed, timelineTime, deltaTime = 0) {
+  if (!item.properties || !item.initialValues)
+    return;
+  const easingFn = easingFunctions[item.ease || "linear"] || easingFunctions.linear;
+  const easedProgress = easingFn(Math.max(0, Math.min(1, progress)));
+  const finalProgress = reversed ? 1 - easedProgress : easedProgress;
+  for (let i = 0;i < item.target.length; i++) {
+    const target = item.target[i];
+    const targetInitialValues = item.initialValues[i];
+    if (!targetInitialValues)
+      continue;
+    for (const [key, endValue] of Object.entries(item.properties)) {
+      const startValue = targetInitialValues[key];
+      const newValue = startValue + (endValue - startValue) * finalProgress;
+      target[key] = newValue;
+    }
+  }
+  if (item.onUpdate) {
+    const animation = {
+      targets: item.target,
+      progress: easedProgress,
+      currentTime: timelineTime,
+      deltaTime
+    };
+    item.onUpdate(animation);
+  }
+}
+function evaluateAnimation(item, timelineTime, deltaTime = 0) {
+  if (timelineTime < item.startTime) {
+    return;
+  }
+  const animationTime = timelineTime - item.startTime;
+  const duration = item.duration || 0;
+  if (timelineTime >= item.startTime && !item.started) {
+    captureInitialValues(item);
+    if (item.onStart) {
+      item.onStart();
+    }
+    item.started = true;
+  }
+  if (duration === 0) {
+    if (!item.completed) {
+      applyAnimationAtProgress(item, 1, false, timelineTime, deltaTime);
+      if (item.onComplete) {
+        item.onComplete();
+      }
+      item.completed = true;
+    }
+    return;
+  }
+  const maxLoops = !item.loop || item.loop === 1 ? 1 : typeof item.loop === "number" ? item.loop : Infinity;
+  const loopDelay = item.loopDelay || 0;
+  const cycleTime = duration + loopDelay;
+  let currentCycle = Math.floor(animationTime / cycleTime);
+  let timeInCycle = animationTime % cycleTime;
+  if (item.onLoop && item.currentLoop !== undefined && currentCycle > item.currentLoop && currentCycle < maxLoops) {
+    item.onLoop();
+  }
+  item.currentLoop = currentCycle;
+  if (item.onComplete && !item.completed && currentCycle === maxLoops - 1 && timeInCycle >= duration) {
+    const finalLoopReversed = (item.alternate || false) && currentCycle % 2 === 1;
+    applyAnimationAtProgress(item, 1, finalLoopReversed, timelineTime, deltaTime);
+    item.onComplete();
+    item.completed = true;
+    return;
+  }
+  if (currentCycle >= maxLoops) {
+    if (!item.completed) {
+      const finalReversed = (item.alternate || false) && (maxLoops - 1) % 2 === 1;
+      applyAnimationAtProgress(item, 1, finalReversed, timelineTime, deltaTime);
+      if (item.onComplete) {
+        item.onComplete();
+      }
+      item.completed = true;
+    }
+    return;
+  }
+  if (timeInCycle === 0 && animationTime > 0 && currentCycle < maxLoops) {
+    currentCycle = currentCycle - 1;
+    timeInCycle = cycleTime;
+  }
+  if (timeInCycle >= duration) {
+    const isReversed = (item.alternate || false) && currentCycle % 2 === 1;
+    applyAnimationAtProgress(item, 1, isReversed, timelineTime, deltaTime);
+    return;
+  }
+  const progress = timeInCycle / duration;
+  const isReversed = (item.alternate || false) && currentCycle % 2 === 1;
+  applyAnimationAtProgress(item, progress, isReversed, timelineTime, deltaTime);
+}
+function evaluateCallback(item, timelineTime) {
+  if (!item.executed && timelineTime >= item.startTime && item.callback) {
+    item.callback();
+    item.executed = true;
+  }
+}
+function evaluateTimelineSync(item, timelineTime, deltaTime = 0) {
+  if (!item.timeline)
+    return;
+  if (timelineTime < item.startTime) {
+    return;
+  }
+  if (!item.timelineStarted) {
+    item.timelineStarted = true;
+    item.timeline.play();
+    const overshoot = timelineTime - item.startTime;
+    item.timeline.update(overshoot);
+    return;
+  }
+  item.timeline.update(deltaTime);
+}
+function evaluateItem(item, timelineTime, deltaTime = 0) {
+  if (item.type === "animation") {
+    evaluateAnimation(item, timelineTime, deltaTime);
+  } else if (item.type === "callback") {
+    evaluateCallback(item, timelineTime);
+  }
+}
+
+class Timeline2 {
+  items = [];
+  subTimelines = [];
+  currentTime = 0;
+  isPlaying = false;
+  isComplete = false;
+  duration;
+  _frameRate;
+  loop;
+  synced = false;
+  autoplay;
+  onComplete;
+  onPause;
+  stateChangeListeners = [];
+  constructor(options = {}) {
+    this.duration = options.duration || 1000;
+    this.frameRate = options.frameRate;
+    this.loop = options.loop === true;
+    this.autoplay = options.autoplay !== false;
+    this.onComplete = options.onComplete;
+    this.onPause = options.onPause;
+  }
+  get frameRate() {
+    return this._frameRate;
+  }
+  set frameRate(value) {
+    if (value !== undefined && !(value > 0))
+      throw new RangeError(`frameRate must be above 0, got ${value}`);
+    this._frameRate = value;
+  }
+  addStateChangeListener(listener) {
+    this.stateChangeListeners.push(listener);
+  }
+  removeStateChangeListener(listener) {
+    this.stateChangeListeners = this.stateChangeListeners.filter((l) => l !== listener);
+  }
+  notifyStateChange() {
+    for (const listener of this.stateChangeListeners) {
+      listener(this);
+    }
+  }
+  add(target, properties, startTime = 0) {
+    const resolvedStartTime = typeof startTime === "string" ? 0 : startTime;
+    const animationProperties = {};
+    for (const key in properties) {
+      if (!["duration", "ease", "onUpdate", "onComplete", "onStart", "onLoop", "loop", "loopDelay", "alternate"].includes(key)) {
+        if (typeof properties[key] === "number") {
+          animationProperties[key] = properties[key];
+        }
+      }
+    }
+    this.items.push({
+      type: "animation",
+      startTime: resolvedStartTime,
+      target: Array.isArray(target) ? target : [target],
+      properties: animationProperties,
+      initialValues: [],
+      duration: properties.duration !== undefined ? properties.duration : 1000,
+      ease: properties.ease || "linear",
+      loop: properties.loop,
+      loopDelay: properties.loopDelay || 0,
+      alternate: properties.alternate || false,
+      onUpdate: properties.onUpdate,
+      onComplete: properties.onComplete,
+      onStart: properties.onStart,
+      onLoop: properties.onLoop,
+      completed: false,
+      started: false,
+      currentLoop: 0,
+      once: properties.once ?? false
+    });
+    return this;
+  }
+  once(target, properties) {
+    this.add(target, {
+      ...properties,
+      once: true
+    }, this.currentTime);
+    return this;
+  }
+  call(callback, startTime = 0) {
+    const resolvedStartTime = typeof startTime === "string" ? 0 : startTime;
+    this.items.push({
+      type: "callback",
+      startTime: resolvedStartTime,
+      callback,
+      executed: false
+    });
+    return this;
+  }
+  sync(timeline, startTime = 0) {
+    if (timeline.synced) {
+      throw new Error("Timeline already synced");
+    }
+    this.subTimelines.push({
+      type: "timeline",
+      startTime,
+      timeline
+    });
+    timeline.synced = true;
+    return this;
+  }
+  play() {
+    if (this.isComplete) {
+      return this.restart();
+    }
+    this.subTimelines.forEach((subTimeline) => {
+      if (subTimeline.timelineStarted) {
+        subTimeline.timeline.play();
+      }
+    });
+    this.isPlaying = true;
+    this.notifyStateChange();
+    return this;
+  }
+  pause() {
+    this.subTimelines.forEach((subTimeline) => {
+      subTimeline.timeline.pause();
+    });
+    this.isPlaying = false;
+    try {
+      this.onPause?.();
+    } finally {
+      this.notifyStateChange();
+    }
+    return this;
+  }
+  resetItems() {
+    this.items.forEach((item) => {
+      if (item.type === "callback") {
+        item.executed = false;
+      } else if (item.type === "animation") {
+        item.completed = false;
+        item.started = false;
+        item.currentLoop = 0;
+      }
+    });
+    this.subTimelines.forEach((subTimeline) => {
+      subTimeline.timelineStarted = false;
+      if (subTimeline.timeline) {
+        subTimeline.timeline.restart();
+        subTimeline.timeline.pause();
+      }
+    });
+  }
+  restart() {
+    this.isComplete = false;
+    this.currentTime = 0;
+    this.isPlaying = true;
+    this.resetItems();
+    this.notifyStateChange();
+    return this;
+  }
+  update(deltaTime) {
+    for (const subTimeline of this.subTimelines) {
+      evaluateTimelineSync(subTimeline, this.currentTime + deltaTime, deltaTime);
+    }
+    if (!this.isPlaying)
+      return;
+    this.currentTime += deltaTime;
+    for (const item of this.items) {
+      evaluateItem(item, this.currentTime, deltaTime);
+    }
+    for (let i = this.items.length - 1;i >= 0; i--) {
+      const item = this.items[i];
+      if (item.type === "animation" && item.once && item.completed) {
+        this.items.splice(i, 1);
+      }
+    }
+    if (this.loop && this.currentTime >= this.duration) {
+      const overshoot = this.currentTime % this.duration;
+      this.resetItems();
+      this.currentTime = 0;
+      if (overshoot > 0) {
+        this.update(overshoot);
+      }
+    } else if (!this.loop && this.currentTime >= this.duration) {
+      this.currentTime = this.duration;
+      this.isPlaying = false;
+      this.isComplete = true;
+      try {
+        this.onComplete?.();
+      } finally {
+        this.notifyStateChange();
+      }
+    }
+  }
+}
+var rendererEngines = new WeakMap;
+var timelineOwners = new WeakMap;
+
+class TimelineEngine {
+  timelines = new Set;
+  renderer = null;
+  frameCallback = async (deltaTime) => {
+    if (this.tickFps === 0)
+      this.update(deltaTime);
+  };
+  isLive = false;
+  tickFps = 0;
+  stopTicks;
+  defaults = {
+    frameRate: 60
+  };
+  attach(renderer) {
+    if (renderer.isDestroyed)
+      throw new Error("Cannot attach timelines to a destroyed renderer");
+    if (this.renderer === renderer) {
+      if (!renderer.hasFrameCallback(this.frameCallback))
+        renderer.setFrameCallback(this.frameCallback);
+      return;
+    }
+    if (this === engine2)
+      this.detach();
+    else if (this.renderer)
+      throw new Error("Timeline engine is already attached; use getTimelineEngine(renderer) for another renderer");
+    else if (rendererEngines.has(renderer))
+      throw new Error("Renderer already has a timeline engine; use getTimelineEngine(renderer)");
+    else
+      rendererEngines.set(renderer, this);
+    this.renderer = renderer;
+    renderer.setFrameCallback(this.frameCallback);
+    this.updateLiveState();
+  }
+  detach() {
+    if (this.renderer) {
+      if (this !== engine2)
+        rendererEngines.delete(this.renderer);
+      this.renderer.removeFrameCallback(this.frameCallback);
+      if (this.isLive) {
+        this.renderer.dropLive();
+        this.isLive = false;
+      }
+      this.setTickFps(0);
+    }
+    this.renderer = null;
+  }
+  updateLiveState() {
+    if (!this.renderer)
+      return;
+    let fps = 0;
+    for (const timeline of this.timelines) {
+      if (timeline.synced || !timeline.isPlaying || timeline.isComplete)
+        continue;
+      fps = Math.max(fps, timeline.frameRate ?? this.defaults.frameRate);
+    }
+    const live = fps > 0 && fps >= this.renderer.targetFps;
+    if (live && !this.isLive) {
+      this.renderer.requestLive();
+      this.isLive = true;
+    } else if (!live && this.isLive) {
+      this.renderer.dropLive();
+      this.isLive = false;
+    }
+    this.setTickFps(live ? 0 : fps);
+  }
+  setTickFps(fps) {
+    if (fps === this.tickFps)
+      return;
+    this.stopTicks?.();
+    this.stopTicks = fps > 0 ? this.renderer?.onAnimationTick(fps, (deltaTime) => this.update(deltaTime)) : undefined;
+    this.tickFps = fps;
+  }
+  onTimelineStateChange = (timeline) => {
+    this.updateLiveState();
+  };
+  register(timeline) {
+    const owner = timelineOwners.get(timeline);
+    if (owner && owner !== this)
+      throw new Error("Timeline belongs to another timeline engine; unregister it first");
+    if (!this.timelines.has(timeline)) {
+      timelineOwners.set(timeline, this);
+      this.timelines.add(timeline);
+      timeline.addStateChangeListener(this.onTimelineStateChange);
+      this.updateLiveState();
+    }
+  }
+  unregister(timeline) {
+    if (this.timelines.has(timeline)) {
+      this.timelines.delete(timeline);
+      timelineOwners.delete(timeline);
+      timeline.removeStateChangeListener(this.onTimelineStateChange);
+      this.updateLiveState();
+    }
+  }
+  clear() {
+    for (const timeline of this.timelines) {
+      timelineOwners.delete(timeline);
+      timeline.removeStateChangeListener(this.onTimelineStateChange);
+    }
+    this.timelines.clear();
+    this.updateLiveState();
+  }
+  update(deltaTime) {
+    for (const timeline of this.timelines) {
+      if (this.renderer?.isDestroyed)
+        break;
+      if (!timeline.synced) {
+        timeline.update(deltaTime);
+      }
+    }
+  }
+}
+var engine2 = new TimelineEngine;
+function getTimelineEngine2(renderer) {
+  const owner = rendererEngines.get(renderer) ?? new TimelineEngine;
+  owner.attach(renderer);
+  return owner;
+}
+function destroyTimelineEngine(renderer) {
+  const owner = rendererEngines.get(renderer);
+  owner?.clear();
+  owner?.detach();
+  if (engine2["renderer"] === renderer)
+    engine2.detach();
+}
+function createTimeline2(options = {}, renderer) {
+  const owner = renderer ? getTimelineEngine2(renderer) : engine2;
+  const timeline = new Timeline2(options);
+  if (options.autoplay !== false) {
+    timeline.play();
+  }
+  owner.register(timeline);
+  return timeline;
+}
+
+// src/renderables/Box.ts
+function isGapType(value) {
+  if (value === undefined) {
+    return true;
+  }
+  if (typeof value === "number" && !Number.isNaN(value)) {
+    return true;
+  }
+  return isValidPercentage(value);
+}
+function borderMask(sides) {
+  return (sides.left ? 1 : 0) | (sides.bottom ? 2 : 0) | (sides.right ? 4 : 0) | (sides.top ? 8 : 0);
+}
+
+class BoxRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    kind: "box",
+    body: { native: this.prototype.renderSelf }
+  };
+  _backgroundColor;
+  _border;
+  _borderStyle;
+  _borderColor;
+  _focusedBorderColor;
+  _customBorderCharsObj;
+  _customBorderChars;
+  borderSides;
+  _shouldFill;
+  _fillDimsImages;
+  _title;
+  _titleColor;
+  _titleAlignment;
+  _bottomTitle;
+  _bottomTitleAlignment;
+  _defaultOptions = {
+    backgroundColor: "transparent",
+    borderStyle: "single",
+    border: false,
+    borderColor: "#FFFFFF",
+    shouldFill: true,
+    titleAlignment: "left",
+    bottomTitleAlignment: "left",
+    focusedBorderColor: "#00AAFF"
+  };
+  constructor(ctx, options) {
+    super(ctx, options);
+    try {
+      if (options.focusable === true) {
+        this._focusable = true;
+      }
+      this._backgroundColor = RGBA2.clone(parseColor2(options.backgroundColor || this._defaultOptions.backgroundColor));
+      this._border = options.border ?? this._defaultOptions.border;
+      if (!options.border && (options.borderStyle || options.borderColor || options.focusedBorderColor || options.customBorderChars)) {
+        this._border = true;
+      }
+      this._borderStyle = parseBorderStyle2(options.borderStyle, this._defaultOptions.borderStyle);
+      this._borderColor = RGBA2.clone(parseColor2(options.borderColor || this._defaultOptions.borderColor));
+      if (Array.isArray(this._border))
+        this._border = [...this._border];
+      this._focusedBorderColor = RGBA2.clone(parseColor2(options.focusedBorderColor || this._defaultOptions.focusedBorderColor));
+      this._customBorderCharsObj = options.customBorderChars;
+      this._customBorderChars = this._customBorderCharsObj ? borderCharsToArray2(this._customBorderCharsObj) : undefined;
+      this.borderSides = getBorderSides2(this._border);
+      this._shouldFill = options.shouldFill ?? this._defaultOptions.shouldFill;
+      this._fillDimsImages = options.fillDimsImages ?? false;
+      if (this._fillDimsImages)
+        this._ctx.nativeScene.setFillDimsImages(this, true);
+      this._title = options.title;
+      this._titleColor = options.titleColor ? RGBA2.clone(parseColor2(options.titleColor)) : undefined;
+      this._titleAlignment = options.titleAlignment || this._defaultOptions.titleAlignment;
+      this._bottomTitle = options.bottomTitle;
+      this._bottomTitleAlignment = options.bottomTitleAlignment || this._defaultOptions.bottomTitleAlignment;
+      this.setNativeScenePaint();
+      this.requestRender();
+      if (this._title || this._bottomTitle || this._titleColor || this._customBorderChars || this._titleAlignment !== "left" || this._bottomTitleAlignment !== "left") {
+        this.setNativeBoxDetails();
+      }
+      const hasInitialGapProps = options.gap !== undefined || options.rowGap !== undefined || options.columnGap !== undefined;
+      if (hasInitialGapProps) {
+        this.applyYogaGap(options);
+      }
+    } catch (error) {
+      this.abortConstruction(error);
+    }
+  }
+  initializeBorder() {
+    if (this._border === false) {
+      this._border = true;
+      this.borderSides = getBorderSides2(this._border);
+    }
+  }
+  get customBorderChars() {
+    return this._customBorderCharsObj;
+  }
+  set customBorderChars(value) {
+    const chars = value ? borderCharsToArray2(value) : undefined;
+    this.setNativeBoxDetails({ customBorderChars: chars });
+    this._customBorderCharsObj = value;
+    this._customBorderChars = chars;
+    this.requestRender();
+  }
+  get backgroundColor() {
+    return RGBA2.clone(this._backgroundColor);
+  }
+  set backgroundColor(value) {
+    if (this.isFreed())
+      return;
+    const newColor = RGBA2.clone(parseColor2(value ?? this._defaultOptions.backgroundColor));
+    this._ctx.nativeScene.setBackground(this, newColor);
+    this._backgroundColor = newColor;
+    this.requestRender();
+  }
+  get border() {
+    if (Array.isArray(this._border))
+      return [...this._border];
+    return this._border;
+  }
+  set border(value) {
+    if (this._border !== value) {
+      const sides = getBorderSides2(value);
+      this.setNativeScenePaint({ border: borderMask(sides) });
+      this._border = Array.isArray(value) ? [...value] : value;
+      this.borderSides = sides;
+      this.requestRender();
+    }
+  }
+  get borderStyle() {
+    return this._borderStyle;
+  }
+  set borderStyle(value) {
+    const _value = parseBorderStyle2(value, this._defaultOptions.borderStyle);
+    if (this._borderStyle !== _value || !this._border) {
+      this.runMutation(() => {
+        this._ctx.nativeScene.setBoxBorderStyle(this, _value, this._border === false ? 15 : borderMask(this.borderSides));
+        this._borderStyle = _value;
+        this._customBorderChars = undefined;
+        this._customBorderCharsObj = undefined;
+        this.initializeBorder();
+        this.requestRender();
+      });
+    }
+  }
+  get borderColor() {
+    return RGBA2.clone(this._borderColor);
+  }
+  set borderColor(value) {
+    const newColor = RGBA2.clone(parseColor2(value ?? this._defaultOptions.borderColor));
+    this.setNativeScenePaint({
+      borderColor: newColor,
+      border: this._border === false ? 15 : borderMask(this.borderSides)
+    });
+    this._borderColor = newColor;
+    this.initializeBorder();
+    this.requestRender();
+  }
+  get focusedBorderColor() {
+    return RGBA2.clone(this._focusedBorderColor);
+  }
+  set focusedBorderColor(value) {
+    const newColor = RGBA2.clone(parseColor2(value ?? this._defaultOptions.focusedBorderColor));
+    this.setNativeScenePaint({
+      focusedBorderColor: newColor,
+      border: this._border === false ? 15 : borderMask(this.borderSides)
+    });
+    this._focusedBorderColor = newColor;
+    this.initializeBorder();
+    this.requestRender();
+  }
+  get title() {
+    return this._title;
+  }
+  set title(value) {
+    if (this._title !== value) {
+      this.setNativeBoxDetails({ title: value });
+      this._title = value;
+      this.requestRender();
+    }
+  }
+  get titleColor() {
+    return this._titleColor ? RGBA2.clone(this._titleColor) : undefined;
+  }
+  set titleColor(value) {
+    const newColor = value ? RGBA2.clone(parseColor2(value)) : undefined;
+    if (this._titleColor !== newColor) {
+      this.setNativeBoxDetails({ titleColor: newColor });
+      this._titleColor = newColor;
+      this.requestRender();
+    }
+  }
+  get titleAlignment() {
+    return this._titleAlignment;
+  }
+  set titleAlignment(value) {
+    value ??= this._defaultOptions.titleAlignment;
+    if (this._titleAlignment !== value) {
+      this.setNativeBoxDetails({ titleAlignment: value });
+      this._titleAlignment = value;
+      this.requestRender();
+    }
+  }
+  get bottomTitle() {
+    return this._bottomTitle;
+  }
+  set bottomTitle(value) {
+    if (this._bottomTitle !== value) {
+      this.setNativeBoxDetails({ bottomTitle: value });
+      this._bottomTitle = value;
+      this.requestRender();
+    }
+  }
+  get bottomTitleAlignment() {
+    return this._bottomTitleAlignment;
+  }
+  set bottomTitleAlignment(value) {
+    value ??= this._defaultOptions.bottomTitleAlignment;
+    if (this._bottomTitleAlignment !== value) {
+      this.setNativeBoxDetails({ bottomTitleAlignment: value });
+      this._bottomTitleAlignment = value;
+      this.requestRender();
+    }
+  }
+  setNativeBoxDetails(details = {}) {
+    if (this.isFreed())
+      return;
+    this._ctx.nativeScene.setBoxDetails(this, {
+      title: this._title,
+      bottomTitle: this._bottomTitle,
+      titleAlignment: this._titleAlignment,
+      bottomTitleAlignment: this._bottomTitleAlignment,
+      titleColor: this._titleColor,
+      customBorderChars: this._customBorderChars,
+      ...details
+    });
+  }
+  renderSelf(buffer) {
+    if (borderMask(this.borderSides) === 0 && !(this._shouldFill && this._backgroundColor.a > 0))
+      return;
+    this._drawNativeBody(buffer);
+  }
+  get shouldFill() {
+    return this._shouldFill;
+  }
+  set shouldFill(value) {
+    value ??= this._defaultOptions.shouldFill;
+    if (this._shouldFill === value)
+      return;
+    this.setNativeScenePaint({ shouldFill: value });
+    this._shouldFill = value;
+    this.requestRender();
+  }
+  get fillDimsImages() {
+    return this._fillDimsImages;
+  }
+  set fillDimsImages(value) {
+    const next = value ?? false;
+    if (this._fillDimsImages === next)
+      return;
+    this._fillDimsImages = next;
+    if (this.isFreed())
+      return;
+    this._ctx.nativeScene.setFillDimsImages(this, next);
+    this.requestRender();
+  }
+  getNativeScenePaint() {
+    return {
+      zIndex: this._zIndex,
+      opacity: this._opacity,
+      translateX: this._translateX,
+      translateY: this._translateY,
+      focusable: this._focusable,
+      border: borderMask(this.borderSides),
+      shouldFill: this._shouldFill,
+      backgroundColor: this._backgroundColor,
+      borderColor: this._borderColor,
+      focusedBorderColor: this._focusedBorderColor,
+      borderStyle: this._borderStyle
+    };
+  }
+  applyYogaGap(options) {
+    if (isGapType(options.gap)) {
+      this.setGap(Gutter2.All, options.gap);
+    }
+    if (isGapType(options.rowGap)) {
+      this.setGap(Gutter2.Row, options.rowGap);
+    }
+    if (isGapType(options.columnGap)) {
+      this.setGap(Gutter2.Column, options.columnGap);
+    }
+  }
+  set gap(gap) {
+    this.setGapStyle(Gutter2.All, gap);
+  }
+  set rowGap(rowGap) {
+    this.setGapStyle(Gutter2.Row, rowGap);
+  }
+  set columnGap(columnGap) {
+    this.setGapStyle(Gutter2.Column, columnGap);
+  }
+  setGapStyle(gutter, gap) {
+    if (gap != null && !isGapType(gap))
+      return;
+    this.setGap(gutter, gap ?? undefined);
+    this.requestRender();
+  }
+}
+
+// src/lib/scroll-chain.ts
+var takers = new WeakMap;
+function wheelDirection(event) {
+  const direction = event.scroll?.direction;
+  if (!direction || !event.modifiers?.shift)
+    return direction;
+  return direction === "up" ? "left" : direction === "down" ? "right" : direction === "right" ? "down" : "up";
+}
+function scrollOnce(event, scroller, scroll) {
+  for (let node = takers.get(event) ?? null;node; node = node.parent)
+    if (node === scroller)
+      return;
+  if (scroll())
+    takers.set(event, scroller);
+}
+
+// src/renderables/TextBufferRenderable.ts
+class TextBufferRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    kind: "text",
+    body: { native: this.prototype.renderSelf },
+    lifecycle: { resize: { native: this.prototype.onResize } },
+    beforeAfter: false,
+    paintBuffer: "destination"
+  };
+  _defaultFg;
+  _defaultBg;
+  _defaultAttributes;
+  _selectionBg;
+  _selectionFg;
+  _wrapMode = "word";
+  _textAlign = "left";
+  lastLocalSelection = null;
+  _tabIndicator;
+  _tabIndicatorColor;
+  _scrollX = 0;
+  _scrollY = 0;
+  _truncate = false;
+  _firstLineOffset = 0;
+  textBuffer;
+  textBufferView;
+  nativeTextScene;
+  _defaultOptions = {
+    fg: RGBA2.fromValues(1, 1, 1, 1),
+    bg: RGBA2.fromValues(0, 0, 0, 0),
+    selectionBg: undefined,
+    selectionFg: undefined,
+    selectable: true,
+    attributes: 0,
+    wrapMode: "word",
+    textAlign: "left",
+    tabIndicator: undefined,
+    tabIndicatorColor: undefined,
+    truncate: false
+  };
+  constructor(ctx, options, sharedText = false) {
+    super(ctx, options);
+    this.nativeTextScene = sharedText ? undefined : ctx.nativeScene;
+    let textBuffer;
+    let textBufferView;
+    try {
+      this._defaultFg = RGBA2.clone(parseColor2(options.fg ?? this._defaultOptions.fg));
+      this._defaultBg = RGBA2.clone(parseColor2(options.bg ?? this._defaultOptions.bg));
+      this._defaultAttributes = options.attributes ?? this._defaultOptions.attributes;
+      this._selectionBg = options.selectionBg ? RGBA2.clone(parseColor2(options.selectionBg)) : undefined;
+      this._selectionFg = options.selectionFg ? RGBA2.clone(parseColor2(options.selectionFg)) : undefined;
+      this.selectable = options.selectable ?? this._defaultOptions.selectable;
+      this._wrapMode = options.wrapMode ?? this._defaultOptions.wrapMode;
+      this._textAlign = options.textAlign ?? this._defaultOptions.textAlign;
+      this._tabIndicator = options.tabIndicator ?? this._defaultOptions.tabIndicator;
+      this._tabIndicatorColor = options.tabIndicatorColor ? RGBA2.clone(parseColor2(options.tabIndicatorColor)) : this._defaultOptions.tabIndicatorColor;
+      this._truncate = options.truncate ?? this._defaultOptions.truncate;
+      if (this.nativeTextScene) {
+        this._firstLineOffset = ctx.claimFirstLineOffset?.(this) ?? 0;
+        this.setNativeScenePaint();
+        this.setNativeSceneTextOptions();
+        return;
+      }
+      textBuffer = TextBuffer2.create(this._ctx.widthMethod, ctx.nativeScene, true);
+      this.textBuffer = textBuffer;
+      textBufferView = TextBufferView2.create(textBuffer);
+      this.textBufferView = textBufferView;
+      this._firstLineOffset = ctx.claimFirstLineOffset?.(this) ?? 0;
+      this.textBufferView.setWrapMode(this._wrapMode);
+      this.textBufferView.setTextAlign(this._textAlign);
+      this.textBufferView.setFirstLineOffset(this._firstLineOffset);
+      ctx.nativeScene.setTextView(this, textBufferView._getSceneHandle(ctx.nativeScene));
+      this.textBuffer._setDefaults(this._defaultFg, this._defaultBg, this._defaultAttributes);
+      if (this._tabIndicator !== undefined) {
+        this.textBufferView.setTabIndicator(this._tabIndicator);
+      }
+      if (this._tabIndicatorColor !== undefined) {
+        this.textBufferView.setTabIndicatorColor(this._tabIndicatorColor);
+      }
+      const width = this.width;
+      if (width > 0 && this.height > 0)
+        this.updateViewportOffset();
+      else if (this._wrapMode !== "none" && width > 0)
+        this.textBufferView.setWrapWidth(Math.trunc(width));
+      this.textBufferView.setTruncate(this._truncate);
+      this.updateTextInfo();
+    } catch (error) {
+      this.abortConstruction(error, (run) => {
+        run(() => textBufferView?.destroy());
+        run(() => textBuffer?.destroy());
+      });
+    }
+  }
+  onMouseEvent(event) {
+    if (event.type === "scroll") {
+      scrollOnce(event, this, () => {
+        const [x, y] = [this.scrollX, this.scrollY];
+        this.handleScroll(event);
+        return this.scrollX !== x || this.scrollY !== y;
+      });
+    }
+  }
+  handleScroll(event) {
+    if (!event.scroll)
+      return;
+    const { delta } = event.scroll;
+    const direction = wheelDirection(event);
+    if (direction === "up") {
+      this.scrollY -= delta;
+    } else if (direction === "down") {
+      this.scrollY += delta;
+    }
+    if (this._wrapMode === "none" && !this._truncate) {
+      if (direction === "left") {
+        this.scrollX -= delta;
+      } else if (direction === "right") {
+        this.scrollX += delta;
+      }
+    }
+  }
+  get lineInfo() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getTextLineInfo(this);
+    return this.textBufferView.logicalLineInfo;
+  }
+  getLineSources(startLine, lineCount) {
+    if (this.needsLineInfoFallback(TextBufferRenderable2.prototype)) {
+      return this.lineInfo.lineSources.slice(startLine, startLine + lineCount);
+    }
+    if (this.nativeTextScene) {
+      return this.nativeTextScene.getTextLineInfo(this, startLine, lineCount).lineSources;
+    }
+    return this.textBufferView.getLineSources(startLine, lineCount);
+  }
+  needsLineInfoFallback(owner) {
+    let prototype = this;
+    while (prototype && prototype !== owner) {
+      if (Object.hasOwn(prototype, "getLineSources"))
+        return false;
+      if (Object.hasOwn(prototype, "lineInfo"))
+        return true;
+      prototype = Object.getPrototypeOf(prototype);
+    }
+    return false;
+  }
+  get lineCount() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getTextMetrics(this).lineCount;
+    return this.textBuffer.getLineCount();
+  }
+  get virtualLineCount() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getTextMetrics(this).virtualLineCount;
+    return this.textBufferView.getVirtualLineCount();
+  }
+  get scrollY() {
+    return this._scrollY;
+  }
+  set scrollY(value) {
+    const clamped = Math.max(0, Math.min(value ?? 0, this.maxScrollY));
+    if (this._scrollY !== clamped) {
+      this.runMutation(() => {
+        this.setNativeSceneTextOptions({ scrollY: clamped });
+        if (!this.nativeTextScene)
+          this.updateViewportOffset(this._scrollX, clamped);
+        this._scrollY = clamped;
+        this.requestRender();
+      });
+    }
+  }
+  get scrollX() {
+    return this._scrollX;
+  }
+  set scrollX(value) {
+    const clamped = Math.max(0, Math.min(value ?? 0, this.maxScrollX));
+    if (this._scrollX !== clamped) {
+      this.runMutation(() => {
+        this.setNativeSceneTextOptions({ scrollX: clamped });
+        if (!this.nativeTextScene)
+          this.updateViewportOffset(clamped, this._scrollY);
+        this._scrollX = clamped;
+        this.requestRender();
+      });
+    }
+  }
+  get scrollWidth() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getTextMetrics(this).widthColsMax;
+    return this.lineInfo.lineWidthColsMax;
+  }
+  get scrollHeight() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getTextMetrics(this).virtualLineCount;
+    return this.virtualLineCount;
+  }
+  get maxScrollY() {
+    return Math.max(0, this.scrollHeight - this.textViewport.height);
+  }
+  get maxScrollX() {
+    return Math.max(0, this.scrollWidth - this.textViewport.width);
+  }
+  get textViewport() {
+    const scene = this.nativeTextScene;
+    return scene && scene.getLayout(this, "paint").width > 0 ? scene.getLayout(this, "content") : this;
+  }
+  updateViewportOffset(scrollX = this._scrollX, scrollY = this._scrollY) {
+    const width = this.width;
+    const height = this.height;
+    if (width > 0 && height > 0) {
+      this.textBufferView.setViewport(Math.trunc(scrollX), Math.trunc(scrollY), Math.trunc(width), Math.trunc(height));
+    }
+  }
+  get plainText() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getText(this);
+    return this.textBuffer.getPlainText();
+  }
+  get textLength() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getTextMetrics(this).textLength;
+    return this.textBuffer.length;
+  }
+  get fg() {
+    return RGBA2.clone(this._defaultFg);
+  }
+  set fg(value) {
+    const newColor = RGBA2.clone(parseColor2(value ?? this._defaultOptions.fg));
+    this.runMutation(() => {
+      this.setNativeSceneTextOptions({ fg: newColor });
+      if (!this.nativeTextScene)
+        this.textBuffer.setDefaultFg(newColor);
+      this._defaultFg = newColor;
+      this.onFgChanged(newColor);
+      this.requestRender();
+    });
+  }
+  get selectionBg() {
+    return this._selectionBg ? RGBA2.clone(this._selectionBg) : undefined;
+  }
+  set selectionBg(value) {
+    const newColor = value ? RGBA2.clone(parseColor2(value)) : undefined;
+    if (this._selectionBg !== newColor) {
+      this.runMutation(() => {
+        this.setSelectionColors(newColor, this._selectionFg);
+        this._selectionBg = newColor;
+        this.requestRender();
+      });
+    }
+  }
+  get selectionFg() {
+    return this._selectionFg ? RGBA2.clone(this._selectionFg) : undefined;
+  }
+  set selectionFg(value) {
+    const newColor = value ? RGBA2.clone(parseColor2(value)) : undefined;
+    if (this._selectionFg !== newColor) {
+      this.runMutation(() => {
+        this.setSelectionColors(this._selectionBg, newColor);
+        this._selectionFg = newColor;
+        this.requestRender();
+      });
+    }
+  }
+  get bg() {
+    return RGBA2.clone(this._defaultBg);
+  }
+  set bg(value) {
+    const newColor = RGBA2.clone(parseColor2(value ?? this._defaultOptions.bg));
+    this.runMutation(() => {
+      this.setNativeSceneTextOptions({ bg: newColor });
+      if (!this.nativeTextScene)
+        this.textBuffer.setDefaultBg(newColor);
+      this._defaultBg = newColor;
+      this.onBgChanged(newColor);
+      this.requestRender();
+    });
+  }
+  get attributes() {
+    return this._defaultAttributes;
+  }
+  set attributes(value) {
+    const attributes = value ?? this._defaultOptions.attributes;
+    if (this._defaultAttributes !== attributes) {
+      this.runMutation(() => {
+        this.setNativeSceneTextOptions({ attributes });
+        if (!this.nativeTextScene)
+          this.textBuffer.setDefaultAttributes(attributes);
+        this._defaultAttributes = attributes;
+        this.onAttributesChanged(attributes);
+        this.requestRender();
+      });
+    }
+  }
+  get wrapMode() {
+    return this._wrapMode;
+  }
+  set wrapMode(value) {
+    value ??= this._defaultOptions.wrapMode;
+    if (this._wrapMode !== value) {
+      this.runMutation(() => {
+        this.setNativeSceneTextOptions({ wrapMode: value });
+        if (!this.nativeTextScene)
+          this.textBufferView.setWrapMode(value);
+        this._wrapMode = value;
+        if (!this.nativeTextScene && value !== "none") {
+          const width = this.width;
+          if (width > 0)
+            this.textBufferView.setWrapWidth(Math.trunc(width));
+        }
+        if (value !== "none")
+          this.scrollX = 0;
+        this.requestRender();
+      });
+    }
+  }
+  get textAlign() {
+    return this._textAlign;
+  }
+  set textAlign(value) {
+    value ??= this._defaultOptions.textAlign;
+    if (this._textAlign !== value) {
+      this.runMutation(() => {
+        this.setNativeSceneTextOptions({ textAlign: value });
+        if (!this.nativeTextScene)
+          this.textBufferView.setTextAlign(value);
+        this._textAlign = value;
+        this.requestRender();
+      });
+    }
+  }
+  get tabIndicator() {
+    return this._tabIndicator;
+  }
+  set tabIndicator(value) {
+    if (this._tabIndicator !== value) {
+      this.runMutation(() => {
+        this.setNativeSceneTextOptions({ tabIndicator: value });
+        if (!this.nativeTextScene)
+          this.textBufferView.setTabIndicator(value ?? 0);
+        this._tabIndicator = value;
+        this.requestRender();
+      });
+    }
+  }
+  get tabIndicatorColor() {
+    return this._tabIndicatorColor ? RGBA2.clone(this._tabIndicatorColor) : undefined;
+  }
+  set tabIndicatorColor(value) {
+    const newColor = value ? RGBA2.clone(parseColor2(value)) : undefined;
+    if (this._tabIndicatorColor !== newColor) {
+      this.runMutation(() => {
+        this.setNativeSceneTextOptions({ tabIndicatorColor: newColor });
+        if (!this.nativeTextScene && newColor !== undefined)
+          this.textBufferView.setTabIndicatorColor(newColor);
+        this._tabIndicatorColor = newColor;
+        this.requestRender();
+      });
+    }
+  }
+  get truncate() {
+    return this._truncate;
+  }
+  set truncate(value) {
+    value ??= this._defaultOptions.truncate;
+    if (this._truncate !== value) {
+      this.runMutation(() => {
+        this.setNativeSceneTextOptions({ truncate: value });
+        if (!this.nativeTextScene)
+          this.textBufferView.setTruncate(value);
+        this._truncate = value;
+        if (value)
+          this.scrollX = 0;
+        this.requestRender();
+      });
+    }
+  }
+  onResize(width, height) {
+    if (!this.nativeTextScene) {
+      this.textBufferView.setViewport(Math.trunc(this._scrollX), Math.trunc(this._scrollY), width, height);
+    }
+    this.requestRender();
+    this.emit("line-info-change");
+  }
+  refreshLocalSelection() {
+    if (this.lastLocalSelection) {
+      return this.updateLocalSelection(this.lastLocalSelection);
+    }
+    return false;
+  }
+  setSelectionColors(bg, fg) {
+    if (this.nativeTextScene)
+      this.nativeTextScene.setTextSelection(this, "colors", null, bg, fg);
+    else
+      this.textBufferView.setSelectionColors(bg, fg);
+  }
+  updateLocalSelection(localSelection, isStart = true, colors) {
+    const bg = colors ? colors.bg : this._selectionBg;
+    const fg = colors ? colors.fg : this._selectionFg;
+    if (this.nativeTextScene) {
+      return this.nativeTextScene.setTextSelection(this, !localSelection?.isActive ? "reset" : isStart ? "set" : "update", localSelection, bg, fg);
+    }
+    if (!localSelection?.isActive) {
+      this.textBufferView.resetLocalSelection();
+      return true;
+    }
+    return this.textBufferView[isStart ? "setLocalSelection" : "updateLocalSelection"](localSelection.anchorX, localSelection.anchorY, localSelection.focusX, localSelection.focusY, bg, fg, localSelection.behavior);
+  }
+  updateTextInfo() {
+    if (this.lastLocalSelection) {
+      this.updateLocalSelection(this.lastLocalSelection);
+    }
+    this.requestRender();
+    this.emit("line-info-change");
+  }
+  shouldStartSelection(x, y) {
+    if (!this.selectable)
+      return false;
+    const localX = x - this.x;
+    const localY = y - this.y;
+    return localX >= 0 && localX < this.width && localY >= 0 && localY < this.height;
+  }
+  onSelectionChanged(selection) {
+    const localSelection = convertGlobalToLocalSelection2(selection, Math.trunc(this.x), Math.trunc(this.y));
+    const changed = this.updateLocalSelection(localSelection, selection?.isStart ?? false);
+    this.lastLocalSelection = localSelection;
+    if (changed) {
+      this.requestRender();
+    }
+    return this.hasSelection();
+  }
+  getSelectedText() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getSelectedText(this);
+    return this.textBufferView.getSelectedText();
+  }
+  hasSelection() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getTextSelection(this) !== null;
+    return this.textBufferView.hasSelection();
+  }
+  getSelection() {
+    if (this.nativeTextScene)
+      return this.nativeTextScene.getTextSelection(this);
+    return this.textBufferView.getSelection();
+  }
+  renderSelf(buffer) {
+    this.drawToBuffer(buffer, this._screenX, this._screenY);
+  }
+  drawToBuffer(buffer, x, y) {
+    if (this.isDestroyed)
+      throw new Error("Cannot draw destroyed text");
+    if (this.nativeTextScene) {
+      this.nativeTextScene.drawBody(this, buffer, Math.trunc(x), Math.trunc(y));
+      return;
+    }
+    buffer.drawTextBuffer(this.textBufferView, Math.trunc(x), Math.trunc(y));
+  }
+  destroyOwnedResources() {
+    if (this.nativeTextScene)
+      return;
+    this.runCleanup((run) => {
+      run(() => this.textBufferView.destroy());
+      run(() => this.textBuffer.destroy());
+    });
+  }
+  setNativeSceneTextOptions(options = {}) {
+    this.nativeTextScene?.setTextOptions(this, {
+      fg: this._defaultFg,
+      bg: this._defaultBg,
+      attributes: this._defaultAttributes,
+      wrapMode: this._wrapMode,
+      textAlign: this._textAlign,
+      truncate: this._truncate,
+      scrollX: this._scrollX,
+      scrollY: this._scrollY,
+      firstLineOffset: this._firstLineOffset,
+      tabIndicator: this._tabIndicator,
+      tabIndicatorColor: this._tabIndicatorColor,
+      ...options
+    });
+  }
+  onFgChanged(newColor) {}
+  onBgChanged(newColor) {}
+  onAttributesChanged(newAttributes) {}
+}
+
+// src/renderables/Slider.ts
+var defaultThumbBackgroundColor = RGBA2.fromHex("#9a9ea3");
+var defaultTrackBackgroundColor = RGBA2.fromHex("#252527");
+var defaultMin = 0;
+var defaultMax = 100;
+
+class SliderRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    kind: "slider",
+    body: { native: this.prototype.renderSelf }
+  };
+  _orientation;
+  _value;
+  _min;
+  _max;
+  _viewPortSize;
+  _backgroundColor;
+  _foregroundColor;
+  _onChange;
+  constructor(ctx, options) {
+    super(ctx, { flexShrink: 0, ...options });
+    try {
+      this._orientation = options.orientation;
+      this._min = options.min ?? defaultMin;
+      this._max = options.max ?? defaultMax;
+      this._value = options.value ?? this._min;
+      this._viewPortSize = options.viewPortSize ?? this.defaultViewPortSize();
+      this._onChange = options.onChange;
+      this._backgroundColor = RGBA2.clone(parseColor2(options.backgroundColor || defaultTrackBackgroundColor));
+      this._foregroundColor = RGBA2.clone(parseColor2(options.foregroundColor || defaultThumbBackgroundColor));
+      this.setNativeSceneSlider();
+      this.setNativeScenePaint();
+      this.setupMouseHandling();
+    } catch (error) {
+      this.abortConstruction(error);
+    }
+  }
+  get orientation() {
+    return this._orientation;
+  }
+  set orientation(value) {
+    if (value === this._orientation)
+      return;
+    this.setNativeSceneSlider({ orientation: value });
+    this._orientation = value;
+    this.requestRender();
+  }
+  get value() {
+    return this._value;
+  }
+  set value(newValue) {
+    newValue ??= this._min;
+    const clamped = Math.max(this._min, Math.min(this._max, newValue));
+    if (clamped !== this._value) {
+      this.setNativeSceneSlider({ value: clamped });
+      this.publishValue(clamped);
+    }
+  }
+  publishValue(value) {
+    if (value === this._value)
+      return;
+    this._value = value;
+    this.requestRender();
+    this._onChange?.(value);
+    this.emit("change", { value });
+  }
+  get min() {
+    return this._min;
+  }
+  set min(newMin) {
+    newMin ??= defaultMin;
+    if (newMin !== this._min) {
+      const value = this._value < newMin ? newMin : this._value;
+      this.setNativeSceneSlider({ min: newMin, value });
+      this._min = newMin;
+      if (this._value < newMin) {
+        this.publishValue(value);
+      }
+      this.requestRender();
+    }
+  }
+  get max() {
+    return this._max;
+  }
+  set max(newMax) {
+    newMax ??= defaultMax;
+    if (newMax !== this._max) {
+      const value = this._value > newMax ? Math.max(this._min, newMax) : this._value;
+      this.setNativeSceneSlider({ max: newMax, value });
+      this._max = newMax;
+      if (this._value > newMax) {
+        this.publishValue(value);
+      }
+      this.requestRender();
+    }
+  }
+  set viewPortSize(size) {
+    size ??= this.defaultViewPortSize();
+    const clampedSize = Math.max(0.01, Math.min(size, this._max - this._min));
+    if (clampedSize !== this._viewPortSize) {
+      this.setNativeSceneSlider({ viewPortSize: clampedSize });
+      this._viewPortSize = clampedSize;
+      this.requestRender();
+    }
+  }
+  get viewPortSize() {
+    return this._viewPortSize;
+  }
+  defaultViewPortSize() {
+    return Math.max(1, (this._max - this._min) * 0.1);
+  }
+  get backgroundColor() {
+    return RGBA2.clone(this._backgroundColor);
+  }
+  set backgroundColor(value) {
+    const color = RGBA2.clone(parseColor2(value ?? defaultTrackBackgroundColor));
+    this.setNativeSceneSlider({ backgroundColor: color });
+    this._backgroundColor = color;
+    this.requestRender();
+  }
+  get foregroundColor() {
+    return RGBA2.clone(this._foregroundColor);
+  }
+  set foregroundColor(value) {
+    const color = RGBA2.clone(parseColor2(value ?? defaultThumbBackgroundColor));
+    this.setNativeSceneSlider({ foregroundColor: color });
+    this._foregroundColor = color;
+    this.requestRender();
+  }
+  setNativeSceneSlider(options = {}) {
+    if (this.isFreed())
+      return;
+    this._ctx.nativeScene.setSlider(this, {
+      orientation: this.orientation,
+      min: this._min,
+      max: this._max,
+      value: this._value,
+      viewPortSize: this._viewPortSize,
+      foregroundColor: this._foregroundColor,
+      backgroundColor: this._backgroundColor,
+      ...options
+    });
+  }
+  calculateDragOffsetVirtual(event) {
+    const trackStart = this.orientation === "vertical" ? this.y : this.x;
+    const trackSize = this.orientation === "vertical" ? this.height : this.width;
+    const mousePos = (this.orientation === "vertical" ? event.y : event.x) - trackStart;
+    const virtualMousePos = Math.max(0, Math.min(trackSize, mousePos)) * 2;
+    const thumbSize = this._ctx.nativeScene.getSliderThumb(this).size;
+    const maxThumbStart = Math.max(0, trackSize * 2 - thumbSize);
+    const range = this._max - this._min;
+    const ratio = range === 0 ? 0 : (this._value - this._min) / range;
+    return Math.max(0, Math.min(thumbSize, virtualMousePos - ratio * maxThumbStart));
+  }
+  setupMouseHandling() {
+    let isDragging = false;
+    let dragOffsetVirtual = 0;
+    let appliedMousePos = 0;
+    const pointerAxis = (event) => this.orientation === "vertical" ? event.y : event.x;
+    this.onMouseDown = (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      const thumb = this.getThumbRect();
+      const inThumb = event.x >= thumb.x && event.x < thumb.x + thumb.width && event.y >= thumb.y && event.y < thumb.y + thumb.height;
+      if (!inThumb) {
+        this.updateValueFromMouseDirect(event);
+        if (this.isDestroyed)
+          return;
+      }
+      isDragging = true;
+      dragOffsetVirtual = this.calculateDragOffsetVirtual(event);
+      appliedMousePos = pointerAxis(event);
+    };
+    const drag = (event) => {
+      const mousePos = pointerAxis(event);
+      if (mousePos === appliedMousePos)
+        return;
+      appliedMousePos = mousePos;
+      this.updateValueFromMouseWithOffset(event, dragOffsetVirtual);
+    };
+    this.onMouseDrag = (event) => {
+      if (!isDragging)
+        return;
+      event.stopPropagation();
+      drag(event);
+    };
+    this.onMouseUp = (event) => {
+      if (isDragging)
+        drag(event);
+      isDragging = false;
+    };
+  }
+  updateValueFromMouseDirect(event) {
+    const trackStart = this.orientation === "vertical" ? this.y : this.x;
+    const trackSize = this.orientation === "vertical" ? this.height : this.width;
+    const mousePos = this.orientation === "vertical" ? event.y : event.x;
+    const relativeMousePos = mousePos - trackStart;
+    const clampedMousePos = Math.max(0, Math.min(trackSize, relativeMousePos));
+    const ratio = trackSize === 0 ? 0 : clampedMousePos / trackSize;
+    const range = this._max - this._min;
+    const newValue = this._min + ratio * range;
+    this.value = newValue;
+  }
+  updateValueFromMouseWithOffset(event, offsetVirtual) {
+    const trackStart = this.orientation === "vertical" ? this.y : this.x;
+    const trackSize = this.orientation === "vertical" ? this.height : this.width;
+    const mousePos = this.orientation === "vertical" ? event.y : event.x;
+    const virtualTrackSize = trackSize * 2;
+    const relativeMousePos = mousePos - trackStart;
+    const clampedMousePos = Math.max(0, Math.min(trackSize, relativeMousePos));
+    const virtualMousePos = clampedMousePos * 2;
+    const virtualThumbSize = this._ctx.nativeScene.getSliderThumb(this).size;
+    const maxThumbStart = Math.max(0, virtualTrackSize - virtualThumbSize);
+    let desiredThumbStart = virtualMousePos - offsetVirtual;
+    desiredThumbStart = Math.max(0, Math.min(maxThumbStart, desiredThumbStart));
+    const ratio = maxThumbStart === 0 ? 0 : desiredThumbStart / maxThumbStart;
+    const range = this._max - this._min;
+    const newValue = this._min + ratio * range;
+    this.value = newValue;
+  }
+  getThumbRect() {
+    const thumb = this._ctx.nativeScene.getSliderThumb(this);
+    const virtualThumbSize = thumb.size;
+    const virtualThumbStart = thumb.start;
+    const realThumbStart = Math.floor(virtualThumbStart / 2);
+    const realThumbSize = Math.ceil((virtualThumbStart + virtualThumbSize) / 2) - realThumbStart;
+    if (this.orientation === "vertical") {
+      return {
+        x: this.x,
+        y: this.y + realThumbStart,
+        width: this.width,
+        height: Math.max(1, realThumbSize)
+      };
+    } else {
+      return {
+        x: this.x + realThumbStart,
+        y: this.y,
+        width: Math.max(1, realThumbSize),
+        height: this.height
+      };
+    }
+  }
+  renderSelf(buffer) {
+    this._drawNativeBody(buffer);
+  }
+}
+
+// src/renderables/ScrollBar.ts
+class ScrollBarRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    ...Renderable2.nativeIntegration,
+    kind: "box"
+  };
+  slider;
+  startArrow;
+  endArrow;
+  orientation;
+  static defaultFocusable = true;
+  _scrollSize = 0;
+  _scrollPosition = 0;
+  _viewportSize = 0;
+  _showArrows = false;
+  _manualVisibility = false;
+  _onChange;
+  arrowRepeat;
+  scrollStep = null;
+  get visible() {
+    return super.visible;
+  }
+  set visible(value) {
+    if (value == null) {
+      this.resetVisibilityControl();
+      return;
+    }
+    this._manualVisibility = true;
+    super.visible = value;
+  }
+  resetVisibilityControl() {
+    this._manualVisibility = false;
+    this.recalculateVisibility();
+  }
+  get scrollSize() {
+    return this._scrollSize;
+  }
+  get scrollPosition() {
+    return this._scrollPosition;
+  }
+  get viewportSize() {
+    return this._viewportSize;
+  }
+  set scrollSize(value) {
+    if (this.isDestroyed)
+      return;
+    this.assertMutable();
+    value ??= 0;
+    if (!Number.isFinite(value) || !Number.isFinite(value - this._viewportSize)) {
+      throw new RangeError("Scene scroll sizes and ranges must be finite numbers");
+    }
+    if (value === this.scrollSize)
+      return;
+    this._scrollSize = value;
+    this.recalculateVisibility();
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.updateSliderFromScrollState();
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.scrollPosition = this.scrollPosition;
+  }
+  set scrollPosition(value) {
+    if (this.isDestroyed)
+      return;
+    this.assertMutable();
+    const newPosition = Math.round(Math.max(0, Math.min(value ?? 0, this.scrollSize - this.viewportSize)));
+    if (!Number.isFinite(newPosition)) {
+      throw new RangeError("Scene scroll positions must be finite numbers");
+    }
+    if (newPosition !== this._scrollPosition) {
+      this._scrollPosition = newPosition;
+      this.updateSliderFromScrollState();
+    }
+  }
+  set viewportSize(value) {
+    if (this.isDestroyed)
+      return;
+    this.assertMutable();
+    value ??= 0;
+    if (!Number.isFinite(value) || !Number.isFinite(this._scrollSize - value)) {
+      throw new RangeError("Scene viewport sizes and ranges must be finite numbers");
+    }
+    if (value === this.viewportSize)
+      return;
+    this.slider.viewPortSize = Math.max(1, value);
+    this._viewportSize = value;
+    this.recalculateVisibility();
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.updateSliderFromScrollState();
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.scrollPosition = this.scrollPosition;
+  }
+  get showArrows() {
+    return this._showArrows;
+  }
+  set showArrows(value) {
+    value ??= false;
+    if (this.isDestroyed || value === this._showArrows)
+      return;
+    this.assertMutable();
+    this._showArrows = value;
+    this.startArrow.visible = value;
+    if (this.isDestroyed || this.endArrow.isDestroyed)
+      return;
+    this.endArrow.visible = value;
+  }
+  constructor(ctx, { trackOptions, arrowOptions, orientation, showArrows = false, ...options }) {
+    super(ctx, {
+      flexDirection: orientation === "vertical" ? "column" : "row",
+      alignSelf: "stretch",
+      alignItems: "stretch",
+      ...options
+    });
+    const children = [];
+    try {
+      this._onChange = options.onChange;
+      this.orientation = orientation;
+      this._showArrows = showArrows;
+      const scrollRange = Math.max(0, this._scrollSize - this._viewportSize);
+      const defaultStepSize = Math.max(1, this._viewportSize);
+      const stepSize = trackOptions?.viewPortSize ?? defaultStepSize;
+      this.slider = new SliderRenderable2(ctx, {
+        orientation,
+        min: 0,
+        max: scrollRange,
+        value: this._scrollPosition,
+        viewPortSize: stepSize,
+        onChange: (value) => {
+          if (this.isDestroyed)
+            return;
+          this._scrollPosition = Math.round(value);
+          this._onChange?.(this._scrollPosition);
+          if (!this.isDestroyed)
+            this.emit("change", { position: this._scrollPosition });
+        },
+        ...orientation === "vertical" ? {
+          width: Math.max(1, Math.min(2, this.width)),
+          height: "100%",
+          marginLeft: "auto"
+        } : {
+          width: "100%",
+          height: 1,
+          marginTop: "auto"
+        },
+        flexGrow: 1,
+        flexShrink: 1,
+        ...trackOptions
+      });
+      children.push(this.slider);
+      this.updateSliderFromScrollState();
+      const arrowOpts = arrowOptions ? {
+        foregroundColor: arrowOptions.backgroundColor,
+        backgroundColor: arrowOptions.backgroundColor,
+        attributes: arrowOptions.attributes,
+        ...arrowOptions
+      } : {};
+      this.startArrow = new ArrowRenderable2(ctx, {
+        alignSelf: "center",
+        visible: this.showArrows,
+        direction: this.orientation === "vertical" ? "up" : "left",
+        height: 1,
+        ...arrowOpts
+      });
+      children.push(this.startArrow);
+      this.endArrow = new ArrowRenderable2(ctx, {
+        alignSelf: "center",
+        visible: this.showArrows,
+        direction: this.orientation === "vertical" ? "down" : "right",
+        height: 1,
+        ...arrowOpts
+      });
+      children.push(this.endArrow);
+      this.add(this.startArrow);
+      this.add(this.slider);
+      this.add(this.endArrow);
+      for (const [arrow, direction] of [
+        [this.startArrow, -1],
+        [this.endArrow, 1]
+      ]) {
+        arrow.onMouseDown = (event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          this.stopArrowRepeat();
+          if (this.isDestroyed || arrow.isDestroyed)
+            return;
+          const repeat = { arrow, timer: undefined };
+          this.arrowRepeat = repeat;
+          this.scrollBy(direction * 0.5, "viewport");
+          if (this.arrowRepeat !== repeat || this.isDestroyed || arrow.isDestroyed)
+            return;
+          repeat.timer = setTimeout(() => {
+            repeat.timer = undefined;
+            if (this.arrowRepeat !== repeat || this.isDestroyed || arrow.isDestroyed)
+              return;
+            this.scrollBy(direction * 0.5, "viewport");
+            if (this.arrowRepeat !== repeat || this.isDestroyed || arrow.isDestroyed)
+              return;
+            repeat.timer = setInterval(() => {
+              if (this.arrowRepeat !== repeat)
+                return;
+              if (this.isDestroyed || arrow.isDestroyed) {
+                this.stopArrowRepeat();
+                return;
+              }
+              this.scrollBy(direction * 0.2, "viewport");
+            }, 200);
+          }, 500);
+        };
+        arrow.onMouseUp = (event) => {
+          event.stopPropagation();
+          this.stopArrowRepeat();
+        };
+        arrow.on("destroyed" /* DESTROYED */, () => {
+          if (this.arrowRepeat?.arrow === arrow)
+            this.stopArrowRepeat();
+        });
+      }
+      this.setNativeScenePaint();
+    } catch (error) {
+      this.abortConstruction(error, (run) => {
+        run(() => this.stopArrowRepeat());
+        for (let index = children.length - 1;index >= 0; index--) {
+          run(() => children[index].destroyRecursively());
+        }
+      });
+    }
+  }
+  stopArrowRepeat() {
+    const repeat = this.arrowRepeat;
+    this.arrowRepeat = undefined;
+    if (repeat)
+      clearTimeout(repeat.timer);
+  }
+  destroyOwnedResources() {
+    this.stopArrowRepeat();
+    super.destroyOwnedResources();
+  }
+  set arrowOptions(options) {
+    this.assignOptions(this.startArrow, options);
+    this.assignOptions(this.endArrow, options);
+    if (!this.isDestroyed)
+      this.requestRender();
+  }
+  set trackOptions(options) {
+    this.assignOptions(this.slider, options);
+    if (!this.isDestroyed)
+      this.requestRender();
+  }
+  updateSliderFromScrollState() {
+    const scrollRange = Math.max(0, this._scrollSize - this._viewportSize);
+    this.slider.min = 0;
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.slider.max = scrollRange;
+    if (this.isDestroyed || this.slider.isDestroyed)
+      return;
+    this.slider.value = Math.min(this._scrollPosition, scrollRange);
+  }
+  scrollBy(delta, unit = "absolute") {
+    this.scrollPosition += scrollUnitSize2(this, unit) * delta;
+  }
+  recalculateVisibility() {
+    if (!this._manualVisibility) {
+      const sizeRatio = this.scrollSize <= this.viewportSize ? 1 : this.viewportSize / this.scrollSize;
+      super.visible = sizeRatio < 1;
+    }
+  }
+  handleKeyPress(key) {
+    switch (key.name) {
+      case "left":
+      case "h":
+        if (this.orientation !== "horizontal")
+          return false;
+        this.scrollBy(-1 / 5, "viewport");
+        return true;
+      case "right":
+      case "l":
+        if (this.orientation !== "horizontal")
+          return false;
+        this.scrollBy(1 / 5, "viewport");
+        return true;
+      case "up":
+      case "k":
+        if (this.orientation !== "vertical")
+          return false;
+        this.scrollBy(-1 / 5, "viewport");
+        return true;
+      case "down":
+      case "j":
+        if (this.orientation !== "vertical")
+          return false;
+        this.scrollBy(1 / 5, "viewport");
+        return true;
+      case "pageup":
+        this.scrollBy(-1 / 2, "viewport");
+        return true;
+      case "pagedown":
+        this.scrollBy(1 / 2, "viewport");
+        return true;
+      case "home":
+        this.scrollBy(-1, "content");
+        return true;
+      case "end":
+        this.scrollBy(1, "content");
+        return true;
+    }
+    return false;
+  }
+}
+var defaultArrowForeground = RGBA2.fromValues(1, 1, 1, 1);
+var defaultArrowBackground = RGBA2.fromValues(0, 0, 0, 0);
+
+class ArrowRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    kind: "arrow",
+    body: { native: this.prototype.renderSelf }
+  };
+  _direction;
+  _foregroundColor;
+  _backgroundColor;
+  _attributes;
+  _arrowChars;
+  constructor(ctx, options) {
+    super(ctx, options);
+    try {
+      this._direction = options.direction;
+      this._foregroundColor = RGBA2.clone(parseColor2(options.foregroundColor || defaultArrowForeground));
+      this._backgroundColor = RGBA2.clone(parseColor2(options.backgroundColor || defaultArrowBackground));
+      this._attributes = options.attributes ?? 0;
+      this._arrowChars = {
+        up: "\u25B2",
+        down: "\u25BC",
+        left: "\u25C0",
+        right: "\u25B6",
+        ...options.arrowChars
+      };
+      if (!options.width)
+        this.width = this.glyphWidth();
+      this.setNativeSceneArrow();
+      this.setNativeScenePaint();
+    } catch (error) {
+      this.abortConstruction(error);
+    }
+  }
+  get direction() {
+    return this._direction;
+  }
+  set direction(value) {
+    if (this._direction !== value) {
+      this.setNativeSceneArrow({ direction: value, text: this._arrowChars[value] });
+      this._direction = value;
+      this.requestRender();
+    }
+  }
+  get foregroundColor() {
+    return RGBA2.clone(this._foregroundColor);
+  }
+  set foregroundColor(value) {
+    const color = RGBA2.clone(parseColor2(value ?? defaultArrowForeground));
+    this.setNativeSceneArrow({ foregroundColor: color });
+    this._foregroundColor = color;
+    this.requestRender();
+  }
+  get backgroundColor() {
+    return RGBA2.clone(this._backgroundColor);
+  }
+  set backgroundColor(value) {
+    const color = RGBA2.clone(parseColor2(value ?? defaultArrowBackground));
+    this.setNativeSceneArrow({ backgroundColor: color });
+    this._backgroundColor = color;
+    this.requestRender();
+  }
+  get attributes() {
+    return this._attributes;
+  }
+  set attributes(value) {
+    value ??= 0;
+    if (this._attributes !== value) {
+      this.setNativeSceneArrow({ attributes: value });
+      this._attributes = value;
+      this.requestRender();
+    }
+  }
+  set arrowChars(value) {
+    const chars = {
+      ...this._arrowChars,
+      ...value
+    };
+    this.setNativeSceneArrow({ text: chars[this._direction] });
+    this._arrowChars = chars;
+    this.requestRender();
+  }
+  setNativeSceneArrow(options = {}) {
+    if (this.isFreed())
+      return;
+    this._ctx.nativeScene.setArrow(this, {
+      direction: this._direction,
+      attributes: this._attributes,
+      foregroundColor: this._foregroundColor,
+      backgroundColor: this._backgroundColor,
+      text: this.getArrowChar(),
+      ...options
+    });
+  }
+  renderSelf(buffer) {
+    this._drawNativeBody(buffer);
+  }
+  defaultDimension(kind) {
+    return kind === "width" ? this.glyphWidth() : super.defaultDimension(kind);
+  }
+  glyphWidth() {
+    const { context, renderLib } = this._ctx.nativeScene.driver;
+    const unicode = renderLib.createContextUnicode(context, this.getArrowChar(), this._ctx.widthMethod);
+    try {
+      return renderLib.getContextUnicode(context, unicode).reduce((width, glyph) => width + glyph.width, 0);
+    } finally {
+      renderLib.destroyContextUnicode(context, unicode);
+    }
+  }
+  getArrowChar() {
+    return this._arrowChars[this._direction];
+  }
+}
+function scrollUnitSize2(bar, unit) {
+  if (unit === "viewport")
+    return bar.viewportSize;
+  if (unit === "content")
+    return bar.scrollSize;
+  return unit === "step" ? bar.scrollStep ?? 1 : 1;
+}
+
+// src/renderables/ScrollBoxParts.ts
+import { EventEmitter as EventEmitter6 } from "events";
+class ScrollBoxPart extends EventEmitter6 {
+  box;
+  constructor(box, event) {
+    super();
+    this.box = box;
+    this.on("newListener", (name) => name === event && box._refreshScrollHook(true));
+    this.on("removeListener", (name) => name === event && box._refreshScrollHook());
+  }
+  get isDestroyed() {
+    return this.box.isDestroyed;
+  }
+  get x() {
+    return this.rect().x;
+  }
+  get y() {
+    return this.rect().y;
+  }
+  get screenX() {
+    return this.rect().x;
+  }
+  get screenY() {
+    return this.rect().y;
+  }
+  get width() {
+    return this.rect().width;
+  }
+  get height() {
+    return this.rect().height;
+  }
+  removeAllListeners(event) {
+    for (const name of event === undefined ? this.eventNames() : [event]) {
+      if (name !== "newListener" && name !== "removeListener")
+        super.removeAllListeners(name);
+    }
+    return this;
+  }
+  _assign(options, keys) {
+    if (options == null)
+      return;
+    for (const key of Reflect.ownKeys(options)) {
+      if (typeof key !== "string" || !keys.includes(key))
+        continue;
+      if (!Object.getOwnPropertyDescriptor(options, key)?.enumerable)
+        continue;
+      this[key] = Reflect.get(options, key);
+      if (this.box.isDestroyed)
+        return;
+    }
+  }
+}
+
+class ScrollBoxFilledPart extends ScrollBoxPart {
+  _backgroundColor;
+  get backgroundColor() {
+    return RGBA2.clone(this._backgroundColor ?? RGBA2.fromValues(0, 0, 0, 0));
+  }
+  set backgroundColor(value) {
+    this._backgroundColor = value == null ? undefined : RGBA2.clone(parseColor2(value));
+    this.box._applyScrollOptions();
+  }
+  _fill() {
+    return this._backgroundColor;
+  }
+}
+
+class ScrollBoxSizedPart extends ScrollBoxFilledPart {
+  _onSizeChange;
+  constructor(box) {
+    super(box, "resize");
+  }
+  get onSizeChange() {
+    return this._onSizeChange;
+  }
+  set onSizeChange(handler) {
+    this._onSizeChange = handler ?? undefined;
+    this.box._refreshScrollHook();
+  }
+  _listening() {
+    return this._onSizeChange !== undefined || this.listenerCount("resize") > 0;
+  }
+  _emitResize() {
+    this._onSizeChange?.();
+    if (!this.box.isDestroyed)
+      this.emit("resize");
+  }
+}
+
+class ScrollBoxWrapper2 extends ScrollBoxFilledPart {
+  static keys = ["backgroundColor"];
+  _listening() {
+    return false;
+  }
+  rect() {
+    return this.box._wrapperRect();
+  }
+}
+var paddingKeys = ["padding", "paddingX", "paddingY", "paddingLeft", "paddingTop", "paddingRight", "paddingBottom"];
+
+class ScrollBoxViewport2 extends ScrollBoxSizedPart {
+  static keys = ["backgroundColor", "onSizeChange", ...paddingKeys];
+  paddings = {};
+  constructor(box) {
+    super(box);
+    paddingKeys.forEach((key, index) => Object.defineProperty(this, key, {
+      configurable: true,
+      get: index < 3 ? undefined : () => this._edges()[index - 3],
+      set: (value) => this.setPadding(key, value)
+    }));
+  }
+  rect() {
+    return this.box._scrollState().viewport;
+  }
+  setPadding(key, value) {
+    const max = nativeConstants.OT_SCENE_SCROLL_PADDING_MAX;
+    if (value != null && (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > max)) {
+      throw new RangeError("ScrollBox viewport padding must be a whole number of cells");
+    }
+    if (value == null)
+      delete this.paddings[key];
+    else
+      this.paddings[key] = value;
+    this.box._applyScrollOptions();
+  }
+  _edges() {
+    const p = this.paddings;
+    const all = p.padding ?? 0;
+    const x = p.paddingX ?? all;
+    const y = p.paddingY ?? all;
+    return [p.paddingLeft ?? x, p.paddingTop ?? y, p.paddingRight ?? x, p.paddingBottom ?? y];
+  }
+}
+var content = NativeStyleFlags.Content;
+var contentStyles = {};
+{
+  const value = (kind, edge = NATIVE_EDGE_NONE2) => (scene, node, input) => sceneSetValue(scene, node, kind, edge, input ?? undefined, content);
+  const enums = [
+    ["flexDirection", YogaEnumKind.FlexDirection, parseFlexDirection2],
+    ["flexWrap", YogaEnumKind.FlexWrap, parseWrap2],
+    ["layoutMode", YogaEnumKind.LayoutMode, parseLayoutMode2],
+    ["alignItems", YogaEnumKind.AlignItems, parseAlignItems2],
+    ["alignContent", YogaEnumKind.AlignContent, parseAlignContent2],
+    ["boxSizing", YogaEnumKind.BoxSizing, parseBoxSizing2],
+    ["justifyContent", YogaEnumKind.JustifyContent, parseJustify2],
+    ["alignSelf", YogaEnumKind.AlignSelf, parseAlign2]
+  ];
+  for (const [key, kind, parse] of enums) {
+    contentStyles[key] = (scene, node, input) => sceneSetEnum(scene, node, kind, parse(input ?? undefined), content);
+  }
+  contentStyles.flexGrow = (scene, node, input) => sceneSetFloat(scene, node, YogaFloatKind.FlexGrow, input ?? 0, content);
+  contentStyles.flexShrink = (scene, node, input) => sceneSetFloat(scene, node, YogaFloatKind.FlexShrink, input ?? 0, content);
+  contentStyles.aspectRatio = (scene, node, input) => sceneSetFloat(scene, node, YogaFloatKind.AspectRatio, input, content);
+  for (const [key, kind] of [
+    ["width", YogaValueKind.Width],
+    ["height", YogaValueKind.Height],
+    ["flexBasis", YogaValueKind.FlexBasis],
+    ["minWidth", YogaValueKind.MinWidth],
+    ["minHeight", YogaValueKind.MinHeight],
+    ["maxWidth", YogaValueKind.MaxWidth],
+    ["maxHeight", YogaValueKind.MaxHeight]
+  ]) {
+    contentStyles[key] = value(kind);
+  }
+  for (const [suffix, edge] of [
+    ["", Edge2.All],
+    ["X", Edge2.Horizontal],
+    ["Y", Edge2.Vertical],
+    ["Top", Edge2.Top],
+    ["Right", Edge2.Right],
+    ["Bottom", Edge2.Bottom],
+    ["Left", Edge2.Left]
+  ]) {
+    contentStyles[`padding${suffix}`] = value(YogaValueKind.Padding, edge);
+    contentStyles[`margin${suffix}`] = value(YogaValueKind.Margin, edge);
+  }
+  contentStyles.gap = value(YogaValueKind.Gap, Gutter2.All);
+  contentStyles.rowGap = value(YogaValueKind.Gap, Gutter2.Row);
+  contentStyles.columnGap = value(YogaValueKind.Gap, Gutter2.Column);
+}
+
+class ScrollBoxContent2 extends ScrollBoxSizedPart {
+  static keys = ["backgroundColor", "onSizeChange", "viewportCulling", ...Object.keys(contentStyles)];
+  styles = new Map;
+  constructor(box) {
+    super(box);
+    for (const key of Object.keys(contentStyles)) {
+      const size = key === "width" || key === "height";
+      Object.defineProperty(this, key, {
+        configurable: true,
+        enumerable: false,
+        get: () => size ? this.rect()[key] : this.styles.get(key),
+        set: (input) => this.setStyle(key, input)
+      });
+    }
+  }
+  rect() {
+    const { content, offset } = this.box._scrollState();
+    return {
+      x: this.box.screenX + content.x - offset[0],
+      y: this.box.screenY + content.y - offset[1],
+      width: content.width,
+      height: content.height
+    };
+  }
+  setStyle(key, input) {
+    this.box._setContentStyle((scene, node) => contentStyles[key](scene, node, input));
+    if (input == null)
+      this.styles.delete(key);
+    else
+      this.styles.set(key, input);
+  }
+  get _row() {
+    const list = parseLayoutMode2(this.styles.get("layoutMode")) === nativeConstants.OT_LAYOUT_MODE_LIST;
+    const direction = parseFlexDirection2(this.styles.get("flexDirection"));
+    return !list && (direction === FlexDirection2.Row || direction === FlexDirection2.RowReverse);
+  }
+  get viewportCulling() {
+    return this.box.viewportCulling;
+  }
+  set viewportCulling(value) {
+    this.box.viewportCulling = value;
+  }
+  add(obj, index) {
+    return this.box.add(obj, index);
+  }
+  insertBefore(obj, anchor) {
+    return this.box.insertBefore(obj, anchor);
+  }
+  remove(child) {
+    this.box.remove(child);
+  }
+  getChildren() {
+    return this.box.getChildren();
+  }
+  getChildrenCount() {
+    return this.box.getChildrenCount();
+  }
+  getRenderable(id) {
+    return this.box.getRenderable(id);
+  }
+  findDescendantById(id) {
+    return this.box.findDescendantById(id);
+  }
+}
+var defaultTrack = RGBA2.fromHex("#252527");
+var defaultThumb = RGBA2.fromHex("#9a9ea3");
+var defaultArrowForeground2 = RGBA2.fromValues(1, 1, 1, 1);
+var defaultArrowBackground2 = RGBA2.fromValues(0, 0, 0, 0);
+
+class ScrollBoxBar2 extends ScrollBoxPart {
+  static keys = [
+    "visible",
+    "showArrows",
+    "arrowOptions",
+    "trackOptions",
+    "onChange",
+    "width",
+    "height",
+    "paddingLeft",
+    "paddingTop",
+    "position",
+    "scrollStep"
+  ];
+  orientation;
+  scrollStep = null;
+  axis;
+  policy = "auto";
+  _showArrows = false;
+  _arrowOptions = {};
+  trackForeground = defaultThumb;
+  trackBackground = defaultTrack;
+  thickness = 1;
+  gap = 0;
+  overlay = false;
+  _onChange;
+  constructor(box, orientation) {
+    super(box, "change");
+    this.orientation = orientation;
+    this.axis = orientation === "vertical" ? 1 : 0;
+  }
+  rect() {
+    const bar = this.box._scrollState().bars[this.axis];
+    const arrows = this._showArrows ? 1 : 0;
+    return this.axis === 1 ? {
+      x: bar.track.x - this.gap,
+      y: bar.track.y - arrows,
+      width: bar.track.width + this.gap,
+      height: bar.track.height + 2 * arrows
+    } : {
+      x: bar.track.x - arrows,
+      y: bar.track.y - this.gap,
+      width: bar.track.width + 2 * arrows,
+      height: bar.track.height + this.gap
+    };
+  }
+  _listening() {
+    return this._onChange !== undefined || this.listenerCount("change") > 0;
+  }
+  _native() {
+    return {
+      policy: this.policy,
+      overlay: this.overlay,
+      thickness: this.thickness,
+      gap: this.gap,
+      arrows: this._showArrows,
+      foregroundColor: this.trackForeground,
+      backgroundColor: this.trackBackground
+    };
+  }
+  _arrows() {
+    const options = this._arrowOptions;
+    const background = options.backgroundColor ?? undefined;
+    const foreground = options.foregroundColor ?? background;
+    const chars = options.arrowChars ?? {};
+    return (this.axis === 1 ? ["up", "down"] : ["left", "right"]).map((direction) => ({
+      attributes: options.attributes ?? 0,
+      foregroundColor: RGBA2.clone(parseColor2(foreground || defaultArrowForeground2)),
+      backgroundColor: RGBA2.clone(parseColor2(background || defaultArrowBackground2)),
+      text: chars[direction]
+    }));
+  }
+  _emitChange(position) {
+    this._onChange?.(position);
+    if (!this.box.isDestroyed)
+      this.emit("change", { position });
+  }
+  get visible() {
+    return this.box._scrollState().bars[this.axis].visible;
+  }
+  set visible(value) {
+    this.setOption(() => this.policy = value == null ? "auto" : value ? "always" : "never");
+  }
+  resetVisibilityControl() {
+    this.visible = null;
+  }
+  get onChange() {
+    return this._onChange;
+  }
+  set onChange(handler) {
+    this._onChange = handler ?? undefined;
+    this.box._refreshScrollHook();
+  }
+  get showArrows() {
+    return this._showArrows;
+  }
+  set showArrows(value) {
+    this.setOption(() => this._showArrows = value ?? false);
+  }
+  set arrowOptions(options) {
+    this._arrowOptions = { ...this._arrowOptions, ...options };
+    if (!this.box.isDestroyed)
+      this.box._applyScrollArrows(this.axis);
+  }
+  set trackOptions(options) {
+    this.setOption(() => {
+      if (options && "foregroundColor" in options) {
+        this.trackForeground = RGBA2.clone(parseColor2(options.foregroundColor ?? defaultThumb));
+      }
+      if (options && "backgroundColor" in options) {
+        this.trackBackground = RGBA2.clone(parseColor2(options.backgroundColor ?? defaultTrack));
+      }
+    });
+  }
+  get width() {
+    return super.width;
+  }
+  set width(value) {
+    if (this.axis === 1)
+      this.setOption(() => this.thickness = Math.max(1, cells(value, 1)));
+  }
+  get height() {
+    return super.height;
+  }
+  set height(value) {
+    if (this.axis === 0)
+      this.setOption(() => this.thickness = Math.max(1, cells(value, 1)));
+  }
+  set paddingLeft(value) {
+    if (this.axis === 1)
+      this.setOption(() => this.gap = cells(value, 0));
+  }
+  set paddingTop(value) {
+    if (this.axis === 0)
+      this.setOption(() => this.gap = cells(value, 0));
+  }
+  set position(value) {
+    this.setOption(() => this.overlay = value === "absolute");
+  }
+  setOption(change) {
+    if (this.box.isDestroyed)
+      return;
+    change();
+    this.box._applyScrollOptions();
+  }
+  get scrollSize() {
+    const { content } = this.box._scrollState();
+    return this.axis === 1 ? content.height : content.width;
+  }
+  get viewportSize() {
+    const { viewport } = this.box._scrollState();
+    return this.axis === 1 ? viewport.height : viewport.width;
+  }
+  get scrollPosition() {
+    return this.box._scrollState().offset[this.axis];
+  }
+  set scrollPosition(value) {
+    this.box._scrollAxis(this.axis, value, false);
+  }
+  scrollBy(delta, unit = "absolute") {
+    this.box._scrollAxis(this.axis, scrollUnitSize2(this, unit) * delta, true, true);
+  }
+  handleKeyPress(key) {
+    return ScrollBarRenderable2.prototype.handleKeyPress.call(this, key);
+  }
+}
+function cells(value, fallback) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(255, Math.trunc(value))) : fallback;
+}
+
+// src/renderables/ScrollBox.ts
+var SCROLLBOX_PADDING_KEYS = [
+  "padding",
+  "paddingX",
+  "paddingY",
+  "paddingTop",
+  "paddingRight",
+  "paddingBottom",
+  "paddingLeft"
+];
+function pickScrollBoxPadding(options) {
+  if (!options)
+    return {};
+  const picked = {};
+  for (const key of SCROLLBOX_PADDING_KEYS) {
+    const value = options[key];
+    if (value !== undefined) {
+      picked[key] = value;
+    }
+  }
+  return picked;
+}
+function stripScrollBoxPadding(options) {
+  const sanitized = { ...options };
+  for (const key of SCROLLBOX_PADDING_KEYS) {
+    delete sanitized[key];
+  }
+  return sanitized;
+}
+
+class ScrollBoxRenderable2 extends BoxRenderable2 {
+  static nativeIntegration = {
+    ...BoxRenderable2.nativeIntegration,
+    lifecycle: {
+      update: {
+        idle: this.prototype.onUpdate,
+        active: (renderable) => renderable["autoScrollOwner"] !== undefined
+      },
+      scroll: {
+        active: (renderable) => renderable.scrollHook,
+        notify: (renderable) => renderable.notifyScroll()
+      }
+    }
+  };
+  wrapper;
+  viewport;
+  content;
+  horizontalScrollBar;
+  verticalScrollBar;
+  static defaultFocusable = true;
+  selectionListener = () => this.stopAutoScroll();
+  autoScrollOwner;
+  autoScrollMouseX = 0;
+  autoScrollMouseY = 0;
+  autoScrollThresholdVertical = 3;
+  autoScrollThresholdHorizontal = 3;
+  autoScrollSpeedSlow = 6;
+  autoScrollSpeedMedium = 36;
+  autoScrollSpeedFast = 72;
+  cachedAutoScrollSpeed = 3;
+  autoScrollAccumulatorX = 0;
+  autoScrollAccumulatorY = 0;
+  scrollAccumulatorX = 0;
+  scrollAccumulatorY = 0;
+  _stickyScroll;
+  _stickyStart;
+  scrollAccel;
+  axes;
+  _viewportCulling;
+  state = emptySceneScrollState();
+  stateRevision;
+  scrollHook = false;
+  configured = false;
+  barPress;
+  layoutCallbacks = [];
+  anchorToken;
+  get stickyScroll() {
+    return this._stickyScroll;
+  }
+  set stickyScroll(value) {
+    this.setScrollOption(() => this._stickyScroll = value);
+  }
+  get stickyStart() {
+    return this._stickyStart;
+  }
+  set stickyStart(value) {
+    this.setScrollOption(() => this._stickyStart = value);
+  }
+  setScrollOption(change) {
+    const previous = [this._stickyScroll, this._stickyStart, this._viewportCulling];
+    change();
+    try {
+      this._applyScrollOptions();
+    } catch (error) {
+      [this._stickyScroll, this._stickyStart, this._viewportCulling] = previous;
+      throw error;
+    }
+  }
+  get scrollX() {
+    return this.axes.x;
+  }
+  set scrollX(value) {
+    this.axes.x = value ?? false;
+    this._applyScrollOptions();
+  }
+  get scrollY() {
+    return this.axes.y;
+  }
+  set scrollY(value) {
+    this.axes.y = value ?? true;
+    this._applyScrollOptions();
+  }
+  get scrollTop() {
+    return this._scrollState().offset[1];
+  }
+  set scrollTop(value) {
+    this._scrollAxis(1, value, false);
+  }
+  get scrollLeft() {
+    return this._scrollState().offset[0];
+  }
+  set scrollLeft(value) {
+    this._scrollAxis(0, value, false);
+  }
+  get scrollWidth() {
+    return this._scrollState().content.width;
+  }
+  get scrollHeight() {
+    return this._scrollState().content.height;
+  }
+  constructor(ctx, options) {
+    const {
+      wrapperOptions,
+      viewportOptions,
+      contentOptions,
+      rootOptions,
+      scrollbarOptions,
+      verticalScrollbarOptions,
+      horizontalScrollbarOptions,
+      stickyScroll = false,
+      stickyStart,
+      scrollX = false,
+      scrollY = true,
+      scrollAcceleration,
+      viewportCulling = true,
+      ...rootBoxOptions
+    } = options;
+    const forwardedContentPadding = {
+      ...pickScrollBoxPadding(rootBoxOptions),
+      ...pickScrollBoxPadding(rootOptions)
+    };
+    const sanitizedRootBoxOptions = stripScrollBoxPadding(rootBoxOptions);
+    const sanitizedRootOptions = rootOptions ? stripScrollBoxPadding(rootOptions) : undefined;
+    super(ctx, {
+      flexDirection: "row",
+      alignItems: "stretch",
+      ...sanitizedRootBoxOptions,
+      ...sanitizedRootOptions,
+      overflow: "hidden"
+    });
+    try {
+      this._stickyScroll = stickyScroll;
+      this._stickyStart = stickyStart;
+      this.scrollAccel = scrollAcceleration ?? new LinearScrollAccel2;
+      this.axes = { x: scrollX, y: scrollY };
+      this._viewportCulling = viewportCulling;
+      this.wrapper = new ScrollBoxWrapper2(this);
+      this.viewport = new ScrollBoxViewport2(this);
+      this.content = new ScrollBoxContent2(this);
+      this.verticalScrollBar = new ScrollBoxBar2(this, "vertical");
+      this.horizontalScrollBar = new ScrollBoxBar2(this, "horizontal");
+      this.wrapper._assign(wrapperOptions, ScrollBoxWrapper2.keys);
+      this.viewport._assign(viewportOptions, ScrollBoxViewport2.keys);
+      for (const [bar, own] of [
+        [this.verticalScrollBar, verticalScrollbarOptions],
+        [this.horizontalScrollBar, horizontalScrollbarOptions]
+      ]) {
+        bar._assign({ ...scrollbarOptions, ...own, arrowOptions: { ...scrollbarOptions?.arrowOptions, ...own?.arrowOptions } }, ScrollBoxBar2.keys);
+      }
+      this.configured = true;
+      this._applyScrollOptions();
+      this._applyScrollArrows(0);
+      this._applyScrollArrows(1);
+      this.content._assign({ ...forwardedContentPadding, ...contentOptions }, ScrollBoxContent2.keys);
+      this._refreshScrollHook();
+      this.setNativeScenePaint();
+    } catch (error) {
+      this.abortConstruction(error, (run) => run(() => this.destroySelf()));
+    }
+  }
+  _applyScrollOptions() {
+    if (!this.configured || this.isFreed())
+      return;
+    const sticky = this._stickyScroll && this._stickyStart;
+    this._ctx.nativeScene.setScroll(this, {
+      scrollX: this.axes.x,
+      scrollY: this.axes.y,
+      follow: sticky ? this._stickyStart : "none",
+      culling: this._viewportCulling,
+      padding: this.viewport._edges(),
+      fills: [this.wrapper._fill(), this.viewport._fill(), this.content._fill()],
+      bars: [this.horizontalScrollBar._native(), this.verticalScrollBar._native()]
+    });
+    this.requestRender();
+  }
+  _applyScrollArrows(axis) {
+    if (!this.configured || this.isFreed())
+      return;
+    const bar = axis === 1 ? this.verticalScrollBar : this.horizontalScrollBar;
+    bar._arrows().forEach((arrow, end) => this._ctx.nativeScene.setScrollArrow(this, axis, end, arrow));
+    this.requestRender();
+  }
+  _setContentStyle(apply) {
+    if (this.isFreed())
+      return;
+    apply(this._ctx.nativeScene, this);
+    this.requestRender();
+  }
+  _scrollState() {
+    if (this.isFreed())
+      return this.state;
+    const revision = this._ctx.nativeScene.observedLayoutRevision;
+    if (revision !== undefined && revision === this.stateRevision)
+      return this.state;
+    this.state = this._ctx.nativeScene.getScroll(this);
+    this.stateRevision = revision;
+    return this.state;
+  }
+  _wrapperRect() {
+    const { viewport, bars } = this._scrollState();
+    const horizontal = bars[0];
+    const gutter = horizontal.visible ? horizontal.track.y + horizontal.track.height - viewport.y - viewport.height : 0;
+    return { ...viewport, height: viewport.height + Math.max(0, gutter) };
+  }
+  _scrollAxis(axis, value, relative, reapply = false) {
+    if (this.isFreed())
+      return;
+    this.assertMutable();
+    value ??= 0;
+    if (Number.isNaN(value))
+      throw new RangeError("Scene scroll positions must be finite numbers");
+    const x = axis === 0 ? value : 0;
+    const y = axis === 1 ? value : 0;
+    this.commitScroll(() => this._ctx.nativeScene.scrollTo(this, x, y, axis !== 0 || relative, axis !== 1 || relative, reapply));
+  }
+  commitScroll(scroll) {
+    const before = this._scrollState().offset;
+    const state = scroll();
+    this.state = state;
+    this.stateRevision = this._ctx.nativeScene.observedLayoutRevision;
+    const moved = (state.offset[0] !== before[0] ? 1 : 0) | (state.offset[1] !== before[1] ? 2 : 0);
+    if (moved)
+      this.requestRender();
+    this.notifyOffsets(state, moved);
+  }
+  notifyOffsets(state, moved) {
+    for (const axis of [1, 0]) {
+      if ((moved & axis + 1) === 0)
+        continue;
+      (axis === 1 ? this.verticalScrollBar : this.horizontalScrollBar)._emitChange(state.offset[axis]);
+      if (this.isDestroyed)
+        return;
+    }
+  }
+  listening() {
+    return this.verticalScrollBar?._listening() || this.horizontalScrollBar?._listening() || this.content?._listening() || this.viewport?._listening() || this.layoutCallbacks.length > 0;
+  }
+  _refreshScrollHook(adding = false) {
+    if (!this.configured || this.isFreed())
+      return;
+    const listening = adding || this.listening();
+    if (listening === this.scrollHook)
+      return;
+    this.scrollHook = listening;
+    this.refreshNativeSceneHooks();
+  }
+  notifyScroll() {
+    const state = this._scrollState();
+    this.notifyOffsets(state, state.changes);
+    if (!this.isDestroyed && state.changes & 8)
+      this.viewport._emitResize();
+    if (!this.isDestroyed && state.changes & 4)
+      this.content._emitResize();
+    if (this.isDestroyed || !(state.changes & 16))
+      return;
+    const frame = this._ctx.frameId;
+    const due = this.layoutCallbacks.filter((entry) => entry.frame < frame);
+    this.layoutCallbacks = this.layoutCallbacks.filter((entry) => entry.frame >= frame);
+    if (this.layoutCallbacks.length > 0)
+      this._ctx.nativeScene.scrollRequest(this, "layout", null);
+    let failure;
+    for (const { callback } of due) {
+      if (this.isDestroyed)
+        break;
+      try {
+        callback();
+      } catch (error) {
+        failure ??= { error };
+      }
+    }
+    this._refreshScrollHook();
+    if (failure)
+      throw failure.error;
+  }
+  afterLayout(callback) {
+    if (this.isFreed())
+      return;
+    this.assertMutable();
+    this.layoutCallbacks.push({ frame: this._ctx.frameId, callback });
+    this._refreshScrollHook();
+    this._ctx.nativeScene.scrollRequest(this, "layout", null);
+    this.requestRender();
+  }
+  anchor(node) {
+    if (this.isFreed())
+      return () => {};
+    this.assertMutable();
+    this._ctx.nativeScene.scrollRequest(this, "anchor", node);
+    const token = {};
+    this.anchorToken = token;
+    return () => {
+      if (this.anchorToken !== token || this.isFreed())
+        return;
+      this._ctx.nativeScene.scrollRequest(this, "anchor", null);
+      this.anchorToken = undefined;
+    };
+  }
+  get primaryAxis() {
+    return this.content._row ? "row" : "column";
+  }
+  onUpdate(deltaTime) {
+    this.handleAutoScroll(deltaTime);
+  }
+  scrollBy(delta, unit = "absolute") {
+    if (typeof delta === "number") {
+      this.verticalScrollBar.scrollBy(delta, unit);
+    } else {
+      this.verticalScrollBar.scrollBy(delta.y, unit);
+      if (this.isDestroyed)
+        return;
+      this.horizontalScrollBar.scrollBy(delta.x, unit);
+    }
+  }
+  scrollChildIntoView(child, options = {}) {
+    const node = typeof child === "string" ? this.findDescendantById(child) : child;
+    if (!node || this.isFreed())
+      return;
+    this.assertMutable();
+    this.commitScroll(() => this._ctx.nativeScene.scrollRequest(this, "into-view", node, options.align, options.inset));
+  }
+  scrollTo(position) {
+    if (typeof position === "number") {
+      this._scrollAxis(1, position, false, true);
+    } else {
+      this._scrollAxis(1, position.y, false, true);
+      if (this.isDestroyed)
+        return;
+      this._scrollAxis(0, position.x, false, true);
+    }
+  }
+  scrollByWheel(event) {
+    const dir = wheelDirection(event);
+    const vertical = dir === "up" || dir === "down";
+    if (!vertical && dir !== "left" && dir !== "right")
+      return false;
+    const axis = vertical ? 1 : 0;
+    const sign = dir === "up" || dir === "left" ? -1 : 1;
+    const { offset, max } = this._scrollState();
+    const position = offset[axis];
+    if (sign < 0 ? position <= 0 : position >= max[axis])
+      return false;
+    let remainder = vertical ? this.scrollAccumulatorY : this.scrollAccumulatorX;
+    if (remainder * sign < 0)
+      remainder = 0;
+    remainder += sign * (event.scroll?.delta ?? 0) * this.scrollAccel.tick(Date.now());
+    const step = Math.trunc(remainder);
+    if (step !== 0)
+      this._scrollAxis(axis, position + step, false);
+    remainder = this._scrollState().offset[axis] - position === step ? remainder - step : 0;
+    if (vertical)
+      this.scrollAccumulatorY = remainder;
+    else
+      this.scrollAccumulatorX = remainder;
+    return true;
+  }
+  onMouseEvent(event) {
+    if (event.type === "scroll")
+      scrollOnce(event, this, () => this.scrollByWheel(event));
+    if (this.handleBarMouse(event))
+      return;
+    if (event.type === "drag" && event.isDragging) {
+      this.updateAutoScroll(event.x, event.y);
+    } else if (event.type === "up") {
+      this.stopAutoScroll();
+    }
+  }
+  handleBarMouse(event) {
+    const press = this.barPress;
+    if (press && (event.type === "drag" || event.type === "up" || event.type === "drag-end")) {
+      if ("offset" in press && event.type !== "drag-end")
+        this.dragThumb(press, event);
+      if (event.type === "up")
+        this.endBarPress();
+      event.stopPropagation();
+      return true;
+    }
+    if (event.type !== "down" || event.button !== 0 || event.target !== this)
+      return false;
+    const { bars } = this._scrollState();
+    for (const axis of [1, 0]) {
+      const bar = bars[axis];
+      if (!bar.visible)
+        continue;
+      const part = axis === 1 ? this.verticalScrollBar : this.horizontalScrollBar;
+      const inside = (rect) => event.x >= rect.x && event.x < rect.x + rect.width && event.y >= rect.y && event.y < rect.y + rect.height;
+      const arrow = part.showArrows ? inside(bar.startArrow) ? -1 : inside(bar.endArrow) ? 1 : 0 : 0;
+      if (arrow === 0 && !inside(bar.track))
+        continue;
+      event.stopPropagation();
+      event.preventDefault();
+      this.endBarPress();
+      if (arrow !== 0)
+        this.pressArrow(axis, arrow, part);
+      else
+        this.pressTrack(axis, event);
+      return true;
+    }
+    return false;
+  }
+  pressArrow(axis, arrow, part) {
+    const press = { axis, arrow, timer: undefined };
+    this.barPress = press;
+    const step = (amount, delay) => {
+      part.scrollBy(arrow * amount, "viewport");
+      if (this.barPress !== press)
+        return;
+      press.timer = this._ctx.clock.setTimeout(() => step(delay === 500 ? 0.5 : 0.2, 200), delay);
+    };
+    step(0.5, 500);
+  }
+  thumbPointer(axis, event) {
+    const bar = this._scrollState().bars[axis];
+    const along = axis === 1 ? event.y - bar.track.y : event.x - bar.track.x;
+    const length = axis === 1 ? bar.track.height : bar.track.width;
+    return {
+      at: Math.max(0, Math.min(length, along)) * 2,
+      length: length * 2,
+      start: bar.thumbStart,
+      size: bar.thumbSize
+    };
+  }
+  pressTrack(axis, event) {
+    let thumb = this.thumbPointer(axis, event);
+    const inThumb = thumb.at >= Math.floor(thumb.start / 2) * 2 && thumb.at < Math.ceil((thumb.start + thumb.size) / 2) * 2;
+    if (!inThumb) {
+      const max = this._scrollState().max[axis];
+      this._scrollAxis(axis, thumb.length === 0 ? 0 : thumb.at / thumb.length * max, false);
+      if (this.isDestroyed)
+        return;
+      thumb = this.thumbPointer(axis, event);
+    }
+    const { offset, max } = this._scrollState();
+    const start = max[axis] === 0 ? 0 : offset[axis] / max[axis] * Math.max(0, thumb.length - thumb.size);
+    this.barPress = { axis, offset: Math.max(0, Math.min(thumb.size, thumb.at - start)), at: thumb.at };
+  }
+  dragThumb(press, event) {
+    const thumb = this.thumbPointer(press.axis, event);
+    if (thumb.at === press.at)
+      return;
+    press.at = thumb.at;
+    const span = Math.max(0, thumb.length - thumb.size);
+    const start = Math.max(0, Math.min(span, thumb.at - press.offset));
+    this._scrollAxis(press.axis, span === 0 ? 0 : start / span * this._scrollState().max[press.axis], false);
+  }
+  endBarPress() {
+    const press = this.barPress;
+    this.barPress = undefined;
+    if (press && "timer" in press && press.timer !== undefined)
+      this._ctx.clock.clearTimeout(press.timer);
+  }
+  handleKeyPress(key) {
+    if (this.verticalScrollBar.handleKeyPress(key) || this.horizontalScrollBar.handleKeyPress(key)) {
+      this.scrollAccel.reset();
+      this.resetScrollAccumulators();
+      return true;
+    }
+    return false;
+  }
+  resetScrollAccumulators() {
+    this.scrollAccumulatorX = 0;
+    this.scrollAccumulatorY = 0;
+  }
+  startAutoScroll(mouseX, mouseY) {
+    if (this.isDestroyed)
+      return;
+    this.stopAutoScroll();
+    this.autoScrollMouseX = mouseX;
+    this.autoScrollMouseY = mouseY;
+    this.cachedAutoScrollSpeed = this.getAutoScrollSpeed(mouseX, mouseY);
+    this.autoScrollOwner = this.draggingSelection();
+    this.live = true;
+    this._ctx.on("selection", this.selectionListener);
+    this.refreshNativeSceneHooks();
+  }
+  updateAutoScroll(mouseX, mouseY) {
+    this.autoScrollMouseX = mouseX;
+    this.autoScrollMouseY = mouseY;
+    this.cachedAutoScrollSpeed = this.getAutoScrollSpeed(mouseX, mouseY);
+    const scrollX = this.getAutoScrollDirectionX(mouseX);
+    const scrollY = this.getAutoScrollDirectionY(mouseY);
+    if (scrollX === 0 && scrollY === 0) {
+      this.stopAutoScroll();
+    } else if (this.autoScrollOwner !== this.draggingSelection()) {
+      this.startAutoScroll(mouseX, mouseY);
+    }
+  }
+  draggingSelection() {
+    const selection = this._ctx.getSelection();
+    return selection?.isDragging ? selection : null;
+  }
+  stopAutoScroll() {
+    const wasAutoScrolling = this.autoScrollOwner !== undefined;
+    this.autoScrollOwner = undefined;
+    this.autoScrollAccumulatorX = 0;
+    this.autoScrollAccumulatorY = 0;
+    if (wasAutoScrolling) {
+      this._ctx.off("selection", this.selectionListener);
+      this.live = false;
+      this.refreshNativeSceneHooks();
+    }
+  }
+  handleAutoScroll(deltaTime) {
+    if (this.autoScrollOwner === undefined)
+      return;
+    if (this.autoScrollOwner?.isDragging === false)
+      return this.stopAutoScroll();
+    const scrollX = this.getAutoScrollDirectionX(this.autoScrollMouseX);
+    const scrollY = this.getAutoScrollDirectionY(this.autoScrollMouseY);
+    const scrollAmount = this.cachedAutoScrollSpeed * (deltaTime / 1000);
+    let scrolled = false;
+    if (scrollX !== 0) {
+      this.autoScrollAccumulatorX += scrollX * scrollAmount;
+      const integerScrollX = Math.trunc(this.autoScrollAccumulatorX);
+      if (integerScrollX !== 0) {
+        this.scrollLeft += integerScrollX;
+        if (this.isDestroyed)
+          return;
+        this.autoScrollAccumulatorX -= integerScrollX;
+        scrolled = true;
+      }
+    }
+    if (scrollY !== 0) {
+      this.autoScrollAccumulatorY += scrollY * scrollAmount;
+      const integerScrollY = Math.trunc(this.autoScrollAccumulatorY);
+      if (integerScrollY !== 0) {
+        this.scrollTop += integerScrollY;
+        if (this.isDestroyed)
+          return;
+        this.autoScrollAccumulatorY -= integerScrollY;
+        scrolled = true;
+      }
+    }
+    if (scrolled) {
+      this._ctx.requestSelectionUpdate();
+    }
+    if (scrollX === 0 && scrollY === 0) {
+      this.stopAutoScroll();
+    }
+  }
+  getAutoScrollDirectionX(mouseX) {
+    const relativeX = mouseX - this.x;
+    const distToLeft = relativeX;
+    const distToRight = this.width - relativeX;
+    if (distToLeft <= this.autoScrollThresholdHorizontal) {
+      return this.scrollLeft > 0 ? -1 : 0;
+    } else if (distToRight <= this.autoScrollThresholdHorizontal) {
+      return this.scrollLeft < this._scrollState().max[0] ? 1 : 0;
+    }
+    return 0;
+  }
+  getAutoScrollDirectionY(mouseY) {
+    const relativeY = mouseY - this.y;
+    const distToTop = relativeY;
+    const distToBottom = this.height - relativeY;
+    if (distToTop <= this.autoScrollThresholdVertical) {
+      return this.scrollTop > 0 ? -1 : 0;
+    } else if (distToBottom <= this.autoScrollThresholdVertical) {
+      return this.scrollTop < this._scrollState().max[1] ? 1 : 0;
+    }
+    return 0;
+  }
+  getAutoScrollSpeed(mouseX, mouseY) {
+    const relativeX = mouseX - this.x;
+    const relativeY = mouseY - this.y;
+    const distToLeft = relativeX;
+    const distToRight = this.width - relativeX;
+    const distToTop = relativeY;
+    const distToBottom = this.height - relativeY;
+    const minDistance = Math.min(distToLeft, distToRight, distToTop, distToBottom);
+    if (minDistance <= 1) {
+      return this.autoScrollSpeedFast;
+    } else if (minDistance <= 2) {
+      return this.autoScrollSpeedMedium;
+    } else {
+      return this.autoScrollSpeedSlow;
+    }
+  }
+  set rootOptions(options) {
+    this.assignOptions(this, options && stripScrollBoxPadding(options));
+    if (options)
+      this.content._assign(pickScrollBoxPadding(options), ScrollBoxContent2.keys);
+    if (!this.isDestroyed)
+      this.requestRender();
+  }
+  set wrapperOptions(options) {
+    this.wrapper._assign(options, ScrollBoxWrapper2.keys);
+  }
+  set viewportOptions(options) {
+    this.viewport._assign(options, ScrollBoxViewport2.keys);
+  }
+  set contentOptions(options) {
+    this.content._assign(options, ScrollBoxContent2.keys);
+  }
+  set scrollbarOptions(options) {
+    this.verticalScrollBar._assign(options ?? { onChange: undefined }, ScrollBoxBar2.keys);
+    this.horizontalScrollBar._assign(options ?? { onChange: undefined }, ScrollBoxBar2.keys);
+  }
+  set verticalScrollbarOptions(options) {
+    this.verticalScrollBar._assign(options ?? { onChange: undefined }, ScrollBoxBar2.keys);
+  }
+  set horizontalScrollbarOptions(options) {
+    this.horizontalScrollBar._assign(options ?? { onChange: undefined }, ScrollBoxBar2.keys);
+  }
+  get scrollAcceleration() {
+    return this.scrollAccel;
+  }
+  set scrollAcceleration(value) {
+    this.scrollAccel = value;
+  }
+  get viewportCulling() {
+    return this._viewportCulling;
+  }
+  set viewportCulling(value) {
+    this.setScrollOption(() => this._viewportCulling = value ?? true);
+  }
+  get overflow() {
+    return "hidden";
+  }
+  set overflow(_value) {}
+  destroySelf() {
+    if (!this.isFreed())
+      this._scrollState();
+    this.layoutCallbacks = [];
+    this.endBarPress();
+    this.runCleanup((run) => {
+      run(() => this._ctx.off("selection", this.selectionListener));
+      run(() => super.destroySelf());
+    });
+  }
+}
+for (const key of SCROLLBOX_PADDING_KEYS) {
+  Object.defineProperty(ScrollBoxRenderable2.prototype, key, {
+    configurable: true,
+    set(value) {
+      this.content[key] = value;
+    }
+  });
+}
+
+// src/renderables/Code.ts
+var PREVIEW = -2;
+var SYNTAX_LAYER = 1;
+
+class CodeRenderable2 extends TextBufferRenderable2 {
+  static nativeIntegration = {
+    ...TextBufferRenderable2.nativeIntegration,
+    kind: "text_view",
+    body: { native: this.prototype.renderSelf },
+    lifecycle: {
+      ...TextBufferRenderable2.nativeIntegration.lifecycle,
+      update: {
+        idle: this.prototype.onUpdate,
+        active: (renderable) => renderable._highlightsDirty
+      }
+    }
+  };
+  _content;
+  _filetype;
+  _syntaxStyle;
+  _isHighlighting = false;
+  _treeSitterClient;
+  _highlightsDirty = false;
+  _version = 0;
+  _shownVersion = -1;
+  _highlightLoopActive = false;
+  _highlightPromise;
+  _highlightRerun = false;
+  _conceal;
+  _drawUnstyledText;
+  _shouldRenderTextBuffer = true;
+  _streaming;
+  _initialStyledText;
+  _checkPainted = false;
+  _baseHighlight;
+  _onHighlight;
+  _onChunks;
+  _highlightingPromise = Promise.resolve();
+  _renderedLineSources;
+  _mappedLineInfo;
+  _deltas;
+  _groupSets = new Map;
+  static nextCopy = 0;
+  _streamsDeltas = false;
+  _contentDefaultOptions = {
+    content: "",
+    conceal: true,
+    drawUnstyledText: true,
+    streaming: false
+  };
+  constructor(ctx, options) {
+    super(ctx, options, true);
+    try {
+      this._content = options.content ?? this._contentDefaultOptions.content;
+      this._filetype = options.filetype;
+      this._syntaxStyle = options.syntaxStyle;
+      this._treeSitterClient = options.treeSitterClient ?? getTreeSitterClient2();
+      this._conceal = options.conceal ?? this._contentDefaultOptions.conceal;
+      this._drawUnstyledText = options.drawUnstyledText ?? this._contentDefaultOptions.drawUnstyledText;
+      this._streaming = options.streaming ?? this._contentDefaultOptions.streaming;
+      this._initialStyledText = options.initialStyledText;
+      this._baseHighlight = options.baseHighlight;
+      this._onHighlight = options.onHighlight;
+      this._onChunks = options.onChunks;
+      if (this._content.length > 0) {
+        if (this._initialStyledText && this._drawUnstyledText) {
+          this.textBuffer.setStyledText(this._initialStyledText);
+        } else {
+          this.textBuffer.setText(this._content);
+        }
+        this.updateTextInfo();
+        this.setShouldRenderTextBuffer(this._drawUnstyledText || !this._filetype);
+      }
+      this.setHighlightsDirty(this._content.length > 0);
+      this.onLifecyclePass = this.checkPainted;
+    } catch (error) {
+      this.rollbackConstruction(error);
+    }
+  }
+  get content() {
+    return this._content;
+  }
+  invalidateHighlights(renders = true) {
+    this.setHighlightsDirty(true);
+    if (renders)
+      this._version++;
+    if (this.isDestroyed)
+      return;
+    if (!this._drawUnstyledText && this._filetype)
+      this.paintHighlightsOnly();
+    if (this._shownVersion < 0 || this._shownVersion === this._version)
+      return;
+    if (this.onLifecyclePass === this.checkPainted && this._ctx.nativeScene.painted(this)) {
+      this._checkPainted = true;
+      this._ctx.nativeScene.lifecyclePasses.refresh(this);
+    } else
+      this.showPlainText();
+  }
+  showPlainText() {
+    this.setShouldRenderTextBuffer(false);
+    this.textBuffer.setText(this._content);
+    this._shownVersion = -1;
+    this.setRenderedLineSources(undefined);
+    this.updateTextInfo();
+  }
+  checkPainted = () => {
+    const stale = !this.isDestroyed && this._shownVersion >= 0 && this._shownVersion !== this._version;
+    if (stale && this._ctx.nativeScene.painted(this))
+      return;
+    this._checkPainted = false;
+    this._ctx.nativeScene.lifecyclePasses.refresh(this);
+    if (!stale)
+      return;
+    this.showPlainText();
+    if (this._highlightsDirty && !this._highlightLoopActive && this.belowView())
+      this.scheduleHighlights();
+  };
+  belowView() {
+    let box;
+    for (let node = this;node; node = node.parent) {
+      if (!node.visible)
+        return false;
+      if (!box && node instanceof ScrollBoxRenderable2)
+        box = node;
+    }
+    return !!box && this.y >= box.viewport.y;
+  }
+  _needsLifecyclePass() {
+    if (this.onLifecyclePass !== this.checkPainted)
+      return super._needsLifecyclePass();
+    return this._checkPainted;
+  }
+  changeStyle() {
+    if (this._shownVersion < 0 || this._shownVersion !== this._version || this.isDestroyed)
+      return this.invalidateHighlights();
+    this._shownVersion = ++this._version;
+    this.setHighlightsDirty(true);
+  }
+  setHighlightsDirty(value) {
+    if (this._highlightsDirty === value)
+      return;
+    this._highlightsDirty = value;
+    if (!this.isDestroyed)
+      this.refreshNativeSceneHooks();
+  }
+  setShouldRenderTextBuffer(value) {
+    if (this._shouldRenderTextBuffer === value)
+      return;
+    this._shouldRenderTextBuffer = value;
+    if (!this.isDestroyed)
+      this._ctx.nativeScene.setTextViewPaint(this, value);
+  }
+  set content(value) {
+    if (this._content === value)
+      return;
+    this.runMutation(() => this.writeContent(value));
+  }
+  writeContent(value) {
+    const delta = this._deltas && value.startsWith(this._content) ? value.slice(this._content.length) : undefined;
+    this._content = value;
+    if (delta !== undefined) {
+      this.textBuffer.append(delta);
+      this._version++;
+      this.setHighlightsDirty(true);
+      this.updateTextInfo();
+      this.requestRender();
+      return;
+    }
+    this.stopDeltas();
+    if (this._streaming && this._shouldRenderTextBuffer && this._shownVersion >= 0 && !this._drawUnstyledText) {
+      this.invalidateHighlights();
+      this.requestRender();
+      return;
+    }
+    if (value && this._initialStyledText && this._drawUnstyledText) {
+      this.textBuffer.setStyledText(this._initialStyledText);
+      this._shownVersion = PREVIEW;
+    } else {
+      this.textBuffer.setText(value);
+      this._shownVersion = -1;
+      if (this._streamsDeltas && this.deltasAllowed()) {
+        const id = CodeRenderable2.nextCopy++;
+        this._deltas = { client: this._treeSitterClient, id, filetype: this._filetype, sent: 0 };
+      }
+    }
+    this.invalidateHighlights();
+    this.setRenderedLineSources(undefined);
+    this.updateTextInfo();
+  }
+  deltasAllowed() {
+    return this._streaming && !!this._filetype && !this._conceal && !this._onHighlight && !this._onChunks && !this._baseHighlight && !this._initialStyledText;
+  }
+  _setStreamsDeltas(open) {
+    this._streamsDeltas = open;
+    if (!open && this._shownVersion === this._version)
+      this.stopDeltas();
+  }
+  stopDeltas() {
+    const deltas = this._deltas;
+    this._deltas = undefined;
+    deltas?.client.removeCopy(deltas.id).catch(() => {});
+  }
+  updateStreamingPreview(content, initialStyledText) {
+    this._content = content;
+    this._initialStyledText = initialStyledText;
+    this._shownVersion = PREVIEW;
+    this.invalidateHighlights();
+    this.textBuffer.setStyledText(initialStyledText);
+    this.setRenderedLineSources(undefined);
+    this.updateTextInfo();
+  }
+  get lineInfo() {
+    if (!this._renderedLineSources)
+      return super.lineInfo;
+    if (this._mappedLineInfo)
+      return this._mappedLineInfo;
+    const lineInfo = super.lineInfo;
+    const renderedLineSources = this._renderedLineSources;
+    this._mappedLineInfo = {
+      ...lineInfo,
+      lineSources: lineInfo.lineSources.map((line) => renderedLineSources[line] ?? line)
+    };
+    return this._mappedLineInfo;
+  }
+  getLineSources(startLine, lineCount) {
+    if (this.needsLineInfoFallback(CodeRenderable2.prototype)) {
+      return this.lineInfo.lineSources.slice(startLine, startLine + lineCount);
+    }
+    const sources = this.textBufferView.getLineSources(startLine, lineCount);
+    const renderedLineSources = this._renderedLineSources;
+    return renderedLineSources ? sources.map((line) => renderedLineSources[line] ?? line) : sources;
+  }
+  get wrapMode() {
+    return super.wrapMode;
+  }
+  set wrapMode(value) {
+    if (super.wrapMode !== value) {
+      this._mappedLineInfo = undefined;
+      super.wrapMode = value;
+    }
+  }
+  onResize(width, height) {
+    this._mappedLineInfo = undefined;
+    super.onResize(width, height);
+  }
+  updateTextInfo() {
+    this._mappedLineInfo = undefined;
+    super.updateTextInfo();
+  }
+  get filetype() {
+    return this._filetype;
+  }
+  set filetype(value) {
+    if (this._filetype !== value) {
+      this._filetype = value;
+      this.invalidateHighlights();
+    }
+  }
+  get syntaxStyle() {
+    return this._syntaxStyle;
+  }
+  set syntaxStyle(value) {
+    if (this._syntaxStyle !== value) {
+      this._syntaxStyle = value;
+      this.changeStyle();
+    }
+  }
+  get conceal() {
+    return this._conceal;
+  }
+  set conceal(value) {
+    if (this._conceal !== value) {
+      this._conceal = value;
+      this.changeStyle();
+    }
+  }
+  get drawUnstyledText() {
+    return this._drawUnstyledText;
+  }
+  set drawUnstyledText(value) {
+    if (this._drawUnstyledText !== value) {
+      this._drawUnstyledText = value;
+      this.invalidateHighlights(false);
+    }
+  }
+  get streaming() {
+    return this._streaming;
+  }
+  set initialStyledText(value) {
+    if (this._initialStyledText === value)
+      return;
+    this._initialStyledText = value;
+    const shows = value && this._drawUnstyledText;
+    const replaces = shows && this._streaming && this._isHighlighting;
+    const previewed = this._shownVersion === PREVIEW;
+    if (!this._content || !(this._shownVersion < 0 || replaces) || !value && previewed)
+      return;
+    this.runMutation(() => {
+      if (shows)
+        this.textBuffer.setStyledText(value);
+      else
+        this.textBuffer.setText(this._content);
+      if (!shows && previewed && !this._drawUnstyledText && this._filetype)
+        this.setShouldRenderTextBuffer(false);
+      this._shownVersion = shows ? PREVIEW : -1;
+      this.setRenderedLineSources(undefined);
+      this.updateTextInfo();
+    });
+  }
+  set streaming(value) {
+    if (this._streaming !== value) {
+      this._streaming = value;
+      if (!value)
+        this.stopDeltas();
+      this.invalidateHighlights(false);
+    }
+  }
+  get treeSitterClient() {
+    return this._treeSitterClient;
+  }
+  set treeSitterClient(value) {
+    if (this._treeSitterClient !== value) {
+      this._treeSitterClient = value;
+      this.invalidateHighlights();
+    }
+  }
+  get onHighlight() {
+    return this._onHighlight;
+  }
+  get baseHighlight() {
+    return this._baseHighlight;
+  }
+  set baseHighlight(value) {
+    if (this._baseHighlight !== value) {
+      this._baseHighlight = value;
+      this.changeStyle();
+    }
+  }
+  set onHighlight(value) {
+    if (this._onHighlight !== value) {
+      this._onHighlight = value;
+      this.changeStyle();
+    }
+  }
+  get onChunks() {
+    return this._onChunks;
+  }
+  set onChunks(value) {
+    if (this._onChunks !== value) {
+      this._onChunks = value;
+      this.changeStyle();
+    }
+  }
+  get isHighlighting() {
+    return this._isHighlighting || this._highlightRerun;
+  }
+  get highlightingDone() {
+    return this._highlightingPromise;
+  }
+  async transformChunks(chunks, context) {
+    if (!this._onChunks)
+      return chunks;
+    const modified = await this._onChunks(chunks, context);
+    return modified ?? chunks;
+  }
+  ensureVisibleTextBeforeHighlight() {
+    const keeps = this._streaming && this._shouldRenderTextBuffer;
+    if (this._drawUnstyledText) {
+      if (!keeps && this._shownVersion !== this._version) {
+        if (this._initialStyledText) {
+          this.textBuffer.setStyledText(this._initialStyledText);
+        } else {
+          this.textBuffer.setText(this._content);
+        }
+        this._shownVersion = this._initialStyledText ? PREVIEW : -1;
+        this.setRenderedLineSources(undefined);
+      } else if (keeps && this._shownVersion === -1 && this._initialStyledText)
+        this._shownVersion = PREVIEW;
+      this.setShouldRenderTextBuffer(true);
+    } else {
+      this.paintHighlightsOnly();
+    }
+  }
+  paintHighlightsOnly() {
+    if (!this._streaming || !this._shouldRenderTextBuffer || this._shownVersion === -1)
+      this.setShouldRenderTextBuffer(this._shownVersion === this._version);
+  }
+  currentDeltas() {
+    const deltas = this._deltas;
+    const same = deltas?.client === this._treeSitterClient && deltas.filetype === this._filetype;
+    return same && this.deltasAllowed() ? deltas : undefined;
+  }
+  async startHighlight() {
+    const deltas = this.currentDeltas();
+    if (deltas)
+      return this.highlightDelta(deltas);
+    this.stopDeltas();
+    const content = this._content;
+    const filetype = this._filetype;
+    const version = this._version;
+    if (!filetype)
+      return;
+    this._isHighlighting = true;
+    const current = () => {
+      if (version !== this._version)
+        this.requestRender();
+      return version === this._version && !this.isDestroyed;
+    };
+    const keeps = () => this._initialStyledText && this._drawUnstyledText || this._shownVersion !== -1;
+    try {
+      const result = await this._treeSitterClient.highlightOnce(content, filetype).then((answer) => {
+        if (answer.error)
+          throw new Error(answer.error);
+        return answer;
+      }).catch((error) => {
+        if (!this._onChunks || keeps())
+          throw error;
+        console.warn("Code highlighting failed, rendering without highlights:", error);
+        return { highlights: [] };
+      });
+      if (!current())
+        return;
+      let highlights = result.highlights ?? [];
+      if (this._onHighlight && highlights.length >= 0) {
+        const context = {
+          content,
+          filetype,
+          syntaxStyle: this._syntaxStyle
+        };
+        const modified = await this._onHighlight(highlights, context);
+        if (modified !== undefined) {
+          highlights = modified;
+        }
+      }
+      if (!current())
+        return;
+      if (highlights.length > 0 || this._onChunks || this._baseHighlight) {
+        const sourceRanges = this._onChunks ? [] : undefined;
+        const context = {
+          content,
+          filetype,
+          syntaxStyle: this._syntaxStyle,
+          highlights,
+          sourceRanges
+        };
+        let chunks = treeSitterToTextChunks2(content, highlights, this._syntaxStyle, {
+          enabled: this._conceal,
+          baseHighlight: this._baseHighlight,
+          ranges: sourceRanges
+        });
+        const renderedLineSources = this._onChunks ? undefined : this.getConcealLinesSourceMap(content, highlights);
+        chunks = await this.transformChunks(chunks, context);
+        if (!current())
+          return;
+        this.settle(version, new StyledText2(chunks), renderedLineSources);
+      } else {
+        this.settle(version, undefined, undefined);
+      }
+    } catch (error) {
+      if (version !== this._version) {
+        this.requestRender();
+        return;
+      }
+      console.warn("Code highlighting failed, falling back to plain text:", error);
+      if (this.isDestroyed)
+        return;
+      this.settle(-1, undefined, undefined, !!this._onChunks);
+    }
+  }
+  async highlightDelta(deltas) {
+    const version = this._version;
+    const offset = deltas.sent;
+    const content = this._content;
+    deltas.sent = content.length;
+    this._isHighlighting = true;
+    const answer = await deltas.client.highlightAppend(deltas.id, offset, content.slice(offset), deltas.filetype).catch((error) => ({ highlights: undefined, error: String(error) }));
+    if (this.currentDeltas() !== deltas || this.isDestroyed)
+      return;
+    try {
+      if (!answer.highlights)
+        throw new Error(answer.error);
+      const names = [];
+      const { highlights } = answer;
+      const options = { enabled: false, names };
+      const chunks = highlights.length ? treeSitterToTextChunks2(content, highlights, this._syntaxStyle, options) : [];
+      const runs = [];
+      let end = 0;
+      chunks.forEach((chunk, index) => {
+        if (!chunk.text)
+          return;
+        const start = end;
+        end += Buffer.byteLength(chunk.text);
+        const key = names[index];
+        let set = this._groupSets.get(key.join(`
+`));
+        if (set === undefined)
+          this._groupSets.set(key.join(`
+`), set = this.textBuffer._groupSet(key));
+        runs.push(start, end, set);
+      });
+      if (this.textBuffer.getSyntaxStyle() !== this._syntaxStyle)
+        this.textBuffer.setSyntaxStyle(this._syntaxStyle);
+      this.textBuffer._setLayer(SYNTAX_LAYER, 0, Buffer.byteLength(content), new Uint32Array(runs));
+    } catch {
+      this.stopDeltas();
+      this._highlightRerun = true;
+      return;
+    }
+    this._shownVersion = version;
+    this._isHighlighting = false;
+    if (!this._streamsDeltas && deltas.sent === this._content.length)
+      this.stopDeltas();
+    this.setShouldRenderTextBuffer(true);
+    this.requestRender();
+  }
+  settle(version, text, lineSources, keep = false) {
+    if (!keep) {
+      if (text)
+        this.textBuffer.setStyledText(text);
+      else
+        this.textBuffer.setText(this._content);
+      this.setRenderedLineSources(lineSources);
+      this._shownVersion = version;
+      this.setShouldRenderTextBuffer(true);
+    } else if (this._shouldRenderTextBuffer)
+      this._shownVersion = PREVIEW;
+    this._isHighlighting = false;
+    this.setHighlightsDirty(false);
+    this.updateTextInfo();
+  }
+  async runHighlights() {
+    try {
+      do {
+        this._highlightRerun = false;
+        await this.startHighlight();
+      } while (this._highlightRerun && !this.isDestroyed && this._content.length > 0 && this._filetype);
+    } finally {
+      this._isHighlighting = false;
+      this._highlightLoopActive = false;
+      this._highlightRerun = false;
+    }
+  }
+  clearPendingHighlight() {
+    this._isHighlighting = false;
+    this._highlightRerun = false;
+    this._highlightingPromise = Promise.resolve();
+  }
+  setRenderedLineSources(lineSources) {
+    this._renderedLineSources = lineSources;
+    this._mappedLineInfo = undefined;
+  }
+  static isIdentityLineSources(lineSources) {
+    for (let i = 0;i < lineSources.length; i++) {
+      if (lineSources[i] !== i)
+        return false;
+    }
+    return true;
+  }
+  static getMergedConcealLineRanges(highlights) {
+    const ranges = [];
+    for (const highlight of highlights) {
+      const meta = highlight[3];
+      if (meta?.concealLines === undefined)
+        continue;
+      const group = highlight[2];
+      const isEmptyConceal = meta.conceal === "" || meta.conceal === undefined && (group === "conceal" || group.startsWith("conceal."));
+      if (isEmptyConceal) {
+        ranges.push([highlight[0], highlight[1]]);
+      }
+    }
+    if (ranges.length <= 1)
+      return ranges;
+    ranges.sort((a, b) => a[0] - b[0]);
+    let writeIndex = 0;
+    for (let i = 1;i < ranges.length; i++) {
+      const current = ranges[writeIndex];
+      const next = ranges[i];
+      if (next[0] <= current[1]) {
+        current[1] = Math.max(current[1], next[1]);
+      } else {
+        writeIndex++;
+        ranges[writeIndex] = next;
+      }
+    }
+    ranges.length = writeIndex + 1;
+    return ranges;
+  }
+  getConcealLinesSourceMap(content, highlights) {
+    if (!this._conceal || content.length === 0)
+      return;
+    const concealLineRanges = CodeRenderable2.getMergedConcealLineRanges(highlights);
+    if (concealLineRanges.length === 0)
+      return;
+    const lineSources = [];
+    let sourceLine = 0;
+    let lineStart = 0;
+    let rangeIndex = 0;
+    let currentRenderedLineHasText = false;
+    const setCurrentRenderedLineSource = (line, hasText) => {
+      if (lineSources.length === 0) {
+        lineSources.push(line);
+      } else if (!currentRenderedLineHasText) {
+        lineSources[lineSources.length - 1] = line;
+      }
+      if (hasText)
+        currentRenderedLineHasText = true;
+    };
+    while (lineStart <= content.length) {
+      const newlineOffset = content.indexOf(`
+`, lineStart);
+      const lineEnd = newlineOffset === -1 ? content.length : newlineOffset;
+      while (rangeIndex < concealLineRanges.length && concealLineRanges[rangeIndex][1] <= lineStart) {
+        rangeIndex++;
+      }
+      const range = concealLineRanges[rangeIndex];
+      const fullyConcealed = !!range && lineEnd > lineStart && range[0] <= lineStart && range[1] >= lineEnd;
+      const lineBreakConcealed = newlineOffset !== -1 && !!range && range[0] <= newlineOffset && range[1] >= newlineOffset;
+      if (!fullyConcealed || !lineBreakConcealed) {
+        const hasText = lineEnd > lineStart && !fullyConcealed;
+        if (hasText || newlineOffset !== -1 || !fullyConcealed) {
+          setCurrentRenderedLineSource(sourceLine, hasText);
+        }
+        if (newlineOffset !== -1 && !lineBreakConcealed) {
+          lineSources.push(sourceLine + 1);
+          currentRenderedLineHasText = false;
+        }
+      }
+      sourceLine++;
+      if (newlineOffset === -1)
+        break;
+      lineStart = newlineOffset + 1;
+    }
+    if (lineSources.length === 0 || CodeRenderable2.isIdentityLineSources(lineSources))
+      return;
+    return lineSources;
+  }
+  getLineHighlights(lineIdx) {
+    return this.textBuffer.getLineHighlights(lineIdx);
+  }
+  onUpdate(deltaTime) {
+    super.onUpdate(deltaTime);
+    this.scheduleHighlights();
+  }
+  scheduleHighlights() {
+    if (!this._highlightsDirty || this.isDestroyed)
+      return;
+    const hasContent = this._content.length > 0;
+    if (!hasContent || !this._filetype) {
+      this.stopDeltas();
+      this.setShouldRenderTextBuffer(hasContent);
+      this.setHighlightsDirty(false);
+      this.clearPendingHighlight();
+      this.textBuffer.setText(this._content);
+      this._shownVersion = -1;
+      this.setRenderedLineSources(undefined);
+      this.updateTextInfo();
+      return;
+    }
+    this.ensureVisibleTextBeforeHighlight();
+    this.setHighlightsDirty(false);
+    if (this._highlightLoopActive) {
+      this._isHighlighting = true;
+      this._highlightRerun = true;
+      this._highlightingPromise = this._highlightPromise;
+      return;
+    }
+    this._highlightLoopActive = true;
+    this._highlightPromise = this.runHighlights();
+    this._highlightingPromise = this._highlightPromise;
+  }
+  renderSelf(buffer) {
+    if (!this._shouldRenderTextBuffer)
+      return;
+    super.renderSelf(buffer);
+  }
+  destroyOwnedResources() {
+    this.runCleanup((run) => {
+      run(() => this.clearPendingHighlight());
+      run(() => this.stopDeltas());
+      run(() => super.destroyOwnedResources());
+    });
+  }
+}
+
+// src/image.ts
+import { open, stat } from "fs/promises";
+class ImageLoadError2 extends Error {
+  code;
+  source;
+  status;
+  constructor(code, source, message, options) {
+    super(message, { cause: options?.cause });
+    this.name = "ImageLoadError";
+    this.code = code;
+    this.source = source;
+    this.status = options?.status;
+  }
+}
+
+class OwnedRawImageImpl {
+  data;
+  width;
+  height;
+  stride;
+  lib;
+  owner;
+  handle;
+  format = "rgba8";
+  colorSpace = "srgb";
+  alpha = "straight";
+  constructor(data, width, height, stride, lib, handle, owner) {
+    this.data = data;
+    this.width = width;
+    this.height = height;
+    this.stride = stride;
+    this.lib = lib;
+    this.owner = owner;
+    this.handle = handle;
+  }
+  dispose() {
+    if (!this.handle)
+      return;
+    this.lib.imageReleasePixels(this.handle);
+    this.handle = null;
+    this.owner.release();
+  }
+}
+
+class ImageOwner {
+  resources;
+  automatic;
+  static automaticOwner;
+  references = 0;
+  constructor(resources, automatic) {
+    this.resources = resources;
+    this.automatic = automatic;
+  }
+  static acquire(options) {
+    resolveRenderLib2().getYogaHost().assertMutable();
+    const owner = options.owner;
+    let result;
+    if (owner !== undefined) {
+      owner.assertAlive();
+      result = new ImageOwner(owner, false);
+    } else {
+      result = this.automaticOwner ??= new ImageOwner(new ResourceContext2({ objectCapacity: 4096, renderCellsMax: 1 }), true);
+    }
+    result.retain();
+    return result;
+  }
+  retain() {
+    this.references++;
+  }
+  release() {
+    this.references--;
+    if (this.references === 0 && this.automatic) {
+      this.resources.destroy();
+      ImageOwner.automaticOwner = undefined;
+    }
+  }
+}
+var STATUS_MESSAGES = [
+  "ok",
+  "invalid image handle",
+  "unsupported image format",
+  "unsupported image color space",
+  "malformed image data",
+  "image dimensions exceed limits",
+  "image memory limit exceeded",
+  "invalid image argument",
+  "out of memory",
+  "image output buffer is too small",
+  "internal image error",
+  "unsupported image feature",
+  "image is retained"
+];
+var STATUS_CODES = [
+  "internal-error",
+  "invalid-handle",
+  "unsupported-format",
+  "unsupported-color-space",
+  "malformed-data",
+  "dimension-limit",
+  "memory-limit",
+  "invalid-argument",
+  "out-of-memory",
+  "output-too-small",
+  "internal-error",
+  "unsupported-feature",
+  "busy"
+];
+var BUSY_STATUS = 12;
+
+class ImageError2 extends Error {
+  code;
+  status;
+  constructor(status) {
+    super(`Native image operation failed: ${STATUS_MESSAGES[status] ?? `unknown status ${status}`}`);
+    this.name = "ImageError";
+    this.status = status;
+    this.code = STATUS_CODES[status] ?? "internal-error";
+  }
+}
+var FILTER_IDS = {
+  default: nativeConstants.OT_IMAGE_FILTER_DEFAULT,
+  area: nativeConstants.OT_IMAGE_FILTER_AREA,
+  triangle: nativeConstants.OT_IMAGE_FILTER_TRIANGLE,
+  "cubic-bspline": nativeConstants.OT_IMAGE_FILTER_CUBIC_BSPLINE,
+  "catmull-rom": nativeConstants.OT_IMAGE_FILTER_CATMULL_ROM,
+  mitchell: nativeConstants.OT_IMAGE_FILTER_MITCHELL,
+  nearest: nativeConstants.OT_IMAGE_FILTER_NEAREST
+};
+var BLEND_IDS = {
+  "source-over": nativeConstants.OT_IMAGE_BLEND_SOURCE_OVER,
+  source: nativeConstants.OT_IMAGE_BLEND_SOURCE,
+  "destination-over": nativeConstants.OT_IMAGE_BLEND_DESTINATION_OVER
+};
+var PIXEL_FORMAT_BGRA = {
+  rgba8: false,
+  bgra8: true
+};
+var PIXEL_ALPHA_IDS = {
+  straight: nativeConstants.OT_IMAGE_ALPHA_STRAIGHT,
+  opaque: nativeConstants.OT_IMAGE_ALPHA_OPAQUE
+};
+var MAX_ENCODED_BYTES = nativeConstants.OT_IMAGE_ENCODED_BYTES_MAX;
+function imageError(status) {
+  return new ImageError2(status);
+}
+function checkStatus(status) {
+  if (status !== 0)
+    throw imageError(status);
+}
+function requireMappedOption(mapping, value, name) {
+  if (!Object.prototype.hasOwnProperty.call(mapping, value))
+    throw new TypeError(`Unsupported ${name}: ${String(value)}`);
+  return mapping[value];
+}
+function requireU32(value, name, allowZero = false) {
+  if (!Number.isSafeInteger(value) || value < (allowZero ? 0 : 1) || value > 4294967295) {
+    throw new RangeError(`${name} must be ${allowZero ? "a non-negative" : "a positive"} u32 integer`);
+  }
+  return value;
+}
+function pixelImportOptions(width, options) {
+  const stride = requireU32(options.stride ?? width * 4, "stride");
+  const bgra = requireMappedOption(PIXEL_FORMAT_BGRA, options.format ?? "rgba8", "pixel format");
+  const alpha = requireMappedOption(PIXEL_ALPHA_IDS, options.alpha ?? "straight", "pixel alpha");
+  if (options.colorSpace !== undefined && options.colorSpace !== "srgb") {
+    throw new TypeError(`Unsupported pixel color space: ${String(options.colorSpace)}`);
+  }
+  return { stride, format: Number(bgra), alpha };
+}
+function requireI32(value, name) {
+  if (!Number.isSafeInteger(value) || value < -2147483648 || value > 2147483647) {
+    throw new RangeError(`${name} must be an i32 integer`);
+  }
+  return value;
+}
+function requireByte(value, name) {
+  if (!Number.isInteger(value) || value < 0 || value > 255)
+    throw new RangeError(`${name} must be an integer from 0 to 255`);
+  return value;
+}
+function unpackInfo(info) {
+  const format = ["unknown", "png", "raw-rgba", "jpeg", "webp", "gif"][info.format];
+  if (!format || format === "unknown")
+    throw new Error(`Unknown native image format ${info.format}`);
+  return {
+    width: info.width,
+    height: info.height,
+    sourceWidth: info.sourceWidth,
+    sourceHeight: info.sourceHeight,
+    format,
+    colorStatus: info.colorStatus === 1 ? "explicit-srgb" : "assumed-srgb",
+    orientation: info.orientation,
+    hasAlpha: info.hasAlpha !== 0
+  };
+}
+function encodedBytes(data) {
+  if (data instanceof Uint8Array)
+    return data;
+  if (data instanceof ArrayBuffer)
+    return new Uint8Array(data);
+  throw new TypeError("image data must be a Uint8Array or ArrayBuffer");
+}
+async function readResponseBytes(response, signal) {
+  const contentLength = response.headers.get("content-length");
+  if (contentLength !== null) {
+    const declaredLength = Number(contentLength);
+    if (Number.isFinite(declaredLength) && declaredLength > MAX_ENCODED_BYTES) {
+      response.body?.cancel().catch(() => {});
+      throw imageError(6);
+    }
+  }
+  if (!response.body)
+    return new Uint8Array;
+  const reader = response.body.getReader();
+  const abort = () => void reader.cancel(signal?.reason).catch(() => {});
+  signal?.addEventListener("abort", abort, { once: true });
+  let data = new Uint8Array;
+  let total = 0;
+  try {
+    while (true) {
+      signal?.throwIfAborted();
+      const { done, value } = await reader.read();
+      if (done)
+        break;
+      if (value.byteLength > MAX_ENCODED_BYTES - total) {
+        throw imageError(6);
+      }
+      if (value.byteLength === 0)
+        continue;
+      const required = total + value.byteLength;
+      if (required > data.byteLength) {
+        const capacity = Math.min(MAX_ENCODED_BYTES, Math.max(required, data.byteLength * 2));
+        const grown = new Uint8Array(capacity);
+        grown.set(data.subarray(0, total));
+        data = grown;
+      }
+      data.set(value, total);
+      total = required;
+    }
+  } catch (error) {
+    reader.cancel().catch(() => {});
+    throw error;
+  } finally {
+    signal?.removeEventListener("abort", abort);
+    reader.releaseLock();
+  }
+  return data.byteLength === total ? data : data.slice(0, total);
+}
+async function readFileBytes(path, signal) {
+  signal?.throwIfAborted();
+  if ((await stat(path)).size > MAX_ENCODED_BYTES)
+    throw imageError(6);
+  const file = await open(path, "r");
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      signal?.throwIfAborted();
+      const chunk = new Uint8Array(Math.min(64 * 1024, MAX_ENCODED_BYTES - total + 1));
+      const { bytesRead } = await file.read(chunk, 0, chunk.byteLength, null);
+      if (bytesRead === 0)
+        break;
+      total += bytesRead;
+      if (total > MAX_ENCODED_BYTES)
+        throw imageError(6);
+      chunks.push(chunk.subarray(0, bytesRead));
+    }
+  } finally {
+    await file.close();
+  }
+  const data = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    data.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return data;
+}
+async function loadResponseBytes(response, source, signal) {
+  try {
+    signal?.throwIfAborted();
+  } catch (error) {
+    response.body?.cancel().catch(() => {});
+    throw error;
+  }
+  if (!response.ok) {
+    response.body?.cancel().catch(() => {});
+    throw new ImageLoadError2("http-status", source, `Failed to fetch image: HTTP ${response.status}`, {
+      status: response.status
+    });
+  }
+  try {
+    const data = await readResponseBytes(response, signal);
+    signal?.throwIfAborted();
+    return data;
+  } catch (error) {
+    if (signal?.aborted)
+      throw signal.reason;
+    if (error instanceof ImageError2)
+      throw error;
+    throw new ImageLoadError2("network", source, `Failed to read image response: ${source}`, { cause: error });
+  }
+}
+function imageInfo2(data, options = {}) {
+  const bytes = encodedBytes(data);
+  if (bytes.byteLength === 0)
+    throw new TypeError("image data must not be empty");
+  const owner = ImageOwner.acquire(options);
+  try {
+    const result = owner.resources.renderLib.imageInfo(owner.resources.context, bytes);
+    checkStatus(result.status);
+    return unpackInfo(result.info);
+  } finally {
+    owner.release();
+  }
+}
+
+class NativeImage2 {
+  owner;
+  lib;
+  handle;
+  imageInfo;
+  contextImages = new Map;
+  constructor(owner, handle, info) {
+    this.owner = owner;
+    this.lib = owner.resources.renderLib;
+    this.handle = handle;
+    this.imageInfo = info;
+    owner.retain();
+  }
+  static create(options, operation) {
+    const owner = ImageOwner.acquire(options);
+    try {
+      const result = operation(owner);
+      checkStatus(result.status);
+      if (!result.handle)
+        throw imageError(10);
+      return NativeImage2.fromHandle(owner, result.handle);
+    } finally {
+      owner.release();
+    }
+  }
+  static decode(data, options = {}) {
+    const bytes = encodedBytes(data);
+    if (bytes.byteLength === 0)
+      throw new TypeError("image data must not be empty");
+    return NativeImage2.create(options, ({ resources }) => resources.renderLib.imageDecode(resources.context, bytes));
+  }
+  static async load(source, options = {}) {
+    if (source instanceof Response) {
+      return NativeImage2.decode(await loadResponseBytes(source, source.url || "Response", options.signal), options);
+    }
+    options.signal?.throwIfAborted();
+    if (source instanceof Uint8Array || source instanceof ArrayBuffer)
+      return NativeImage2.decode(source, options);
+    if (source instanceof Blob) {
+      if (source.size > MAX_ENCODED_BYTES)
+        throw imageError(6);
+      return NativeImage2.decode(await loadResponseBytes(new Response(source), "Blob", options.signal), options);
+    }
+    const url = source instanceof URL ? source : (/^(?:https?|file|blob|data):/i.test(source) || /^[a-z][a-z0-9+.-]*:\/\//i.test(source)) && !/^[a-z]:[\\/]/i.test(source) ? new URL(source) : null;
+    if (!url || url.protocol === "file:") {
+      const path = url ?? source;
+      let data;
+      try {
+        data = await readFileBytes(path, options.signal);
+      } catch (error) {
+        if (options.signal?.aborted)
+          throw options.signal.reason;
+        if (error instanceof ImageError2)
+          throw error;
+        throw new ImageLoadError2("file-read", String(source), `Failed to read image: ${String(source)}`, {
+          cause: error
+        });
+      }
+      options.signal?.throwIfAborted();
+      return NativeImage2.decode(data, options);
+    }
+    if (url.protocol !== "http:" && url.protocol !== "https:" && url.protocol !== "blob:" && url.protocol !== "data:") {
+      throw new ImageLoadError2("unsupported-url-scheme", url.href, `Unsupported image URL scheme: ${url.protocol}`);
+    }
+    let response;
+    try {
+      response = await (options.fetch ?? globalThis.fetch)(url, { signal: options.signal });
+    } catch (error) {
+      if (options.signal?.aborted)
+        throw options.signal.reason;
+      throw new ImageLoadError2("network", url.href, `Failed to fetch image: ${url.href}`, { cause: error });
+    }
+    return NativeImage2.decode(await loadResponseBytes(response, url.href, options.signal), options);
+  }
+  static fromRgba(pixels, width, height, stride = width * 4, options = {}) {
+    if (!(pixels instanceof Uint8Array))
+      throw new TypeError("pixels must be a Uint8Array");
+    requireU32(width, "width");
+    requireU32(height, "height");
+    requireU32(stride, "stride");
+    return NativeImage2.create(options, ({ resources }) => resources.renderLib.imageCreateFromRgba(resources.context, pixels, width, height, stride));
+  }
+  static fromPixels(pixels, width, height, options = {}) {
+    if (!(pixels instanceof Uint8Array))
+      throw new TypeError("pixels must be a Uint8Array");
+    requireU32(width, "width");
+    requireU32(height, "height");
+    const { stride, format, alpha } = pixelImportOptions(width, options);
+    return NativeImage2.create(options, ({ resources }) => resources.renderLib.imageCreateFromPixels(resources.context, pixels, width, height, stride, format, alpha));
+  }
+  static fromHandle(owner, handle) {
+    const lib = owner.resources.renderLib;
+    try {
+      const result = lib.imageGetInfo(handle);
+      checkStatus(result.status);
+      return new NativeImage2(owner, handle, unpackInfo(result.info));
+    } catch (error) {
+      lib.imageDestroy(handle);
+      throw error;
+    }
+  }
+  guard() {
+    if (!this.handle)
+      throw new Error("NativeImage is disposed");
+    this.owner.resources.assertAlive();
+    return this.handle;
+  }
+  get ptr() {
+    return this.guard();
+  }
+  _getContextHandle(lib, context) {
+    const source = this.guard();
+    if (lib !== this.lib)
+      throw new Error("NativeImage library owner mismatch");
+    if (source.context === context)
+      return source;
+    for (const [owner, identity] of this.contextImages) {
+      const current = owner.deref();
+      if (!current)
+        this.contextImages.delete(owner);
+      else if (current === context)
+        return { ...identity, context };
+    }
+    const result = lib.imageClone(source, context);
+    checkStatus(result.status);
+    const { context: _, ...identity } = result.handle;
+    this.contextImages.set(new WeakRef(context), identity);
+    return result.handle;
+  }
+  releaseContextImages() {
+    let failure;
+    for (const [owner, identity] of this.contextImages) {
+      const context = owner.deref();
+      try {
+        if (context)
+          this.lib.releaseAfterPaint(context, () => this.lib.destroyContextImage(context, { ...identity, context }));
+        this.contextImages.delete(owner);
+      } catch (error) {
+        if (error instanceof NativeError2 && error.status === -7 /* WrongContext */) {
+          this.contextImages.delete(owner);
+        } else
+          failure ??= { error };
+      }
+    }
+    if (failure)
+      throw failure.error;
+  }
+  wrap(result) {
+    checkStatus(result.status);
+    if (!result.handle)
+      throw imageError(10);
+    return NativeImage2.fromHandle(this.owner, result.handle);
+  }
+  info() {
+    this.guard();
+    return { ...this.imageInfo };
+  }
+  get width() {
+    this.guard();
+    return this.imageInfo.width;
+  }
+  get height() {
+    this.guard();
+    return this.imageInfo.height;
+  }
+  clone() {
+    return this.wrap(this.lib.imageClone(this.guard()));
+  }
+  retain() {
+    return this.wrap(this.lib.imageRetain(this.guard()));
+  }
+  resize(options) {
+    if (!options || options.width === undefined && options.height === undefined) {
+      throw new TypeError("resize requires width, height, or both");
+    }
+    let width = options.width;
+    let height = options.height;
+    if (width !== undefined)
+      requireU32(width, "width");
+    if (height !== undefined)
+      requireU32(height, "height");
+    if (width === undefined)
+      width = Math.max(1, Math.round(this.width * height / this.height));
+    if (height === undefined)
+      height = Math.max(1, Math.round(this.height * width / this.width));
+    requireU32(width, "width");
+    requireU32(height, "height");
+    const filter = requireMappedOption(FILTER_IDS, options.kernel ?? "area", "resize kernel");
+    return this.wrap(this.lib.imageResize(this.guard(), width, height, filter));
+  }
+  extract(options) {
+    return this.wrap(this.lib.imageExtract(this.guard(), requireU32(options.left, "left", true), requireU32(options.top, "top", true), requireU32(options.width, "width"), requireU32(options.height, "height")));
+  }
+  extend(options = {}) {
+    const background = options.background ?? [0, 0, 0, 0];
+    if (background.length !== 4)
+      throw new TypeError("background must contain four RGBA channels");
+    const color = Uint8Array.from(background.map((value, index) => requireByte(value, `background[${index}]`)));
+    return this.wrap(this.lib.imageExtend(this.guard(), requireU32(options.top ?? 0, "top", true), requireU32(options.right ?? 0, "right", true), requireU32(options.bottom ?? 0, "bottom", true), requireU32(options.left ?? 0, "left", true), color));
+  }
+  rotate(angle) {
+    const operation = angle === 90 ? 0 : angle === 180 ? 1 : angle === 270 ? 2 : -1;
+    if (operation < 0)
+      throw new RangeError("angle must be 90, 180, or 270");
+    return this.wrap(this.lib.imageTransform(this.guard(), operation));
+  }
+  flip() {
+    return this.wrap(this.lib.imageTransform(this.guard(), 3));
+  }
+  flop() {
+    return this.wrap(this.lib.imageTransform(this.guard(), 4));
+  }
+  composite(overlay, options = {}) {
+    if (!(overlay instanceof NativeImage2))
+      throw new TypeError("overlay must be a NativeImage");
+    const opacity = options.opacity ?? 1;
+    if (!Number.isFinite(opacity) || opacity < 0 || opacity > 1)
+      throw new RangeError("opacity must be between 0 and 1");
+    return this.wrap(this.lib.imageComposite(this.guard(), overlay._getContextHandle(this.lib, this.guard().context), requireI32(options.left ?? 0, "left"), requireI32(options.top ?? 0, "top"), requireMappedOption(BLEND_IDS, options.blend ?? "source-over", "blend mode"), Math.round(opacity * 255)));
+  }
+  ensureEncodedPng() {
+    checkStatus(this.lib.imageEnsureEncodedPng(this.guard()));
+  }
+  raw(format = "rgba8") {
+    const stride = this.width * 4;
+    const data = new Uint8Array(stride * this.height);
+    checkStatus(this.lib.imageCopyPixels(this.guard(), data, stride, requireMappedOption(PIXEL_FORMAT_BGRA, format, "pixel format")));
+    return { data, width: this.width, height: this.height, stride, format, colorSpace: "srgb", alpha: "straight" };
+  }
+  takeRaw() {
+    const handle = this.guard();
+    this.releaseContextImages();
+    const result = this.lib.imageTakePixels(handle);
+    if (result.status === BUSY_STATUS) {
+      throw new Error("Cannot transfer image pixels while native buffers retain the image");
+    }
+    checkStatus(result.status);
+    const width = this.imageInfo.width;
+    const height = this.imageInfo.height;
+    const stride = width * 4;
+    this.handle = null;
+    try {
+      const data = new Uint8Array(toArrayBuffer(result.pointer, 0, result.byteCount));
+      return new OwnedRawImageImpl(data, width, height, stride, this.lib, result.lease, this.owner);
+    } catch (error) {
+      this.lib.imageReleasePixels(result.lease);
+      this.owner.release();
+      throw error;
+    }
+  }
+  copyTo(destination, options = {}) {
+    if (!(destination instanceof Uint8Array))
+      throw new TypeError("destination must be a Uint8Array");
+    const stride = options.stride ?? this.width * 4;
+    requireU32(stride, "stride");
+    const bgra = requireMappedOption(PIXEL_FORMAT_BGRA, options.format ?? "rgba8", "pixel format");
+    checkStatus(this.lib.imageCopyPixels(this.guard(), destination, stride, bgra));
+  }
+  dispose() {
+    try {
+      this.releaseContextImages();
+    } finally {
+      if (this.handle) {
+        const handle = this.handle;
+        if (!this.owner.resources.disposed)
+          this.lib.releaseAfterPaint(handle.context, () => this.lib.imageDestroy(handle));
+        this.handle = null;
+        this.owner.release();
+      }
+    }
+  }
+}
+
+class NativeImagePool2 {
+  lib;
+  owner;
+  images = [];
+  disposed = false;
+  width;
+  height;
+  capacity;
+  constructor(options) {
+    this.owner = options.owner;
+    this.width = requireU32(options.width, "width");
+    this.height = requireU32(options.height, "height");
+    this.capacity = requireU32(options.capacity ?? 3, "capacity");
+    if (this.capacity > 8)
+      throw new RangeError("capacity must be between 1 and 8");
+    this.lib = resolveRenderLib2();
+  }
+  publishRgba(pixels, stride = this.width * 4) {
+    return this.publishPixels(pixels, { stride: requireU32(stride, "stride") });
+  }
+  publishPixels(pixels, options = {}) {
+    if (this.disposed)
+      throw new Error("NativeImagePool is disposed");
+    if (!(pixels instanceof Uint8Array))
+      throw new TypeError("pixels must be a Uint8Array");
+    const { stride, format, alpha } = pixelImportOptions(this.width, options);
+    for (const image of this.images) {
+      const status = this.lib.imageUpdatePixels(image.ptr, pixels, stride, format, alpha);
+      if (status === BUSY_STATUS)
+        continue;
+      checkStatus(status);
+      return image.retain();
+    }
+    if (this.images.length === this.capacity)
+      return null;
+    const image = NativeImage2.fromPixels(pixels, this.width, this.height, { ...options, owner: this.owner });
+    this.images.push(image);
+    return image.retain();
+  }
+  dispose() {
+    if (this.disposed)
+      return;
+    for (const image of this.images)
+      image.dispose();
+    this.images.length = 0;
+    this.disposed = true;
+  }
+}
+
+// src/renderables/Image.ts
+function resolveImageRenderProtocol2(requested, capabilities, hasResolution) {
+  if (requested !== "auto")
+    return requested === "sixel" && !hasResolution ? "blocks" : requested;
+  const configured = capabilities?.image_protocol ?? "auto";
+  if (configured !== "auto")
+    return configured === "sixel" && !hasResolution ? "blocks" : configured;
+  if (!capabilities || capabilities.multiplexer === "tmux")
+    return "blocks";
+  if (capabilities.kitty_graphics)
+    return "kitty";
+  if (capabilities.sixel && hasResolution)
+    return "sixel";
+  return "blocks";
+}
+function checkCrop2(crop, width = Infinity, height = Infinity) {
+  const { left, top, width: cropWidth, height: cropHeight } = crop;
+  const u32 = (value, min) => Number.isInteger(value) && value >= min && value <= 4294967295;
+  if (!u32(left, 0) || !u32(top, 0) || !u32(cropWidth, 1) || !u32(cropHeight, 1))
+    throw new RangeError("crop needs u32 left and top and a positive u32 width and height");
+  if (left + cropWidth > width || top + cropHeight > height)
+    throw new RangeError(`crop ${cropWidth}x${cropHeight} at ${left},${top} lies outside the ${width}x${height} source`);
+  return { left, top, width: cropWidth, height: cropHeight };
+}
+function sameCrop2(a, b) {
+  return a === b || !!a && !!b && a.left === b.left && a.top === b.top && a.width === b.width && a.height === b.height;
+}
+function pixelResolution(ctx) {
+  const terminalWidth = ctx.terminalWidth ?? 0;
+  const terminalHeight = ctx.terminalHeight ?? 0;
+  const resolution = terminalWidth > 0 && terminalHeight > 0 ? ctx.resolution : null;
+  return resolution && resolution.width > 0 && resolution.height > 0 ? resolution : null;
+}
+
+class ImageRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    kind: "image",
+    body: { native: this.prototype.renderSelf, buffered: true },
+    bufferComposition: "native"
+  };
+  _source;
+  _image = null;
+  _pendingImage = null;
+  _loadError = null;
+  _loadController = null;
+  onLoad;
+  onError;
+  _fit;
+  _crop;
+  _protocol;
+  _placementOpacity;
+  loadPromise = null;
+  constructor(ctx, options) {
+    super(ctx, options);
+    try {
+      this._fit = options.fit ?? "fit";
+      this._protocol = options.protocol ?? "auto";
+      this._placementOpacity = options.placementOpacity ?? null;
+      this.onLoad = options.onLoad;
+      this.onError = options.onError;
+      this.setNativeSceneImage();
+      if (options.source !== undefined)
+        this.source = options.source;
+      this.crop = options.crop;
+    } catch (error) {
+      this.abortConstruction(error, () => this.destroySelf());
+    }
+  }
+  get source() {
+    return this._source;
+  }
+  set source(source) {
+    source ??= undefined;
+    if (source === this._source)
+      return;
+    if (source === undefined)
+      this.setNativeSceneImage(null);
+    this._source = source;
+    const previous = this._loadController;
+    previous?.abort();
+    if (this.isDestroyed || this._loadController !== previous)
+      return;
+    this._loadController = null;
+    this._pendingImage?.dispose();
+    this._pendingImage = null;
+    if (source === undefined) {
+      this._loadError = null;
+      this._image?.dispose();
+      this._image = null;
+      this.loadPromise = null;
+      this.requestRender();
+      return;
+    }
+    const controller = new AbortController;
+    this._loadController = controller;
+    this._loadError = null;
+    let imagePromise;
+    if (source instanceof NativeImage2) {
+      try {
+        const image = source.retain();
+        this._pendingImage = image;
+        imagePromise = Promise.resolve(image);
+      } catch (error) {
+        imagePromise = Promise.reject(error);
+      }
+    } else {
+      imagePromise = NativeImage2.load(source, {
+        signal: controller.signal,
+        owner: this._ctx.nativeScene.resourceContext
+      });
+    }
+    this.loadPromise = this.load(imagePromise, controller);
+  }
+  get image() {
+    return this._image;
+  }
+  get fit() {
+    return this._fit;
+  }
+  set fit(value) {
+    const next = value ?? "fit";
+    if (this._fit === next)
+      return;
+    this.setNativeSceneImage(this._image, next);
+    this._fit = next;
+    this.requestRender();
+  }
+  get crop() {
+    return this._crop && { ...this._crop };
+  }
+  set crop(value) {
+    if (sameCrop2(this._crop, value ?? undefined) || this.isDestroyed)
+      return;
+    const next = this.acceptCrop(value ?? undefined, this._loadController ? null : this._image);
+    if (next === null)
+      return;
+    this._ctx.nativeScene.setCrop(this, next);
+    this._crop = next;
+    this.requestRender();
+  }
+  get protocol() {
+    return this._protocol;
+  }
+  set protocol(value) {
+    const next = value ?? "auto";
+    if (this._protocol === next)
+      return;
+    this.setNativeSceneImage(this._image, this._fit, next);
+    this._protocol = next;
+    this.requestRender();
+  }
+  get placementOpacity() {
+    return this._placementOpacity;
+  }
+  set placementOpacity(value) {
+    const next = value ?? null;
+    if (this._placementOpacity === next)
+      return;
+    this._placementOpacity = next;
+    this.setNativeSceneImage(this._image, this._fit, this._protocol);
+    this.requestRender();
+  }
+  get effectiveProtocol() {
+    return resolveImageRenderProtocol2(this._protocol, this._ctx.capabilities, pixelResolution(this._ctx) !== null);
+  }
+  get cellAspectRatio() {
+    const resolution = pixelResolution(this._ctx);
+    if (!resolution)
+      return 2;
+    const cellWidth = resolution.width / this._ctx.terminalWidth;
+    const cellHeight = resolution.height / this._ctx.terminalHeight;
+    return cellWidth > 0 && cellHeight > 0 ? cellHeight / cellWidth : 2;
+  }
+  getFittedSize(targetWidth, targetHeight, cellAspectRatio = this.cellAspectRatio, sourceWidth = this.region()?.width ?? 0, sourceHeight = this.region()?.height ?? 0) {
+    if (sourceWidth <= 0 || sourceHeight <= 0 || targetWidth <= 0 || targetHeight <= 0)
+      return { width: 0, height: 0 };
+    if (this._fit === "fill")
+      return { width: targetWidth, height: targetHeight };
+    const displayAspect = sourceWidth / sourceHeight * cellAspectRatio;
+    const scale = this._fit === "fit" ? Math.min(targetWidth / displayAspect, targetHeight) : Math.max(targetWidth / displayAspect, targetHeight);
+    return {
+      width: Math.max(1, Math.round(displayAspect * scale)),
+      height: Math.max(1, Math.round(scale))
+    };
+  }
+  get loading() {
+    return this._loadController !== null;
+  }
+  get loadError() {
+    return this._loadError;
+  }
+  createFrameBuffer() {
+    const previous = this.frameBuffer;
+    super.createFrameBuffer();
+    if (this._fit === undefined || this.frameBuffer === previous)
+      return;
+    try {
+      this.setNativeSceneImage();
+    } catch (error) {
+      const candidate = this.frameBuffer;
+      this.frameBuffer = previous;
+      try {
+        candidate?.destroy();
+      } catch {}
+      throw error;
+    }
+  }
+  renderSelf(buffer) {
+    const width = this._paintWidth;
+    const height = this._paintHeight;
+    if (!this._image || width <= 0 || height <= 0)
+      return;
+    const fitted = this._fit === "cover" ? { width, height } : this.getFittedSize(width, height);
+    if (fitted.width <= 0 || fitted.height <= 0)
+      return;
+    const originX = this.buffered ? 0 : this._screenX;
+    const originY = this.buffered ? 0 : this._screenY;
+    const x = originX + Math.floor((width - fitted.width) / 2);
+    const y = originY + Math.floor((height - fitted.height) / 2);
+    const resolution = pixelResolution(this._ctx);
+    const pixelWidth = resolution ? Math.max(1, Math.round(fitted.width * resolution.width / this._ctx.terminalWidth)) : 0;
+    const pixelHeight = resolution ? Math.max(1, Math.round(fitted.height * resolution.height / this._ctx.terminalHeight)) : 0;
+    const region = this.region();
+    let { left: sourceX, top: sourceY, width: sourceWidth, height: sourceHeight } = region;
+    if (this._fit === "cover") {
+      const targetAspect = width / (height * this.cellAspectRatio);
+      const sourceAspect = sourceWidth / sourceHeight;
+      if (sourceAspect > targetAspect) {
+        sourceWidth = Math.max(1, Math.round(sourceHeight * targetAspect));
+        sourceX += Math.floor((region.width - sourceWidth) / 2);
+      } else {
+        sourceHeight = Math.max(1, Math.round(sourceWidth / targetAspect));
+        sourceY += Math.floor((region.height - sourceHeight) / 2);
+      }
+    }
+    buffer.drawImage(this._image, x, y, fitted.width, fitted.height, pixelWidth, pixelHeight, sourceX, sourceY, sourceWidth, sourceHeight, this._protocol, this._placementOpacity ?? undefined, this._fit === "fit");
+  }
+  async load(imagePromise, controller) {
+    let image;
+    try {
+      image = await imagePromise;
+      if (this.isDestroyed || this._loadController !== controller) {
+        image.dispose();
+        return;
+      }
+      if (this._pendingImage === image)
+        this._pendingImage = null;
+      this.setNativeSceneImage(image);
+    } catch (error) {
+      try {
+        image?.dispose();
+      } catch {}
+      if (controller.signal.aborted || this.isDestroyed || this._loadController !== controller)
+        return;
+      this._loadController = null;
+      this._loadError = error;
+      this.onError?.(error);
+      return;
+    }
+    const previous = this._image;
+    this._image = image;
+    this._loadController = null;
+    this.runCleanup((run) => {
+      run(() => previous?.dispose());
+      run(() => this.requestRender());
+      run(() => this.acceptCrop(this._crop, image));
+      run(() => this.onLoad?.(image));
+    });
+  }
+  region() {
+    const image = this._image;
+    if (!image)
+      return null;
+    const crop = this._crop;
+    if (crop && crop.left + crop.width <= image.width && crop.top + crop.height <= image.height)
+      return crop;
+    return { left: 0, top: 0, width: image.width, height: image.height };
+  }
+  acceptCrop(crop, image) {
+    try {
+      return crop && checkCrop2(crop, image?.width, image?.height);
+    } catch (error) {
+      queueMicrotask(() => this.isDestroyed || this.onError?.(error));
+      return null;
+    }
+  }
+  setNativeSceneImage(image = this._image, fit = this._fit, protocol = this._protocol) {
+    this._ctx.nativeScene.setImage(this, image, fit, protocol, this.buffered ? this.frameBuffer : null, this._placementOpacity);
+  }
+  destroySelf() {
+    const controller = this._loadController;
+    const pending = this._pendingImage;
+    const image = this._image;
+    this._loadController = null;
+    this._pendingImage = null;
+    this._image = null;
+    this.runCleanup((run) => {
+      run(() => controller?.abort());
+      run(() => pending?.dispose());
+      run(() => image?.dispose());
+      run(() => super.destroySelf());
+    });
+  }
+}
+
+// src/renderables/TextNode.ts
+var BrandedTextNodeRenderable = Symbol.for("@opentui/core/TextNodeRenderable");
+function isTextNodeRenderable2(obj) {
+  return !!obj?.[BrandedTextNodeRenderable];
+}
+function styledTextToTextNodes(styledText) {
+  return styledText.chunks.map((chunk) => {
+    const node = new TextNodeRenderable2({
+      fg: chunk.fg,
+      bg: chunk.bg,
+      attributes: chunk.attributes,
+      link: chunk.link
+    });
+    node.add(chunk.text);
+    return node;
+  });
+}
+
+class TextNodeRenderable2 extends BaseRenderable2 {
+  [BrandedTextNodeRenderable] = true;
+  _fg;
+  _bg;
+  _attributes;
+  _link;
+  _children = [];
+  dirtyRevision = 0;
+  parent = null;
+  constructor(options) {
+    super(options);
+    this._fg = options.fg ? RGBA2.clone(parseColor2(options.fg)) : undefined;
+    this._bg = options.bg ? RGBA2.clone(parseColor2(options.bg)) : undefined;
+    this._attributes = options.attributes ?? 0;
+    this._link = options.link;
+  }
+  get children() {
+    return this._children;
+  }
+  set children(children) {
+    for (const child of this._children) {
+      if (isTextNodeRenderable2(child) && child.parent === this) {
+        child.parent = null;
+      }
+    }
+    for (const child of children) {
+      if (isTextNodeRenderable2(child)) {
+        if (child.parent && child.parent !== this) {
+          child.parent.remove(child);
+        }
+        child.parent = this;
+      }
+    }
+    this._children = children;
+    this.requestRender();
+  }
+  requestRender() {
+    this.markDirty();
+    this.parent?.requestRender();
+  }
+  markDirty() {
+    super.markDirty();
+    this.dirtyRevision++;
+  }
+  add(obj, index) {
+    if (typeof obj === "string") {
+      if (index !== undefined) {
+        this._children.splice(index, 0, obj);
+        this.requestRender();
+        return index;
+      }
+      const insertIndex = this._children.length;
+      this._children.push(obj);
+      this.requestRender();
+      return insertIndex;
+    }
+    if (isTextNodeRenderable2(obj)) {
+      const insertIndex = this.prepareChildInsert(obj, index);
+      this._children.splice(insertIndex, 0, obj);
+      obj.parent = this;
+      this.requestRender();
+      return insertIndex;
+    }
+    if (isStyledText2(obj)) {
+      const textNodes = styledTextToTextNodes(obj);
+      if (index !== undefined) {
+        this._children.splice(index, 0, ...textNodes);
+        textNodes.forEach((node) => node.parent = this);
+        this.requestRender();
+        return index;
+      }
+      const insertIndex = this._children.length;
+      this._children.push(...textNodes);
+      textNodes.forEach((node) => node.parent = this);
+      this.requestRender();
+      return insertIndex;
+    }
+    throw new Error("TextNodeRenderable only accepts strings, TextNodeRenderable instances, or StyledText instances");
+  }
+  prepareChildInsert(child, index) {
+    let insertIndex = index ?? this._children.length;
+    if (child.parent && child.parent !== this) {
+      child.parent.remove(child);
+    } else if (child.parent === this) {
+      const currentIndex = this._children.indexOf(child);
+      if (currentIndex !== -1) {
+        this._children.splice(currentIndex, 1);
+        if (currentIndex < insertIndex)
+          insertIndex -= 1;
+      }
+    }
+    return Math.max(0, Math.min(insertIndex, this._children.length));
+  }
+  replace(obj, index) {
+    const existing = this._children[index];
+    if (isTextNodeRenderable2(existing) && existing.parent === this) {
+      existing.parent = null;
+    }
+    if (isTextNodeRenderable2(obj)) {
+      if (obj.parent && obj.parent !== this) {
+        obj.parent.remove(obj);
+      } else if (obj.parent === this) {
+        const currentIndex = this._children.indexOf(obj);
+        if (currentIndex !== -1 && currentIndex !== index) {
+          this._children.splice(currentIndex, 1);
+          if (currentIndex < index)
+            index -= 1;
+        }
+      }
+      obj.parent = this;
+    }
+    this._children[index] = obj;
+    this.requestRender();
+  }
+  insertBefore(child, anchorNode) {
+    if (!anchorNode || !isTextNodeRenderable2(anchorNode)) {
+      throw new Error("Anchor must be a TextNodeRenderable");
+    }
+    const anchorIndex = this._children.indexOf(anchorNode);
+    if (anchorIndex === -1) {
+      throw new Error("Anchor node not found in children");
+    }
+    if (child === anchorNode) {
+      return this;
+    }
+    if (isTextNodeRenderable2(child)) {
+      this.add(child, anchorIndex);
+      return this;
+    }
+    if (typeof child === "string") {
+      this._children.splice(anchorIndex, 0, child);
+    } else if (isStyledText2(child)) {
+      const textNodes = styledTextToTextNodes(child);
+      this._children.splice(anchorIndex, 0, ...textNodes);
+      textNodes.forEach((node) => node.parent = this);
+    } else {
+      throw new Error("Child must be a string, TextNodeRenderable, or StyledText instance");
+    }
+    this.requestRender();
+    return this;
+  }
+  remove(child) {
+    if (!isTextNodeRenderable2(child)) {
+      throw new Error("remove expects a TextNodeRenderable child object");
+    }
+    const childIndex = this._children.indexOf(child);
+    if (childIndex === -1) {
+      if (true) {
+        console.warn(`TextNodeRenderable with id ${child.id} is not a child of ${this.id}, skipping remove`);
+      }
+      return;
+    }
+    this._children.splice(childIndex, 1);
+    child.parent = null;
+    this.requestRender();
+  }
+  clear() {
+    for (const child of this._children) {
+      if (isTextNodeRenderable2(child) && child.parent === this) {
+        child.parent = null;
+      }
+    }
+    this._children = [];
+    this.requestRender();
+  }
+  mergeStyles(parentStyle) {
+    return {
+      fg: this.fg ?? parentStyle.fg,
+      bg: this.bg ?? parentStyle.bg,
+      attributes: this._attributes | parentStyle.attributes,
+      link: this._link ?? parentStyle.link
+    };
+  }
+  gatherWithInheritedStyle(parentStyle = {
+    fg: undefined,
+    bg: undefined,
+    attributes: 0
+  }) {
+    return this.gatherChunks(parentStyle);
+  }
+  prepareWithInheritedStyle(parentStyle) {
+    const revisions = new Map;
+    const chunks = this.gatherChunks(parentStyle, revisions);
+    return {
+      chunks,
+      acknowledge: () => {
+        for (const [node, revision] of revisions) {
+          if (node.dirtyRevision === revision)
+            node.markClean();
+        }
+      }
+    };
+  }
+  gatherChunks(parentStyle, revisions) {
+    revisions?.set(this, this.dirtyRevision);
+    const currentStyle = this.mergeStyles(parentStyle);
+    const chunks = [];
+    for (const child of this._children) {
+      if (typeof child === "string") {
+        chunks.push({
+          __isChunk: true,
+          text: child,
+          fg: currentStyle.fg,
+          bg: currentStyle.bg,
+          attributes: currentStyle.attributes,
+          link: currentStyle.link
+        });
+      } else {
+        const childChunks = revisions ? child.gatherChunks(currentStyle, revisions) : child.gatherWithInheritedStyle(currentStyle);
+        chunks.push(...childChunks);
+      }
+    }
+    if (!revisions)
+      this.markClean();
+    return chunks;
+  }
+  static fromString(text, options = {}) {
+    const node = new TextNodeRenderable2(options);
+    node.add(text);
+    return node;
+  }
+  static fromNodes(nodes, options = {}) {
+    const node = new TextNodeRenderable2(options);
+    for (const childNode of nodes) {
+      node.add(childNode);
+    }
+    return node;
+  }
+  toChunks(parentStyle = {
+    fg: undefined,
+    bg: undefined,
+    attributes: 0
+  }) {
+    return this.gatherWithInheritedStyle(parentStyle);
+  }
+  getChildren() {
+    return this._children.filter((child) => typeof child !== "string");
+  }
+  getChildrenCount() {
+    return this._children.length;
+  }
+  getRenderable(id) {
+    return this._children.find((child) => typeof child !== "string" && child.id === id);
+  }
+  getRenderableIndex(id) {
+    return this._children.findIndex((child) => isTextNodeRenderable2(child) && child.id === id);
+  }
+  get fg() {
+    return this._fg ? RGBA2.clone(this._fg) : undefined;
+  }
+  set fg(fg) {
+    if (!fg) {
+      this._fg = undefined;
+      this.requestRender();
+      return;
+    }
+    this._fg = RGBA2.clone(parseColor2(fg));
+    this.requestRender();
+  }
+  set bg(bg) {
+    if (!bg) {
+      this._bg = undefined;
+      this.requestRender();
+      return;
+    }
+    this._bg = RGBA2.clone(parseColor2(bg));
+    this.requestRender();
+  }
+  get bg() {
+    return this._bg ? RGBA2.clone(this._bg) : undefined;
+  }
+  set attributes(attributes) {
+    this._attributes = attributes;
+    this.requestRender();
+  }
+  get attributes() {
+    return this._attributes;
+  }
+  set link(link) {
+    this._link = link;
+    this.requestRender();
+  }
+  get link() {
+    return this._link;
+  }
+  findDescendantById(id) {
+    return;
+  }
+}
+
+class RootTextNodeRenderable2 extends TextNodeRenderable2 {
+  ctx;
+  textParent;
+  constructor(ctx, options, textParent) {
+    super(options);
+    this.ctx = ctx;
+    this.textParent = textParent;
+  }
+  requestRender() {
+    this.markDirty();
+    this.textParent.requestRender();
+  }
+}
+
+// src/renderables/Text.ts
+class TextRenderable2 extends TextBufferRenderable2 {
+  static nativeIntegration = {
+    ...TextBufferRenderable2.nativeIntegration,
+    lineInfo: true
+  };
+  _text;
+  _hasManualStyledText = false;
+  rootTextNode;
+  composeText = () => this.updateTextFromNodes();
+  _contentDefaultOptions = {
+    content: ""
+  };
+  constructor(ctx, options) {
+    super(ctx, options);
+    try {
+      const initialContent = options.content;
+      const content = initialContent ?? this._contentDefaultOptions.content;
+      this.content = content;
+      this._hasManualStyledText = initialContent !== undefined && content !== "";
+      this.onLifecyclePass = this.composeText;
+    } catch (error) {
+      this.rollbackConstruction(error);
+    }
+  }
+  get content() {
+    if (typeof this._text === "string")
+      this._text = stringToStyledText2(this._text);
+    return this._text;
+  }
+  get chunks() {
+    return this.content.chunks;
+  }
+  get textNode() {
+    return this.rootTextNode ??= new RootTextNodeRenderable2(this._ctx, {
+      id: `${this.id}-root`,
+      fg: this._defaultFg,
+      bg: this._defaultBg,
+      attributes: this._defaultAttributes
+    }, this);
+  }
+  set content(value) {
+    if (typeof value !== "string" && this._text === value) {
+      this._hasManualStyledText = true;
+      this._ctx.nativeScene.lifecyclePasses.refresh(this);
+      return;
+    }
+    this._ctx.nativeScene.setText(this, value);
+    this._text = value;
+    this._hasManualStyledText = true;
+    this._ctx.nativeScene.lifecyclePasses.refresh(this);
+    this.requestRender();
+    this.refreshLocalSelection();
+    this.emit("line-info-change");
+  }
+  updateTextFromNodes() {
+    if (this.rootTextNode?.isDirty && !this._hasManualStyledText) {
+      const style = {
+        fg: this._defaultFg,
+        bg: this._defaultBg,
+        attributes: this._defaultAttributes,
+        link: undefined
+      };
+      const prepared = this.rootTextNode.prepareWithInheritedStyle(style);
+      this._ctx.nativeScene.setText(this, new StyledText2(prepared.chunks));
+      prepared.acknowledge();
+      this._ctx.nativeScene.lifecyclePasses.refresh(this);
+      this.refreshLocalSelection();
+      this.emit("line-info-change");
+      return;
+    }
+    this._ctx.nativeScene.lifecyclePasses.refresh(this);
+  }
+  _needsLifecyclePass() {
+    if (this.onLifecyclePass !== this.composeText)
+      return super._needsLifecyclePass();
+    return !this._hasManualStyledText && !!this.rootTextNode?.isDirty;
+  }
+  requestRender() {
+    if (this.isDestroyed)
+      return;
+    this._ctx.nativeScene.lifecyclePasses.refresh(this);
+    super.requestRender();
+  }
+  add(obj, index) {
+    return this.textNode.add(obj, index);
+  }
+  remove(child) {
+    this.textNode.remove(child);
+  }
+  insertBefore(obj, anchor) {
+    this.textNode.insertBefore(obj, anchor);
+    return this.textNode.children.indexOf(obj);
+  }
+  getTextChildren() {
+    return this.rootTextNode?.getChildren() ?? [];
+  }
+  clear() {
+    this._ctx.nativeScene.setText(this, "");
+    this._text = stringToStyledText2("");
+    this.rootTextNode?.clear();
+    this.requestRender();
+    this.refreshLocalSelection();
+    this.emit("line-info-change");
+  }
+  onFgChanged(newColor) {
+    if (this.rootTextNode)
+      this.rootTextNode.fg = newColor;
+  }
+  onBgChanged(newColor) {
+    if (this.rootTextNode)
+      this.rootTextNode.bg = newColor;
+  }
+  onAttributesChanged(newAttributes) {
+    if (this.rootTextNode)
+      this.rootTextNode.attributes = newAttributes;
+  }
+  destroyOwnedResources() {
+    this.runCleanup((run) => {
+      run(() => {
+        if (this.rootTextNode) {
+          for (const child of this.rootTextNode.getChildren()) {
+            if (child.parent === this.rootTextNode)
+              child.parent = null;
+          }
+        }
+        if (this.rootTextNode)
+          this.rootTextNode.children.length = 0;
+      });
+      run(() => super.destroyOwnedResources());
+    });
+  }
+}
+
+// src/NativeSession.ts
+import { Writable } from "stream";
+var scheduler = {
+  now: () => process.hrtime.bigint(),
+  schedule(callback, delayMs) {
+    if (delayMs === undefined) {
+      const handle = setImmediate(callback);
+      return () => clearImmediate(handle);
+    }
+    const handle = setTimeout(callback, delayMs);
+    return () => clearTimeout(handle);
+  }
+};
+var emptyOutput = new Uint8Array(0);
+var stdoutBudget = 65536;
+var immediatePolls = 64;
+var immediateAgeNs = 500000n;
+registerEnvVar2({
+  name: "OTUI_STDOUT_THREAD",
+  description: "Write terminal stdout from a native thread so slow links never block the JS thread; false keeps it on the JS thread.",
+  type: "boolean",
+  default: true
+});
+
+class ReadySessions {
+  host;
+  ready = new Set;
+  pending = new Set;
+  current = null;
+  cancelTurn = null;
+  failure = null;
+  constructor(host) {
+    this.host = host;
+  }
+  scope(onError) {
+    if (this.failure)
+      throw this.failure;
+    const tasks = new Set;
+    const scoped = {
+      now: () => this.host.now(),
+      schedule: (callback, delayMs) => {
+        if (this.failure)
+          throw this.failure;
+        let cancelTimer;
+        const task = {
+          callback,
+          active: true,
+          onError,
+          cancel: () => {
+            task.active = false;
+            tasks.delete(task);
+            this.pending.delete(task);
+            if (tasks.size === 0)
+              this.ready.delete(tasks);
+            const cancel = cancelTimer;
+            cancelTimer = undefined;
+            try {
+              cancel?.();
+            } finally {
+              if (this.ready.size === 0) {
+                const cancel = this.cancelTurn;
+                this.cancelTurn = null;
+                cancel?.();
+              }
+            }
+          }
+        };
+        this.pending.add(task);
+        const enqueue = () => {
+          if (!task.active)
+            return;
+          tasks.add(task);
+          this.ready.add(tasks);
+          this.arm();
+        };
+        try {
+          if (delayMs === undefined)
+            enqueue();
+          else
+            cancelTimer = this.host.schedule(enqueue, delayMs);
+        } catch (error) {
+          this.fail(error);
+        }
+        if (this.failure)
+          throw this.failure;
+        return task.cancel;
+      }
+    };
+    readyServices.set(scoped, this);
+    return scoped;
+  }
+  arm() {
+    if (this.failure || this.cancelTurn || this.ready.size === 0)
+      return;
+    let arming = true;
+    try {
+      this.cancelTurn = this.host.schedule(() => {
+        if (arming)
+          throw new Error("NativeSessionScheduler.schedule ran a callback inline");
+        this.cancelTurn = null;
+        const tasks = this.ready.values().next().value;
+        if (!tasks)
+          return;
+        const task = this.current = tasks.values().next().value;
+        this.ready.delete(tasks);
+        tasks.delete(task);
+        if (tasks.size > 0)
+          this.ready.add(tasks);
+        task.active = false;
+        this.pending.delete(task);
+        try {
+          task.callback();
+        } finally {
+          try {
+            this.arm();
+          } finally {
+            this.current = null;
+          }
+        }
+      });
+    } catch (error) {
+      this.fail(error);
+    } finally {
+      arming = false;
+    }
+  }
+  fail(error) {
+    if (this.failure)
+      return;
+    this.failure = asError(error);
+    const affected = new Set(this.pending);
+    if (this.current)
+      affected.add(this.current);
+    const owners = new Set;
+    let cleanupFailure;
+    for (const task of affected) {
+      owners.add(task.onError);
+      try {
+        task.cancel();
+      } catch (error) {
+        cleanupFailure ??= { error };
+      }
+    }
+    this.ready.clear();
+    this.pending.clear();
+    for (const onError of owners) {
+      try {
+        onError(this.failure);
+      } catch (error) {
+        cleanupFailure ??= { error };
+      }
+    }
+    if (cleanupFailure)
+      throw cleanupFailure.error;
+  }
+}
+var readyServices = new WeakMap;
+function sessionScheduler(host, onError) {
+  let service = readyServices.get(host);
+  if (!service) {
+    service = new ReadySessions(host);
+    readyServices.set(host, service);
+  }
+  return service.scope(onError);
+}
+function completion() {
+  const result = Promise.withResolvers();
+  result.promise.catch(() => {});
+  return result;
+}
+function asError(error) {
+  return error instanceof Error ? error : new Error("NativeSession failed", { cause: error });
+}
+
+class NativeSession2 {
+  sink;
+  owner;
+  lib = resolveRenderLib2();
+  attachmentCleanup;
+  resourceContext;
+  nativeSession;
+  buffer;
+  outputBufferSize;
+  sinkWrite;
+  scheduler;
+  maxWriteBytes;
+  maxAtomicWriteBytes;
+  closeTimeoutNs;
+  closeWait = completion();
+  idleWait = null;
+  presentationWait = null;
+  imageUploadsPending = 0;
+  transition = null;
+  scheduled = null;
+  output = null;
+  stdoutPost = null;
+  stdoutWriter;
+  blocked = false;
+  sinkErrorSeen = false;
+  detached = false;
+  closeDeadlineNs = null;
+  closeCapNs = null;
+  closeLate = null;
+  closeRequested = false;
+  closeInterruption = null;
+  stopped = false;
+  exiting = false;
+  finishing = false;
+  _disposed = false;
+  _error = null;
+  detachedSessions = new Set;
+  closed = this.closeWait.promise;
+  constructor(sink, options = {}, owner) {
+    this.sink = sink;
+    this.owner = owner;
+    this.lib.getYogaHost().assertMutable();
+    const size = options.outputBufferSize ?? 65536;
+    const timeout = options.closeTimeoutMs ?? 1000;
+    const output = options.output ?? {
+      chunkSize: 65536,
+      spanCapacity: 128,
+      maxBytes: 8388608n,
+      controlCapacity: 4096
+    };
+    if (!Number.isInteger(size) || size <= 0 || size > 4294967295) {
+      throw new RangeError("NativeSession outputBufferSize must be a positive u32");
+    }
+    if (!Number.isInteger(timeout) || timeout < 0 || timeout > 2147483647) {
+      throw new RangeError("NativeSession closeTimeoutMs must be an integer from 0 to 2147483647");
+    }
+    if (!sink.writable || sink.destroyed || sink.writableEnded)
+      throw new Error("NativeSession sink is not writable");
+    this.sinkWrite = sink.write;
+    this.outputBufferSize = size;
+    this.buffer = sink === process.stdout && process.stdout.fd === 1 ? null : new Uint8Array(size);
+    this.stdoutWriter = this.buffer === null && env2.OTUI_STDOUT_THREAD !== false;
+    this.scheduler = sessionScheduler(options.scheduler ?? scheduler, (error) => {
+      if (this.stopped) {
+        if (this.canDetach())
+          this.detach();
+      } else
+        this.finish(error);
+    });
+    this.maxWriteBytes = output.maxBytes;
+    this.closeTimeoutNs = BigInt(timeout) * 1000000n;
+    owner?.checkOpen();
+    this.resourceContext = owner?.resourceContext ?? new ResourceContext2(options.context ?? { objectCapacity: 65536, renderCellsMax: 1e6 });
+    let session;
+    try {
+      session = this.lib.createSession(this.context, output);
+      this.nativeSession = Object.freeze(session);
+      this.maxAtomicWriteBytes = this.lib.sessionGetWriteLimit(this.context, session);
+      sink.on("error", this.onError);
+      sink.on("close", this.onClose);
+      sink.on("finish", this.onFinish);
+      sink.on("drain", this.onDrain);
+      if (this._error)
+        throw this._error;
+      if (!sink.writable || sink.destroyed || sink.writableEnded)
+        throw new Error("NativeSession sink is not writable");
+      this.blocked = sink.writableNeedDrain;
+      owner?.detachedSessions.add(this);
+    } catch (error) {
+      this.stopped = true;
+      try {
+        if (session)
+          this.finish(asError(error));
+        else if (!owner)
+          this.resourceContext.destroy();
+      } catch {} finally {
+        this.detach();
+      }
+      throw error;
+    }
+  }
+  get context() {
+    return this.resourceContext.context;
+  }
+  get renderLib() {
+    return this.lib;
+  }
+  get session() {
+    return this.nativeSession;
+  }
+  get disposed() {
+    return this._disposed;
+  }
+  get contextDisposed() {
+    return this.resourceContext.disposed;
+  }
+  get error() {
+    return this._error;
+  }
+  get open() {
+    return !this._error && !this.closeRequested && !this.exiting;
+  }
+  usesOutput(sink) {
+    return this.sink === sink;
+  }
+  attachRenderer(options, beforeDispose) {
+    this.checkOpen();
+    this.lib.sessionAttachRenderer(this.context, this.session, options);
+    this.attachmentCleanup = beforeDispose;
+  }
+  createDetached(options, beforeDispose) {
+    this.checkOpen();
+    const detached = new NativeSession2(new Writable({
+      write(_bytes, _encoding, complete) {
+        complete();
+      }
+    }), {
+      output: { chunkSize: 4096, spanCapacity: 2, maxBytes: 8192n, controlCapacity: 0 },
+      outputBufferSize: 4096,
+      scheduler: this.scheduler
+    }, this);
+    try {
+      detached.attachRenderer(options, beforeDispose);
+      return detached;
+    } catch (error) {
+      detached.dispose();
+      throw error;
+    }
+  }
+  setupTerminal(options = {}) {
+    return this.changeTerminal("setup", options);
+  }
+  suspend() {
+    return this.changeTerminal("suspend");
+  }
+  resume() {
+    return this.changeTerminal("resume");
+  }
+  render(force, frame) {
+    this.checkOpen();
+    const result = this.lib.sceneFrameCommit(this.context, this.session, frame, force);
+    if (result === 1 /* Pending */)
+      this.schedule();
+    return result;
+  }
+  renderSplit(frame, commits, pinnedRenderOffset, force) {
+    this.checkOpen();
+    const result = this.lib.sessionRenderSplit(this.context, this.session, frame, commits, pinnedRenderOffset, force);
+    if (result.status === 1 /* Pending */)
+      this.schedule();
+    return result;
+  }
+  setScreen(alternate, width, height, trailingOutput) {
+    this.checkOpen();
+    this.lib.sessionSetScreen(this.context, this.session, alternate, width, height, trailingOutput);
+    this.schedule();
+  }
+  whenPresented() {
+    this.checkOpen();
+    if (this.presentationWait)
+      return this.presentationWait.promise;
+    const state = this.lib.sessionGetRendererState(this.context, this.session);
+    if (!state.framePending) {
+      this.imageUploadsPending = state.imageUploadsPending;
+      return Promise.resolve();
+    }
+    const wait = this.presentationWait = completion();
+    this.schedule();
+    return wait.promise;
+  }
+  resize(width, height) {
+    this.checkOpen();
+    this.lib.sessionResizeRenderer(this.context, this.session, width, height);
+  }
+  control(command) {
+    this.checkOpen();
+    this.lib.sessionControl(this.context, this.session, command);
+    this.schedule();
+  }
+  writeClipboard(target, bytes) {
+    this.checkOpen();
+    const accepted = this.lib.sessionClipboard(this.context, this.session, target, bytes);
+    if (accepted)
+      this.schedule();
+    return accepted;
+  }
+  triggerNotification(message, title) {
+    this.checkOpen();
+    const accepted = this.lib.sessionNotification(this.context, this.session, message, title);
+    if (accepted)
+      this.schedule();
+    return accepted;
+  }
+  setProgramStatus(status) {
+    this.checkOpen();
+    try {
+      this.lib.sessionControl(this.context, this.session, { kind: "program-status", status });
+    } catch (error) {
+      if (error instanceof NativeError2 && (error.status === -19 /* InvalidPhase */ || error.status === -11 /* OutputBackpressure */)) {
+        return false;
+      }
+      throw error;
+    }
+    this.schedule();
+    return true;
+  }
+  setKittyImageTransport(mode) {
+    this.checkOpen();
+    this.lib.sessionSetKittyImageTransport(this.context, this.session, mode);
+    this.schedule();
+  }
+  getKittyImageTransport() {
+    this.checkOpen();
+    return this.lib.sessionGetKittyImageTransport(this.context, this.session);
+  }
+  pollKittyImageTransport() {
+    this.checkOpen();
+    return this.lib.sessionPollKittyImageTransport(this.context, this.session, this.scheduler.now());
+  }
+  cancelKittyImageTransport(failed) {
+    this.checkOpen();
+    this.lib.sessionCancelKittyImageTransport(this.context, this.session, failed);
+  }
+  processKittyImageReply(bytes) {
+    this.checkOpen();
+    return this.lib.sessionProcessKittyImageReply(this.context, this.session, bytes);
+  }
+  startKittyFileProbe() {
+    this.checkOpen();
+    this.lib.sessionStartKittyFileProbe(this.context, this.session);
+    this.schedule();
+  }
+  getCapabilities() {
+    this.checkOpen();
+    return this.lib.sessionGetCapabilities(this.context, this.session);
+  }
+  write(bytes) {
+    this.checkOpen();
+    try {
+      this.lib.sessionWrite(this.context, this.session, bytes);
+    } catch (error) {
+      if (error instanceof NativeError2 && error.status === -11 /* OutputBackpressure */)
+        return false;
+      throw error;
+    }
+    this.schedule();
+    return true;
+  }
+  idle() {
+    this.lib.getYogaHost().assertMutable();
+    if (this.stopped)
+      return this.closed;
+    if (this.idleWait)
+      return this.idleWait.promise;
+    const wait = this.idleWait = completion();
+    this.schedule();
+    return wait.promise;
+  }
+  close() {
+    this.lib.getYogaHost().assertMutable();
+    if (this.stopped || this.closeRequested)
+      return this.closed;
+    try {
+      this.closeRequested = true;
+      this.closeDeadlineNs ??= this.scheduler.now() + this.closeTimeoutNs;
+      this.closeCapNs ??= this.scheduler.now() + 10n * this.closeTimeoutNs;
+      if (this.transition) {
+        this.closeInterruption = new Error("NativeSession terminal transition interrupted by close");
+        this.transition.wait.reject(this.closeInterruption);
+        this.transition = null;
+      }
+      if (this._error)
+        throw this._error;
+      this.lib.sessionClose(this.context, this.session);
+      if (this.lib.sessionGetState(this.context, this.session) === 2 /* Closed */)
+        this.finish(null);
+      else
+        this.schedule();
+    } catch (error) {
+      this.finish(asError(error));
+    }
+    return this.closed;
+  }
+  armCloseTimeout() {
+    this.checkOpen();
+    this.closeDeadlineNs ??= this.scheduler.now() + this.closeTimeoutNs;
+    this.closeCapNs ??= this.scheduler.now() + 10n * this.closeTimeoutNs;
+    this.schedule();
+  }
+  isCloseInterruption(error) {
+    return error != null && (error === this.closeInterruption || error === this.closeLate);
+  }
+  dispose() {
+    this.lib.getYogaHost().assertMutable();
+    this.finish(this._error ?? new Error("NativeSession disposed without graceful close"));
+  }
+  restoreOnExit() {
+    if (this._disposed || this.finishing)
+      return false;
+    this.exiting = true;
+    try {
+      if (this.sink !== process.stdout || process.stdout.fd !== 1 || this.sink.writableLength !== 0 || this.sink.writableCorked !== 0 || this._error || this.sink.destroyed || this.sink.errored || !this.sink.writable || this.sink.writableEnded)
+        return false;
+      if (this.output) {
+        if (!this.output.completed || this.output.failed)
+          return false;
+        if (this.output.ticket)
+          this.lib.sessionCompleteOutput(this.context, this.session, this.output.ticket, true);
+        this.output = null;
+      }
+      let viaWriter = this.stdoutWriter && (this.lib.sessionPostStdout(this.context, this.session, 0, true).written > 0 || !this.stdoutPost);
+      this.stdoutPost = null;
+      if (this.closeCapNs !== null)
+        this.lib.sessionDropOutput(this.context, this.session);
+      for (;; ) {
+        const status = this.lib.sessionPumpExit(this.context, this.session);
+        if (status === 4 /* Closed */)
+          return true;
+        if (status === 1 /* Again */)
+          continue;
+        if (status !== 2 /* OutputPending */)
+          throw new Error("Unexpected native exit pump status");
+        if (viaWriter) {
+          if (this.exitThroughWriter())
+            continue;
+          viaWriter = false;
+        }
+        if (this.lib.sessionDrainStdout(this.context, this.session) === 0)
+          return false;
+      }
+    } catch (error) {
+      this._error ??= asError(error);
+      return false;
+    }
+  }
+  exitThroughWriter() {
+    try {
+      if (!this.lib.sessionPostStdout(this.context, this.session, stdoutBudget, false).inFlight)
+        return false;
+    } catch (error) {
+      if (error instanceof NativeError2 && error.status === -24 /* UnsupportedResource */)
+        return false;
+      throw error;
+    }
+    return this.lib.sessionPostStdout(this.context, this.session, 0, true).written > 0;
+  }
+  checkOpen() {
+    this.lib.getYogaHost().assertMutable();
+    if (this._error)
+      throw this._error;
+    if (this.stopped || this.closeRequested)
+      throw this.closeLate ?? new Error("NativeSession is closing or disposed");
+    this.owner?.checkOpen();
+  }
+  changeTerminal(kind, options) {
+    this.checkOpen();
+    if (this.transition) {
+      if (this.transition.kind === kind)
+        return this.transition.wait.promise;
+      throw new Error("NativeSession terminal transition is pending");
+    }
+    switch (kind) {
+      case "setup":
+        this.lib.sessionSetupTerminal(this.context, this.session, options);
+        break;
+      case "suspend":
+        this.lib.sessionSuspend(this.context, this.session);
+        break;
+      case "resume":
+        this.lib.sessionResume(this.context, this.session);
+        break;
+    }
+    const wait = completion();
+    this.transition = { kind, wait };
+    this.schedule();
+    return wait.promise;
+  }
+  onError = (error) => {
+    this.sinkErrorSeen = true;
+    if (!this.stopped)
+      this._error ??= asError(error);
+    this.schedule();
+  };
+  onClose = () => {
+    this.output = null;
+    if (this.stopped)
+      this.detach();
+    else {
+      this._error ??= new Error("NativeSession sink closed before graceful close");
+      this.schedule();
+    }
+  };
+  onFinish = () => {
+    if (!this.stopped)
+      this._error ??= new Error("NativeSession sink finished before graceful close");
+    this.schedule();
+  };
+  onDrain = () => {
+    if (this.stopped)
+      return;
+    this.blocked = false;
+    this.schedule();
+  };
+  schedule(deadlineNs = null) {
+    if (this.exiting) {
+      if (this.stopped && this.canDetach())
+        this.detach();
+      return;
+    }
+    if (this.stopped && (this.detached || !this.canDetach()))
+      return;
+    const previous = this.scheduled;
+    if (previous && (previous.deadlineNs === null || deadlineNs !== null && previous.deadlineNs <= deadlineNs)) {
+      return;
+    }
+    const task = { deadlineNs, cancel: () => {} };
+    try {
+      previous?.cancel();
+      this.scheduled = task;
+      let delayMs;
+      if (deadlineNs !== null) {
+        const remaining = deadlineNs - this.scheduler.now();
+        delayMs = Math.min(Number(((remaining > 0n ? remaining : 0n) + 999999n) / 1000000n), 2147483647);
+      }
+      task.cancel = this.scheduler.schedule(() => {
+        if (this.scheduled !== task)
+          return;
+        this.scheduled = null;
+        if (this.stopped) {
+          if (this.canDetach())
+            this.detach();
+        } else
+          this.turn();
+      }, delayMs);
+    } catch (error) {
+      if (this.stopped) {
+        if (this.canDetach())
+          this.detach();
+      } else
+        this.finish(asError(error));
+    }
+  }
+  turn() {
+    let deadlineNs = null;
+    try {
+      if (this._error)
+        throw this._error;
+      const now = this.scheduler.now();
+      const expired = !this.stdoutPost && this.closeDeadlineNs !== null && now >= this.closeDeadlineNs;
+      const capped = !this.closeLate && this.closeCapNs !== null && now >= this.closeCapNs;
+      if (this.output?.completed) {
+        if (this.output.ticket)
+          this.lib.sessionCompleteOutput(this.context, this.session, this.output.ticket, true);
+        this.output = null;
+        this.completePresentation();
+      }
+      const start = !capped && this.sink.writableLength === 0 && this.sink.writableCorked === 0;
+      if (this.stdoutPost)
+        this.postStdout(now, start);
+      if (this.stdoutPost)
+        deadlineNs = this.pollDeadline(now);
+      const result = this.output || this.stdoutPost ? null : this.lib.sessionPump(this.context, this.session, now, 1);
+      if ((expired || capped) && result?.status !== 4 /* Closed */) {
+        if (this.closeLate) {
+          throw new Error("NativeSession graceful close timed out; output cancelled without restoration");
+        }
+        this.closeLate = new Error("NativeSession graceful close ran late; queued output was dropped");
+        this.closeRequested = true;
+        this.lib.sessionDropOutput(this.context, this.session);
+        this.presentationWait?.reject(this.closeLate);
+        this.presentationWait = null;
+        this.closeDeadlineNs = now + this.closeTimeoutNs;
+        this.schedule();
+        return;
+      }
+      if (!result) {
+        if (deadlineNs === 0n) {
+          deadlineNs = null;
+          this.schedule();
+        }
+        return;
+      }
+      switch (result.status) {
+        case 0 /* Idle */:
+          if (this.transition) {
+            const phase = this.transition.kind === "suspend" ? 4 /* Suspended */ : 2 /* Active */;
+            if (this.lib.sessionGetTerminalState(this.context, this.session) !== phase) {
+              throw new Error("NativeSession terminal transition did not complete");
+            }
+            this.transition.wait.resolve();
+            this.transition = null;
+          }
+          if (!this.blocked) {
+            this.idleWait?.resolve();
+            this.idleWait = null;
+          }
+          break;
+        case 1 /* Again */:
+          this.schedule();
+          break;
+        case 2 /* OutputPending */:
+          if (!this.blocked)
+            this.writeOutput();
+          break;
+        case 3 /* WaitUntil */:
+          deadlineNs = result.deadlineNs;
+          break;
+        case 4 /* Closed */:
+          this.finish(this.closeLate);
+          break;
+      }
+    } catch (error) {
+      this.finish(asError(error));
+    } finally {
+      for (const closeNs of [this.stdoutPost ? null : this.closeDeadlineNs, this.closeLate ? null : this.closeCapNs]) {
+        if (closeNs !== null && (deadlineNs === null || closeNs < deadlineNs))
+          deadlineNs = closeNs;
+      }
+      if (deadlineNs !== null)
+        this.schedule(deadlineNs);
+    }
+  }
+  writeOutput() {
+    if (this.buffer === null) {
+      if (this.sink.writableLength > 0 || this.sink.writableCorked > 0) {
+        this.writeSink(emptyOutput, null);
+        return;
+      }
+      if (this.stdoutWriter) {
+        const now = this.scheduler.now();
+        try {
+          this.postStdout(now, true);
+          this.schedule();
+          return;
+        } catch (error) {
+          if (!(error instanceof NativeError2) || error.status !== -24 /* UnsupportedResource */)
+            throw error;
+          this.stdoutWriter = false;
+        }
+      }
+      try {
+        const written = this.lib.sessionDrainStdout(this.context, this.session);
+        const now = this.scheduler.now();
+        if (written > 0 && this.closeDeadlineNs !== null)
+          this.closeDeadlineNs = now + this.closeTimeoutNs;
+        this.completePresentation();
+        this.schedule(written === 0 ? now + 1000000n : null);
+        return;
+      } catch (error) {
+        if (!(error instanceof NativeError2) || error.status !== -24 /* UnsupportedResource */)
+          throw error;
+        this.buffer = new Uint8Array(this.outputBufferSize);
+      }
+    }
+    const ticket = this.lib.sessionReadOutput(this.context, this.session, this.buffer);
+    if (!ticket)
+      throw new Error("NativeSession output pending without bytes");
+    if (ticket.byteCount > this.buffer.length)
+      throw new Error("NativeSession output ticket exceeds its buffer");
+    this.writeSink(this.buffer.subarray(0, ticket.byteCount), ticket);
+  }
+  postStdout(now, start) {
+    const posted = this.stdoutPost;
+    const { written, inFlight } = this.lib.sessionPostStdout(this.context, this.session, start ? stdoutBudget : 0, false);
+    if (written > 0)
+      this.completePresentation();
+    if (this.closeDeadlineNs !== null)
+      this.closeDeadlineNs = now + this.closeTimeoutNs;
+    if (!inFlight)
+      this.stdoutPost = null;
+    else if (!posted || written > 0)
+      this.stdoutPost = { since: now, polls: 0 };
+    else
+      posted.polls++;
+  }
+  pollDeadline(now) {
+    const post = this.stdoutPost;
+    if (post.polls < immediatePolls && now - post.since < immediateAgeNs)
+      return 0n;
+    const age = (now - post.since) / 8n;
+    return now + (age < 1000000n ? 1000000n : age > 50000000n ? 50000000n : age);
+  }
+  writeSink(bytes, ticket) {
+    if (this.output)
+      throw new Error("NativeSession output is already in flight");
+    const output = { ticket, completed: false, failed: false };
+    this.output = output;
+    this.blocked = true;
+    try {
+      const ready = this.sinkWrite.call(this.sink, bytes, "utf8", (error) => {
+        if (this.output !== output || output.completed)
+          return;
+        output.completed = true;
+        output.failed = error != null;
+        if (error && !this.stopped)
+          this._error ??= asError(error);
+        this.schedule();
+      });
+      if (!this.stopped && ready)
+        this.blocked = false;
+    } catch (error) {
+      this.output = null;
+      if (this.stopped)
+        this.detach();
+      throw error;
+    }
+  }
+  completePresentation() {
+    if (!this.presentationWait)
+      return;
+    const state = this.lib.sessionGetRendererState(this.context, this.session);
+    if (!state.framePending) {
+      this.imageUploadsPending = state.imageUploadsPending;
+      this.presentationWait.resolve();
+      this.presentationWait = null;
+    }
+  }
+  detach() {
+    this.detached = true;
+    this.output = null;
+    for (const [event, listener] of [
+      ["error", this.onError],
+      ["close", this.onClose],
+      ["finish", this.onFinish],
+      ["drain", this.onDrain]
+    ]) {
+      try {
+        this.sink.off(event, listener);
+      } catch (error) {
+        this._error ??= asError(error);
+      }
+    }
+  }
+  canDetach() {
+    if (this.output && !this.output.completed)
+      return false;
+    return this.sink.closed || this.sinkErrorSeen || !this.output?.failed && !this.sink.destroyed;
+  }
+  finish(error) {
+    if (this.finishing)
+      return;
+    if (this._disposed) {
+      this.schedule();
+      return;
+    }
+    this.finishing = true;
+    try {
+      this.stopped = true;
+      this._error ??= error === this.closeLate ? null : error;
+      const scheduled = this.scheduled;
+      this.scheduled = null;
+      try {
+        scheduled?.cancel();
+      } catch (error) {
+        this._error ??= asError(error);
+      }
+      if (this._error) {
+        try {
+          this.lib.sessionCancel(this.context, this.session);
+        } catch (error) {
+          this._error ??= asError(error);
+        }
+      }
+      for (const child of this.detachedSessions) {
+        try {
+          child.dispose();
+          if (!child.disposed)
+            this._error ??= child.error;
+        } catch (error) {
+          this._error ??= asError(error);
+        }
+      }
+      if (this.detachedSessions.size === 0) {
+        try {
+          this.attachmentCleanup?.();
+        } catch (error) {
+          this._error ??= asError(error);
+          try {
+            this.lib.sessionCancel(this.context, this.session);
+          } catch (error) {
+            this._error ??= asError(error);
+          }
+        }
+        try {
+          this.lib.getYogaHost().runMutation(() => {
+            if (!this.resourceContext.disposed) {
+              if (this.owner)
+                this.lib.destroySession(this.context, this.session);
+              else
+                this.resourceContext.destroy();
+            }
+            this._disposed = true;
+            this.owner?.detachedSessions.delete(this);
+          });
+        } catch (error) {
+          this._error ??= asError(error);
+        }
+      }
+      if (!this.output && !this.sink.destroyed && !this.sink.writableFinished && !this.sink.errored)
+        this.detach();
+      else
+        this.schedule();
+      this._error ??= error;
+      if (!this._disposed && !this._error)
+        return;
+      for (const wait of [this.closeWait, this.idleWait, this.presentationWait, this.transition?.wait]) {
+        if (this._error)
+          wait?.reject(this._error);
+        else
+          wait?.resolve();
+      }
+      this.idleWait = null;
+      this.presentationWait = null;
+      this.transition = null;
+    } finally {
+      try {
+        if ((this._disposed || this._error) && this.owner?.stopped && !this.owner.finishing) {
+          this.owner.finish(this._disposed ? this.owner.error : this._error);
+        }
+      } finally {
+        this.finishing = false;
+      }
+    }
+  }
+}
+
+// src/console.ts
+import { EventEmitter as EventEmitter8 } from "events";
+import { Console } from "console";
+import fs from "fs";
+import path3 from "path";
+import util2 from "util";
+
+// src/lib/output.capture.ts
+import { Writable as Writable2 } from "stream";
+import { EventEmitter as EventEmitter7 } from "events";
+
+class Capture extends EventEmitter7 {
+  output = [];
+  constructor() {
+    super();
+  }
+  get size() {
+    return this.output.length;
+  }
+  write(stream, data) {
+    if (this.output.length >= 1000)
+      this.output.shift();
+    this.output.push({ stream, output: data });
+    this.emit("write", stream, data);
+  }
+  claimOutput() {
+    const output = this.output.map((o) => o.output).join("");
+    this.clear();
+    return output;
+  }
+  clear() {
+    this.output = [];
+  }
+}
+
+class CapturedWritableStream extends Writable2 {
+  stream;
+  capture;
+  isTTY = true;
+  columns = process.stdout.columns || 80;
+  rows = process.stdout.rows || 24;
+  constructor(stream, capture) {
+    super();
+    this.stream = stream;
+    this.capture = capture;
+  }
+  _write(chunk, encoding, callback) {
+    const data = chunk.toString();
+    this.capture.write(this.stream, data);
+    callback();
+  }
+  getColorDepth() {
+    return process.stdout.getColorDepth?.() || 8;
+  }
+}
+
+// src/lib/keybinding.internal.ts
+var defaultKeyAliases = {
+  enter: "return",
+  esc: "escape",
+  kp0: "0",
+  kp1: "1",
+  kp2: "2",
+  kp3: "3",
+  kp4: "4",
+  kp5: "5",
+  kp6: "6",
+  kp7: "7",
+  kp8: "8",
+  kp9: "9",
+  kpdecimal: ".",
+  kpdivide: "/",
+  kpmultiply: "*",
+  kpminus: "-",
+  kpplus: "+",
+  kpenter: "enter",
+  kpequal: "=",
+  kpseparator: ",",
+  kpleft: "left",
+  kpright: "right",
+  kpup: "up",
+  kpdown: "down",
+  kppageup: "pageup",
+  kppagedown: "pagedown",
+  kphome: "home",
+  kpend: "end",
+  kpinsert: "insert",
+  kpdelete: "delete"
+};
+function mergeKeyAliases(defaults, custom) {
+  return { ...defaults, ...custom };
+}
+function mergeKeyBindings(defaults, custom) {
+  const map = new Map;
+  for (const binding of defaults) {
+    const key = getKeyBindingKey(binding);
+    map.set(key, binding);
+  }
+  for (const binding of custom) {
+    const key = getKeyBindingKey(binding);
+    map.set(key, binding);
+  }
+  return Array.from(map.values());
+}
+function getKeyBindingKey(binding) {
+  return `${binding.name}:${binding.ctrl ? 1 : 0}:${binding.shift ? 1 : 0}:${binding.meta ? 1 : 0}:${binding.super ? 1 : 0}`;
+}
+function getBaseCodeKeyName({ name: typedName, baseCode }) {
+  if (baseCode === undefined || baseCode <= 32 || baseCode === 127) {
+    return;
+  }
+  if (!/^[^\x00-\x7f]$/u.test(typedName) && (baseCode < 48 || baseCode > 57)) {
+    return;
+  }
+  try {
+    const name = String.fromCodePoint(baseCode);
+    if (name.length === 1 && name >= "A" && name <= "Z") {
+      return name.toLowerCase();
+    }
+    return name;
+  } catch {
+    return;
+  }
+}
+function getKeyBindingKeys(binding) {
+  const names = new Set([binding.name]);
+  const baseCodeName = getBaseCodeKeyName(binding);
+  if (baseCodeName) {
+    names.add(baseCodeName);
+  }
+  return [...names].map((name) => getKeyBindingKey({ ...binding, name }));
+}
+function getKeyBindingAction(map, binding) {
+  for (const key of getKeyBindingKeys(binding)) {
+    const action = map.get(key);
+    if (action !== undefined) {
+      return action;
+    }
+  }
+  return;
+}
+function matchesKeyBinding(binding, match) {
+  const matchKey = getKeyBindingKey(match);
+  return getKeyBindingKeys(binding).includes(matchKey);
+}
+function buildKeyBindingsMap(bindings, aliasMap) {
+  const map = new Map;
+  const aliases = aliasMap || {};
+  for (const binding of bindings) {
+    const key = getKeyBindingKey(binding);
+    map.set(key, binding.action);
+  }
+  for (const binding of bindings) {
+    const normalizedName = aliases[binding.name] || binding.name;
+    if (normalizedName !== binding.name) {
+      const aliasedKey = getKeyBindingKey({ ...binding, name: normalizedName });
+      map.set(aliasedKey, binding.action);
+    }
+  }
+  return map;
+}
+function keyBindingToString(binding) {
+  const parts = [];
+  if (binding.ctrl)
+    parts.push("ctrl");
+  if (binding.shift)
+    parts.push("shift");
+  if (binding.meta)
+    parts.push("meta");
+  if (binding.super)
+    parts.push("super");
+  parts.push(binding.name);
+  return parts.join("+");
+}
+
+// src/console.ts
+function getCallerInfo() {
+  const err = new Error;
+  const stackLines = err.stack?.split(`
+`).slice(5) || [];
+  if (!stackLines.length)
+    return null;
+  const callerLine = stackLines[0].trim();
+  const regex = /at\s+(?:([\w$.<>]+)\s+\()?((?:\/|[A-Za-z]:\\)[^:]+):(\d+):(\d+)\)?/;
+  const match = callerLine.match(regex);
+  if (!match)
+    return null;
+  const functionName = match[1] || "<anonymous>";
+  const fullPath = match[2];
+  const fileName = fullPath.split(/[\\/]/).pop() || "<unknown>";
+  const lineNumber = parseInt(match[3], 10) || 0;
+  const columnNumber = parseInt(match[4], 10) || 0;
+  return { functionName, fullPath, fileName, lineNumber, columnNumber };
+}
+var capture2 = singleton("ConsoleCapture", () => new Capture);
+registerEnvVar2({
+  name: "OTUI_USE_CONSOLE",
+  description: "Whether to use the console. Will not capture console output if set to false.",
+  type: "boolean",
+  default: true
+});
+registerEnvVar2({
+  name: "SHOW_CONSOLE",
+  description: "Show the console at startup if set to true.",
+  type: "boolean",
+  default: false
+});
+
+class TerminalConsoleCache extends EventEmitter8 {
+  _cachedLogs = [];
+  MAX_CACHE_SIZE = 1000;
+  _collectCallerInfo = false;
+  _cachingEnabled = true;
+  _originalConsole = null;
+  get cachedLogs() {
+    return this._cachedLogs;
+  }
+  constructor() {
+    super();
+  }
+  activate() {
+    if (!env2.OTUI_USE_CONSOLE)
+      return;
+    if (!this._originalConsole) {
+      this._originalConsole = global.console;
+    }
+    this.setupConsoleCapture();
+    this.overrideConsoleMethods();
+  }
+  setupConsoleCapture() {
+    if (!env2.OTUI_USE_CONSOLE)
+      return;
+    const mockStdout = new CapturedWritableStream("stdout", capture2);
+    const mockStderr = new CapturedWritableStream("stderr", capture2);
+    global.console = new Console({
+      stdout: mockStdout,
+      stderr: mockStderr,
+      colorMode: true,
+      inspectOptions: {
+        compact: false,
+        breakLength: 80,
+        depth: 2
+      }
+    });
+  }
+  overrideConsoleMethods() {
+    console.log = (...args) => {
+      this.appendToConsole("LOG" /* LOG */, ...args);
+    };
+    console.info = (...args) => {
+      this.appendToConsole("INFO" /* INFO */, ...args);
+    };
+    console.warn = (...args) => {
+      this.appendToConsole("WARN" /* WARN */, ...args);
+    };
+    console.error = (...args) => {
+      this.appendToConsole("ERROR" /* ERROR */, ...args);
+    };
+    console.debug = (...args) => {
+      this.appendToConsole("DEBUG" /* DEBUG */, ...args);
+    };
+    if (typeof console.timeStamp !== "function") {
+      console.timeStamp = () => {};
+    }
+  }
+  setCollectCallerInfo(enabled) {
+    this._collectCallerInfo = enabled;
+  }
+  clearConsole() {
+    this._cachedLogs = [];
+  }
+  setCachingEnabled(enabled) {
+    this._cachingEnabled = enabled;
+  }
+  deactivate() {
+    this.restoreOriginalConsole();
+  }
+  restoreOriginalConsole() {
+    if (this._originalConsole) {
+      global.console = this._originalConsole;
+    }
+  }
+  addLogEntry(level, ...args) {
+    const callerInfo = this._collectCallerInfo ? getCallerInfo() : null;
+    const logEntry = [new Date, level, args, callerInfo];
+    if (this._cachingEnabled) {
+      if (this._cachedLogs.length >= this.MAX_CACHE_SIZE) {
+        this._cachedLogs.shift();
+      }
+      this._cachedLogs.push(logEntry);
+    }
+    return logEntry;
+  }
+  appendToConsole(level, ...args) {
+    if (this._cachedLogs.length >= this.MAX_CACHE_SIZE) {
+      this._cachedLogs.shift();
+    }
+    const entry = this.addLogEntry(level, ...args);
+    this.emit("entry", entry);
+  }
+  destroy() {
+    this.deactivate();
+  }
+}
+var terminalConsoleCache = singleton("TerminalConsoleCache", () => {
+  const terminalConsoleCache = new TerminalConsoleCache;
+  process.on("exit", () => {
+    terminalConsoleCache.destroy();
+  });
+  return terminalConsoleCache;
+});
+var ConsolePosition2;
+((ConsolePosition) => {
+  ConsolePosition["TOP"] = "top";
+  ConsolePosition["BOTTOM"] = "bottom";
+  ConsolePosition["LEFT"] = "left";
+  ConsolePosition["RIGHT"] = "right";
+})(ConsolePosition2 ||= {});
+var defaultConsoleKeybindings = [
+  { name: "up", action: "scroll-up" },
+  { name: "down", action: "scroll-down" },
+  { name: "up", shift: true, action: "scroll-to-top" },
+  { name: "down", shift: true, action: "scroll-to-bottom" },
+  { name: "p", ctrl: true, action: "position-previous" },
+  { name: "o", ctrl: true, action: "position-next" },
+  { name: "+", action: "size-increase" },
+  { name: "=", shift: true, action: "size-increase" },
+  { name: "-", action: "size-decrease" },
+  { name: "s", ctrl: true, action: "save-logs" },
+  { name: "c", ctrl: true, shift: true, action: "copy-selection" }
+];
+var DEFAULT_CONSOLE_OPTIONS = {
+  position: "bottom" /* BOTTOM */,
+  sizePercent: 30,
+  zIndex: Infinity,
+  colorInfo: "#00FFFF",
+  colorWarn: "#FFFF00",
+  colorError: "#FF0000",
+  colorDebug: "#808080",
+  colorDefault: "#FFFFFF",
+  backgroundColor: RGBA2.fromValues(0.1, 0.1, 0.1, 0.7),
+  startInDebugMode: false,
+  title: "Console",
+  titleBarColor: RGBA2.fromValues(0.05, 0.05, 0.05, 0.7),
+  titleBarTextColor: "#FFFFFF",
+  cursorColor: "#00A0FF",
+  maxStoredLogs: 2000,
+  maxDisplayLines: 3000,
+  onCopySelection: undefined,
+  keyBindings: undefined,
+  keyAliasMap: undefined,
+  selectionColor: RGBA2.fromValues(0.3, 0.5, 0.8, 0.5),
+  copyButtonColor: "#00A0FF"
+};
+var INDENT_WIDTH = 2;
+var graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+function wrapDisplayCells(text, firstCells, restCells) {
+  const segments = [];
+  let segment = "";
+  let cells = 0;
+  for (const { segment: grapheme } of graphemeSegmenter.segment(text)) {
+    const width = stringWidth(grapheme);
+    const budget = segments.length === 0 ? firstCells : restCells;
+    if (segment.length > 0 && cells + width > budget) {
+      segments.push(segment);
+      segment = "";
+      cells = 0;
+    }
+    segment += grapheme;
+    cells += width;
+  }
+  if (segment.length > 0)
+    segments.push(segment);
+  return segments;
+}
+
+class TerminalConsole2 extends EventEmitter8 {
+  isVisible = false;
+  isFocused = false;
+  renderer;
+  keyHandler;
+  options;
+  _debugModeEnabled = false;
+  frameBuffer = null;
+  consoleX = 0;
+  consoleY = 0;
+  consoleWidth = 0;
+  consoleHeight = 0;
+  scrollTopIndex = 0;
+  isScrolledToBottom = true;
+  currentLineIndex = 0;
+  _displayLines = [];
+  _allLogEntries = [];
+  _needsFrameBufferUpdate = false;
+  _entryListener;
+  _selectionStart = null;
+  _selectionEnd = null;
+  _isDragging = false;
+  _copyButtonBounds = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  };
+  _autoScrollInterval = null;
+  clock;
+  _keyBindingsMap;
+  _keyAliasMap;
+  _keyBindings;
+  _mergedKeyBindings;
+  _actionHandlers;
+  markNeedsRerender() {
+    this._needsFrameBufferUpdate = true;
+    this.renderer.requestRender();
+  }
+  getCopyButtonLabel() {
+    const copyBindings = this._mergedKeyBindings.filter((b) => b.action === "copy-selection");
+    const copyBinding = copyBindings[copyBindings.length - 1];
+    if (copyBinding) {
+      const shortcut = keyBindingToString(copyBinding);
+      return `[Copy (${shortcut})]`;
+    }
+    return "[Copy]";
+  }
+  _rgbaInfo;
+  _rgbaWarn;
+  _rgbaError;
+  _rgbaDebug;
+  _rgbaDefault;
+  backgroundColor;
+  _rgbaTitleBar;
+  _rgbaTitleBarText;
+  _title;
+  _rgbaCursor;
+  _rgbaSelection;
+  _rgbaCopyButton;
+  _positions = [
+    "top" /* TOP */,
+    "right" /* RIGHT */,
+    "bottom" /* BOTTOM */,
+    "left" /* LEFT */
+  ];
+  constructor(renderer, options = {}) {
+    super();
+    this.renderer = renderer;
+    this.clock = options.clock ?? new SystemClock2;
+    this.options = { ...DEFAULT_CONSOLE_OPTIONS, ...options };
+    this.keyHandler = this.handleKeyPress.bind(this);
+    this._debugModeEnabled = this.options.startInDebugMode;
+    terminalConsoleCache.setCollectCallerInfo(this._debugModeEnabled);
+    this._rgbaInfo = RGBA2.clone(parseColor2(this.options.colorInfo));
+    this._rgbaWarn = RGBA2.clone(parseColor2(this.options.colorWarn));
+    this._rgbaError = RGBA2.clone(parseColor2(this.options.colorError));
+    this._rgbaDebug = RGBA2.clone(parseColor2(this.options.colorDebug));
+    this._rgbaDefault = RGBA2.clone(parseColor2(this.options.colorDefault));
+    this.backgroundColor = RGBA2.clone(parseColor2(this.options.backgroundColor));
+    this._rgbaTitleBar = RGBA2.clone(parseColor2(this.options.titleBarColor));
+    this._rgbaTitleBarText = RGBA2.clone(parseColor2(this.options.titleBarTextColor || this.options.colorDefault));
+    this._title = this.options.title;
+    this._rgbaCursor = RGBA2.clone(parseColor2(this.options.cursorColor));
+    this._rgbaSelection = RGBA2.clone(parseColor2(this.options.selectionColor));
+    this._rgbaCopyButton = RGBA2.clone(parseColor2(this.options.copyButtonColor));
+    this._keyAliasMap = mergeKeyAliases(defaultKeyAliases, options.keyAliasMap || {});
+    this._keyBindings = options.keyBindings || [];
+    this._mergedKeyBindings = mergeKeyBindings(defaultConsoleKeybindings, this._keyBindings);
+    this._keyBindingsMap = buildKeyBindingsMap(this._mergedKeyBindings, this._keyAliasMap);
+    this._actionHandlers = this.buildActionHandlers();
+    this._updateConsoleDimensions();
+    this._scrollToBottom(true);
+    this._entryListener = (logEntry) => {
+      this._handleNewLog(logEntry);
+    };
+    terminalConsoleCache.on("entry", this._entryListener);
+    if (env2.SHOW_CONSOLE) {
+      this.show();
+    }
+  }
+  buildActionHandlers() {
+    return new Map([
+      ["scroll-up", () => this.scrollUp()],
+      ["scroll-down", () => this.scrollDown()],
+      ["scroll-to-top", () => this.scrollToTop()],
+      ["scroll-to-bottom", () => this.scrollToBottomAction()],
+      ["position-previous", () => this.positionPrevious()],
+      ["position-next", () => this.positionNext()],
+      ["size-increase", () => this.sizeIncrease()],
+      ["size-decrease", () => this.sizeDecrease()],
+      ["save-logs", () => this.saveLogsAction()],
+      ["copy-selection", () => this.triggerCopyAction()]
+    ]);
+  }
+  activate() {
+    terminalConsoleCache.activate();
+  }
+  deactivate() {
+    terminalConsoleCache.deactivate();
+  }
+  _handleNewLog(logEntry) {
+    if (!this.isVisible)
+      return;
+    this._allLogEntries.push(logEntry);
+    if (this._allLogEntries.length > this.options.maxStoredLogs) {
+      this._allLogEntries.splice(0, this._allLogEntries.length - this.options.maxStoredLogs);
+    }
+    const newDisplayLines = this._processLogEntry(logEntry);
+    this._displayLines.push(...newDisplayLines);
+    if (this._displayLines.length > this.options.maxDisplayLines) {
+      this._displayLines.splice(0, this._displayLines.length - this.options.maxDisplayLines);
+      const linesRemoved = this._displayLines.length - this.options.maxDisplayLines;
+      this.scrollTopIndex = Math.max(0, this.scrollTopIndex - linesRemoved);
+    }
+    if (this.isScrolledToBottom) {
+      this._scrollToBottom();
+    }
+    this.markNeedsRerender();
+  }
+  _updateConsoleDimensions(termWidth, termHeight) {
+    const width = termWidth ?? this.renderer.width;
+    const height = termHeight ?? this.renderer.height;
+    const sizePercent = this.options.sizePercent / 100;
+    switch (this.options.position) {
+      case "top" /* TOP */:
+        this.consoleX = 0;
+        this.consoleY = 0;
+        this.consoleWidth = width;
+        this.consoleHeight = Math.max(1, Math.floor(height * sizePercent));
+        break;
+      case "bottom" /* BOTTOM */:
+        this.consoleHeight = Math.max(1, Math.floor(height * sizePercent));
+        this.consoleWidth = width;
+        this.consoleX = 0;
+        this.consoleY = height - this.consoleHeight;
+        break;
+      case "left" /* LEFT */:
+        this.consoleWidth = Math.max(1, Math.floor(width * sizePercent));
+        this.consoleHeight = height;
+        this.consoleX = 0;
+        this.consoleY = 0;
+        break;
+      case "right" /* RIGHT */:
+        this.consoleWidth = Math.max(1, Math.floor(width * sizePercent));
+        this.consoleHeight = height;
+        this.consoleY = 0;
+        this.consoleX = width - this.consoleWidth;
+        break;
+    }
+    this.currentLineIndex = Math.max(0, Math.min(this.currentLineIndex, this.consoleHeight - 1));
+  }
+  handleKeyPress(event) {
+    if (event.name === "escape") {
+      this.blur();
+      return;
+    }
+    const action = getKeyBindingAction(this._keyBindingsMap, event);
+    if (action) {
+      const handler = this._actionHandlers.get(action);
+      if (handler) {
+        handler();
+        return;
+      }
+    }
+  }
+  scrollUp() {
+    const logAreaHeight = Math.max(1, this.consoleHeight - 1);
+    if (this.currentLineIndex > 0) {
+      this.currentLineIndex--;
+      this.markNeedsRerender();
+    } else if (this.scrollTopIndex > 0) {
+      this.scrollTopIndex--;
+      this.isScrolledToBottom = false;
+      this.markNeedsRerender();
+    }
+    return true;
+  }
+  scrollDown() {
+    const displayLineCount = this._displayLines.length;
+    const logAreaHeight = Math.max(1, this.consoleHeight - 1);
+    const maxScrollTop = Math.max(0, displayLineCount - logAreaHeight);
+    const canCursorMoveDown = this.currentLineIndex < logAreaHeight - 1 && this.scrollTopIndex + this.currentLineIndex < displayLineCount - 1;
+    if (canCursorMoveDown) {
+      this.currentLineIndex++;
+      this.markNeedsRerender();
+    } else if (this.scrollTopIndex < maxScrollTop) {
+      this.scrollTopIndex++;
+      this.isScrolledToBottom = this.scrollTopIndex === maxScrollTop;
+      this.markNeedsRerender();
+    }
+    return true;
+  }
+  scrollToTop() {
+    if (this.scrollTopIndex > 0 || this.currentLineIndex > 0) {
+      this.scrollTopIndex = 0;
+      this.currentLineIndex = 0;
+      this.isScrolledToBottom = this._displayLines.length <= Math.max(1, this.consoleHeight - 1);
+      this.markNeedsRerender();
+    }
+    return true;
+  }
+  scrollToBottomAction() {
+    const logAreaHeightForScroll = Math.max(1, this.consoleHeight - 1);
+    const maxScrollPossible = Math.max(0, this._displayLines.length - logAreaHeightForScroll);
+    if (this.scrollTopIndex < maxScrollPossible || !this.isScrolledToBottom) {
+      this._scrollToBottom(true);
+      this.markNeedsRerender();
+    }
+    return true;
+  }
+  positionPrevious() {
+    const currentPositionIndex = this._positions.indexOf(this.options.position);
+    const prevIndex = (currentPositionIndex - 1 + this._positions.length) % this._positions.length;
+    this.options.position = this._positions[prevIndex];
+    this.resize(this.renderer.width, this.renderer.height);
+    return true;
+  }
+  positionNext() {
+    const currentPositionIndex = this._positions.indexOf(this.options.position);
+    const nextIndex = (currentPositionIndex + 1) % this._positions.length;
+    this.options.position = this._positions[nextIndex];
+    this.resize(this.renderer.width, this.renderer.height);
+    return true;
+  }
+  sizeIncrease() {
+    this.options.sizePercent = Math.min(100, this.options.sizePercent + 5);
+    this.resize(this.renderer.width, this.renderer.height);
+    return true;
+  }
+  sizeDecrease() {
+    this.options.sizePercent = Math.max(10, this.options.sizePercent - 5);
+    this.resize(this.renderer.width, this.renderer.height);
+    return true;
+  }
+  saveLogsAction() {
+    this.saveLogsToFile();
+    return true;
+  }
+  triggerCopyAction() {
+    this.triggerCopy();
+    return true;
+  }
+  attachStdin() {
+    if (this.isFocused)
+      return;
+    this.renderer.keyInput.on("keypress", this.keyHandler);
+    this.isFocused = true;
+  }
+  detachStdin() {
+    if (!this.isFocused)
+      return;
+    this.renderer.keyInput.off("keypress", this.keyHandler);
+    this.isFocused = false;
+  }
+  formatTimestamp(date) {
+    return new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    }).format(date);
+  }
+  formatArguments(args) {
+    return args.map((arg) => {
+      if (arg instanceof Error) {
+        const errorProps = arg;
+        return `Error: ${errorProps.message}
+` + (errorProps.stack ? `${errorProps.stack}
+` : "");
+      }
+      try {
+        return util2.inspect(arg, { depth: 2 });
+      } catch (e) {
+        return String(arg);
+      }
+    }).join(" ").replace(/\r\n/g, `
+`).replace(/[\x00-\x08\x0b-\x1f\x7f-\x9f]/g, (control) => `\\x${control.charCodeAt(0).toString(16).padStart(2, "0")}`);
+  }
+  resize(width, height) {
+    this._updateConsoleDimensions(width, height);
+    if (this.frameBuffer) {
+      this.frameBuffer.resize(this.consoleWidth, this.consoleHeight);
+      const displayLineCount = this._displayLines.length;
+      const logAreaHeight = Math.max(1, this.consoleHeight - 1);
+      const maxScrollTop = Math.max(0, displayLineCount - logAreaHeight);
+      this.scrollTopIndex = Math.min(this.scrollTopIndex, maxScrollTop);
+      this.isScrolledToBottom = this.scrollTopIndex === maxScrollTop;
+      const visibleLineCount = Math.min(logAreaHeight, displayLineCount - this.scrollTopIndex);
+      this.currentLineIndex = Math.max(0, Math.min(this.currentLineIndex, visibleLineCount - 1));
+      if (this.isVisible) {
+        this.markNeedsRerender();
+      }
+    }
+  }
+  clear() {
+    terminalConsoleCache.clearConsole();
+    this._allLogEntries = [];
+    this._displayLines = [];
+    this.markNeedsRerender();
+  }
+  toggle() {
+    if (this.isVisible) {
+      if (this.isFocused) {
+        this.hide();
+      } else {
+        this.focus();
+      }
+    } else {
+      this.show();
+    }
+    if (!this.renderer.isRunning) {
+      this.renderer.requestRender();
+    }
+  }
+  focus() {
+    this.attachStdin();
+    this._scrollToBottom(true);
+    this.markNeedsRerender();
+  }
+  blur() {
+    this.detachStdin();
+    this.markNeedsRerender();
+  }
+  show() {
+    if (this.renderer.isDestroyed)
+      throw new Error("Cannot show the console after renderer destruction");
+    if (!this.isVisible) {
+      if (!this.frameBuffer) {
+        this.frameBuffer = OptimizedBuffer2.create(this.consoleWidth, this.consoleHeight, this.renderer.widthMethod, {
+          respectAlpha: this.backgroundColor.a < 1,
+          id: "console framebuffer",
+          owner: this.renderer.nativeScene
+        });
+      }
+      this.isVisible = true;
+      this._processCachedLogs();
+      terminalConsoleCache.setCachingEnabled(false);
+      const logCount = terminalConsoleCache.cachedLogs.length;
+      const visibleLogLines = Math.min(this.consoleHeight, logCount);
+      this.currentLineIndex = Math.max(0, visibleLogLines - 1);
+      this.scrollTopIndex = 0;
+      this._scrollToBottom(true);
+      this.focus();
+      this.markNeedsRerender();
+    }
+  }
+  hide() {
+    if (this.isVisible) {
+      this.stopAutoScroll();
+      this.isVisible = false;
+      this.blur();
+      terminalConsoleCache.setCachingEnabled(true);
+    }
+  }
+  destroy() {
+    this.stopAutoScroll();
+    this.hide();
+    this.deactivate();
+    terminalConsoleCache.off("entry", this._entryListener);
+    this.frameBuffer?.destroy();
+    this.frameBuffer = null;
+  }
+  getCachedLogs() {
+    return terminalConsoleCache.cachedLogs.map((logEntry) => logEntry[0].toISOString() + " " + logEntry.slice(1).join(" ")).join(`
+`);
+  }
+  updateFrameBuffer() {
+    if (!this.frameBuffer)
+      return;
+    this.frameBuffer.clear(this.backgroundColor);
+    const displayLines = this._displayLines;
+    const displayLineCount = displayLines.length;
+    const logAreaHeight = Math.max(1, this.consoleHeight - 1);
+    this.frameBuffer.fillRect(0, 0, this.consoleWidth, 1, this._rgbaTitleBar);
+    const dynamicTitle = `${this._title}${this.isFocused ? " (Focused)" : ""}`;
+    const titleX = Math.max(0, Math.floor((this.consoleWidth - dynamicTitle.length) / 2));
+    this.frameBuffer.drawText(dynamicTitle, titleX, 0, this._rgbaTitleBarText, this._rgbaTitleBar);
+    const copyLabel = this.getCopyButtonLabel();
+    const copyButtonX = this.consoleWidth - copyLabel.length - 1;
+    if (copyButtonX >= 0) {
+      const copyButtonEnabled = this.hasSelection();
+      const disabledColor = RGBA2.fromInts(100, 100, 100, 255);
+      const copyColor = copyButtonEnabled ? this._rgbaCopyButton : disabledColor;
+      this.frameBuffer.drawText(copyLabel, copyButtonX, 0, copyColor, this._rgbaTitleBar);
+      this._copyButtonBounds = { x: copyButtonX, y: 0, width: copyLabel.length, height: 1 };
+    } else {
+      this._copyButtonBounds = { x: -1, y: -1, width: 0, height: 0 };
+    }
+    const startIndex = this.scrollTopIndex;
+    const endIndex = Math.min(startIndex + logAreaHeight, displayLineCount);
+    const visibleDisplayLines = displayLines.slice(startIndex, endIndex);
+    let lineY = 1;
+    for (let i = 0;i < visibleDisplayLines.length; i++) {
+      if (lineY >= this.consoleHeight)
+        break;
+      const displayLine = visibleDisplayLines[i];
+      const absoluteLineIndex = startIndex + i;
+      let levelColor = this._rgbaDefault;
+      switch (displayLine.level) {
+        case "INFO" /* INFO */:
+          levelColor = this._rgbaInfo;
+          break;
+        case "WARN" /* WARN */:
+          levelColor = this._rgbaWarn;
+          break;
+        case "ERROR" /* ERROR */:
+          levelColor = this._rgbaError;
+          break;
+        case "DEBUG" /* DEBUG */:
+          levelColor = this._rgbaDebug;
+          break;
+      }
+      const showCursor = this.isFocused && lineY - 1 === this.currentLineIndex;
+      if (showCursor) {
+        this.frameBuffer.drawText(">", 0, lineY, this._rgbaCursor, this.backgroundColor);
+      } else {
+        this.frameBuffer.drawText(" ", 0, lineY, this._rgbaDefault, this.backgroundColor);
+      }
+      const fullText = (displayLine.indent ? " ".repeat(INDENT_WIDTH) : "") + displayLine.text;
+      const selectionRange = this.getLineSelectionRange(absoluteLineIndex);
+      if (selectionRange) {
+        const adjustedStart = Math.max(0, selectionRange.start);
+        const adjustedEnd = Math.min(fullText.length, selectionRange.end);
+        if (adjustedStart > 0) {
+          this.frameBuffer.drawText(fullText.substring(0, adjustedStart), 1, lineY, levelColor);
+        }
+        if (adjustedStart < adjustedEnd) {
+          this.frameBuffer.fillRect(1 + adjustedStart, lineY, adjustedEnd - adjustedStart, 1, this._rgbaSelection);
+          this.frameBuffer.drawText(fullText.substring(adjustedStart, adjustedEnd), 1 + adjustedStart, lineY, levelColor, this._rgbaSelection);
+        }
+        if (adjustedEnd < fullText.length) {
+          this.frameBuffer.drawText(fullText.substring(adjustedEnd), 1 + adjustedEnd, lineY, levelColor);
+        }
+      } else {
+        this.frameBuffer.drawText(fullText, 1, lineY, levelColor);
+      }
+      lineY++;
+    }
+  }
+  renderToBuffer(buffer) {
+    if (!this.isVisible || !this.frameBuffer)
+      return;
+    if (this._needsFrameBufferUpdate) {
+      this.updateFrameBuffer();
+      this._needsFrameBufferUpdate = false;
+    }
+    buffer.drawFrameBuffer(this.consoleX, this.consoleY, this.frameBuffer);
+  }
+  setDebugMode(enabled) {
+    this._debugModeEnabled = enabled;
+    terminalConsoleCache.setCollectCallerInfo(enabled);
+    if (this.isVisible) {
+      this.markNeedsRerender();
+    }
+  }
+  toggleDebugMode() {
+    this.setDebugMode(!this._debugModeEnabled);
+  }
+  set keyBindings(bindings) {
+    this._keyBindings = bindings;
+    this._mergedKeyBindings = mergeKeyBindings(defaultConsoleKeybindings, bindings);
+    this._keyBindingsMap = buildKeyBindingsMap(this._mergedKeyBindings, this._keyAliasMap);
+    this.markNeedsRerender();
+  }
+  set keyAliasMap(aliases) {
+    this._keyAliasMap = mergeKeyAliases(defaultKeyAliases, aliases);
+    this._mergedKeyBindings = mergeKeyBindings(defaultConsoleKeybindings, this._keyBindings);
+    this._keyBindingsMap = buildKeyBindingsMap(this._mergedKeyBindings, this._keyAliasMap);
+    this.markNeedsRerender();
+  }
+  set onCopySelection(callback) {
+    this.options.onCopySelection = callback;
+  }
+  get onCopySelection() {
+    return this.options.onCopySelection;
+  }
+  _scrollToBottom(forceCursorToLastLine = false) {
+    const displayLineCount = this._displayLines.length;
+    const logAreaHeight = Math.max(1, this.consoleHeight - 1);
+    const maxScrollTop = Math.max(0, displayLineCount - logAreaHeight);
+    this.scrollTopIndex = maxScrollTop;
+    this.isScrolledToBottom = true;
+    const visibleLineCount = Math.min(logAreaHeight, displayLineCount - this.scrollTopIndex);
+    if (forceCursorToLastLine || this.currentLineIndex >= visibleLineCount) {
+      this.currentLineIndex = Math.max(0, visibleLineCount - 1);
+    }
+  }
+  _processLogEntry(logEntry) {
+    const [date, level, args, callerInfo] = logEntry;
+    const displayLines = [];
+    const timestamp = this.formatTimestamp(date);
+    const callerSource = callerInfo ? `${callerInfo.fileName}:${callerInfo.lineNumber}` : "unknown";
+    const prefix = `[${timestamp}] [${level}]` + (this._debugModeEnabled ? ` [${callerSource}]` : "") + " ";
+    const formattedArgs = this.formatArguments(args);
+    const initialLines = formattedArgs.split(`
+`);
+    const cells = Math.max(1, this.consoleWidth - 1);
+    const indentedCells = Math.max(1, this.consoleWidth - 1 - INDENT_WIDTH);
+    for (let i = 0;i < initialLines.length; i++) {
+      const isFirstLineOfEntry = i === 0;
+      const segments = isFirstLineOfEntry ? wrapDisplayCells(prefix + initialLines[i], cells, indentedCells) : wrapDisplayCells(initialLines[i], indentedCells, indentedCells);
+      for (let segment = 0;segment < segments.length; segment++) {
+        displayLines.push({ text: segments[segment], level, indent: !isFirstLineOfEntry || segment > 0 });
+      }
+    }
+    return displayLines;
+  }
+  _processCachedLogs() {
+    const logsToProcess = [...terminalConsoleCache.cachedLogs];
+    terminalConsoleCache.clearConsole();
+    this._allLogEntries.push(...logsToProcess);
+    if (this._allLogEntries.length > this.options.maxStoredLogs) {
+      this._allLogEntries.splice(0, this._allLogEntries.length - this.options.maxStoredLogs);
+    }
+    for (const logEntry of logsToProcess) {
+      const processed = this._processLogEntry(logEntry);
+      this._displayLines.push(...processed);
+    }
+    if (this._displayLines.length > this.options.maxDisplayLines) {
+      this._displayLines.splice(0, this._displayLines.length - this.options.maxDisplayLines);
+    }
+  }
+  hasSelection() {
+    if (this._selectionStart === null || this._selectionEnd === null)
+      return false;
+    return this._selectionStart.line !== this._selectionEnd.line || this._selectionStart.col !== this._selectionEnd.col;
+  }
+  normalizeSelection() {
+    if (!this._selectionStart || !this._selectionEnd)
+      return null;
+    const start = this._selectionStart;
+    const end = this._selectionEnd;
+    const startBeforeEnd = start.line < end.line || start.line === end.line && start.col <= end.col;
+    if (startBeforeEnd) {
+      return {
+        startLine: start.line,
+        startCol: start.col,
+        endLine: end.line,
+        endCol: end.col
+      };
+    } else {
+      return {
+        startLine: end.line,
+        startCol: end.col,
+        endLine: start.line,
+        endCol: start.col
+      };
+    }
+  }
+  getSelectedText() {
+    const selection = this.normalizeSelection();
+    if (!selection)
+      return "";
+    const lines = [];
+    for (let i = selection.startLine;i <= selection.endLine; i++) {
+      if (i < 0 || i >= this._displayLines.length)
+        continue;
+      const line = this._displayLines[i];
+      const fullText = (line.indent ? " ".repeat(INDENT_WIDTH) : "") + line.text;
+      let text = fullText;
+      if (i === selection.startLine && i === selection.endLine) {
+        text = fullText.substring(selection.startCol, selection.endCol);
+      } else if (i === selection.startLine) {
+        text = fullText.substring(selection.startCol);
+      } else if (i === selection.endLine) {
+        text = fullText.substring(0, selection.endCol);
+      }
+      lines.push(text);
+    }
+    return lines.join(`
+`);
+  }
+  clearSelection() {
+    this._selectionStart = null;
+    this._selectionEnd = null;
+    this._isDragging = false;
+    this.stopAutoScroll();
+  }
+  stopAutoScroll() {
+    if (this._autoScrollInterval !== null) {
+      this.clock.clearInterval(this._autoScrollInterval);
+      this._autoScrollInterval = null;
+    }
+  }
+  startAutoScroll(direction) {
+    this.stopAutoScroll();
+    this._autoScrollInterval = this.clock.setInterval(() => {
+      if (direction === "up") {
+        if (this.scrollTopIndex > 0) {
+          this.scrollTopIndex--;
+          this.isScrolledToBottom = false;
+          if (this._selectionEnd) {
+            this._selectionEnd = {
+              line: this.scrollTopIndex,
+              col: this._selectionEnd.col
+            };
+          }
+          this.markNeedsRerender();
+        } else {
+          this.stopAutoScroll();
+        }
+      } else {
+        const displayLineCount = this._displayLines.length;
+        const logAreaHeight = Math.max(1, this.consoleHeight - 1);
+        const maxScrollTop = Math.max(0, displayLineCount - logAreaHeight);
+        if (this.scrollTopIndex < maxScrollTop) {
+          this.scrollTopIndex++;
+          this.isScrolledToBottom = this.scrollTopIndex === maxScrollTop;
+          if (this._selectionEnd) {
+            const maxLine = this.scrollTopIndex + logAreaHeight - 1;
+            this._selectionEnd = {
+              line: Math.min(maxLine, displayLineCount - 1),
+              col: this._selectionEnd.col
+            };
+          }
+          this.markNeedsRerender();
+        } else {
+          this.stopAutoScroll();
+        }
+      }
+    }, 50);
+  }
+  triggerCopy() {
+    if (!this.hasSelection())
+      return;
+    const text = this.getSelectedText();
+    if (text && this.options.onCopySelection) {
+      try {
+        this.options.onCopySelection(text);
+      } catch {}
+      this.clearSelection();
+      this.markNeedsRerender();
+    }
+  }
+  getLineSelectionRange(lineIndex) {
+    const selection = this.normalizeSelection();
+    if (!selection)
+      return null;
+    if (lineIndex < selection.startLine || lineIndex > selection.endLine) {
+      return null;
+    }
+    const line = this._displayLines[lineIndex];
+    if (!line)
+      return null;
+    const fullTextLength = (line.indent ? INDENT_WIDTH : 0) + line.text.length;
+    let start = 0;
+    let end = fullTextLength;
+    if (lineIndex === selection.startLine) {
+      start = Math.max(0, selection.startCol);
+    }
+    if (lineIndex === selection.endLine) {
+      end = Math.min(fullTextLength, selection.endCol);
+    }
+    if (start >= end)
+      return null;
+    return { start, end };
+  }
+  handleMouse(event) {
+    if (!this.isVisible)
+      return false;
+    const localX = event.x - this.consoleX;
+    const localY = event.y - this.consoleY;
+    if (localX < 0 || localX >= this.consoleWidth || localY < 0 || localY >= this.consoleHeight) {
+      return false;
+    }
+    if (event.type === "scroll" && event.scroll) {
+      if (event.scroll.direction === "up") {
+        this.scrollUp();
+      } else if (event.scroll.direction === "down") {
+        this.scrollDown();
+      }
+      return true;
+    }
+    if (localY === 0) {
+      if (event.type === "down" && event.button === 0 && localX >= this._copyButtonBounds.x && localX < this._copyButtonBounds.x + this._copyButtonBounds.width) {
+        this.triggerCopy();
+        return true;
+      }
+      return true;
+    }
+    const lineIndex = this.scrollTopIndex + (localY - 1);
+    const colIndex = Math.max(0, localX - 1);
+    if (event.type === "down" && event.button === 0) {
+      this.clearSelection();
+      this._selectionStart = { line: lineIndex, col: colIndex };
+      this._selectionEnd = { line: lineIndex, col: colIndex };
+      this._isDragging = true;
+      this.markNeedsRerender();
+      return true;
+    }
+    if (event.type === "drag" && this._isDragging) {
+      this._selectionEnd = { line: lineIndex, col: colIndex };
+      const logAreaHeight = Math.max(1, this.consoleHeight - 1);
+      const relativeY = localY - 1;
+      if (relativeY <= 0) {
+        this.startAutoScroll("up");
+      } else if (relativeY >= logAreaHeight - 1) {
+        this.startAutoScroll("down");
+      } else {
+        this.stopAutoScroll();
+      }
+      this.markNeedsRerender();
+      return true;
+    }
+    if (event.type === "up") {
+      if (this._isDragging) {
+        this._selectionEnd = { line: lineIndex, col: colIndex };
+        this._isDragging = false;
+        this.stopAutoScroll();
+        this.markNeedsRerender();
+      }
+      return true;
+    }
+    return true;
+  }
+  get visible() {
+    return this.isVisible;
+  }
+  get bounds() {
+    return {
+      x: this.consoleX,
+      y: this.consoleY,
+      width: this.consoleWidth,
+      height: this.consoleHeight
+    };
+  }
+  saveLogsToFile() {
+    try {
+      const timestamp = Date.now();
+      const filename = `_console_${timestamp}.log`;
+      const filepath = path3.join(process.cwd(), filename);
+      const allLogEntries = [...this._allLogEntries, ...terminalConsoleCache.cachedLogs];
+      const logLines = [];
+      for (const [date, level, args, callerInfo] of allLogEntries) {
+        const timestampStr = this.formatTimestamp(date);
+        const callerSource = callerInfo ? `${callerInfo.fileName}:${callerInfo.lineNumber}` : "unknown";
+        const prefix = `[${timestampStr}] [${level}]` + (this._debugModeEnabled ? ` [${callerSource}]` : "") + " ";
+        const formattedArgs = this.formatArguments(args);
+        logLines.push(prefix + formattedArgs);
+      }
+      const content = logLines.join(`
+`);
+      fs.writeFileSync(filepath, content, "utf8");
+      console.info(`Console logs saved to: ${filename}`);
+    } catch (error) {
+      console.error(`Failed to save console logs:`, error);
+    }
+  }
+}
+
+// src/renderables/EditBufferRenderable.ts
+var BrandedEditBufferRenderable = Symbol.for("@opentui/core/EditBufferRenderable");
+var emptyVisualCursor = Object.freeze({
+  visualRow: 0,
+  visualCol: 0,
+  logicalRow: 0,
+  logicalCol: 0,
+  offset: 0
+});
+var EditBufferRenderableEvents2;
+((EditBufferRenderableEvents) => {
+  EditBufferRenderableEvents["TRAITS_CHANGED"] = "traits-changed";
+})(EditBufferRenderableEvents2 ||= {});
+function sameCapture(a, b) {
+  if (a === b)
+    return true;
+  if (!a || !b)
+    return !a && !b;
+  if (a.length !== b.length)
+    return false;
+  return a.every((item, i) => item === b[i]);
+}
+function sameTraits(a, b) {
+  return a.suspend === b.suspend && a.status === b.status && sameCapture(a.capture, b.capture);
+}
+function isEditBufferRenderable2(obj) {
+  return !!(obj && typeof obj === "object" && (BrandedEditBufferRenderable in obj));
+}
+
+class EditBufferRenderable2 extends Renderable2 {
+  static nativeIntegration = {
+    kind: "editor",
+    body: { native: this.prototype.renderSelf },
+    lifecycle: {
+      resize: { native: this.prototype.onResize },
+      update: {
+        idle: this.prototype.onUpdate,
+        active: (renderable) => renderable._needsAutoScrollUpdate
+      }
+    },
+    beforeAfter: false,
+    paintBuffer: "destination",
+    bufferComposition: "native"
+  };
+  [BrandedEditBufferRenderable] = true;
+  static defaultFocusable = true;
+  _traits = {};
+  _textColor;
+  _backgroundColor;
+  _defaultAttributes;
+  _selectionBg;
+  _selectionFg;
+  _wrapMode = "word";
+  _scrollMargin;
+  _showCursor = true;
+  _cursorColor;
+  _cursorStyle;
+  lastLocalSelection = null;
+  _tabIndicator;
+  _tabIndicatorColor;
+  _cursorChangeListener = undefined;
+  _contentChangeListener = undefined;
+  _autoScrollVelocity = 0;
+  _autoScrollAccumulator = 0;
+  _scrollSpeed = 16;
+  _keyboardSelectionActive = false;
+  editBuffer;
+  editorView;
+  _defaultOptions = {
+    textColor: RGBA2.fromValues(1, 1, 1, 1),
+    backgroundColor: "transparent",
+    selectionBg: undefined,
+    selectionFg: undefined,
+    selectable: true,
+    attributes: 0,
+    wrapMode: "word",
+    scrollMargin: 0.2,
+    scrollSpeed: 16,
+    showCursor: true,
+    cursorColor: RGBA2.fromValues(1, 1, 1, 1),
+    cursorStyle: {
+      style: "block",
+      blinking: true
+    },
+    tabIndicator: undefined,
+    tabIndicatorColor: undefined
+  };
+  constructor(ctx, options) {
+    super(ctx, options);
+    let editBuffer;
+    let editorView;
+    try {
+      this._textColor = RGBA2.clone(parseColor2(options.textColor ?? this._defaultOptions.textColor));
+      this._backgroundColor = RGBA2.clone(parseColor2(options.backgroundColor ?? this._defaultOptions.backgroundColor));
+      this._defaultAttributes = options.attributes ?? this._defaultOptions.attributes;
+      this._selectionBg = options.selectionBg ? RGBA2.clone(parseColor2(options.selectionBg)) : undefined;
+      this._selectionFg = options.selectionFg ? RGBA2.clone(parseColor2(options.selectionFg)) : undefined;
+      this.selectable = options.selectable ?? this._defaultOptions.selectable;
+      this._wrapMode = options.wrapMode ?? this._defaultOptions.wrapMode;
+      this._scrollSpeed = options.scrollSpeed ?? this._defaultOptions.scrollSpeed;
+      this._showCursor = options.showCursor ?? this._defaultOptions.showCursor;
+      this._cursorColor = RGBA2.clone(parseColor2(options.cursorColor ?? this._defaultOptions.cursorColor));
+      this._cursorStyle = { ...options.cursorStyle ?? this._defaultOptions.cursorStyle };
+      if (this._cursorStyle.color)
+        this._cursorStyle.color = RGBA2.clone(this._cursorStyle.color);
+      this._tabIndicator = options.tabIndicator ?? this._defaultOptions.tabIndicator;
+      this._tabIndicatorColor = options.tabIndicatorColor ? RGBA2.clone(parseColor2(options.tabIndicatorColor)) : this._defaultOptions.tabIndicatorColor;
+      editBuffer = EditBuffer2.create(this._ctx.widthMethod, this._ctx.nativeScene, true);
+      this.editBuffer = editBuffer;
+      editorView = EditorView2.create(editBuffer, Math.max(1, Math.trunc(this.width || 80)), Math.max(1, Math.trunc(this.height || 24)));
+      this.editorView = editorView;
+      this.editorView.setWrapMode(this._wrapMode);
+      this.scrollMargin = options.scrollMargin;
+      if (options.selectionOccupancy === "boundary") {
+        this.editorView.setSelectionOccupancy("boundary");
+      }
+      this.editBuffer.setDefaultFg(this._textColor);
+      this.editBuffer.setDefaultBg(this._backgroundColor);
+      this.editBuffer.setDefaultAttributes(this._defaultAttributes);
+      if (options.syntaxStyle) {
+        this.editBuffer.setSyntaxStyle(options.syntaxStyle);
+      }
+      if (this._tabIndicator !== undefined) {
+        this.editorView.setTabIndicator(this._tabIndicator);
+      }
+      if (this._tabIndicatorColor !== undefined) {
+        this.editorView.setTabIndicatorColor(this._tabIndicatorColor);
+      }
+      this._ctx.nativeScene.setEditorView(this, this.editorView._getSceneHandle(this._ctx.nativeScene));
+      this.setNativeEditorOptions();
+      this.setupEventListeners(options);
+    } catch (error) {
+      this.abortConstruction(error, (run) => {
+        run(() => editorView?.destroy());
+        run(() => editBuffer?.destroy());
+      });
+    }
+  }
+  get lineInfo() {
+    return this.editorView.getLogicalLineInfo();
+  }
+  setupEventListeners(options) {
+    this._cursorChangeListener = options.onCursorChange;
+    this._contentChangeListener = options.onContentChange;
+    this.editBuffer.on("cursor-changed", () => {
+      if (this._cursorChangeListener) {
+        const cursor = this.editBuffer.getCursorPosition();
+        this._cursorChangeListener({
+          line: cursor.row,
+          visualColumn: cursor.col
+        });
+      }
+    });
+    this.editBuffer.on("content-changed", () => {
+      this.requestRender();
+      this.emit("line-info-change");
+      if (this._contentChangeListener) {
+        this._contentChangeListener({});
+      }
+    });
+  }
+  get lineCount() {
+    return this.editBuffer.getLineCount();
+  }
+  get virtualLineCount() {
+    return this.editorView.getVirtualLineCount();
+  }
+  get scrollY() {
+    return this.editorView.getViewport().offsetY;
+  }
+  get scrollMargin() {
+    return this._scrollMargin;
+  }
+  set scrollMargin(value) {
+    if (this.isDestroyed)
+      return;
+    const margin = value ?? this._defaultOptions.scrollMargin;
+    this.editorView.setScrollMargin(margin);
+    this._scrollMargin = margin;
+  }
+  get plainText() {
+    return this.editBuffer.getText();
+  }
+  get logicalCursor() {
+    return this.editBuffer.getCursorPosition();
+  }
+  get visualCursor() {
+    if (this.editorView.isDestroyed)
+      return emptyVisualCursor;
+    return this.editorView.getVisualCursor();
+  }
+  get cursorOffset() {
+    return this.editorView.isDestroyed ? emptyVisualCursor.offset : this.editBuffer.getCursorPosition().offset;
+  }
+  set cursorOffset(offset) {
+    const direction = Math.sign((offset ?? 0) - this.cursorOffset);
+    this.resetSelection();
+    this.editorView.setCursorByOffset(offset ?? 0);
+    this.editorView._keepCursorOutside(direction);
+    this.requestRender();
+  }
+  selectionSide() {
+    const selection = this.lastLocalSelection;
+    if (!selection?.isActive)
+      return;
+    return Math.sign(selection.anchorY - selection.focusY || selection.anchorX - selection.focusX);
+  }
+  get cursorCharacterOffset() {
+    const len = this.plainText.length;
+    if (len <= 0)
+      return;
+    const cursor = this.logicalCursor;
+    const offset = this.cursorOffset;
+    if (offset >= len) {
+      if (cursor.col > 0)
+        return len - 1;
+      return 0;
+    }
+    if (this.plainText[offset] === `
+` && cursor.col > 0) {
+      return offset - 1;
+    }
+    return offset;
+  }
+  get textColor() {
+    return RGBA2.clone(this._textColor);
+  }
+  set textColor(value) {
+    const newColor = RGBA2.clone(parseColor2(value ?? this._defaultOptions.textColor));
+    this.editBuffer.setDefaultFg(newColor);
+    this._textColor = newColor;
+    this.requestRender();
+  }
+  get selectionBg() {
+    return this._selectionBg ? RGBA2.clone(this._selectionBg) : undefined;
+  }
+  get traits() {
+    return this._traits;
+  }
+  set traits(value) {
+    if (sameTraits(this._traits, value))
+      return;
+    const prev = this._traits;
+    this._traits = value;
+    this.emit("traits-changed" /* TRAITS_CHANGED */, value, prev);
+  }
+  set selectionBg(value) {
+    const newColor = value ? RGBA2.clone(parseColor2(value)) : undefined;
+    if (this._selectionBg !== newColor) {
+      this.editorView.setSelectionColors(newColor, this._selectionFg);
+      this._selectionBg = newColor;
+      this.requestRender();
+    }
+  }
+  get selectionFg() {
+    return this._selectionFg ? RGBA2.clone(this._selectionFg) : undefined;
+  }
+  set selectionFg(value) {
+    const newColor = value ? RGBA2.clone(parseColor2(value)) : undefined;
+    if (this._selectionFg !== newColor) {
+      this.editorView.setSelectionColors(this._selectionBg, newColor);
+      this._selectionFg = newColor;
+      this.requestRender();
+    }
+  }
+  get backgroundColor() {
+    return RGBA2.clone(this._backgroundColor);
+  }
+  set backgroundColor(value) {
+    const newColor = RGBA2.clone(parseColor2(value ?? this._defaultOptions.backgroundColor));
+    this.editBuffer.setDefaultBg(newColor);
+    this._backgroundColor = newColor;
+    this.requestRender();
+  }
+  get attributes() {
+    return this._defaultAttributes;
+  }
+  set attributes(value) {
+    const attributes = value ?? this._defaultOptions.attributes;
+    if (this._defaultAttributes !== attributes) {
+      this.runMutation(() => {
+        this.editBuffer.setDefaultAttributes(attributes);
+        this._defaultAttributes = attributes;
+        this.requestRender();
+      });
+    }
+  }
+  get wrapMode() {
+    return this._wrapMode;
+  }
+  set wrapMode(value) {
+    if (this._wrapMode !== value) {
+      this.runMutation(() => {
+        this.editorView.setWrapMode(value);
+        this._wrapMode = value;
+        this.requestRender();
+      });
+    }
+  }
+  get showCursor() {
+    return this._showCursor;
+  }
+  set showCursor(value) {
+    value ??= this._defaultOptions.showCursor;
+    if (this._showCursor !== value) {
+      this.setNativeEditorOptions({ showCursor: value });
+      this._showCursor = value;
+      this.requestRender();
+    }
+  }
+  get cursorColor() {
+    return RGBA2.clone(this._cursorColor);
+  }
+  set cursorColor(value) {
+    const newColor = RGBA2.clone(parseColor2(value ?? this._defaultOptions.cursorColor));
+    this.setNativeEditorOptions({ color: newColor });
+    this._cursorColor = newColor;
+    if (this._focused) {
+      this.requestRender();
+    }
+  }
+  get cursorStyle() {
+    return { ...this._cursorStyle, color: this._cursorStyle.color ? RGBA2.clone(this._cursorStyle.color) : undefined };
+  }
+  set cursorStyle(value) {
+    const style = value ?? this._defaultOptions.cursorStyle;
+    const newStyle = { ...style, color: style.color ? RGBA2.clone(style.color) : undefined };
+    if (this._cursorStyle.style !== newStyle.style || this._cursorStyle.blinking !== newStyle.blinking || this._cursorStyle.cursor !== newStyle.cursor) {
+      this.setNativeEditorOptions({
+        style: newStyle.style ?? "block",
+        blinking: newStyle.blinking ?? true,
+        cursor: newStyle.cursor
+      });
+      this._cursorStyle = newStyle;
+      if (this._focused) {
+        this.requestRender();
+      }
+    }
+  }
+  get selectionOccupancy() {
+    return this.editorView.getSelectionOccupancy();
+  }
+  set selectionOccupancy(value) {
+    const occupancy = value ?? "cell";
+    if (this.selectionOccupancy === occupancy)
+      return;
+    this.editorView.setSelectionOccupancy(occupancy);
+    this.requestRender();
+  }
+  get tabIndicator() {
+    return this._tabIndicator;
+  }
+  set tabIndicator(value) {
+    value ??= this._defaultOptions.tabIndicator;
+    if (this._tabIndicator !== value) {
+      this._tabIndicator = value;
+      if (value !== undefined) {
+        this.editorView.setTabIndicator(value);
+      }
+      this.requestRender();
+    }
+  }
+  get tabIndicatorColor() {
+    return this._tabIndicatorColor ? RGBA2.clone(this._tabIndicatorColor) : undefined;
+  }
+  set tabIndicatorColor(value) {
+    const newColor = value ? RGBA2.clone(parseColor2(value)) : undefined;
+    if (this._tabIndicatorColor !== newColor) {
+      if (newColor !== undefined) {
+        this.editorView.setTabIndicatorColor(newColor);
+      }
+      this._tabIndicatorColor = newColor;
+      this.requestRender();
+    }
+  }
+  get scrollSpeed() {
+    return this._scrollSpeed;
+  }
+  set scrollSpeed(value) {
+    this._scrollSpeed = Math.max(0, value);
+  }
+  onMouseEvent(event) {
+    if (event.type === "scroll") {
+      scrollOnce(event, this, () => {
+        const before = this.editorView.getViewport();
+        const direction = wheelDirection(event);
+        this.handleScroll(event);
+        this.editorView._keepCursorOutside(direction === "down" || direction === "right" ? 1 : -1);
+        const after = this.editorView.getViewport();
+        return after.offsetX !== before.offsetX || after.offsetY !== before.offsetY;
+      });
+    } else if (event.type === "down") {
+      this.editorView._keepCursorOutside(0);
+    }
+  }
+  handleScroll(event) {
+    if (!event.scroll)
+      return;
+    const { delta } = event.scroll;
+    const direction = wheelDirection(event);
+    const viewport = this.editorView.getViewport();
+    if (direction === "up") {
+      const newOffsetY = Math.max(0, viewport.offsetY - delta);
+      this.editorView.setViewport(viewport.offsetX, newOffsetY, viewport.width, viewport.height, true);
+      this.requestRender();
+    } else if (direction === "down") {
+      const totalVirtualLines = this.editorView.getTotalVirtualLineCount();
+      const maxOffsetY = Math.max(0, totalVirtualLines - viewport.height);
+      const newOffsetY = Math.min(viewport.offsetY + delta, maxOffsetY);
+      this.editorView.setViewport(viewport.offsetX, newOffsetY, viewport.width, viewport.height, true);
+      this.requestRender();
+    }
+    if (this._wrapMode === "none") {
+      if (direction === "left") {
+        const newOffsetX = Math.max(0, viewport.offsetX - delta);
+        this.editorView.setViewport(newOffsetX, viewport.offsetY, viewport.width, viewport.height, true);
+        this.requestRender();
+      } else if (direction === "right") {
+        const maxOffsetX = Math.max(0, this.lineInfo.lineWidthColsMax - viewport.width);
+        const newOffsetX = Math.min(viewport.offsetX + delta, Math.max(viewport.offsetX, maxOffsetX));
+        this.editorView.setViewport(newOffsetX, viewport.offsetY, viewport.width, viewport.height, true);
+        this.requestRender();
+      }
+    }
+  }
+  onResize(width, height) {
+    this.editorView.setViewportSize(width, height);
+  }
+  refreshLocalSelection() {
+    if (this.lastLocalSelection) {
+      return this.updateLocalSelection(this.lastLocalSelection);
+    }
+    return false;
+  }
+  updateLocalSelection(localSelection) {
+    if (!localSelection?.isActive) {
+      this.editorView.resetLocalSelection();
+      return true;
+    }
+    return this.editorView.setLocalSelection(localSelection.anchorX, localSelection.anchorY, localSelection.focusX, localSelection.focusY, this._selectionBg, this._selectionFg, false, false, localSelection.behavior);
+  }
+  shouldStartSelection(x, y) {
+    if (!this.selectable)
+      return false;
+    const localX = x - this.x;
+    const localY = y - this.y;
+    return localX >= 0 && localX < this.width && localY >= 0 && localY < this.height;
+  }
+  onSelectionChanged(selection) {
+    const localSelection = convertGlobalToLocalSelection2(selection, Math.trunc(this.x), Math.trunc(this.y));
+    const side = localSelection?.isActive ? 0 : this.selectionSide();
+    this.lastLocalSelection = localSelection;
+    const updateCursor = true;
+    const followCursor = this._keyboardSelectionActive;
+    let changed;
+    if (!localSelection?.isActive) {
+      this._keyboardSelectionActive = false;
+      this.editorView.resetLocalSelection();
+      changed = true;
+    } else if (selection?.isStart) {
+      changed = this.editorView.setLocalSelection(localSelection.anchorX, localSelection.anchorY, localSelection.focusX, localSelection.focusY, this._selectionBg, this._selectionFg, updateCursor, followCursor, localSelection.behavior);
+    } else {
+      changed = this.editorView.updateLocalSelection(localSelection.anchorX, localSelection.anchorY, localSelection.focusX, localSelection.focusY, this._selectionBg, this._selectionFg, updateCursor, followCursor, localSelection.behavior);
+    }
+    const previousVelocity = this._autoScrollVelocity;
+    const previousAccumulator = this._autoScrollAccumulator;
+    if (changed && localSelection?.isActive && selection?.isDragging) {
+      const viewport = this.editorView.getViewport();
+      const focusY = localSelection.focusY;
+      const scrollMargin = Math.max(1, Math.floor(viewport.height * this._scrollMargin));
+      if (focusY < scrollMargin) {
+        this._autoScrollVelocity = -this._scrollSpeed;
+      } else if (focusY >= viewport.height - scrollMargin) {
+        this._autoScrollVelocity = this._scrollSpeed;
+      } else {
+        this._autoScrollVelocity = 0;
+      }
+    } else {
+      this._keyboardSelectionActive = false;
+      this._autoScrollVelocity = 0;
+      this._autoScrollAccumulator = 0;
+    }
+    if (previousVelocity !== 0 !== this._needsAutoScrollUpdate) {
+      const generation = this._nativeSceneHookGeneration;
+      try {
+        this.refreshNativeSceneHooks();
+      } catch (error) {
+        if (generation === this._nativeSceneHookGeneration) {
+          this._autoScrollVelocity = previousVelocity;
+          this._autoScrollAccumulator = previousAccumulator;
+        }
+        throw error;
+      }
+    }
+    if (changed) {
+      this.requestRender();
+    }
+    if ((!selection?.isDragging || !selection.isStart) && side !== undefined)
+      this.editorView._keepCursorOutside(side);
+    return this.hasSelection();
+  }
+  get _needsAutoScrollUpdate() {
+    return (this._autoScrollVelocity ?? 0) !== 0;
+  }
+  onUpdate(deltaTime) {
+    super.onUpdate(deltaTime);
+    if (this._autoScrollVelocity !== 0 && this.hasSelection()) {
+      const deltaSeconds = deltaTime / 1000;
+      this._autoScrollAccumulator += this._autoScrollVelocity * deltaSeconds;
+      const linesToScroll = Math.floor(Math.abs(this._autoScrollAccumulator));
+      if (linesToScroll > 0) {
+        const direction = this._autoScrollVelocity > 0 ? 1 : -1;
+        const viewport = this.editorView.getViewport();
+        const totalVirtualLines = this.editorView.getTotalVirtualLineCount();
+        const maxOffsetY = Math.max(0, totalVirtualLines - viewport.height);
+        const newOffsetY = Math.max(0, Math.min(viewport.offsetY + direction * linesToScroll, maxOffsetY));
+        if (newOffsetY !== viewport.offsetY) {
+          this.editorView.setViewport(viewport.offsetX, newOffsetY, viewport.width, viewport.height, false);
+          this._ctx.requestSelectionUpdate();
+        }
+        this._autoScrollAccumulator -= direction * linesToScroll;
+      }
+    }
+  }
+  getSelectedText() {
+    return this.editorView.getSelectedText();
+  }
+  hasSelection() {
+    return this.editorView.hasSelection();
+  }
+  getSelection() {
+    return this.editorView.getSelection();
+  }
+  deleteSelectedText() {
+    this.editorView.deleteSelectedText();
+    this._ctx.clearSelection();
+    this.requestRender();
+  }
+  resetSelection() {
+    this.lastLocalSelection = null;
+    this.editorView.resetLocalSelection();
+    this._ctx.clearSelection();
+  }
+  setSelection(start, end) {
+    this.resetSelection();
+    this.editorView.setSelection(start, end, this._selectionBg, this._selectionFg);
+    this.editorView._keepCursorOutside(0);
+    this.requestRender();
+  }
+  setSelectionInclusive(start, end) {
+    this.resetSelection();
+    this.editorView.setSelectionInclusive(start, end, this._selectionBg, this._selectionFg);
+    this.editorView._keepCursorOutside(0);
+    this.requestRender();
+  }
+  clearSelection() {
+    const side = this.selectionSide() ?? 0;
+    const had = this.hasSelection();
+    this.resetSelection();
+    if (had) {
+      this.editorView._keepCursorOutside(side);
+      this.requestRender();
+    }
+    return had;
+  }
+  deleteSelection() {
+    if (!this.hasSelection())
+      return false;
+    this.lastLocalSelection = null;
+    this.deleteSelectedText();
+    return true;
+  }
+  setCursor(row, col) {
+    this.clearSelection();
+    this.editBuffer.setCursor(row, col);
+    this.requestRender();
+  }
+  insertChar(char) {
+    this.insertOrReplaceSelection(char, () => this.editBuffer.insertChar(char));
+  }
+  insertText(text) {
+    this.insertOrReplaceSelection(text, () => this.editBuffer.insertText(text));
+  }
+  insertOrReplaceSelection(text, insert) {
+    const hasSelection = this.hasSelection();
+    this.editBuffer.runMutation(() => {
+      if (hasSelection) {
+        this.editorView._replaceSelectedText(text);
+        this._ctx.clearSelection();
+      } else {
+        insert();
+      }
+      this.requestRender();
+    });
+    if (this.editorView._atomic)
+      this.editBuffer._keepOutside(0);
+  }
+  deleteChar() {
+    if (this.hasSelection()) {
+      this.deleteSelectedText();
+      return true;
+    }
+    this._ctx.clearSelection();
+    this.editBuffer.deleteChar();
+    this.requestRender();
+    return true;
+  }
+  deleteCharBackward() {
+    if (this.hasSelection()) {
+      this.deleteSelectedText();
+      return true;
+    }
+    this._ctx.clearSelection();
+    this.editBuffer.deleteCharBackward();
+    this.requestRender();
+    return true;
+  }
+  newLine() {
+    this._ctx.clearSelection();
+    this.editBuffer.newLine();
+    this.requestRender();
+    return true;
+  }
+  deleteLine() {
+    this._ctx.clearSelection();
+    this.editBuffer.deleteLine();
+    this.requestRender();
+    return true;
+  }
+  collapseSelectionToEdge(edge) {
+    const selection = this.getSelection();
+    if (!selection)
+      return false;
+    this.editBuffer.setCursorByOffset(edge === "start" ? selection.start : selection.end);
+    this.resetSelection();
+    this.editorView._keepCursorOutside(edge === "start" ? -1 : 1);
+    this.requestRender();
+    return true;
+  }
+  moveCursorLeft(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("start"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    this.editBuffer.moveCursorLeft();
+    if (select)
+      this.updateSelectionForMovement(true, false);
+    this.requestRender();
+    return true;
+  }
+  moveCursorRight(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("end"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    this.editBuffer.moveCursorRight();
+    if (select)
+      this.updateSelectionForMovement(true, false);
+    this.requestRender();
+    return true;
+  }
+  moveCursorUp(options) {
+    const select = options?.select ?? false;
+    this.updateSelectionForMovement(select, true);
+    this.editorView.moveUpVisual();
+    if (select)
+      this.updateSelectionForMovement(true, false);
+    this.requestRender();
+    return true;
+  }
+  moveCursorDown(options) {
+    const select = options?.select ?? false;
+    this.updateSelectionForMovement(select, true);
+    this.editorView.moveDownVisual();
+    if (select)
+      this.updateSelectionForMovement(true, false);
+    this.requestRender();
+    return true;
+  }
+  gotoLine(line) {
+    this.clearSelection();
+    this.editBuffer.gotoLine(line);
+    this.requestRender();
+  }
+  gotoLineStart() {
+    this.setCursor(this.logicalCursor.row, 0);
+  }
+  gotoLineTextEnd() {
+    const eol = this.editBuffer.getEOL();
+    this.setCursor(eol.row, eol.col);
+  }
+  gotoLineHome(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("start"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    const cursor = this.editorView.getCursor();
+    if (cursor.col === 0 && cursor.row > 0) {
+      this.editBuffer.setCursor(cursor.row - 1, 0);
+      const prevLineEol = this.editBuffer.getEOL();
+      this.editBuffer.setCursor(prevLineEol.row, prevLineEol.col);
+    } else {
+      this.editBuffer.setCursor(cursor.row, 0);
+    }
+    this.updateSelectionForMovement(select, false);
+    this.requestRender();
+    return true;
+  }
+  gotoLineEnd(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("end"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    const cursor = this.editorView.getCursor();
+    const eol = this.editBuffer.getEOL();
+    const lineCount = this.editBuffer.getLineCount();
+    if (cursor.col === eol.col && cursor.row < lineCount - 1) {
+      this.editBuffer.setCursor(cursor.row + 1, 0);
+    } else {
+      this.editBuffer.setCursor(eol.row, eol.col);
+    }
+    this.updateSelectionForMovement(select, false);
+    this.requestRender();
+    return true;
+  }
+  gotoVisualLineHome(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("start"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    const sol = this.editorView.getVisualSOL();
+    this.editBuffer.setCursor(sol.logicalRow, sol.logicalCol);
+    this.updateSelectionForMovement(select, false);
+    this.requestRender();
+    return true;
+  }
+  gotoVisualLineEnd(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("end"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    this.editorView.gotoVisualLineEnd();
+    this.updateSelectionForMovement(select, false);
+    this.requestRender();
+    return true;
+  }
+  gotoBufferHome(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("start"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    this.editBuffer.setCursor(0, 0);
+    this.updateSelectionForMovement(select, false);
+    this.requestRender();
+    return true;
+  }
+  gotoBufferEnd(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("end"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    this.editBuffer.gotoLine(999999);
+    this.updateSelectionForMovement(select, false);
+    this.requestRender();
+    return true;
+  }
+  selectAll() {
+    this.updateSelectionForMovement(false, true);
+    this.editBuffer.setCursor(0, 0);
+    return this.gotoBufferEnd({ select: true });
+  }
+  deleteToLineEnd() {
+    const cursor = this.editorView.getCursor();
+    const eol = this.editBuffer.getEOL();
+    if (eol.col > cursor.col) {
+      this.editBuffer.deleteRange(cursor.row, cursor.col, eol.row, eol.col);
+    }
+    this.requestRender();
+    return true;
+  }
+  deleteToLineStart() {
+    const cursor = this.editorView.getCursor();
+    if (cursor.col > 0) {
+      this.editBuffer.deleteRange(cursor.row, 0, cursor.row, cursor.col);
+    } else if (cursor.row > 0) {
+      this.editBuffer.deleteCharBackward();
+    }
+    this.requestRender();
+    return true;
+  }
+  undo() {
+    this._ctx.clearSelection();
+    this.editBuffer.undo();
+    this.requestRender();
+    return true;
+  }
+  redo() {
+    this._ctx.clearSelection();
+    this.editBuffer.redo();
+    this.requestRender();
+    return true;
+  }
+  moveWordForward(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("end"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    const nextWord = this.editBuffer.getNextWordBoundary();
+    this.editBuffer.setCursorByOffset(nextWord.offset);
+    if (select)
+      this.updateSelectionForMovement(true, false);
+    this.requestRender();
+    return true;
+  }
+  moveWordBackward(options) {
+    const select = options?.select ?? false;
+    if (!select && this.collapseSelectionToEdge("start"))
+      return true;
+    this.updateSelectionForMovement(select, true);
+    const prevWord = this.editBuffer.getPrevWordBoundary();
+    this.editBuffer.setCursorByOffset(prevWord.offset);
+    if (select)
+      this.updateSelectionForMovement(true, false);
+    this.requestRender();
+    return true;
+  }
+  deleteWordForward() {
+    if (this.hasSelection()) {
+      this.deleteSelectedText();
+      return true;
+    }
+    const currentCursor = this.editBuffer.getCursorPosition();
+    const nextWord = this.editBuffer.getNextWordBoundary();
+    if (nextWord.offset > currentCursor.offset) {
+      this.editBuffer.deleteRange(currentCursor.row, currentCursor.col, nextWord.row, nextWord.col);
+    }
+    this._ctx.clearSelection();
+    this.requestRender();
+    return true;
+  }
+  deleteWordBackward() {
+    if (this.hasSelection()) {
+      this.deleteSelectedText();
+      return true;
+    }
+    const currentCursor = this.editBuffer.getCursorPosition();
+    const prevWord = this.editBuffer.getPrevWordBoundary();
+    if (prevWord.offset < currentCursor.offset) {
+      this.editBuffer.deleteRange(prevWord.row, prevWord.col, currentCursor.row, currentCursor.col);
+    }
+    this._ctx.clearSelection();
+    this.requestRender();
+    return true;
+  }
+  renderSelf(buffer) {
+    buffer.drawEditorView(this.editorView, Math.trunc(this._screenX), Math.trunc(this._screenY));
+  }
+  focus() {
+    super.focus();
+    this.requestRender();
+  }
+  blur() {
+    super.blur();
+    this.requestRender();
+  }
+  destroyOwnedResources() {
+    this.runCleanup((run) => {
+      run(() => {
+        this.traits = {};
+      });
+      if (this._focused) {
+        run(() => this.blur());
+      }
+      run(() => this.editorView.destroy());
+      run(() => this.editBuffer.destroy());
+    });
+  }
+  set onCursorChange(handler) {
+    this._cursorChangeListener = handler;
+  }
+  get onCursorChange() {
+    return this._cursorChangeListener;
+  }
+  set onContentChange(handler) {
+    this._contentChangeListener = handler;
+  }
+  get onContentChange() {
+    return this._contentChangeListener;
+  }
+  get syntaxStyle() {
+    return this.editBuffer.getSyntaxStyle();
+  }
+  set syntaxStyle(style) {
+    this.editBuffer.setSyntaxStyle(style);
+    this.requestRender();
+  }
+  addHighlight(lineIdx, highlight) {
+    this.editBuffer.addHighlight(lineIdx, highlight);
+    this.requestRender();
+  }
+  addHighlightByCharRange(highlight) {
+    this.editBuffer.addHighlightByCharRange(highlight);
+    this.requestRender();
+  }
+  removeHighlightsByRef(hlRef) {
+    this.editBuffer.removeHighlightsByRef(hlRef);
+    this.requestRender();
+  }
+  clearLineHighlights(lineIdx) {
+    this.editBuffer.clearLineHighlights(lineIdx);
+    this.requestRender();
+  }
+  clearAllHighlights() {
+    this.editBuffer.clearAllHighlights();
+    this.requestRender();
+  }
+  getLineHighlights(lineIdx) {
+    return this.editBuffer.getLineHighlights(lineIdx);
+  }
+  setText(text) {
+    this.runMutation(() => {
+      this.editBuffer.setText(text);
+      this.requestRender();
+    });
+  }
+  replaceText(text) {
+    this.runMutation(() => {
+      this.editBuffer.replaceText(text);
+      this.requestRender();
+    });
+  }
+  clear() {
+    this.editBuffer.clear();
+    this.editBuffer.clearAllHighlights();
+    this.requestRender();
+  }
+  deleteRange(startLine, startCol, endLine, endCol) {
+    this.editBuffer.deleteRange(startLine, startCol, endLine, endCol);
+    this.requestRender();
+  }
+  getTextRange(startOffset, endOffset) {
+    return this.editBuffer.getTextRange(startOffset, endOffset);
+  }
+  getTextRangeByCoords(startRow, startCol, endRow, endCol) {
+    return this.editBuffer.getTextRangeByCoords(startRow, startCol, endRow, endCol);
+  }
+  setNativeEditorOptions(options = {}) {
+    if (this.isDestroyed)
+      return;
+    this._ctx.nativeScene.setEditorOptions(this, {
+      showCursor: this._showCursor,
+      style: this._cursorStyle.style ?? "block",
+      blinking: this._cursorStyle.blinking ?? true,
+      color: this._cursorColor,
+      cursor: this._cursorStyle.cursor,
+      ...options
+    });
+  }
+  updateSelectionForMovement(shiftPressed, isBeforeMovement) {
+    if (!shiftPressed) {
+      this._keyboardSelectionActive = false;
+      if (isBeforeMovement)
+        this.clearSelection();
+      else
+        this.editorView._keepCursorOutside(0);
+      return;
+    }
+    if (!this.selectable)
+      return;
+    this._keyboardSelectionActive = true;
+    const visualCursor = this.editorView.getVisualCursor();
+    const cursorX = Math.trunc(this.x) + visualCursor.visualCol;
+    const cursorY = Math.trunc(this.y) + visualCursor.visualRow;
+    if (isBeforeMovement) {
+      if (!this._ctx.hasSelection || !this.hasSelection()) {
+        this._ctx.startSelection(this, cursorX, cursorY);
+      } else if (this._ctx.getSelection()?.behavior !== "cell") {
+        if (this.editorView.convertSelectionToCell()) {
+          const selection = this._ctx.getSelection();
+          if (selection)
+            selection.behavior = "cell";
+        }
+      }
+      return;
+    }
+    this._ctx.updateSelection(this, cursorX, cursorY, { finishDragging: true });
+  }
+}
+
+// src/renderer.ts
+import { appendFileSync, writeFileSync } from "fs";
+import { Writable as Writable3 } from "stream";
+import { StringDecoder } from "string_decoder";
+
+// src/ansi.ts
+var ANSI = {
+  switchToAlternateScreen: "\x1B[?1049h",
+  switchToMainScreen: "\x1B[?1049l",
+  reset: "\x1B[0m",
+  resetScrollRegion: "\x1B[r",
+  home: "\x1B[H",
+  clearScreen: "\x1B[2J",
+  clearSavedLines: "\x1B[3J",
+  scrollDown: (lines) => `\x1B[${lines}T`,
+  scrollIntoHistory: (lines) => `\x1B[65535H${`
+`.repeat(Math.min(lines, 4000))}${lines > 4000 ? `\x1B[${lines - 4000}S` : ""}`,
+  moveCursor: (row, col) => `\x1B[${row};${col}H`,
+  moveCursorAndClear: (row, col) => `\x1B[${row};${col}H\x1B[J`,
+  setRgbBackground: (r, g, b) => `\x1B[48;2;${r};${g};${b}m`,
+  resetBackground: "\x1B[49m",
+  bracketedPasteStart: "\x1B[200~",
+  bracketedPasteEnd: "\x1B[201~"
+};
+
+// src/NativeScene.ts
+var maxLayoutRounds = 8;
+var maxHostRequests = 65536;
+
+class NativeLifecyclePasses extends Set {
+  order = new WeakMap;
+  nextOrder = 0;
+  work;
+  add(renderable) {
+    if (!this.order.has(renderable))
+      this.order.set(renderable, ++this.nextOrder);
+    this.refresh(renderable);
+    return this;
+  }
+  refresh(renderable) {
+    const order = this.order.get(renderable);
+    if (order === undefined)
+      return;
+    const active = renderable._needsLifecyclePass();
+    if (active === super.has(renderable))
+      return;
+    if (!active) {
+      super.delete(renderable);
+      return;
+    }
+    super.add(renderable);
+    const work = this.work;
+    if (!work || order <= work.order)
+      return;
+    let low = work.index;
+    let high = work.pending.length;
+    while (low < high) {
+      const middle = low + high >>> 1;
+      if (work.pending[middle].order < order)
+        low = middle + 1;
+      else
+        high = middle;
+    }
+    if (work.pending[low]?.order !== order)
+      work.pending.splice(low, 0, { renderable, order });
+  }
+  delete(renderable) {
+    this.order.delete(renderable);
+    return super.delete(renderable);
+  }
+  clear() {
+    super.clear();
+    this.order = new WeakMap;
+  }
+  *iteratePending() {
+    if (this.work)
+      throw new Error("Native scene lifecycle pass is already active");
+    if (this.size === 0)
+      return;
+    const work = {
+      pending: Array.from(this, (renderable) => ({ renderable, order: this.order.get(renderable) })),
+      index: 0,
+      order: 0
+    };
+    work.pending.sort((a, b) => a.order - b.order);
+    this.work = work;
+    try {
+      while (work.index < work.pending.length) {
+        const next = work.pending[work.index++];
+        work.order = next.order;
+        if (this.has(next.renderable) && this.order.get(next.renderable) === next.order)
+          yield next.renderable;
+      }
+    } finally {
+      this.work = undefined;
+    }
+  }
+}
+
+class NativeScene {
+  driver;
+  renderer;
+  get resourceContext() {
+    return this.driver.resourceContext;
+  }
+  lifecyclePasses = new NativeLifecyclePasses;
+  cleanupOwners = new Set;
+  nodes = new Map;
+  paintedFrame = null;
+  paintRecording;
+  destroyed = false;
+  destroying = false;
+  layoutRevision = 0;
+  staging = new SceneStaging;
+  yogaHost;
+  constructor(driver, renderer) {
+    this.driver = driver;
+    this.renderer = renderer;
+    this.yogaHost = driver.renderLib.getYogaHost();
+  }
+  get frame() {
+    return this.paintedFrame;
+  }
+  get observedLayoutRevision() {
+    if (this.yogaHost.inCallback || this.destroyed || this.driver.disposed)
+      return;
+    return this.layoutRevision;
+  }
+  get stopped() {
+    return this.destroyed || this.destroying || this.driver.disposed || this.renderer.isDestroyed;
+  }
+  changeLayout() {
+    this.layoutRevision = this.layoutRevision === Number.MAX_SAFE_INTEGER ? 0 : this.layoutRevision + 1;
+  }
+  get hasStagedMutations() {
+    return this.staging.pending;
+  }
+  flushStaged() {
+    if (this.destroyed || this.driver.disposed) {
+      this.staging.clear();
+      this.yogaHost.forgetScene(this);
+      return;
+    }
+    if (!this.staging.pending)
+      return;
+    try {
+      this.driver.renderLib.sceneFlush(this.driver.context, this.staging);
+    } catch (error) {
+      if (!(error instanceof NativeError2) || error.status !== -12 /* SessionClosed */)
+        throw error;
+      this.staging.clear();
+    } finally {
+      if (!this.staging.pending)
+        this.yogaHost.forgetScene(this);
+    }
+  }
+  getRenderables() {
+    return this.nodes.values();
+  }
+  assertAlive() {
+    if (this.destroyed || this.driver.disposed)
+      throw new Error("Native scene is destroyed");
+  }
+  createNode(renderable, options) {
+    this.yogaHost.assertMutable();
+    this.assertAlive();
+    if (this.destroying)
+      throw new Error("Native scene is being destroyed");
+    const kind = renderable.nativeIntegration.kind;
+    if (options.enableLayout === false)
+      throw new Error("Native scene requires Yoga layout");
+    const handle = this.driver.renderLib.sceneCreateNode(this.driver.context, this.driver.session, kind, renderable.num);
+    try {
+      renderable._bindSceneHandle(handle);
+      this.nodes.set(renderable.num, renderable);
+    } catch (error) {
+      try {
+        this.driver.renderLib.sceneDestroyNode(this.driver.context, handle);
+      } catch {}
+      throw error;
+    }
+  }
+  moveNode(child, parent, index) {
+    const handle = child._getSceneHandle(this);
+    const parentHandle = parent?._getSceneHandle(this) ?? null;
+    this.driver.renderLib.sceneMoveNode(this.driver.context, handle, parentHandle, index);
+    this.changeLayout();
+  }
+  setViewport(content, viewport) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetViewport(this.driver.context, content._getSceneHandle(this), viewport ? viewport._getSceneHandle(this) : null);
+  }
+  setFocus(renderable, focused) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetFocus(this.driver.context, renderable._getSceneHandle(this), focused);
+  }
+  destroyNode(renderable) {
+    renderable.assertMutable();
+    const handle = renderable._getSceneHandle(this);
+    let flushFailure;
+    try {
+      this.flushStaged();
+    } catch (error) {
+      flushFailure = { error };
+    }
+    try {
+      this.driver.renderLib.sceneDestroyNode(this.driver.context, handle);
+      this.staging.discard(handle);
+      if (!this.staging.pending)
+        this.yogaHost.forgetScene(this);
+      this.changeLayout();
+      renderable._releaseSceneHandle();
+      this.nodes.delete(renderable.num);
+      this.renderer.unregisterLifecyclePass(renderable);
+    } catch (error) {
+      if (flushFailure) {
+        throw new AggregateError([flushFailure.error, error], "Native scene flush and node cleanup both failed");
+      }
+      throw error;
+    }
+    if (flushFailure)
+      throw flushFailure.error;
+  }
+  setHooks(renderable, flags, generation, initialWidth, initialHeight) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetHooks(this.driver.context, renderable._getSceneHandle(this), flags, generation, initialWidth, initialHeight);
+  }
+  setStyle(node, group, kind, edge, unit, value, flags = 0) {
+    this.yogaHost.assertMutable();
+    const handle = node._getSceneHandle(this);
+    if (this.staging.full)
+      this.flushStaged();
+    if (this.staging.stageStyle(this.driver.context, handle, group, kind, edge, unit, value, flags)) {
+      this.yogaHost.stageScene(this);
+    }
+  }
+  getStyle(node, group, kind, edge) {
+    const handle = node._getSceneHandle(this);
+    this.flushStaged();
+    return this.driver.renderLib.sceneGetStyle(this.driver.context, handle, group, kind, edge);
+  }
+  setMeasureFunc(node, measure) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetMeasure(this.driver.context, node._getSceneHandle(this), measure);
+  }
+  hasMeasureFunc(node) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneHasMeasure(this.driver.context, node._getSceneHandle(this));
+  }
+  reachesHooks(node) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneReachesHooks(this.driver.context, node._getSceneHandle(this));
+  }
+  painted(node) {
+    this.flushStaged();
+    return this.driver.renderLib.scenePainted(this.driver.context, node._getSceneHandle(this));
+  }
+  markDirty(node) {
+    this.flushStaged();
+    this.driver.renderLib.sceneMarkDirty(this.driver.context, node._getSceneHandle(this));
+  }
+  setPositions(node, mask, units, values) {
+    const edgeMaskMax = (1 << Edge2.Bottom + 1) - 1;
+    if (!Number.isInteger(mask) || mask < 0 || mask > edgeMaskMax)
+      throw new RangeError("Scene position mask must use four edges");
+    for (let edge = 0;edge <= Edge2.Bottom; edge++) {
+      if ((mask & 1 << edge) !== 0)
+        SceneStaging.checkStyleValue(NativeStyleGroup.Value, values[edge]);
+    }
+    for (let edge = 0;edge <= Edge2.Bottom; edge++) {
+      if ((mask & 1 << edge) === 0)
+        continue;
+      this.setStyle(node, NativeStyleGroup.Value, YogaValueKind.Position, edge, units[edge], values[edge], NativeStyleFlags.None);
+    }
+  }
+  setPaint(renderable, paint) {
+    this.yogaHost.assertMutable();
+    const handle = renderable._getSceneHandle(this);
+    if (this.staging.full)
+      this.flushStaged();
+    if (this.staging.stagePaint(this.driver.context, handle, paint, renderable))
+      this.yogaHost.stageScene(this);
+    const { translateX = renderable.translateX, translateY = renderable.translateY } = paint;
+    if (translateX !== renderable.translateX || translateY !== renderable.translateY)
+      this.changeLayout();
+  }
+  setBackground(renderable, color) {
+    this.yogaHost.assertMutable();
+    const handle = renderable._getSceneHandle(this);
+    if (this.staging.full)
+      this.flushStaged();
+    if (this.staging.stageBackground(this.driver.context, handle, color, renderable))
+      this.yogaHost.stageScene(this);
+  }
+  setFillDimsImages(renderable, on) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetFillDimsImages(this.driver.context, renderable._getSceneHandle(this), on);
+  }
+  setBoxDetails(renderable, details) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetBoxDetails(this.driver.context, renderable._getSceneHandle(this), details);
+  }
+  setBoxBorderStyle(renderable, style, sides) {
+    this.setPaint(renderable, { borderStyle: style, border: sides, resetBorderCharacters: true });
+  }
+  setText(renderable, content) {
+    this.flushStaged();
+    const node = renderable._getSceneHandle(this);
+    if (typeof content === "string") {
+      this.driver.renderLib.sceneSetText(this.driver.context, node, this.driver.renderLib.encoder.encode(content));
+    } else {
+      this.driver.renderLib.sceneSetStyledText(this.driver.context, node, content);
+    }
+  }
+  textNode(renderable) {
+    this.flushStaged();
+    return renderable._getSceneHandle(this);
+  }
+  textByteAt(renderable, x, y) {
+    return this.driver.renderLib.sceneGetTextByteAt(this.driver.context, this.textNode(renderable), x, y);
+  }
+  setTextOptions(renderable, options) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetTextOptions(this.driver.context, renderable._getSceneHandle(this), options);
+  }
+  setSlider(renderable, options) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetSlider(this.driver.context, renderable._getSceneHandle(this), options);
+  }
+  getSliderThumb(renderable) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneGetSliderThumb(this.driver.context, renderable._getSceneHandle(this));
+  }
+  setArrow(renderable, options) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetArrow(this.driver.context, renderable._getSceneHandle(this), options);
+  }
+  setImage(renderable, image, fit, protocol, buffer, placementOpacity) {
+    this.flushStaged();
+    const { renderLib: lib, context } = this.driver;
+    lib.sceneSetImage(context, renderable._getSceneHandle(this), image?._getContextHandle(lib, context) ?? null, fit, protocol, buffer?._getSceneHandle(this) ?? null, placementOpacity ?? null);
+  }
+  setVideo(renderable, fit, buffer) {
+    this.flushStaged();
+    const { renderLib: lib, context } = this.driver;
+    lib.sceneSetVideo(context, renderable._getSceneHandle(this), fit, buffer?._getSceneHandle(this) ?? null);
+  }
+  setCrop(renderable, crop) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetCrop(this.driver.context, renderable._getSceneHandle(this), crop);
+  }
+  videoNode(renderable) {
+    this.flushStaged();
+    return { lib: this.driver.renderLib, context: this.driver.context, node: renderable._getSceneHandle(this) };
+  }
+  setScroll(renderable, options) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetScroll(this.driver.context, renderable._getSceneHandle(this), options);
+    this.changeLayout();
+  }
+  setScrollArrow(renderable, axis, end, options) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetScrollArrow(this.driver.context, renderable._getSceneHandle(this), axis, end, options);
+  }
+  scrollTo(renderable, x, y, relativeX, relativeY, reapply = false) {
+    this.flushStaged();
+    const handle = renderable._getSceneHandle(this);
+    const state = this.driver.renderLib.sceneScrollTo(this.driver.context, handle, x, y, relativeX, relativeY, reapply);
+    this.changeLayout();
+    return state;
+  }
+  scrollRequest(renderable, kind, target, align, inset) {
+    this.flushStaged();
+    const { renderLib: lib, context } = this.driver;
+    const handle = renderable._getSceneHandle(this);
+    const state = lib.sceneScrollRequest(context, handle, kind, target?._getSceneHandle(this) ?? null, align, inset);
+    this.changeLayout();
+    return state;
+  }
+  getScroll(renderable) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneGetScroll(this.driver.context, renderable._getSceneHandle(this));
+  }
+  setEditorView(renderable, view) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetEditorView(this.driver.context, renderable._getSceneHandle(this), view);
+  }
+  setSurface(renderable, buffer) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetSurface(this.driver.context, renderable._getSceneHandle(this), buffer?._getSceneHandle(this) ?? null);
+  }
+  setTextView(renderable, view) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetTextView(this.driver.context, renderable._getSceneHandle(this), view);
+  }
+  setTextViewPaint(renderable, enabled) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetTextViewPaint(this.driver.context, renderable._getSceneHandle(this), enabled);
+  }
+  setEditorOptions(renderable, options) {
+    this.flushStaged();
+    this.driver.renderLib.sceneSetEditorOptions(this.driver.context, renderable._getSceneHandle(this), options);
+  }
+  getText(renderable) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneGetText(this.driver.context, renderable._getSceneHandle(this));
+  }
+  drawBody(renderable, buffer, x, y) {
+    this.flushStaged();
+    buffer._drawSceneBody(this, renderable._getSceneHandle(this), x, y);
+  }
+  setTextSelection(renderable, operation, bounds, bg, fg) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneSetTextSelection(this.driver.context, renderable._getSceneHandle(this), {
+      operation,
+      anchorX: bounds?.anchorX ?? 0,
+      anchorY: bounds?.anchorY ?? 0,
+      focusX: bounds?.focusX ?? 0,
+      focusY: bounds?.focusY ?? 0,
+      behavior: bounds?.behavior ?? "cell",
+      bg,
+      fg
+    });
+  }
+  getTextSelection(renderable) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneGetTextSelection(this.driver.context, renderable._getSceneHandle(this));
+  }
+  getSelectedText(renderable) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneGetSelectedText(this.driver.context, renderable._getSceneHandle(this));
+  }
+  getTextLineInfo(renderable, firstLine, lineCount) {
+    this.flushStaged();
+    const handle = renderable._getSceneHandle(this);
+    return this.driver.renderLib.sceneGetTextLineInfo(this.driver.context, handle, firstLine, lineCount);
+  }
+  getTextMetrics(renderable) {
+    this.flushStaged();
+    return this.driver.renderLib.sceneGetTextMetrics(this.driver.context, renderable._getSceneHandle(this));
+  }
+  getLayout(node, rawYoga = false) {
+    const handle = node._getSceneHandle(this);
+    this.flushStaged();
+    return this.driver.renderLib.sceneGetLayout(this.driver.context, handle, rawYoga);
+  }
+  measureSnapshot(root) {
+    this.yogaHost.assertMutable();
+    this.assertAlive();
+    if (this.frame)
+      throw new Error("Cannot measure a snapshot during a native scene frame");
+    const owner = this.renderer.root;
+    root._getSceneHandle(this);
+    const attached = root.parent === owner;
+    if (root === owner || root.parent && !attached)
+      throw new Error("Snapshot root belongs to another parent");
+    if (!attached)
+      owner.add(root);
+    try {
+      this.runLifecyclePasses();
+      this.assertAlive();
+      this.flushStaged();
+      try {
+        this.driver.renderLib.sceneMeasureLayout(this.driver.context, this.driver.session, owner._getSceneHandle(this));
+      } finally {
+        this.changeLayout();
+      }
+      return Math.max(1, Math.trunc(this.getLayout(root, true).height));
+    } finally {
+      if (!attached && root.parent === owner)
+        owner.remove(root);
+    }
+  }
+  paint(deltaTime, getPaintOptions) {
+    this.yogaHost.assertMutable();
+    this.assertAlive();
+    if (this.paintedFrame)
+      throw new Error("Native scene is already painting a frame");
+    this.renderer.root._setCurrentRenderable(undefined);
+    this.runLifecyclePasses();
+    this.advancePaint(deltaTime, getPaintOptions);
+  }
+  runLifecyclePasses() {
+    if (this.renderer.root.visible) {
+      let visits = 0;
+      for (const renderable of this.lifecyclePasses.iteratePending()) {
+        if (this.stopped || this.renderer.controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
+          return;
+        if (++visits > maxHostRequests)
+          throw new Error("Native scene lifecycle work limit exceeded");
+        if (!renderable.isDestroyed) {
+          renderable._runLifecyclePass();
+        }
+      }
+    }
+  }
+  advancePaint(deltaTime, getPaintOptions) {
+    let request = null;
+    let recording = null;
+    try {
+      while (!this.stopped) {
+        const options = { ...getPaintOptions(), maxLayoutRounds, maxHostRequests };
+        if (this.stopped || this.renderer.controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
+          return;
+        this.flushStaged();
+        try {
+          request = this.driver.renderLib.sceneFrameStep(this.driver.context, this.driver.session, request, options, recording);
+        } finally {
+          this.changeLayout();
+          this.paintRecording?.recorder.settle();
+        }
+        recording = null;
+        if (request.kind === NativeSceneFrame2.Done) {
+          this.paintedFrame = request;
+          return;
+        }
+        if (!sameHandle(request.session, this.driver.session) || !sameHandle(request.root, this.renderer.root._getSceneHandle(this))) {
+          throw new Error("Native scene returned a stale host request");
+        }
+        if (request.kind === NativeSceneFrame2.Record) {
+          recording = this.recordPaint(request, deltaTime);
+          continue;
+        }
+        const renderable = this.nodes.get(request.num);
+        if (!renderable || renderable.isDestroyed)
+          continue;
+        if (!sameHandle(request.node, renderable._getSceneHandle(this))) {
+          throw new Error("Native scene returned a stale host request");
+        }
+        renderable._runNativeSceneHook(request, deltaTime);
+      }
+    } finally {
+      this.paintRecording?.recorder.settle();
+      if (request && request !== this.paintedFrame)
+        this.cancelAttempt(request);
+    }
+  }
+  cancelAttempt(request) {
+    if (this.driver.disposed)
+      return;
+    this.changeLayout();
+    try {
+      this.driver.renderLib.sceneFrameCancel(this.driver.context, this.driver.session, request.frameId);
+    } catch {}
+  }
+  recordPaint(request, deltaTime) {
+    const { renderLib: lib, context, session } = this.driver;
+    const slots = lib.sceneFrameGetPaintSlots(context, session, request);
+    const paint = this.paintRecording ??= this.createPaintRecording();
+    const revision = this.layoutRevision;
+    paint.recorder.begin(context);
+    try {
+      for (let index = 0;index < slots.length; index++) {
+        if (this.stopped)
+          return null;
+        const slot = slots[index];
+        const renderable = this.nodes.get(slot.num);
+        if (!renderable || renderable.isDestroyed)
+          continue;
+        if (!sameHandle(slot.node, renderable._getSceneHandle(this))) {
+          throw new Error("Native scene returned a stale paint slot");
+        }
+        this.renderer.root._setCurrentRenderable(renderable);
+        renderable._recordNativeScenePaint(slot, index, deltaTime, paint.buffer, paint.recorder, this.layoutRevision === revision ? slot.publicLayout : undefined);
+        this.renderer.root._setCurrentRenderable(undefined);
+      }
+      return paint.recorder.recording;
+    } finally {
+      paint.recorder.end();
+    }
+  }
+  createPaintRecording() {
+    const recorder = new NativePaintRecorder;
+    const { renderLib: lib, context, session } = this.driver;
+    return { recorder, buffer: OptimizedBuffer2.fromRecorder(lib, context, session, recorder) };
+  }
+  commit(force = false) {
+    const frame = this.paintedFrame;
+    if (!frame)
+      throw new Error("Native scene has no painted frame");
+    const result = this.driver.render(force, frame);
+    this.paintedFrame = null;
+    return result;
+  }
+  commitSplit(commits, pinnedRenderOffset, force) {
+    const frame = this.paintedFrame;
+    if (!frame)
+      throw new Error("Native scene has no painted frame");
+    const result = this.driver.renderSplit(frame, commits, pinnedRenderOffset, force);
+    this.paintedFrame = null;
+    return result;
+  }
+  cancelFrame() {
+    const frame = this.paintedFrame;
+    this.paintedFrame = null;
+    if (frame)
+      this.cancelAttempt(frame);
+  }
+  hitTest(x, y, excluded = 0) {
+    this.assertAlive();
+    const id = this.driver.renderLib.sceneHitTest(this.driver.context, this.driver.session, x, y, excluded);
+    const renderable = this.nodes.get(id);
+    return renderable && !renderable.isDestroyed ? id : 0;
+  }
+  destroy() {
+    if (this.destroyed || this.destroying)
+      return;
+    this.yogaHost.assertMutable();
+    this.destroying = true;
+    this.staging.clear();
+    this.yogaHost.forgetScene(this);
+    let failure;
+    try {
+      for (const renderable of this.nodes.values()) {
+        try {
+          renderable.destroyRecursively();
+        } catch (error) {
+          failure ??= { error };
+        }
+      }
+      this.destroyed = this.nodes.size === 0;
+    } finally {
+      this.staging.clear();
+      this.yogaHost.forgetScene(this);
+      this.destroying = false;
+    }
+    if (failure)
+      throw failure.error;
+  }
+}
+function sameHandle(left, right) {
+  return left.contextId === right.contextId && left.slot === right.slot && left.generation === right.generation;
+}
+
+// src/renderer.ts
+import { EventEmitter as EventEmitter9 } from "events";
+
+// src/lib/objects-in-viewport.ts
+function getObjectsInViewport(viewport, objects, direction = "column", padding = 10, minTriggerSize = 16) {
+  if (viewport.width <= 0 || viewport.height <= 0) {
+    return [];
+  }
+  if (objects.length === 0) {
+    return [];
+  }
+  if (objects.length < minTriggerSize) {
+    return objects;
+  }
+  const viewportTop = viewport.y - padding;
+  const viewportBottom = viewport.y + viewport.height + padding;
+  const viewportLeft = viewport.x - padding;
+  const viewportRight = viewport.x + viewport.width + padding;
+  const isRow = direction === "row";
+  const children = objects;
+  const totalChildren = children.length;
+  if (totalChildren === 0)
+    return [];
+  const vpStart = isRow ? viewportLeft : viewportTop;
+  const vpEnd = isRow ? viewportRight : viewportBottom;
+  let lo = 0;
+  let hi = totalChildren - 1;
+  let candidate = -1;
+  while (lo <= hi) {
+    const mid = lo + hi >> 1;
+    const c = children[mid];
+    const start = isRow ? c.screenX : c.screenY;
+    const end = isRow ? c.screenX + c.width : c.screenY + c.height;
+    if (end < vpStart) {
+      lo = mid + 1;
+    } else if (start > vpEnd) {
+      hi = mid - 1;
+    } else {
+      candidate = mid;
+      break;
+    }
+  }
+  const visibleChildren = [];
+  if (candidate === -1) {
+    candidate = lo > 0 ? lo - 1 : 0;
+  }
+  const maxLookBehind = 50;
+  let left = candidate;
+  let gapCount = 0;
+  while (left - 1 >= 0) {
+    const prev = children[left - 1];
+    const prevEnd = isRow ? prev.screenX + prev.width : prev.screenY + prev.height;
+    if (prevEnd <= vpStart) {
+      gapCount++;
+      if (gapCount >= maxLookBehind) {
+        break;
+      }
+    } else {
+      gapCount = 0;
+    }
+    left--;
+  }
+  let right = candidate + 1;
+  while (right < totalChildren) {
+    const next = children[right];
+    if ((isRow ? next.screenX : next.screenY) >= vpEnd)
+      break;
+    right++;
+  }
+  for (let i = left;i < right; i++) {
+    const child = children[i];
+    const start = isRow ? child.screenX : child.screenY;
+    const end = isRow ? child.screenX + child.width : child.screenY + child.height;
+    if (end <= vpStart)
+      continue;
+    if (start >= vpEnd)
+      break;
+    if (isRow) {
+      const childBottom = child.screenY + child.height;
+      if (childBottom < viewportTop)
+        continue;
+      const childTop = child.screenY;
+      if (childTop > viewportBottom)
+        continue;
+    } else {
+      const childRight = child.screenX + child.width;
+      if (childRight < viewportLeft)
+        continue;
+      const childLeft = child.screenX;
+      if (childLeft > viewportRight)
+        continue;
+    }
+    visibleChildren.push(child);
+  }
+  if (visibleChildren.length > 1) {
+    visibleChildren.sort((a, b) => a.zIndex > b.zIndex ? 1 : a.zIndex < b.zIndex ? -1 : 0);
+  }
+  return visibleChildren;
+}
+
+// src/lib/render-geometry.ts
+function calculateRenderGeometry(screenMode, terminalWidth, terminalHeight, footerHeight) {
+  const safeTerminalWidth = Math.max(terminalWidth, 0);
+  const safeTerminalHeight = Math.max(terminalHeight, 0);
+  if (screenMode !== "split-footer") {
+    return {
+      effectiveFooterHeight: 0,
+      renderOffset: 0,
+      renderWidth: safeTerminalWidth,
+      renderHeight: safeTerminalHeight
+    };
+  }
+  const effectiveFooterHeight = Math.min(footerHeight, safeTerminalHeight);
+  return {
+    effectiveFooterHeight,
+    renderOffset: safeTerminalHeight - effectiveFooterHeight,
+    renderWidth: safeTerminalWidth,
+    renderHeight: effectiveFooterHeight
+  };
+}
+
+// src/lib/terminal-capability-detection.ts
+function isCapabilityResponse(sequence) {
+  if (/\x1b\[\?\d+(?:;\d+)*\$y/.test(sequence)) {
+    return true;
+  }
+  if (/\x1bP>\|[\s\S]*?\x1b\\/.test(sequence)) {
+    return true;
+  }
+  if (/\x1bP(?:1\+r(?:4d73|524742|5463)(?:=[^\x1b]*)?|0\+r(?:4d73|524742|5463)?)\x1b\\/i.test(sequence)) {
+    return true;
+  }
+  if (/\x1b_G[\s\S]*?\x1b\\/.test(sequence)) {
+    return true;
+  }
+  if (/\x1b\[\?\d+(?:;\d+)?u/.test(sequence)) {
+    return true;
+  }
+  if (/\x1b\[\?[0-9;]*c/.test(sequence)) {
+    return true;
+  }
+  if (/\x1b\]99;[^\x07\x1b]*i=opentui-notifications[^\x07\x1b]*p=\?[\s\S]*?(?:\x07|\x1b\\)/.test(sequence)) {
+    return true;
+  }
+  if (/\x1b\]1337;Capabilities=[\s\S]*?(?:\x07|\x1b\\)/.test(sequence)) {
+    return true;
+  }
+  if (/\x1b\]7501; *\?[^\x07\x1b]*(?:\x07|\x1b\\)/.test(sequence)) {
+    return true;
+  }
+  return false;
+}
+function isExplicitWidthReport(sequence) {
+  return /\x1b\[2;[23]R/.test(sequence);
+}
+function isPixelResolutionResponse(sequence) {
+  return /\x1b\[4;\d+;\d+t/.test(sequence);
+}
+function parsePixelResolution(sequence) {
+  const match = sequence.match(/\x1b\[4;(\d+);(\d+)t/);
+  if (match) {
+    const width = Number(match[2]);
+    const height = Number(match[1]);
+    if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width > 2147483647 || height > 2147483647)
+      return null;
+    return { width, height };
+  }
+  return null;
+}
+
+// src/renderer-theme-mode.ts
+var OSC_THEME_RESPONSE = /\x1b](10|11);(?:(?:rgb:)([0-9a-fA-F]+)\/([0-9a-fA-F]+)\/([0-9a-fA-F]+)|#([0-9a-fA-F]{6}))(?:\x07|\x1b\\)/g;
+function scaleOscThemeComponent(component) {
+  const value = parseInt(component, 16);
+  const maxValue = (1 << 4 * component.length) - 1;
+  return Math.round(value / maxValue * 255).toString(16).padStart(2, "0");
+}
+function oscThemeColorToHex(r, g, b, hex6) {
+  if (hex6) {
+    return `#${hex6.toLowerCase()}`;
+  }
+  if (r && g && b) {
+    return `#${scaleOscThemeComponent(r)}${scaleOscThemeComponent(g)}${scaleOscThemeComponent(b)}`;
+  }
+  return "#000000";
+}
+function inferThemeModeFromBackgroundColor(color) {
+  const [r, g, b] = parseColor2(color).toInts();
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 128 ? "light" : "dark";
+}
+
+class RendererThemeMode {
+  host;
+  clock;
+  static QUERY_TIMEOUT_MS = 250;
+  _themeMode = null;
+  refreshPending = false;
+  themeRefreshTimeoutId = null;
+  waiters = new Set;
+  constructor(host, clock) {
+    this.host = host;
+    this.clock = clock;
+  }
+  get themeMode() {
+    return this._themeMode;
+  }
+  waitForThemeMode(timeoutMs, isDestroyed) {
+    if (this._themeMode !== null || isDestroyed || timeoutMs === 0) {
+      return Promise.resolve(this._themeMode);
+    }
+    return new Promise((resolve) => {
+      const waiter = {
+        resolve,
+        timeoutHandle: null
+      };
+      if (timeoutMs > 0) {
+        waiter.timeoutHandle = this.clock.setTimeout(() => {
+          this.waiters.delete(waiter);
+          waiter.timeoutHandle = null;
+          resolve(this._themeMode);
+        }, timeoutMs);
+      }
+      this.waiters.add(waiter);
+    });
+  }
+  dispose() {
+    this.cancelRefresh();
+    this.resolveWaiters();
+  }
+  resolveWaiters() {
+    for (const waiter of this.waiters) {
+      if (waiter.timeoutHandle !== null) {
+        this.clock.clearTimeout(waiter.timeoutHandle);
+      }
+      waiter.resolve(this._themeMode);
+    }
+    this.waiters.clear();
+  }
+  handleSequence(sequence) {
+    if (sequence === "\x1B[?997;1n" || sequence === "\x1B[?997;2n") {
+      this.requestThemeOscColors();
+      return { handled: true, changedMode: null };
+    }
+    let handled = false;
+    let background = null;
+    let match;
+    OSC_THEME_RESPONSE.lastIndex = 0;
+    while (match = OSC_THEME_RESPONSE.exec(sequence)) {
+      handled = true;
+      if (match[1] === "11")
+        background = oscThemeColorToHex(match[2], match[3], match[4], match[5]);
+    }
+    if (background === null) {
+      return { handled, changedMode: null };
+    }
+    this.cancelRefresh();
+    return { handled, changedMode: this.applyThemeMode(inferThemeModeFromBackgroundColor(background)) };
+  }
+  cancelRefresh() {
+    this.refreshPending = false;
+    if (this.themeRefreshTimeoutId === null) {
+      return;
+    }
+    this.clock.clearTimeout(this.themeRefreshTimeoutId);
+    this.themeRefreshTimeoutId = null;
+  }
+  requestThemeOscColors() {
+    if (this.refreshPending) {
+      return;
+    }
+    const batched = this.host.queryThemeColors();
+    this.refreshPending = true;
+    if (batched)
+      return;
+    this.themeRefreshTimeoutId = this.clock.setTimeout(() => {
+      this.themeRefreshTimeoutId = null;
+      this.refreshPending = false;
+    }, RendererThemeMode.QUERY_TIMEOUT_MS);
+  }
+  applyThemeMode(mode) {
+    const changed = this._themeMode !== mode;
+    this._themeMode = mode;
+    if (!changed) {
+      return null;
+    }
+    this.resolveWaiters();
+    return mode;
+  }
+}
+
+// src/renderer.ts
+registerEnvVar2({
+  name: "OTUI_DUMP_CAPTURES",
+  description: "Dump captured stdout and console caches when the renderer exit handler runs.",
+  type: "boolean",
+  default: false
+});
+registerEnvVar2({
+  name: "OTUI_USE_ALTERNATE_SCREEN",
+  description: "When explicitly set, force screen mode selection: true=alternate-screen, false=main-screen.",
+  type: "boolean",
+  default: true
+});
+registerEnvVar2({
+  name: "OTUI_OVERRIDE_STDOUT",
+  description: "When explicitly set, force stdout routing: false=passthrough, true=capture in split-footer mode.",
+  type: "boolean",
+  default: true
+});
+registerEnvVar2({
+  name: "OTUI_DEBUG",
+  description: "Enable debug mode to capture all raw input for debugging purposes.",
+  type: "boolean",
+  default: false
+});
+registerEnvVar2({
+  name: "OTUI_STDIN_LOG",
+  description: "Write the raw stdin byte stream to this file for debugging.",
+  type: "string",
+  default: ""
+});
+registerEnvVar2({
+  name: "OTUI_SHOW_STATS",
+  description: "Show the debug overlay at startup.",
+  type: "boolean",
+  default: false
+});
+var KITTY_IMAGE_TRANSPORTS = ["raw", "zlib", "file"];
+var DEFAULT_FOOTER_HEIGHT = 12;
+var MAX_SCROLLBACK_SURFACE_HEIGHT_PASSES = 4;
+var TRANSPARENT_RGBA = RGBA2.fromValues(0, 0, 0, 0);
+var scrollbackSurfaceCounter = 0;
+function normalizeFooterHeight(footerHeight) {
+  if (footerHeight === undefined) {
+    return DEFAULT_FOOTER_HEIGHT;
+  }
+  if (!Number.isFinite(footerHeight)) {
+    throw new Error("footerHeight must be a finite number");
+  }
+  const normalizedFooterHeight = Math.trunc(footerHeight);
+  if (normalizedFooterHeight <= 0) {
+    throw new Error("footerHeight must be greater than 0");
+  }
+  return normalizedFooterHeight;
+}
+function resolveModes(config) {
+  let screenMode = config.screenMode ?? "alternate-screen";
+  if (process.env.OTUI_USE_ALTERNATE_SCREEN !== undefined) {
+    screenMode = env2.OTUI_USE_ALTERNATE_SCREEN ? "alternate-screen" : "main-screen";
+  }
+  const footerHeight = screenMode === "split-footer" ? normalizeFooterHeight(config.footerHeight) : DEFAULT_FOOTER_HEIGHT;
+  let externalOutputMode = config.externalOutputMode ?? (screenMode === "split-footer" ? "capture-stdout" : "passthrough");
+  if (process.env.OTUI_OVERRIDE_STDOUT !== undefined) {
+    externalOutputMode = env2.OTUI_OVERRIDE_STDOUT && screenMode === "split-footer" ? "capture-stdout" : "passthrough";
+  }
+  if (externalOutputMode === "capture-stdout" && screenMode !== "split-footer") {
+    throw new Error('externalOutputMode "capture-stdout" requires screenMode "split-footer"');
+  }
+  return {
+    screenMode,
+    footerHeight,
+    externalOutputMode
+  };
+}
+var STDOUT_TAB_WIDTH = 8;
+var graphemeSegmenter2 = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+var STDOUT_ESCAPE = /\x1b(?:\[[\x20-\x3f]*([\x40-\x7e])?|[\]PX^_][^\x00-\x1f]*(\x07)?|[\x20-\x2f]*([\x30-\x7e])?)/g;
+function snapshotRowWidths(snapshot, rowColumns) {
+  return snapshot.withBuffers(({ width, height, char }) => {
+    const widths = [];
+    for (let y = 0;y < height; y += 1) {
+      let x = rowColumns;
+      while (x > 0 && char[y * width + x - 1] === 0)
+        x -= 1;
+      widths.push(x);
+    }
+    return widths;
+  });
+}
+var CAPTURED_STDOUT_MAX_BYTES = 64 * 1024 * 1024;
+var CAPTURED_STDOUT_HIGH_WATER_BYTES = CAPTURED_STDOUT_MAX_BYTES / 2;
+var capturedRowBytes = (cells) => 3072 + 48 * cells;
+function runCleanups(cleanups) {
+  let failure;
+  for (const cleanup of cleanups) {
+    try {
+      cleanup();
+    } catch (error) {
+      failure ??= { error };
+    }
+  }
+  if (failure)
+    throw failure.error;
+}
+
+class ExternalOutputQueue {
+  maxCells;
+  onDrain;
+  commits = [];
+  capturedBytes = 0;
+  drainPending = false;
+  constructor(maxCells, onDrain) {
+    this.maxCells = maxCells;
+    this.onDrain = onDrain;
+  }
+  owns(snapshot) {
+    return this.commits.some((commit) => commit.snapshot === snapshot);
+  }
+  get size() {
+    return this.commits.length;
+  }
+  writeSnapshots(commits, captured) {
+    for (const { rowColumns, snapshot } of commits) {
+      if (!Number.isInteger(rowColumns) || rowColumns < 0 || rowColumns > snapshot.width) {
+        throw new RangeError("Scrollback commit rowColumns must be an integer from 0 to the snapshot width");
+      }
+      if (snapshot.width * snapshot.height > this.maxCells) {
+        throw new Error("Scrollback snapshot exceeds the Session output capacity");
+      }
+    }
+    const entries = commits.map((commit) => this.entry(commit, captured, 0));
+    for (const entry of entries) {
+      this.commits.push(entry);
+      this.capturedBytes += entry.bytes;
+    }
+    return entries;
+  }
+  entry(commit, captured, dropped) {
+    const cells = commit.snapshot.width * commit.snapshot.height;
+    const rowWidths = snapshotRowWidths(commit.snapshot, commit.rowColumns);
+    return { ...commit, cells, rowWidths, bytes: captured ? capturedRowBytes(cells) : 0, dropped };
+  }
+  writable() {
+    if (this.capturedBytes >= CAPTURED_STDOUT_HIGH_WATER_BYTES)
+      this.drainPending = true;
+    return !this.drainPending;
+  }
+  takeDrain(force = false) {
+    if (!this.drainPending || !force && this.capturedBytes >= CAPTURED_STDOUT_HIGH_WATER_BYTES)
+      return false;
+    this.drainPending = false;
+    return true;
+  }
+  collapse(limits, marker) {
+    if (this.capturedBytes <= CAPTURED_STDOUT_MAX_BYTES && limits.trimmed === 0)
+      return null;
+    const kept = [];
+    const removed = new Set;
+    const runs = [];
+    let bytes = this.capturedBytes;
+    let open = false;
+    let partial = false;
+    let boundary = -1;
+    const endRow = () => {
+      if (partial)
+        runs.at(-1).rows += 1;
+      partial = false;
+    };
+    const close = () => {
+      endRow();
+      open = false;
+    };
+    for (const [index, commit] of this.commits.entries()) {
+      if (index === limits.boundary) {
+        close();
+        boundary = kept.length + runs.length;
+      }
+      if (index === limits.incoming && limits.trimmed > 0) {
+        if (!open)
+          runs.push({ index: kept.length, rows: 0 });
+        runs.at(-1).rows += limits.trimmed;
+        open = true;
+        partial = false;
+      }
+      if (index < limits.start || commit.bytes === 0 || bytes <= CAPTURED_STDOUT_HIGH_WATER_BYTES && !partial) {
+        if (commit.bytes === 0)
+          endRow();
+        else
+          close();
+        kept.push(commit);
+        continue;
+      }
+      if (!open)
+        runs.push({ index: kept.length, rows: 0 });
+      open = true;
+      partial = !commit.endsRow;
+      runs.at(-1).rows += commit.dropped || (commit.endsRow ? 1 : 0);
+      removed.add(commit.snapshot);
+      bytes -= commit.bytes;
+    }
+    close();
+    if (runs.length === 0)
+      return null;
+    const markers = runs.map((run) => marker(run.rows));
+    for (let run = runs.length - 1;run >= 0; run--) {
+      const entry = this.entry(markers[run], true, runs[run].rows);
+      kept.splice(runs[run].index, 0, entry);
+      this.capturedBytes += entry.bytes;
+    }
+    const gone = this.commits.filter((commit) => removed.has(commit.snapshot));
+    this.commits = kept;
+    this.drainPending = true;
+    this.release(gone, false);
+    return { markers, removed, boundary: boundary < 0 ? kept.length : boundary };
+  }
+  batch(limit) {
+    if (!(limit >= 1))
+      throw new RangeError("ExternalOutputQueue.batch requires a limit of at least 1");
+    let count = 0;
+    let cells = 0;
+    let writers = 0;
+    while (count < Math.min(limit, this.commits.length)) {
+      cells += this.commits[count].cells;
+      writers += this.commits[count].bytes === 0 ? 1 : 0;
+      if (cells > this.maxCells || writers > 8)
+        break;
+      count += 1;
+    }
+    return this.commits.slice(0, count);
+  }
+  peek(limit = Number.POSITIVE_INFINITY) {
+    return this.commits.slice(0, limit);
+  }
+  claim() {
+    const output = this.commits;
+    this.commits = [];
+    return output;
+  }
+  drop(count) {
+    this.release(this.commits.splice(0, count));
+  }
+  release(removed, drain = true) {
+    for (const commit of removed) {
+      this.capturedBytes -= commit.bytes;
+      commit.snapshot.destroy();
+    }
+    if (drain && this.drainPending && this.capturedBytes < CAPTURED_STDOUT_HIGH_WATER_BYTES)
+      this.onDrain();
+  }
+  clear() {
+    this.drop(this.commits.length);
+  }
+}
+
+class ScrollbackSnapshotRenderContext extends EventEmitter9 {
+  nativeOwner;
+  clock;
+  width;
+  height;
+  terminalWidth;
+  terminalHeight;
+  resolution;
+  frameId = 0;
+  widthMethod;
+  capabilities;
+  hasSelection = false;
+  currentFocusedRenderable = null;
+  keyInput;
+  _internalKeyInput;
+  nativeScene;
+  root;
+  nextRenderBuffer;
+  isDestroyed = false;
+  controlState = "idle" /* IDLE */;
+  detachedSession;
+  constructor(width, height, widthMethod, terminalWidth, terminalHeight, resolution, capabilities, nativeOwner, clock) {
+    super();
+    this.nativeOwner = nativeOwner;
+    this.clock = clock;
+    this.width = width;
+    this.height = height;
+    this.terminalWidth = terminalWidth;
+    this.terminalHeight = terminalHeight;
+    this.resolution = resolution;
+    this.capabilities = capabilities;
+    this.widthMethod = widthMethod;
+    this.keyInput = new KeyHandler2;
+    this._internalKeyInput = new InternalKeyHandler2;
+    this.detachedSession = nativeOwner.createDetached({ width, height, remote: true, environment: {} }, () => {
+      this.nativeScene?.cancelFrame();
+      this.nativeScene?.destroy();
+    });
+    try {
+      nativeOwner.renderLib.sessionSyncDetached(nativeOwner.context, this.detachedSession.session, nativeOwner.session);
+      this.nativeScene = new NativeScene(this.detachedSession, this);
+      this.nextRenderBuffer = OptimizedBuffer2.fromSession(nativeOwner.renderLib, nativeOwner.context, this.detachedSession.session, "next", () => this.nativeScene.frame);
+    } catch (error) {
+      this.detachedSession.dispose();
+      throw error;
+    }
+  }
+  renderSnapshot(root, buffer) {
+    this.root = root;
+    this.detachedSession.renderLib.sessionSyncDetached(this.detachedSession.context, this.detachedSession.session, this.nativeOwner.session);
+    this.detachedSession.resize(this.width, this.height);
+    try {
+      this.nativeScene.paint(0, () => ({
+        background: TRANSPARENT_RGBA,
+        useMouse: false,
+        excludedHitNum: 0,
+        preserveUnwritten: true
+      }));
+      if (!this.nativeScene.frame)
+        throw new Error("Detached scene did not complete painting");
+      this.detachedSession.renderLib.sceneFrameCopyBuffer(this.detachedSession.context, this.detachedSession.session, this.nativeScene.frame, buffer._getSceneHandle(this.nativeScene));
+    } finally {
+      this.nativeScene.cancelFrame();
+      if (this.isDestroyed)
+        this.disposeSession();
+    }
+  }
+  destroy() {
+    if (this.isDestroyed)
+      return;
+    this.isDestroyed = true;
+    runCleanups([
+      () => this.removeAllListeners(),
+      () => this.keyInput.removeAllListeners(),
+      () => this._internalKeyInput.removeAllListeners(),
+      () => this.disposeSession()
+    ]);
+  }
+  disposeSession() {
+    const dispose = () => this.detachedSession.dispose();
+    if (!this.root?._deferUntilCleanupComplete(dispose))
+      dispose();
+  }
+  requestRender() {}
+  requestAnimationFrame(_callback) {
+    return -1;
+  }
+  cancelAnimationFrame(_handle) {}
+  setCursorPosition(_x, _y, _visible) {}
+  setCursorStyle(_options) {}
+  setCursorColor(_color) {}
+  setMousePointer(_shape) {}
+  requestLive() {}
+  dropLive() {}
+  onAnimationTick() {
+    return () => {};
+  }
+  getSelection() {
+    return null;
+  }
+  get currentFocusedEditor() {
+    if (!this.currentFocusedRenderable)
+      return null;
+    if (!isEditBufferRenderable2(this.currentFocusedRenderable))
+      return null;
+    return this.currentFocusedRenderable;
+  }
+  requestSelectionUpdate() {}
+  focusRenderable(renderable) {
+    this.currentFocusedRenderable = renderable;
+  }
+  blurRenderable(renderable) {
+    if (this.currentFocusedRenderable === renderable) {
+      this.currentFocusedRenderable = null;
+    }
+  }
+  registerLifecyclePass(renderable) {
+    this.getLifecyclePasses().add(renderable);
+  }
+  unregisterLifecyclePass(renderable) {
+    this.getLifecyclePasses().delete(renderable);
+  }
+  getLifecyclePasses() {
+    return this.nativeScene.lifecyclePasses;
+  }
+  clearSelection() {}
+  startSelection(_renderable, _x, _y, _behavior) {}
+  updateSelection(_currentRenderable, _x, _y, _options) {}
+}
+var DEFAULT_FORWARDED_ENV_KEYS = [
+  "TMPDIR",
+  "SSH_CONNECTION",
+  "SSH_CLIENT",
+  "SSH_TTY",
+  "MOSH_CONNECTION",
+  "TMUX",
+  "ZELLIJ",
+  "ZELLIJ_SESSION_NAME",
+  "ZELLIJ_PANE_ID",
+  "TERM",
+  "OPENTUI_GRAPHICS",
+  "OPENTUI_IMAGE_PROTOCOL",
+  "TERM_PROGRAM",
+  "TERM_PROGRAM_VERSION",
+  "TERM_FEATURES",
+  "VTE_VERSION",
+  "XTERM_VERSION",
+  "KONSOLE_VERSION",
+  "FORCE_HYPERLINK",
+  "ALACRITTY_SOCKET",
+  "ALACRITTY_LOG",
+  "COLORTERM",
+  "OPENTUI_FORCE_TRUECOLOR",
+  "TERMUX_VERSION",
+  "VHS_RECORD",
+  "OPENTUI_FORCE_WCWIDTH",
+  "OPENTUI_FORCE_UNICODE",
+  "OPENTUI_FORCE_NOZWJ",
+  "OPENTUI_FORCE_EXPLICIT_WIDTH",
+  "OPENTUI_NOTIFICATION_PROTOCOL",
+  "OPENTUI_NOTIFICATIONS",
+  "WT_SESSION",
+  "STY",
+  "WSL_DISTRO_NAME",
+  "WSL_INTEROP"
+];
+var KITTY_FLAG_DISAMBIGUATE = nativeConstants.OT_KITTY_KEYBOARD_DISAMBIGUATE;
+var KITTY_FLAG_EVENT_TYPES = nativeConstants.OT_KITTY_KEYBOARD_EVENT_TYPES;
+var KITTY_FLAG_ALTERNATE_KEYS = nativeConstants.OT_KITTY_KEYBOARD_ALTERNATE_KEYS;
+var KITTY_FLAG_ALL_KEYS_AS_ESCAPES = nativeConstants.OT_KITTY_KEYBOARD_ALL_KEYS_AS_ESCAPES;
+var KITTY_FLAG_REPORT_TEXT = nativeConstants.OT_KITTY_KEYBOARD_REPORT_TEXT;
+var KITTY_FLAGS_ALL = nativeConstants.OT_KITTY_KEYBOARD_ALL;
+var NATIVE_PALETTE_QUERY_SIZE = 16;
+var REPLY_BACKSTOP_MS = 5000;
+var PIXEL_QUERIES_MAX = 4;
+var DA1_REPLY = /^\x1b\[\?[\d;]*c$/;
+var KITTY_KEYBOARD_REPLY = /^\x1b\[\?\d+u$/;
+function buildKittyKeyboardFlags2(config) {
+  if (!config) {
+    return 0;
+  }
+  let flags = 0;
+  if (config.disambiguate !== false) {
+    flags |= KITTY_FLAG_DISAMBIGUATE;
+  }
+  if (config.alternateKeys !== false) {
+    flags |= KITTY_FLAG_ALTERNATE_KEYS;
+  }
+  if (config.events === true) {
+    flags |= KITTY_FLAG_EVENT_TYPES;
+  }
+  if (config.allKeysAsEscapes === true) {
+    flags |= KITTY_FLAG_ALL_KEYS_AS_ESCAPES;
+  }
+  if (config.reportText === true) {
+    flags |= KITTY_FLAG_REPORT_TEXT;
+  }
+  return flags;
+}
+
+class MouseEvent2 {
+  type;
+  button;
+  x;
+  y;
+  source;
+  modifiers;
+  scroll;
+  target;
+  currentTarget = null;
+  isDragging;
+  _propagationStopped = false;
+  _defaultPrevented = false;
+  get propagationStopped() {
+    return this._propagationStopped;
+  }
+  get defaultPrevented() {
+    return this._defaultPrevented;
+  }
+  constructor(target, attributes) {
+    this.target = target;
+    this.type = attributes.type;
+    this.button = attributes.button;
+    this.x = attributes.x;
+    this.y = attributes.y;
+    this.modifiers = attributes.modifiers;
+    this.scroll = attributes.scroll;
+    this.source = attributes.source;
+    this.isDragging = attributes.isDragging;
+  }
+  stopPropagation() {
+    this._propagationStopped = true;
+  }
+  preventDefault() {
+    this._defaultPrevented = true;
+  }
+}
+var MouseButton2;
+((MouseButton) => {
+  MouseButton[MouseButton["LEFT"] = 0] = "LEFT";
+  MouseButton[MouseButton["MIDDLE"] = 1] = "MIDDLE";
+  MouseButton[MouseButton["RIGHT"] = 2] = "RIGHT";
+  MouseButton[MouseButton["WHEEL_UP"] = 4] = "WHEEL_UP";
+  MouseButton[MouseButton["WHEEL_DOWN"] = 5] = "WHEEL_DOWN";
+})(MouseButton2 ||= {});
+var rendererTracker = singleton("RendererTracker", () => ({
+  renderers: new Set,
+  streamOwners: new WeakMap
+}));
+async function createCliRenderer2(config = {}) {
+  if (process.argv.includes("--delay-start")) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
+  const stdin = config.stdin ?? process.stdin;
+  const stdout = config.stdout ?? process.stdout;
+  const width = stdout.columns || config.width || 80;
+  const height = stdout.rows || config.height || 24;
+  const renderer = new CliRenderer2(stdin, stdout, width, height, config);
+  try {
+    await renderer.setupTerminal();
+    return renderer;
+  } catch (error) {
+    try {
+      renderer.destroy();
+    } catch (destroyError) {
+      console.error("Error destroying partially-set-up renderer:", destroyError);
+    }
+    await renderer.closed.catch(() => {});
+    throw error;
+  }
+}
+var CliRenderEvents2;
+((CliRenderEvents) => {
+  CliRenderEvents["RESIZE"] = "resize";
+  CliRenderEvents["FRAME"] = "frame";
+  CliRenderEvents["RENDER_ERROR"] = "render:error";
+  CliRenderEvents["FRAME_DROPPED"] = "frame:dropped";
+  CliRenderEvents["HANDLER_ERROR"] = "handler:error";
+  CliRenderEvents["EXTERNAL_OUTPUT"] = "external_output";
+  CliRenderEvents["FOCUS"] = "focus";
+  CliRenderEvents["BLUR"] = "blur";
+  CliRenderEvents["FOCUSED_RENDERABLE"] = "focused_renderable";
+  CliRenderEvents["FOCUSED_EDITOR"] = "focused_editor";
+  CliRenderEvents["THEME_MODE"] = "theme_mode";
+  CliRenderEvents["PALETTE"] = "palette";
+  CliRenderEvents["CAPABILITIES"] = "capabilities";
+  CliRenderEvents["SELECTION"] = "selection";
+  CliRenderEvents["DEBUG_OVERLAY_TOGGLE"] = "debugOverlay:toggle";
+  CliRenderEvents["DESTROY"] = "destroy";
+  CliRenderEvents["MEMORY_SNAPSHOT"] = "memory:snapshot";
+})(CliRenderEvents2 ||= {});
+var RendererControlState2;
+((RendererControlState) => {
+  RendererControlState["IDLE"] = "idle";
+  RendererControlState["AUTO_STARTED"] = "auto_started";
+  RendererControlState["EXPLICIT_STARTED"] = "explicit_started";
+  RendererControlState["EXPLICIT_PAUSED"] = "explicit_paused";
+  RendererControlState["EXPLICIT_SUSPENDED"] = "explicit_suspended";
+  RendererControlState["EXPLICIT_STOPPED"] = "explicit_stopped";
+})(RendererControlState2 ||= {});
+var CLICK_REPEAT_INTERVAL_MS = 500;
+var ANIMATION_TIMER_SLACK_MS = 1;
+
+class CliRenderer2 extends EventEmitter9 {
+  static animationFrameId = 0;
+  lib;
+  nativeScene;
+  nativeSession;
+  nativeDestroyWait;
+  nativeClosed;
+  nativeTerminalTransition = null;
+  pendingNativeResize = null;
+  pendingNativeMode = null;
+  nativeSplitAcceptedCount = 0;
+  nativeSplitFlush = null;
+  pendingNativeReplay = null;
+  detachedSurfaces = new Set;
+  nativeResizeWait = null;
+  nativeKittyKeyboardFlags = 0;
+  kittyTransportMode = "raw";
+  synchronizedOutput;
+  kittyTransportTimer = null;
+  _lastSceneTimeMs = 0;
+  get lastSceneTimeMs() {
+    return this._lastSceneTimeMs;
+  }
+  get closed() {
+    return this.nativeClosed;
+  }
+  stdin;
+  stdout;
+  exitOnCtrlC;
+  exitSignals;
+  _exitListenersAdded = false;
+  _isDestroyed = false;
+  _destroyPending = false;
+  _destroyFinalized = false;
+  _destroyCleanupPrepared = false;
+  _streamLeaseAcquired = false;
+  flushTerminalInputOnClose = false;
+  nextRenderBuffer;
+  currentRenderBuffer;
+  _isRunning = false;
+  _targetFps = 30;
+  _maxFps = 60;
+  automaticMemorySnapshot = false;
+  memorySnapshotInterval;
+  memorySnapshotTimer = null;
+  lastMemorySnapshot = {
+    heapUsed: 0,
+    heapTotal: 0,
+    arrayBuffers: 0
+  };
+  root;
+  width;
+  height;
+  gatherStats = false;
+  frameTimes = [];
+  maxStatSamples = 300;
+  postProcessFns = [];
+  backgroundColor = RGBA2.fromInts(0, 0, 0, 0);
+  _selectionBg;
+  _selectionFg;
+  waitingForPixelResolution = false;
+  pixelResolutionRequeryPending = false;
+  unansweredPixelQueries = 0;
+  replyBatches = [];
+  replySentinel = true;
+  startupCursorReportPending = false;
+  clock;
+  rendering = false;
+  renderingCompletion = null;
+  renderTimeout = null;
+  lastTime = 0;
+  frameCount = 0;
+  _frameId = 0;
+  lastFpsTime = 0;
+  currentFps = 0;
+  targetFrameTime = 1000 / this._targetFps;
+  minTargetFrameTime = 1000 / this._maxFps;
+  immediateRerenderRequested = false;
+  liveRequestCounter = 0;
+  animationTickers = new Set;
+  animationTimer = null;
+  _controlState = "idle" /* IDLE */;
+  frameCallbacks = [];
+  renderStats = {
+    frameCount: 0,
+    fps: 0,
+    renderTime: 0,
+    frameCallbackTime: 0
+  };
+  debugOverlay = {
+    enabled: env2.OTUI_SHOW_STATS,
+    corner: 3 /* bottomRight */
+  };
+  _console;
+  _resolution = null;
+  _keyHandler;
+  stdinParser = null;
+  oscSubscribers = new Set;
+  hasLoggedStdinParserError = false;
+  animationRequest = new Map;
+  cancelFrameContinuation = null;
+  cancelReadyFrame = null;
+  resizeTimeoutId = null;
+  pendingResizeSawDifferentSize = false;
+  terminalKeepAliveTimer = null;
+  xtVersionWaiters = new Set;
+  splitStartupSeedTimeoutId = null;
+  pendingSplitStartupCursorSeed = false;
+  resizeDebounceDelay = 100;
+  enableMouseMovement = false;
+  _useMouse = true;
+  autoFocus = true;
+  _screenMode = "alternate-screen";
+  _footerHeight = DEFAULT_FOOTER_HEIGHT;
+  _externalOutputMode = "passthrough";
+  clearOnShutdown = true;
+  _suspendedMouseEnabled = false;
+  _previousControlState = "idle" /* IDLE */;
+  capturedRenderable;
+  pressedRenderable;
+  lastDrag;
+  lastOverRenderableNum = 0;
+  lastOverRenderable;
+  currentSelection = null;
+  selectionContainers = [];
+  lastClick = null;
+  _splitHeight = 0;
+  renderOffset = 0;
+  splitTailColumn = 0;
+  parkedSplitScrollback = false;
+  queuedSplitTail = null;
+  pendingSplitFooterTransition = null;
+  forceFullRepaintRequested = false;
+  splitCommitLimit = nativeConstants.OT_SPLIT_SNAPSHOTS_MAX;
+  droppedFrames = 0;
+  dropRetried = false;
+  _terminalWidth = 0;
+  _terminalHeight = 0;
+  _terminalIsSetup = false;
+  externalOutputQueue;
+  pendingExternalOutputMode = null;
+  stdoutDecoder = new StringDecoder("utf8");
+  stdoutRow = "";
+  stdoutEscape = "";
+  realStdoutWrite;
+  _useConsole = true;
+  sigwinchHandler = (() => {
+    const width = this.stdout.columns;
+    const height = this.stdout.rows;
+    if (width > 0 && height > 0)
+      this.requestResize(width, height);
+  }).bind(this);
+  _capabilities = null;
+  _latestPointer = { x: 0, y: 0 };
+  _hasPointer = false;
+  _lastPointerModifiers = {
+    shift: false,
+    alt: false,
+    ctrl: false
+  };
+  _currentMousePointerStyle = undefined;
+  _currentFocusedRenderable = null;
+  focusChange;
+  _openConsoleOnError = true;
+  _paletteDetector = null;
+  _paletteCache = new Map;
+  _paletteDetectionPromise = null;
+  _cancelPaletteDetection = null;
+  _paletteDetectionSize = 0;
+  _paletteDetectionGeneration = 0;
+  _paletteEpoch = 0;
+  _nativePaletteSignature = null;
+  _emittedPaletteSignature = null;
+  _palettePublishGeneration = 0;
+  paletteReplies = null;
+  _onDestroy;
+  themeModeState;
+  _terminalFocusState = null;
+  sequenceHandlers = [];
+  prependedInputHandlers = [];
+  shouldRestoreModesOnNextFocus = false;
+  themeModeHandler;
+  idleResolvers = [];
+  _debugInputs = [];
+  _debugModeEnabled = env2.OTUI_DEBUG;
+  stdinLogPath = env2.OTUI_STDIN_LOG;
+  handleError = ((error) => {
+    console.error(error);
+    if (this._openConsoleOnError && !this._isDestroyed && !this.nativeSession?.error && !this.nativeSession?.disposed) {
+      this.console.show();
+    }
+  }).bind(this);
+  dumpOutputCache(optionalMessage = "") {
+    const cachedLogs = this._console.getCachedLogs();
+    const capturedConsoleOutput = capture2.claimOutput();
+    const capturedExternalOutputCommits = this.externalOutputQueue.claim();
+    let capturedExternalOutput = "";
+    for (const commit of capturedExternalOutputCommits) {
+      capturedExternalOutput += `[snapshot ${commit.snapshot.width}x${commit.snapshot.height}]
+`;
+      commit.snapshot.destroy();
+    }
+    if (capturedConsoleOutput.length > 0 || capturedExternalOutput.length > 0 || cachedLogs.length > 0) {
+      this.realStdoutWrite.call(this.stdout, optionalMessage);
+    }
+    if (cachedLogs.length > 0) {
+      this.realStdoutWrite.call(this.stdout, `Console cache:
+`);
+      this.realStdoutWrite.call(this.stdout, cachedLogs);
+    }
+    if (capturedConsoleOutput.length > 0) {
+      this.realStdoutWrite.call(this.stdout, `
+Captured console output:
+`);
+      this.realStdoutWrite.call(this.stdout, capturedConsoleOutput + `
+`);
+    }
+    if (capturedExternalOutput.length > 0) {
+      this.realStdoutWrite.call(this.stdout, `
+Captured external output:
+`);
+      this.realStdoutWrite.call(this.stdout, capturedExternalOutput + `
+`);
+    }
+    this.realStdoutWrite.call(this.stdout, ANSI.reset);
+  }
+  exitHandler = (() => {
+    this.destroy();
+    this.closed.then(() => {
+      if (env2.OTUI_DUMP_CAPTURES)
+        this.dumpOutputCache(`=== CAPTURED OUTPUT ===
+`);
+    }).catch((error) => console.error("Native scene shutdown failed:", error));
+  }).bind(this);
+  nativeProcessExitHandler = () => {
+    const disposed = this.nativeSession.disposed;
+    const restored = !disposed && this.nativeSession.restoreOnExit();
+    try {
+      this.leaveRawMode();
+      this.destroy();
+      if (this.flushTerminalInputOnClose)
+        this.lib.terminalFlushInput();
+    } finally {
+      this.nativeSession.dispose();
+      if (!disposed && !restored && this._terminalIsSetup) {
+        console.error("Native scene output cancelled at process exit; terminal restoration did not complete");
+      }
+    }
+  };
+  warningHandler = ((warning) => {
+    console.warn(JSON.stringify(warning.message, null, 2));
+  }).bind(this);
+  _usesProcessStdout;
+  outputIdleRenderScheduled = false;
+  ordinaryFrameWaitingForOutput = false;
+  ordinaryFrameWaitControlState = null;
+  get controlState() {
+    return this._controlState;
+  }
+  constructor(stdin, stdout, width, height, config = {}) {
+    super();
+    this.stdin = stdin;
+    this.stdout = stdout;
+    this._usesProcessStdout = stdout === process.stdout;
+    this.realStdoutWrite = stdout.write;
+    if (config.nativeSceneWorkBudget !== undefined) {
+      throw new Error("nativeSceneWorkBudget was removed: frames always paint synchronously");
+    }
+    this.kittyTransportMode = config.kittyImageTransport ?? "raw";
+    this.synchronizedOutput = config.synchronizedOutput;
+    const transportCode = KITTY_IMAGE_TRANSPORTS.indexOf(this.kittyTransportMode);
+    if (transportCode < 0)
+      throw new TypeError("Invalid kittyImageTransport");
+    const useMemoryBufferedOutput = config.bufferedOutput === "memory";
+    if (config.nativeSession) {
+      if (useMemoryBufferedOutput)
+        throw new Error("nativeSession does not support memory buffered output");
+      if (!config.nativeSession.usesOutput(stdout))
+        throw new Error("nativeSession must use the renderer stdout");
+    }
+    const { screenMode, footerHeight, externalOutputMode } = resolveModes(config);
+    const initialGeometry = calculateRenderGeometry(screenMode, width, height, footerHeight);
+    const remoteMode = config.remote ?? (!this._usesProcessStdout && !useMemoryBufferedOutput ? true : undefined);
+    const forwardEnvKeys = config.forwardEnvKeys ?? (remoteMode === true ? [] : DEFAULT_FORWARDED_ENV_KEYS);
+    if (rendererTracker.streamOwners.get(stdin)) {
+      throw new Error("Cannot create CliRenderer: stdin is already used by another CliRenderer");
+    }
+    if (rendererTracker.streamOwners.get(stdout)) {
+      throw new Error("Cannot create CliRenderer: stdout is already used by another CliRenderer");
+    }
+    let driver;
+    try {
+      const sink = useMemoryBufferedOutput ? new Writable3({
+        write(_bytes, _encoding, complete) {
+          complete();
+        }
+      }) : stdout;
+      driver = config.nativeSession ?? new NativeSession2(sink);
+      driver.attachRenderer({
+        width: initialGeometry.renderWidth,
+        height: initialGeometry.renderHeight,
+        remote: remoteMode,
+        environment: {
+          ...Object.fromEntries(forwardEnvKeys.flatMap((key) => {
+            const value = process.env[key];
+            return value === undefined ? [] : [[key, value]];
+          })),
+          ...config.environment
+        }
+      }, () => {
+        try {
+          this.nativeScene?.cancelFrame();
+        } finally {
+          this.nativeScene?.destroy();
+        }
+      });
+      this.nativeSession = driver;
+      this.externalOutputQueue = new ExternalOutputQueue(Number(driver.maxWriteBytes / 24n), () => process.nextTick(() => !this._isDestroyed && this.externalOutputQueue.takeDrain() && this.stdout.emit("drain")));
+      this.nativeDestroyWait = Promise.withResolvers();
+      this.nativeClosed = this.nativeSession.closed.finally(() => this.nativeDestroyWait.promise).finally(() => {
+        if (this.nativeSession.error && !this.nativeSession.disposed)
+          this.nativeSession.dispose();
+        this.leaveRawMode(this.flushTerminalInputOnClose);
+        this.removeCleanupListener(process, "exit", this.nativeProcessExitHandler);
+        this.releaseStreamLease();
+      });
+      this.nativeClosed.catch(() => {});
+      this.nativeScene = new NativeScene(this.nativeSession, this);
+      this.nativeSession.setKittyImageTransport(transportCode);
+    } catch (error) {
+      if (!config.nativeSession || this.nativeSession)
+        driver?.dispose();
+      this.nativeDestroyWait?.resolve();
+      throw error;
+    }
+    this.lib = this.nativeSession.renderLib;
+    try {
+      const kittyConfig = config.useKittyKeyboard ?? {};
+      this.nativeKittyKeyboardFlags = buildKittyKeyboardFlags2(kittyConfig);
+      this._terminalWidth = width;
+      this._terminalHeight = height;
+      this._externalOutputMode = externalOutputMode;
+      this.width = initialGeometry.renderWidth;
+      this.height = initialGeometry.renderHeight;
+      this._splitHeight = initialGeometry.effectiveFooterHeight;
+      this.renderOffset = screenMode === "split-footer" ? 0 : initialGeometry.renderOffset;
+      this._footerHeight = footerHeight;
+      this.clearOnShutdown = config.clearOnShutdown ?? true;
+      this.exitOnCtrlC = config.exitOnCtrlC === undefined ? true : config.exitOnCtrlC;
+      this.exitSignals = config.exitSignals || [
+        "SIGINT",
+        "SIGTERM",
+        "SIGQUIT",
+        "SIGABRT",
+        "SIGHUP",
+        "SIGPIPE",
+        "SIGBREAK",
+        "SIGBUS"
+      ];
+      this.resizeDebounceDelay = config.debounceDelay || 100;
+      this.targetFps = config.targetFps || 30;
+      this.maxFps = config.maxFps || 60;
+      this.clock = config.clock ?? new SystemClock2;
+      this.themeModeState = new RendererThemeMode({
+        queryThemeColors: () => {
+          this.nativeSession.control({ kind: "query-theme-colors", sentinel: this.replySentinel });
+          if (!this.replySentinel)
+            return false;
+          this.admitReplyBatch("theme", () => {
+            this.themeModeState.cancelRefresh();
+            this.themeModeState.resolveWaiters();
+          });
+          return true;
+        }
+      }, this.clock);
+      this.themeModeHandler = (sequence) => {
+        const result = this.themeModeState.handleSequence(sequence);
+        if (result.changedMode) {
+          this.clearPaletteCache();
+          if (this.shouldSyncNativePaletteState() || this.listenerCount("palette" /* PALETTE */) > 0) {
+            this.refreshPalette();
+          }
+          this.emit("theme_mode" /* THEME_MODE */, result.changedMode);
+        }
+        return result.handled;
+      };
+      this.memorySnapshotInterval = config.memorySnapshotInterval ?? 0;
+      this.gatherStats = config.gatherStats || false;
+      this.maxStatSamples = config.maxStatSamples || 300;
+      this.enableMouseMovement = config.enableMouseMovement ?? true;
+      this._useMouse = config.useMouse ?? true;
+      this.autoFocus = config.autoFocus ?? true;
+      this.nextRenderBuffer = OptimizedBuffer2.fromSession(this.lib, this.nativeSession.context, this.nativeSession.session, "next", () => this.nativeScene.frame);
+      this.currentRenderBuffer = OptimizedBuffer2.fromSession(this.lib, this.nativeSession.context, this.nativeSession.session, "current", () => this.nativeScene.frame);
+      this._capabilities = this.nativeSession.getCapabilities();
+      if (config.backgroundColor !== undefined)
+        this.backgroundColor = RGBA2.clone(parseColor2(config.backgroundColor));
+      if (config.selectionBg !== undefined)
+        this._selectionBg = RGBA2.clone(parseColor2(config.selectionBg));
+      if (config.selectionFg !== undefined)
+        this._selectionFg = RGBA2.clone(parseColor2(config.selectionFg));
+      this.lib.contextSetSelectionColors(this.nativeSession.context, this._selectionBg, this._selectionFg);
+      this.postProcessFns = config.postProcessFns || [];
+      this.prependedInputHandlers = config.prependInputHandlers || [];
+      this.root = new RootRenderable2(this);
+      if (this.memorySnapshotInterval > 0) {
+        this.startMemorySnapshotTimer();
+      }
+      if (this._usesProcessStdout) {
+        process.on("SIGWINCH", this.sigwinchHandler);
+      }
+      process.on("warning", this.warningHandler);
+      process.on("uncaughtException", this.handleError);
+      process.on("unhandledRejection", this.handleError);
+      this._keyHandler = new InternalKeyHandler2;
+      this._keyHandler.on("keypress", (event) => {
+        if (this.exitOnCtrlC && matchesKeyBinding(event, { name: "c", ctrl: true })) {
+          process.nextTick(this.exitHandler);
+          return;
+        }
+      });
+      this.addExitListeners();
+      this.stdinParser = new NativeStdinParser({
+        armTimeouts: true,
+        onTimeoutFlush: () => this.drainStdinParser(),
+        clock: this.clock,
+        session: { lib: this.lib, context: this.nativeSession.context, session: this.nativeSession.session }
+      });
+      this._console = new TerminalConsole2(this, {
+        ...config.consoleOptions ?? {},
+        clock: this.clock
+      });
+      this.consoleMode = config.consoleMode ?? "console-overlay";
+      this.applyScreenMode(screenMode, false, false);
+      rendererTracker.streamOwners.set(stdin, this);
+      rendererTracker.streamOwners.set(stdout, this);
+      this._streamLeaseAcquired = true;
+      rendererTracker.renderers.add(this);
+      this.stdout.write = externalOutputMode === "capture-stdout" ? this.interceptStdoutWrite : this.realStdoutWrite;
+      this._openConsoleOnError = config.openConsoleOnError ?? true;
+      this._onDestroy = config.onDestroy;
+      process.on("exit", this.nativeProcessExitHandler);
+      this.setupInput();
+      this.nativeSession.closed.catch((error) => {
+        if (this._isDestroyed)
+          return;
+        try {
+          const setupPending = !this._terminalIsSetup && this.nativeTerminalTransition !== null;
+          if (!setupPending)
+            this.handleError(error);
+        } catch {} finally {
+          this.destroy();
+        }
+      });
+    } catch (error) {
+      try {
+        this.destroy();
+      } catch (destroyError) {
+        console.error("Error destroying partially constructed renderer:", destroyError);
+      } finally {
+        this.nativeSession.dispose();
+        this.nativeDestroyWait?.resolve();
+        this.releaseStreamLease();
+      }
+      throw error;
+    }
+  }
+  addExitListeners() {
+    if (this._exitListenersAdded || this.exitSignals.length === 0)
+      return;
+    this.exitSignals.forEach((signal) => {
+      process.addListener(signal, this.exitHandler);
+    });
+    this._exitListenersAdded = true;
+  }
+  startTerminalKeepAlive() {
+    if (this.stdin !== process.stdin || this.terminalKeepAliveTimer !== null)
+      return;
+    this.terminalKeepAliveTimer = setInterval(() => {}, 60000);
+  }
+  stopTerminalKeepAlive() {
+    if (this.terminalKeepAliveTimer === null)
+      return;
+    clearInterval(this.terminalKeepAliveTimer);
+    this.terminalKeepAliveTimer = null;
+  }
+  removeExitListeners() {
+    if (!this._exitListenersAdded || this.exitSignals.length === 0)
+      return;
+    this.exitSignals.forEach((signal) => {
+      this.removeCleanupListener(process, signal, this.exitHandler);
+    });
+    this._exitListenersAdded = false;
+  }
+  removeCleanupListener(target, event, listener) {
+    try {
+      target.removeListener(event, listener);
+    } catch (error) {
+      if (!this._isDestroyed)
+        throw error;
+      console.error("Error removing native scene lifecycle listener:", error);
+    }
+  }
+  get isDestroyed() {
+    return this._isDestroyed;
+  }
+  registerLifecyclePass(renderable) {
+    this.getLifecyclePasses().add(renderable);
+  }
+  unregisterLifecyclePass(renderable) {
+    this.getLifecyclePasses().delete(renderable);
+  }
+  getLifecyclePasses() {
+    return this.nativeScene.lifecyclePasses;
+  }
+  get currentFocusedRenderable() {
+    return this._currentFocusedRenderable;
+  }
+  get currentFocusedEditor() {
+    if (!this._currentFocusedRenderable)
+      return null;
+    if (!isEditBufferRenderable2(this._currentFocusedRenderable))
+      return null;
+    return this._currentFocusedRenderable;
+  }
+  normalizeClockTime(now, fallback) {
+    if (Number.isFinite(now)) {
+      return now;
+    }
+    return Number.isFinite(fallback) ? fallback : 0;
+  }
+  getElapsedMs(now, then) {
+    if (!Number.isFinite(now) || !Number.isFinite(then)) {
+      return 0;
+    }
+    return Math.max(now - then, 0);
+  }
+  focusRenderable(renderable) {
+    if (renderable.ctx !== this) {
+      throw new Error("Cannot focus renderables from another render context");
+    }
+    this.changeFocus(renderable);
+  }
+  blurRenderable(renderable) {
+    if (this._currentFocusedRenderable !== renderable) {
+      return;
+    }
+    this.changeFocus(null);
+  }
+  changeFocus(renderable) {
+    if (this._currentFocusedRenderable === renderable)
+      return;
+    const change = this.focusChange = {};
+    const previous = this._currentFocusedRenderable;
+    const previousEditor = this.currentFocusedEditor;
+    this._currentFocusedRenderable = renderable;
+    let failure;
+    const run = (operation) => {
+      try {
+        operation();
+      } catch (error) {
+        failure ??= { error };
+      }
+    };
+    if (renderable)
+      run(() => previous?.blur());
+    const currentEditor = this.currentFocusedEditor;
+    if (previousEditor !== currentEditor)
+      run(() => this.emit("focused_editor" /* FOCUSED_EDITOR */, currentEditor, previousEditor));
+    if (this.focusChange === change && this._currentFocusedRenderable === renderable && !renderable?.isDestroyed) {
+      run(() => this.emit("focused_renderable" /* FOCUSED_RENDERABLE */, renderable, previous));
+    }
+    if (failure)
+      throw failure.error;
+  }
+  get widthMethod() {
+    return this.capabilities?.unicode ?? this.nextRenderBuffer.widthMethod;
+  }
+  get frameId() {
+    return this._frameId;
+  }
+  scheduleRenderAfterOutputIdle() {
+    if (this.outputIdleRenderScheduled || this._isDestroyed)
+      return;
+    this.outputIdleRenderScheduled = true;
+    this.nativeSession.idle().then(() => {
+      this.outputIdleRenderScheduled = false;
+      const ordinaryFrameWasWaiting = this.ordinaryFrameWaitingForOutput;
+      const ordinaryFrameWaitControlState = this.ordinaryFrameWaitControlState;
+      this.ordinaryFrameWaitingForOutput = false;
+      if (!this.rendering)
+        this.ordinaryFrameWaitControlState = null;
+      if (this._isDestroyed || ordinaryFrameWasWaiting && this._controlState !== ordinaryFrameWaitControlState && (this._controlState === "explicit_paused" /* EXPLICIT_PAUSED */ || this._controlState === "explicit_stopped" /* EXPLICIT_STOPPED */ || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)) {
+        this.resolveIdleIfNeeded();
+        return;
+      }
+      this.scheduleRenderTimer();
+      this.resolveIdleIfNeeded();
+    }).catch((error) => {
+      this.outputIdleRenderScheduled = false;
+      this.ordinaryFrameWaitingForOutput = false;
+      this.ordinaryFrameWaitControlState = null;
+      if (!this._isDestroyed)
+        this.handleError(error);
+      this.resolveIdleIfNeeded();
+    });
+  }
+  scheduleRenderTimer() {
+    if (this.renderTimeout || this.cancelReadyFrame || this._isDestroyed || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
+      return;
+    this.scheduleFrame(this.nextFrameDelay());
+  }
+  nextFrameDelay() {
+    const now = this.normalizeClockTime(this.clock.now(), this.lastTime);
+    return Math.max(this.minTargetFrameTime - this.getElapsedMs(now, this.lastTime), 0);
+  }
+  scheduleFrame(delayMs) {
+    this.clearFrameTimer();
+    this.renderTimeout = this.clock.setTimeout(() => {
+      this.renderTimeout = null;
+      this.queueFrame();
+    }, delayMs);
+  }
+  clearFrameTimer() {
+    if (this.renderTimeout === null)
+      return;
+    this.clock.clearTimeout(this.renderTimeout);
+    this.renderTimeout = null;
+  }
+  requestRender() {
+    if (this._isDestroyed || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      return;
+    }
+    if (this.outputIdleRenderScheduled) {
+      this.ordinaryFrameWaitControlState = this._controlState;
+      return;
+    }
+    if (this._isRunning) {
+      if (!this.rendering)
+        this.scheduleRenderTimer();
+      return;
+    }
+    if (this.rendering) {
+      this.immediateRerenderRequested = true;
+      this.ordinaryFrameWaitControlState = this._controlState;
+      return;
+    }
+    if (!this.cancelReadyFrame && !this.renderTimeout) {
+      const delay = this.nextFrameDelay();
+      if (delay === 0)
+        this.queueFrame();
+      else
+        this.scheduleFrame(delay);
+    }
+  }
+  get consoleMode() {
+    return this._useConsole ? "console-overlay" : "disabled";
+  }
+  set consoleMode(mode) {
+    this._useConsole = mode === "console-overlay";
+    if (this._useConsole) {
+      this._console.activate();
+    } else {
+      this._console.deactivate();
+    }
+  }
+  get isRunning() {
+    return this._isRunning;
+  }
+  hasScheduledWork() {
+    return Boolean(this.renderTimeout || this.cancelReadyFrame || this.outputIdleRenderScheduled || this.immediateRerenderRequested || this.nativeTerminalTransition || this.nativeResizeWait || this.pendingNativeResize && this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */);
+  }
+  isIdleNow() {
+    return this._isDestroyed || !this._isRunning && !this.rendering && !this.hasScheduledWork();
+  }
+  resolveIdleIfNeeded() {
+    if (!this.isIdleNow())
+      return;
+    const resolvers = this.idleResolvers.splice(0);
+    for (const resolve of resolvers) {
+      resolve();
+    }
+  }
+  idle() {
+    if (this._isDestroyed)
+      return this.closed;
+    const idle = this.isIdleNow() ? Promise.resolve() : new Promise((resolve) => {
+      this.idleResolvers.push(resolve);
+    });
+    return idle.then(() => this.nativeSession.idle());
+  }
+  getSchedulerState() {
+    return {
+      isRunning: this._isRunning,
+      isRendering: this.rendering,
+      hasScheduledRender: this.hasScheduledWork()
+    };
+  }
+  get resolution() {
+    return this._resolution;
+  }
+  get console() {
+    return this._console;
+  }
+  get keyInput() {
+    return this._keyHandler;
+  }
+  get _internalKeyInput() {
+    return this._keyHandler;
+  }
+  get terminalWidth() {
+    return this._terminalWidth;
+  }
+  get terminalHeight() {
+    return this._terminalHeight;
+  }
+  get targetFps() {
+    return this._targetFps;
+  }
+  set targetFps(targetFps) {
+    this._targetFps = targetFps;
+    this.targetFrameTime = 1000 / this._targetFps;
+  }
+  get maxFps() {
+    return this._maxFps;
+  }
+  set maxFps(maxFps) {
+    this._maxFps = maxFps;
+    this.minTargetFrameTime = 1000 / this._maxFps;
+  }
+  get useMouse() {
+    return this._useMouse;
+  }
+  set useMouse(useMouse) {
+    if (this.nativeTerminalTransition || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      throw new Error("Cannot change native scene mouse modes during a terminal transition or suspension");
+    }
+    if (this._useMouse === useMouse)
+      return;
+    if (useMouse) {
+      this.enableMouse();
+      this.requestRender();
+    } else {
+      this.disableMouse();
+      this.requestRender();
+    }
+  }
+  get screenMode() {
+    return this.pendingNativeMode?.screenMode ?? this._screenMode;
+  }
+  set screenMode(mode) {
+    if (this.pendingExternalOutputMode === "passthrough" && mode !== "split-footer") {
+      this.applyScreenMode(mode);
+      return;
+    }
+    if (this.externalOutputMode === "capture-stdout" && mode !== "split-footer") {
+      throw new Error('externalOutputMode "capture-stdout" requires screenMode "split-footer"');
+    }
+    this.applyScreenMode(mode);
+  }
+  get footerHeight() {
+    return this.pendingNativeMode?.footerHeight ?? this._footerHeight;
+  }
+  set footerHeight(footerHeight) {
+    const normalizedFooterHeight = normalizeFooterHeight(footerHeight);
+    if (normalizedFooterHeight === this.footerHeight) {
+      return;
+    }
+    if (this.screenMode === "split-footer") {
+      this.applyScreenMode("split-footer", true, true, normalizedFooterHeight);
+    } else {
+      this._footerHeight = normalizedFooterHeight;
+    }
+  }
+  get externalOutputMode() {
+    return this.pendingExternalOutputMode ?? this._externalOutputMode;
+  }
+  set externalOutputMode(mode) {
+    if (mode === "capture-stdout" && this.screenMode !== "split-footer") {
+      throw new Error('externalOutputMode "capture-stdout" requires screenMode "split-footer"');
+    }
+    if (this._isDestroyed) {
+      this.pendingExternalOutputMode = null;
+      if (mode === "passthrough")
+        this.applyExternalOutputMode(mode);
+      return;
+    }
+    if (mode === "passthrough" && this.stdoutRow)
+      this.captureStdout("", false);
+    if (mode === "passthrough" && !this.rendering && !this.pendingNativeMode && this.externalOutputQueue.size === 0) {
+      this.flushStdoutDecoder();
+    }
+    if (this.rendering || this.pendingNativeMode || this.externalOutputQueue.size > 0) {
+      this.pendingExternalOutputMode = mode;
+      this.requestRender();
+      return;
+    }
+    const previousMode = this._externalOutputMode;
+    if (previousMode === mode) {
+      if (this.pendingExternalOutputMode !== null && this.pendingExternalOutputMode !== mode) {
+        this.pendingExternalOutputMode = null;
+      }
+      return;
+    }
+    this.pendingExternalOutputMode = null;
+    this.applyExternalOutputMode(mode);
+    this.afterExternalOutputModeChanged(previousMode, mode);
+  }
+  applyExternalOutputMode(mode) {
+    this._externalOutputMode = mode;
+    this.stdout.write = mode === "capture-stdout" ? this.interceptStdoutWrite : this.realStdoutWrite;
+  }
+  afterExternalOutputModeChanged(previousMode, mode) {
+    if (this._screenMode === "split-footer" && this._splitHeight > 0 && mode === "capture-stdout") {
+      const previousSurfaceTopLine = this.renderOffset + 1;
+      const previousSurfaceHeight = this._splitHeight;
+      this.clearPendingSplitFooterTransition();
+      if (this.parkedSplitScrollback) {
+        this.parkedSplitScrollback = false;
+        this.forceFullRepaintRequested = true;
+      } else {
+        this.resetSplitScrollback(this.getSplitCursorSeedRows());
+      }
+      if (previousMode === "passthrough" && this._terminalIsSetup) {
+        const nextSurfaceTopLine = this.renderOffset + 1;
+        if (previousSurfaceTopLine !== nextSurfaceTopLine) {
+          this.setPendingSplitFooterTransition({
+            mode: "clear-stale-rows",
+            sourceTopLine: previousSurfaceTopLine,
+            sourceHeight: previousSurfaceHeight,
+            targetTopLine: nextSurfaceTopLine,
+            targetHeight: this._splitHeight,
+            scrollLines: 0
+          });
+          this.forceFullRepaintRequested = true;
+        }
+      }
+      this.requestRender();
+      return;
+    }
+    if (this._screenMode === "split-footer" && this._splitHeight > 0 && previousMode === "capture-stdout" && mode === "passthrough") {
+      this.clearPendingSplitFooterTransition();
+      return;
+    }
+    this.syncSplitFooterState();
+  }
+  applyPendingExternalOutputModeIfReady() {
+    if (this.rendering)
+      return;
+    if (this.stdoutRow && this.pendingExternalOutputMode !== null)
+      this.captureStdout("", false);
+    const pendingMode = this.pendingExternalOutputMode;
+    if (pendingMode === null || this.externalOutputQueue.size > 0 && !(pendingMode === "capture-stdout" && this._screenMode === "split-footer")) {
+      return;
+    }
+    if (pendingMode === "passthrough") {
+      this.flushStdoutDecoder();
+      if (this.externalOutputQueue.size > 0)
+        return;
+    }
+    const previousMode = this._externalOutputMode;
+    this.pendingExternalOutputMode = null;
+    if (previousMode === pendingMode) {
+      return;
+    }
+    this.applyExternalOutputMode(pendingMode);
+    this.afterExternalOutputModeChanged(previousMode, pendingMode);
+  }
+  get liveRequestCount() {
+    return this.liveRequestCounter;
+  }
+  get currentControlState() {
+    return this._controlState;
+  }
+  get capabilities() {
+    return this._capabilities;
+  }
+  get kittyImageTransport() {
+    return this.kittyTransportMode;
+  }
+  set kittyImageTransport(mode) {
+    const code = KITTY_IMAGE_TRANSPORTS.indexOf(mode);
+    if (code < 0)
+      throw new TypeError("Invalid kittyImageTransport");
+    if (this._isDestroyed || mode === this.kittyTransportMode)
+      return;
+    this.kittyTransportMode = mode;
+    this.startKittyTransportPolling();
+    this.nativeSession.setKittyImageTransport(code);
+    this.requestRender();
+  }
+  startKittyTransportPolling() {
+    if (!this._terminalIsSetup || this.kittyTransportMode !== "file" || this.kittyTransportTimer !== null)
+      return;
+    this.kittyTransportTimer = this.clock.setInterval(() => {
+      if (!this._isDestroyed && this.nativeSession.pollKittyImageTransport())
+        this.requestRender();
+    }, 1000);
+  }
+  get kittyImageTransportStatus() {
+    const status = this.nativeSession.getKittyImageTransport();
+    return {
+      requested: KITTY_IMAGE_TRANSPORTS[status.requested],
+      effective: ["raw", "zlib", "png", "file"][status.effective],
+      fileState: ["disabled", "probing", "ready", "unsupported", "timeout", "io-error", "cancelled"][status.fileState],
+      fallback: ["none", "not-ready", "unavailable", "budget", "busy", "preparation", "compression"][status.fallback],
+      pendingFiles: status.pendingFiles,
+      pendingBytes: status.pendingBytes
+    };
+  }
+  cancelKittyImageTransport() {
+    if (this._isDestroyed)
+      return;
+    this.nativeSession.cancelKittyImageTransport(false);
+    this.requestRender();
+  }
+  triggerNotification(message, title) {
+    if (this._isDestroyed)
+      return false;
+    return this.nativeSession.triggerNotification(message, title);
+  }
+  setProgramStatus(status) {
+    if (!this.nativeSession.open)
+      return false;
+    return this.nativeSession.setProgramStatus(status);
+  }
+  get themeMode() {
+    return this.themeModeState.themeMode;
+  }
+  waitForThemeMode(timeoutMs = 1000) {
+    if (!Number.isFinite(timeoutMs) || timeoutMs < 0) {
+      throw new Error("timeoutMs must be a non-negative finite number");
+    }
+    const answered = this.replySentinel && this._terminalIsSetup && !this.replyBatches.some((batch) => batch.kind === "startup" || batch.kind === "theme");
+    return this.themeModeState.waitForThemeMode(answered ? 0 : timeoutMs, this._isDestroyed);
+  }
+  getDebugInputs() {
+    return [...this._debugInputs];
+  }
+  get useKittyKeyboard() {
+    return this.nativeKittyKeyboardFlags !== 0;
+  }
+  set useKittyKeyboard(use) {
+    const flags = use ? KITTY_FLAG_DISAMBIGUATE | KITTY_FLAG_ALTERNATE_KEYS : 0;
+    this.enableKittyKeyboard(flags);
+  }
+  createScrollbackSurface(options = {}) {
+    if (this._isDestroyed)
+      throw new Error("Renderer is destroyed");
+    if (this.screenMode !== "split-footer" || this.externalOutputMode !== "capture-stdout") {
+      throw new Error('createScrollbackSurface requires screenMode "split-footer" and externalOutputMode "capture-stdout"');
+    }
+    const renderer = this;
+    const surfaceId = scrollbackSurfaceCounter++;
+    const startOnNewLine = options.startOnNewLine ?? true;
+    const tailColumn = renderer.getPendingSplitTailColumn();
+    const firstLineOffset = !startOnNewLine && tailColumn > 0 && tailColumn < renderer.width ? tailColumn : 0;
+    const snapshotContext = new ScrollbackSnapshotRenderContext(renderer.width, 1, renderer.widthMethod, renderer._terminalWidth, renderer._terminalHeight, renderer.resolution, renderer.capabilities, renderer.nativeSession, renderer.clock);
+    let firstLineOffsetOwner = null;
+    const renderContext = Object.create(snapshotContext);
+    Object.defineProperty(renderContext, "claimFirstLineOffset", {
+      value: (renderable) => {
+        if (firstLineOffsetOwner?.isDestroyed) {
+          firstLineOffsetOwner = null;
+        }
+        if (firstLineOffsetOwner) {
+          return 0;
+        }
+        firstLineOffsetOwner = renderable ?? null;
+        return firstLineOffset;
+      },
+      enumerable: true,
+      configurable: true
+    });
+    let internalRoot;
+    let publicRoot;
+    let backingBuffer;
+    try {
+      internalRoot = new RootRenderable2(renderContext);
+      snapshotContext.root = internalRoot;
+      publicRoot = new BoxRenderable2(renderContext, {
+        id: `scrollback-surface-root-${surfaceId}`,
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: renderer.width,
+        height: "auto",
+        border: false,
+        backgroundColor: "transparent",
+        shouldFill: false,
+        flexDirection: "column"
+      });
+      internalRoot.add(publicRoot);
+      backingBuffer = OptimizedBuffer2.create(renderer.width, 1, renderer.widthMethod, {
+        id: `scrollback-surface-buffer-${surfaceId}`,
+        owner: renderer.nativeScene
+      });
+    } catch (error) {
+      runCleanups([() => internalRoot?.destroyRecursively(), () => snapshotContext.destroy()]);
+      throw error;
+    }
+    const readGeometry = () => [
+      renderer.width,
+      renderer.widthMethod,
+      renderer._terminalWidth,
+      renderer._terminalHeight,
+      renderer.resolution?.width,
+      renderer.resolution?.height
+    ].join();
+    let renderedGeometry = readGeometry();
+    let surfaceWidth = renderer.width;
+    let surfaceHeight = 1;
+    let surfaceDestroyed = false;
+    let hasRendered = false;
+    let nextCommitStartOnNewLine = startOnNewLine;
+    const pendingWaits = new Set;
+    const capabilitiesListener = (capabilities) => {
+      snapshotContext.capabilities = capabilities;
+      renderContext.emit("capabilities" /* CAPABILITIES */, capabilities);
+    };
+    const assertNotDestroyed = () => {
+      if (surfaceDestroyed) {
+        throw new Error("ScrollbackSurface is destroyed");
+      }
+    };
+    const assertRendered = () => {
+      if (!hasRendered) {
+        throw new Error("ScrollbackSurface.commitRows requires render() before commitRows()");
+      }
+    };
+    const assertGeometryStillCurrent = () => {
+      if (readGeometry() !== renderedGeometry) {
+        throw new Error("ScrollbackSurface.commitRows requires render() after renderer geometry changes");
+      }
+    };
+    const assertRowRange = (startRow, endRowExclusive) => {
+      if (!Number.isInteger(startRow) || !Number.isInteger(endRowExclusive)) {
+        throw new Error("ScrollbackSurface.commitRows requires finite integer row bounds");
+      }
+      if (startRow < 0) {
+        throw new Error("ScrollbackSurface.commitRows requires startRow >= 0");
+      }
+      if (endRowExclusive < startRow) {
+        throw new Error("ScrollbackSurface.commitRows requires endRowExclusive >= startRow");
+      }
+      if (endRowExclusive > surfaceHeight) {
+        throw new Error("ScrollbackSurface.commitRows row range exceeds rendered surface height");
+      }
+    };
+    const collectPendingResources = (node) => {
+      const pending = [];
+      for (const resource of snapshotContext.nativeScene.getRenderables()) {
+        if (resource.isDestroyed)
+          continue;
+        const promise = resource instanceof CodeRenderable2 && resource.isHighlighting ? resource.highlightingDone : resource instanceof ImageRenderable2 && resource.loading ? resource.loadPromise : null;
+        if (!promise)
+          continue;
+        let ancestor = resource;
+        while (ancestor && ancestor !== node)
+          ancestor = ancestor.parent;
+        if (ancestor === node)
+          pending.push(promise);
+      }
+      return pending;
+    };
+    const waitForPendingHighlights = async (pending, timeoutMs) => {
+      await new Promise((resolve, reject) => {
+        let settled = false;
+        const finish = (error) => {
+          if (settled)
+            return;
+          settled = true;
+          renderer.clock.clearTimeout(timeoutHandle);
+          pendingWaits.delete(cancel);
+          if (error)
+            reject(error);
+          else
+            resolve();
+        };
+        const cancel = () => finish(new Error("ScrollbackSurface is destroyed"));
+        const timeoutHandle = renderer.clock.setTimeout(() => finish(new Error("ScrollbackSurface.settle timed out waiting for CodeRenderable highlighting")), timeoutMs);
+        pendingWaits.add(cancel);
+        Promise.all(pending).then(() => finish(), finish);
+      });
+    };
+    const renderSurface = () => {
+      assertNotDestroyed();
+      hasRendered = false;
+      const geometry = readGeometry();
+      const width = renderer.width;
+      const widthMethod = renderer.widthMethod;
+      snapshotContext.width = width;
+      snapshotContext.widthMethod = widthMethod;
+      snapshotContext.terminalWidth = renderer._terminalWidth;
+      snapshotContext.terminalHeight = renderer._terminalHeight;
+      snapshotContext.resolution = renderer.resolution;
+      snapshotContext.capabilities = renderer.capabilities;
+      publicRoot.width = width;
+      let targetHeight = Math.max(1, surfaceHeight);
+      if (backingBuffer.widthMethod !== widthMethod) {
+        const replacement = OptimizedBuffer2.create(width, targetHeight, widthMethod, {
+          id: `scrollback-surface-buffer-${surfaceId}`,
+          owner: renderer.nativeScene
+        });
+        backingBuffer.destroy();
+        backingBuffer = replacement;
+      }
+      for (let pass = 0;; pass += 1) {
+        snapshotContext.height = targetHeight;
+        internalRoot.resize(width, targetHeight);
+        backingBuffer.resize(width, targetHeight);
+        backingBuffer.clear(TRANSPARENT_RGBA);
+        snapshotContext.frameId += 1;
+        snapshotContext.renderSnapshot(internalRoot, backingBuffer);
+        const measuredHeight = Math.max(1, publicRoot.height);
+        if (pass === MAX_SCROLLBACK_SURFACE_HEIGHT_PASSES || measuredHeight === targetHeight)
+          break;
+        targetHeight = measuredHeight;
+      }
+      renderedGeometry = geometry;
+      surfaceWidth = width;
+      surfaceHeight = targetHeight;
+      hasRendered = true;
+    };
+    const settleSurface = async (timeoutMs = 2000) => {
+      assertNotDestroyed();
+      if (!Number.isFinite(timeoutMs) || timeoutMs < 0)
+        throw new Error("ScrollbackSurface.settle requires a finite non-negative timeout");
+      const startedAt = renderer.clock.now();
+      renderSurface();
+      while (true) {
+        assertNotDestroyed();
+        const pending = collectPendingResources(publicRoot);
+        if (pending.length === 0) {
+          return;
+        }
+        const remainingMs = timeoutMs - (renderer.clock.now() - startedAt);
+        if (remainingMs <= 0) {
+          throw new Error("ScrollbackSurface.settle timed out waiting for CodeRenderable highlighting");
+        }
+        await waitForPendingHighlights(pending, remainingMs);
+        assertNotDestroyed();
+        renderSurface();
+      }
+    };
+    const commitRows = (startRow, endRowExclusive, commitOptions = {}) => {
+      assertNotDestroyed();
+      assertRendered();
+      assertGeometryStillCurrent();
+      assertRowRange(startRow, endRowExclusive);
+      if (startRow === endRowExclusive) {
+        return;
+      }
+      const rowCount = endRowExclusive - startRow;
+      const commitBuffer = OptimizedBuffer2.create(surfaceWidth, rowCount, backingBuffer.widthMethod, {
+        id: `scrollback-surface-commit-${surfaceId}`,
+        owner: renderer.nativeScene
+      });
+      try {
+        commitBuffer.drawFrameBuffer(0, 0, backingBuffer, 0, startRow, surfaceWidth, rowCount);
+        renderer.enqueueRenderedScrollbackCommit({
+          snapshot: commitBuffer,
+          rowColumns: commitOptions.rowColumns,
+          startOnNewLine: nextCommitStartOnNewLine,
+          trailingNewline: commitOptions.trailingNewline ?? true
+        });
+        nextCommitStartOnNewLine = false;
+      } catch (error) {
+        if (!renderer.externalOutputQueue.owns(commitBuffer))
+          commitBuffer.destroy();
+        throw error;
+      }
+    };
+    const destroySurface = () => {
+      if (surfaceDestroyed) {
+        return;
+      }
+      surfaceDestroyed = true;
+      renderer.detachedSurfaces.delete(destroySurface);
+      renderer.off("capabilities" /* CAPABILITIES */, capabilitiesListener);
+      for (const cancel of pendingWaits)
+        cancel();
+      runCleanups([
+        () => internalRoot.destroyRecursively(),
+        () => backingBuffer.destroy(),
+        () => renderContext.removeAllListeners(),
+        () => snapshotContext.destroy()
+      ]);
+    };
+    renderer.detachedSurfaces.add(destroySurface);
+    renderer.on("capabilities" /* CAPABILITIES */, capabilitiesListener);
+    return {
+      get renderContext() {
+        return renderContext;
+      },
+      get root() {
+        return publicRoot;
+      },
+      get width() {
+        return surfaceWidth;
+      },
+      get height() {
+        return surfaceHeight;
+      },
+      get isDestroyed() {
+        return surfaceDestroyed;
+      },
+      render: renderSurface,
+      settle: settleSurface,
+      commitRows,
+      destroy: destroySurface
+    };
+  }
+  writeToScrollback(write) {
+    if (this._isDestroyed)
+      throw new Error("Renderer is destroyed");
+    if (this.screenMode !== "split-footer" || this.externalOutputMode !== "capture-stdout") {
+      throw new Error('writeToScrollback requires screenMode "split-footer" and externalOutputMode "capture-stdout"');
+    }
+    const snapshotContext = new ScrollbackSnapshotRenderContext(this.width, this.height, this.widthMethod, this._terminalWidth, this._terminalHeight, this.resolution, this.capabilities, this.nativeSession, this.clock);
+    let snapshot;
+    let renderFailed = false;
+    let snapshotRoot = null;
+    let snapshotBuffer = null;
+    try {
+      snapshotRoot = new RootRenderable2(snapshotContext);
+      snapshotContext.root = snapshotRoot;
+      snapshot = write({
+        width: this.width,
+        widthMethod: this.widthMethod,
+        tailColumn: this.getPendingSplitTailColumn(),
+        renderContext: snapshotContext
+      });
+      if (!snapshot || !snapshot.root)
+        throw new Error("writeToScrollback must return a snapshot root renderable");
+      const rootRenderable = snapshot.root;
+      const snapshotWidth = this.getSnapshotDimension("width", snapshot.width, rootRenderable.width, this.width);
+      const snapshotHeight = this.getSnapshotDimension("height", snapshot.height, rootRenderable.height, Infinity);
+      snapshotContext.width = snapshotWidth;
+      snapshotContext.height = snapshotHeight;
+      snapshotContext.widthMethod = this.widthMethod;
+      snapshotRoot.resize(snapshotWidth, snapshotHeight);
+      snapshotBuffer = OptimizedBuffer2.create(snapshotWidth, snapshotHeight, this.widthMethod, {
+        id: "scrollback-snapshot-commit",
+        owner: this.nativeScene
+      });
+      snapshotRoot.add(rootRenderable);
+      snapshotContext.renderSnapshot(snapshotRoot, snapshotBuffer);
+      this.enqueueRenderedScrollbackCommit({
+        snapshot: snapshotBuffer,
+        rowColumns: snapshot.rowColumns,
+        startOnNewLine: snapshot.startOnNewLine,
+        trailingNewline: snapshot.trailingNewline
+      });
+    } catch (error) {
+      renderFailed = true;
+      if (snapshotBuffer && !this.externalOutputQueue.owns(snapshotBuffer))
+        snapshotBuffer.destroy();
+      throw error;
+    } finally {
+      try {
+        runCleanups([
+          () => snapshotRoot?.destroyRecursively(),
+          () => snapshot?.teardown?.(),
+          () => snapshotContext.destroy()
+        ]);
+      } catch (error) {
+        if (!renderFailed)
+          throw error;
+      }
+    }
+  }
+  resetSplitFooterForReplay(options = {}) {
+    if (this._isDestroyed)
+      return;
+    if (this._screenMode !== "split-footer" || this._externalOutputMode !== "capture-stdout") {
+      throw new Error('resetSplitFooterForReplay requires screenMode "split-footer" and externalOutputMode "capture-stdout"');
+    }
+    if (!this._terminalIsSetup || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      throw new Error("resetSplitFooterForReplay requires an active terminal");
+    }
+    this.flushStdoutDecoder();
+    if (this.rendering || this.externalOutputQueue.size > 0) {
+      this.pendingNativeReplay = { options, remaining: this.externalOutputQueue.size };
+      this.requestRender();
+      return;
+    }
+    this.applySplitFooterReplayReset(options);
+  }
+  applySplitFooterReplayReset(options) {
+    const bytes = this.lib.encoder.encode(ANSI.resetScrollRegion + ANSI.reset + ANSI.home + ANSI.clearScreen + (options.clearSavedLines ? ANSI.clearSavedLines : "") + ANSI.home);
+    if (!this.nativeSession.write(bytes))
+      throw new NativeError2("Native terminal output", -11 /* OutputBackpressure */);
+    this.clearSplitStartupCursorSeed();
+    this.clearPendingSplitFooterTransition();
+    this.resetSplitScrollback();
+    this.pendingNativeReplay = null;
+    this.forceFullRepaintRequested = true;
+    this.requestRender();
+  }
+  getSnapshotDimension(axis, value, fallback, max) {
+    const rawValue = value ?? fallback;
+    if (!Number.isFinite(rawValue)) {
+      throw new Error(`writeToScrollback produced a non-finite ${axis}`);
+    }
+    return Math.min(Math.max(Math.trunc(rawValue), 1), Math.max(max, 1));
+  }
+  advanceSplitTailColumn(tailColumn, columns, width) {
+    if (columns <= 0) {
+      return tailColumn;
+    }
+    let tail = tailColumn;
+    let remaining = columns;
+    while (remaining > 0) {
+      if (tail >= width) {
+        tail = 0;
+      }
+      const step = Math.min(remaining, width - tail);
+      tail += step;
+      remaining -= step;
+      if (remaining > 0 && tail >= width) {
+        tail = 0;
+      }
+    }
+    return tail;
+  }
+  getSplitTailColumnAfterCommit(commit, initialTailColumn, width) {
+    let tailColumn = initialTailColumn;
+    if (commit.startOnNewLine && tailColumn > 0) {
+      tailColumn = 0;
+    }
+    const rowWidths = commit.rowWidths;
+    for (const [index, rowWidth] of rowWidths.entries()) {
+      tailColumn = this.advanceSplitTailColumn(tailColumn, rowWidth, width);
+      if (index < rowWidths.length - 1 || commit.trailingNewline) {
+        tailColumn = 0;
+      }
+    }
+    return tailColumn;
+  }
+  recordSplitCommit(commit) {
+    this.splitTailColumn = this.getSplitTailColumnAfterCommit(commit, this.splitTailColumn, Math.max(this.width, 1));
+  }
+  getPendingSplitTailColumn() {
+    while (this.stdoutRow)
+      this.captureStdout("", false);
+    const width = Math.max(this.width, 1);
+    const skipped = this.pendingNativeReplay?.remaining ?? 0;
+    const cached = this.queuedSplitTail;
+    if (this.externalOutputQueue.size > skipped && cached?.width === width)
+      return cached.column;
+    let tailColumn = this.pendingNativeReplay ? 0 : this.splitTailColumn;
+    for (const commit of this.externalOutputQueue.peek().slice(skipped)) {
+      tailColumn = this.getSplitTailColumnAfterCommit(commit, tailColumn, width);
+    }
+    return tailColumn;
+  }
+  enqueueRenderedScrollbackCommit(options) {
+    if (this.screenMode !== "split-footer" || this.externalOutputMode !== "capture-stdout") {
+      throw new Error('scrollback commit requires screenMode "split-footer" and externalOutputMode "capture-stdout"');
+    }
+    const rowColumns = Math.min(Math.max(Math.trunc(options.rowColumns ?? options.snapshot.width), 0), options.snapshot.width);
+    this.enqueueSplitCommits([
+      {
+        snapshot: options.snapshot,
+        rowColumns,
+        startOnNewLine: Boolean(options.startOnNewLine ?? true),
+        trailingNewline: Boolean(options.trailingNewline ?? true)
+      }
+    ]);
+  }
+  enqueueSplitCommits(commits, captured = false) {
+    for (const commit of commits)
+      commit.nativeSnapshot = commit.snapshot._getSceneHandle(this.nativeScene);
+    const width = Math.max(this.width, 1);
+    let column = this.getPendingSplitTailColumn();
+    for (const entry of this.externalOutputQueue.writeSnapshots(commits, captured)) {
+      column = this.getSplitTailColumnAfterCommit(entry, column, width);
+    }
+    this.queuedSplitTail = { column, width };
+    this.requestRender();
+    if (!captured)
+      this.emitExternalOutput(commits);
+  }
+  emitExternalOutput(commits) {
+    if (this.listenerCount("external_output" /* EXTERNAL_OUTPUT */) > 0) {
+      for (const commit of commits)
+        this.emit("external_output" /* EXTERNAL_OUTPUT */, commit);
+    }
+  }
+  splitStdoutRows(text, tailColumn, hold = false) {
+    const width = Math.max(1, this.width);
+    const rows = [];
+    let rowStart = 0;
+    let line = "";
+    let cells = 0;
+    let start = 0;
+    const widthMethod = this.widthMethod;
+    const widths = new Map;
+    for (const { segment, index } of graphemeSegmenter2.segment(text)) {
+      if (segment === "\r") {
+        rows.length = rowStart;
+        line = "";
+        cells = 0;
+        start = index + 1;
+        continue;
+      }
+      if (segment === `
+` || segment === `\r
+`) {
+        rows.push({ line, cells, trailingNewline: true, endsRow: true });
+        rowStart = rows.length;
+        line = "";
+        cells = 0;
+        start = index + segment.length;
+        continue;
+      }
+      const column = (rows.length === 0 && tailColumn < width ? tailColumn : 0) + cells;
+      const tabCells = Math.min(STDOUT_TAB_WIDTH - column % STDOUT_TAB_WIDTH, Math.max(0, width - 1 - column));
+      const grapheme = segment === "\t" ? " ".repeat(tabCells) : segment;
+      const graphemeCells = /[^\x00-\x9f]/.test(grapheme) ? widths.get(grapheme) ?? widths.set(grapheme, measureEditText2(grapheme, { widthMethod })).get(grapheme) : stringWidth(grapheme);
+      if (column > 0 && column + graphemeCells > width) {
+        const padding = Math.max(0, width - column);
+        rows.push({ line: line + " ".repeat(padding), cells: cells + padding, trailingNewline: false, endsRow: true });
+        line = "";
+        cells = 0;
+        start = index;
+      }
+      line += grapheme;
+      cells += graphemeCells;
+    }
+    if (hold && line.length > 0 && text.length - start <= 8 * width)
+      return { rows, held: text.slice(start) };
+    if (line.length > 0) {
+      const column = (rows.length === 0 && tailColumn < width ? tailColumn : 0) + cells;
+      rows.push({ line, cells, trailingNewline: false, endsRow: column >= width });
+    }
+    return { rows, held: "" };
+  }
+  createStdoutSnapshotCommits(rows) {
+    if (rows.length === 0) {
+      return [];
+    }
+    const snapshotContext = new ScrollbackSnapshotRenderContext(this.width, 1, this.widthMethod, this._terminalWidth, this._terminalHeight, this.resolution, this.capabilities, this.nativeSession, this.clock);
+    const commits = [];
+    let snapshotRoot;
+    try {
+      snapshotRoot = new RootRenderable2(snapshotContext);
+      const snapshotRenderable = new TextRenderable2(snapshotContext, {
+        id: "captured-stdout-snapshot",
+        position: "absolute",
+        left: 0,
+        top: 0,
+        height: 1
+      });
+      snapshotRoot.add(snapshotRenderable);
+      for (const { line, cells, trailingNewline, endsRow } of rows) {
+        const snapshotWidth = Math.max(1, cells);
+        snapshotContext.width = snapshotWidth;
+        snapshotRoot.resize(snapshotWidth, 1);
+        snapshotRenderable.width = snapshotWidth;
+        snapshotRenderable.content = line;
+        const snapshot = OptimizedBuffer2.create(snapshotWidth, 1, this.widthMethod, {
+          id: "captured-stdout-snapshot",
+          owner: this.nativeScene
+        });
+        commits.push({ snapshot, rowColumns: cells, startOnNewLine: false, trailingNewline, endsRow });
+        snapshotContext.renderSnapshot(snapshotRoot, snapshot);
+      }
+      return commits;
+    } catch (error) {
+      for (const commit of commits)
+        commit.snapshot.destroy();
+      throw error;
+    } finally {
+      runCleanups([() => snapshotRoot?.destroyRecursively(), () => snapshotContext.destroy()]);
+    }
+  }
+  flushStdoutDecoder() {
+    const text = this.stdoutDecoder.end();
+    if (text && this.nativeSession.open)
+      this.interceptStdoutWrite(text);
+    while (this.stdoutRow && this.nativeSession.open)
+      this.captureStdout("", false);
+    this.stdoutRow = this.stdoutEscape = "";
+  }
+  interceptStdoutWrite = (chunk, encoding, callback) => {
+    const resolvedCallback = typeof encoding === "function" ? encoding : callback;
+    let writable = true;
+    if (this._externalOutputMode === "capture-stdout" && this._screenMode === "split-footer" && this._splitHeight > 0) {
+      const bytes = ArrayBuffer.isView(chunk) ? new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength) : Buffer.from(String(chunk ?? ""), Buffer.isEncoding(encoding) ? encoding : undefined);
+      writable = this.captureStdout(this.stdoutDecoder.write(bytes), true);
+    }
+    if (typeof resolvedCallback === "function") {
+      process.nextTick(resolvedCallback);
+    }
+    return writable;
+  };
+  captureStdout(input, hold) {
+    if (this.stdoutRow && /^\r(?!\n)/.test(input))
+      this.captureStdout("", false);
+    const decoded = this.stdoutRow + this.stdoutEscape + input;
+    this.stdoutRow = this.stdoutEscape = "";
+    const text = decoded.replace(STDOUT_ESCAPE, (match, csi, bel, esc, offset) => {
+      if (offset + match.length === decoded.length && (csi ?? bel ?? esc) === undefined) {
+        this.stdoutEscape = match.slice(0, 2);
+      }
+      return "";
+    });
+    const queue = this.externalOutputQueue;
+    const { rows, held } = this.splitStdoutRows(text, this.getPendingSplitTailColumn(), hold);
+    let added = rows.reduce((sum, row) => sum + capturedRowBytes(Math.max(1, row.cells)), 0);
+    let trimmed = 0;
+    if (queue.capturedBytes + added > CAPTURED_STDOUT_MAX_BYTES) {
+      while (added > CAPTURED_STDOUT_HIGH_WATER_BYTES)
+        added -= capturedRowBytes(Math.max(1, rows[trimmed++].cells));
+    }
+    const commits = this.createStdoutSnapshotCommits(rows.slice(trimmed));
+    try {
+      this.enqueueSplitCommits(commits, true);
+    } catch (error) {
+      for (const commit of commits) {
+        if (!queue.owns(commit.snapshot))
+          commit.snapshot.destroy();
+      }
+      throw error;
+    }
+    const limits = {
+      start: this.nativeSplitAcceptedCount,
+      boundary: this.pendingNativeReplay?.remaining ?? Infinity,
+      incoming: queue.size - commits.length,
+      trimmed
+    };
+    const collapsed = queue.collapse(limits, (rows) => this.createDroppedRowCommit(rows));
+    if (collapsed) {
+      this.queuedSplitTail = null;
+      if (this.pendingNativeReplay)
+        this.pendingNativeReplay.remaining = collapsed.boundary;
+    }
+    this.stdoutRow = held;
+    this.emitExternalOutput(collapsed?.markers ?? []);
+    this.emitExternalOutput(commits.filter((commit) => !collapsed?.removed.has(commit.snapshot)));
+    return queue.writable();
+  }
+  createDroppedRowCommit(rows) {
+    const text = `[${rows} lines dropped]`.slice(0, Math.max(1, this.width));
+    const [commit] = this.createStdoutSnapshotCommits(this.splitStdoutRows(text, 0).rows);
+    commit.nativeSnapshot = commit.snapshot._getSceneHandle(this.nativeScene);
+    return { ...commit, startOnNewLine: true, trailingNewline: true, endsRow: true };
+  }
+  getSplitPinnedRenderOffset() {
+    return this._screenMode === "split-footer" ? Math.max(this._terminalHeight - this._splitHeight, 0) : 0;
+  }
+  getSplitCursorSeedRows() {
+    const cursorState = this.getCursorState();
+    const cursorRow = Number.isFinite(cursorState.y) ? Math.max(Math.trunc(cursorState.y), 1) : 1;
+    return Math.min(cursorRow, Math.max(this._terminalHeight, 1));
+  }
+  isSplitCursorSeedFrameBlocked() {
+    return this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout" && this._splitHeight > 0 && this.pendingSplitStartupCursorSeed && this.splitStartupSeedTimeoutId !== null;
+  }
+  clearSplitStartupCursorSeed() {
+    this.pendingSplitStartupCursorSeed = false;
+    if (this.splitStartupSeedTimeoutId !== null) {
+      this.clock.clearTimeout(this.splitStartupSeedTimeoutId);
+      this.splitStartupSeedTimeoutId = null;
+    }
+  }
+  resetSplitScrollback(seedRows = 0) {
+    this.renderOffset = this.lib.sessionSplitControl(this.nativeSession.context, this.nativeSession.session, {
+      kind: "reset",
+      seedRows,
+      pinnedRenderOffset: this.getSplitPinnedRenderOffset()
+    });
+    this.splitTailColumn = 0;
+    this.queuedSplitTail = null;
+  }
+  syncSplitScrollback() {
+    this.renderOffset = this.lib.sessionSplitControl(this.nativeSession.context, this.nativeSession.session, {
+      kind: "sync",
+      pinnedRenderOffset: this.getSplitPinnedRenderOffset()
+    });
+  }
+  getSplitOutputOffset(surfaceOffset = this.renderOffset) {
+    return this.lib.sessionSplitControl(this.nativeSession.context, this.nativeSession.session, {
+      kind: "output-offset",
+      surfaceOffset
+    });
+  }
+  clearPendingSplitFooterTransition() {
+    if (this.pendingSplitFooterTransition === null) {
+      return;
+    }
+    this.lib.sessionSplitControl(this.nativeSession.context, this.nativeSession.session, { kind: "clear-transition" });
+    this.pendingSplitFooterTransition = null;
+  }
+  setPendingSplitFooterTransition(transition) {
+    this.lib.sessionSplitControl(this.nativeSession.context, this.nativeSession.session, {
+      kind: "transition",
+      ...transition
+    });
+    this.pendingSplitFooterTransition = transition;
+  }
+  setRenderOffset(offset) {
+    this.lib.sessionSplitControl(this.nativeSession.context, this.nativeSession.session, {
+      kind: "render-offset",
+      renderOffset: offset
+    });
+    this.renderOffset = offset;
+  }
+  syncSplitFooterState() {
+    const splitActive = this._screenMode === "split-footer" && this._splitHeight > 0;
+    if (!splitActive) {
+      this.clearPendingSplitFooterTransition();
+      if (!this.parkedSplitScrollback)
+        this.resetSplitScrollback();
+      this.setRenderOffset(0);
+      return;
+    }
+    if (this._externalOutputMode === "capture-stdout" || this.parkedSplitScrollback) {
+      this.syncSplitScrollback();
+    } else {
+      this.clearPendingSplitFooterTransition();
+      this.resetSplitScrollback();
+      this.setRenderOffset(this.getSplitPinnedRenderOffset());
+    }
+  }
+  getStaleSplitSurfaceClear(previousTopLine, previousHeight, nextTopLine, nextHeight) {
+    if (!this._terminalIsSetup || previousHeight <= 0 || this._terminalHeight <= 0) {
+      return "";
+    }
+    const terminalBottom = this._terminalHeight;
+    const previousStart = Math.max(1, previousTopLine);
+    const previousEnd = Math.min(terminalBottom, previousTopLine + previousHeight - 1);
+    if (previousEnd < previousStart) {
+      return "";
+    }
+    const nextStart = Math.max(1, nextTopLine);
+    const nextEnd = Math.min(terminalBottom, nextTopLine + Math.max(nextHeight, 0) - 1);
+    let clear = "";
+    for (let line = previousStart;line <= previousEnd; line += 1) {
+      if (line >= nextStart && line <= nextEnd) {
+        continue;
+      }
+      clear += `${ANSI.moveCursor(line, 1)}\x1B[2K`;
+    }
+    return clear;
+  }
+  applyScreenMode(screenMode, emitResize = true, requestRender = true, footerHeight = this._footerHeight) {
+    if (this._isDestroyed)
+      return;
+    if (this.nativeTerminalTransition && this._screenMode !== screenMode) {
+      throw new Error("Cannot change native scene screen mode during a terminal transition");
+    }
+    if (this._screenMode === "split-footer" && screenMode !== "split-footer") {
+      this.clearSplitStartupCursorSeed();
+    }
+    if (this.rendering || this._screenMode === "split-footer" && this.externalOutputQueue.size > 0 || this.nativeTerminalTransition) {
+      this.pendingNativeMode = { screenMode, footerHeight };
+      this.requestRender();
+      return;
+    }
+    const prevScreenMode = this._screenMode;
+    const prevSplitHeight = this._splitHeight;
+    const nextGeometry = calculateRenderGeometry(screenMode, this._terminalWidth, this._terminalHeight, footerHeight);
+    const nextSplitHeight = nextGeometry.effectiveFooterHeight;
+    if (prevScreenMode === screenMode && prevSplitHeight === nextSplitHeight) {
+      this._footerHeight = footerHeight;
+      this.pendingNativeMode = null;
+      return;
+    }
+    const terminalWritable = this._terminalIsSetup && this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */;
+    const prevUseAlternateScreen = prevScreenMode === "alternate-screen";
+    const nextUseAlternateScreen = screenMode === "alternate-screen";
+    const terminalScreenModeChanged = this._terminalIsSetup && prevUseAlternateScreen !== nextUseAlternateScreen;
+    const leavingSplitFooter = prevSplitHeight > 0 && nextSplitHeight === 0;
+    if (prevScreenMode === "split-footer" && prevSplitHeight > 0 && nextUseAlternateScreen) {
+      this.parkedSplitScrollback = this.getSplitOutputOffset(this._terminalHeight) > 0;
+    } else if (screenMode === "main-screen") {
+      this.parkedSplitScrollback = false;
+    }
+    const previousSurfaceTopLine = this.renderOffset + 1;
+    const shouldDeferSplitFooterResizeTransition = this._terminalIsSetup && prevScreenMode === "split-footer" && screenMode === "split-footer" && this._externalOutputMode === "capture-stdout" && prevSplitHeight > 0 && nextSplitHeight > 0 && !terminalScreenModeChanged;
+    const splitStartupSeedBlocksFirstNativeFrame = this.pendingSplitStartupCursorSeed && this.splitStartupSeedTimeoutId !== null;
+    const splitTransitionSourceTopLine = this.pendingSplitFooterTransition?.sourceTopLine ?? previousSurfaceTopLine;
+    const splitTransitionSourceHeight = this.pendingSplitFooterTransition?.sourceHeight ?? prevSplitHeight;
+    const splitTransitionSourceSurfaceOffset = Math.max(splitTransitionSourceTopLine - 1, 0);
+    const splitTransitionSourceOutputOffset = prevScreenMode === "split-footer" && prevSplitHeight > 0 && this._externalOutputMode === "capture-stdout" ? this.getSplitOutputOffset(splitTransitionSourceSurfaceOffset) : splitTransitionSourceSurfaceOffset;
+    const nextPinnedRenderOffset = nextGeometry.renderOffset;
+    const nextSplitOutputOffset = screenMode === "split-footer" && nextSplitHeight > 0 && this._externalOutputMode === "capture-stdout" ? this.getSplitOutputOffset(nextPinnedRenderOffset) : nextPinnedRenderOffset;
+    const pendingSplitFooterTransition = this.pendingSplitFooterTransition;
+    const pendingSplitFooterReturn = pendingSplitFooterTransition !== null && nextSplitHeight === splitTransitionSourceHeight;
+    const pendingSplitFooterViewportReturn = pendingSplitFooterReturn && pendingSplitFooterTransition.mode === "viewport-scroll" && (pendingSplitFooterTransition.scrollLines ?? 0) > 0;
+    const shrinkingSplitFooter = nextSplitHeight > 0 && nextSplitHeight < splitTransitionSourceHeight;
+    const growingSplitFooter = nextSplitHeight > splitTransitionSourceHeight && splitTransitionSourceHeight > 0;
+    const nextSplitSurfaceOffset = screenMode !== "split-footer" || nextSplitHeight === 0 ? 0 : pendingSplitFooterViewportReturn ? pendingSplitFooterTransition.targetTopLine - 1 : pendingSplitFooterReturn ? splitTransitionSourceSurfaceOffset : shrinkingSplitFooter && splitTransitionSourceSurfaceOffset > 0 ? splitTransitionSourceSurfaceOffset : shrinkingSplitFooter ? nextSplitOutputOffset : growingSplitFooter ? Math.max(nextSplitOutputOffset, Math.min(splitTransitionSourceSurfaceOffset, nextPinnedRenderOffset)) : nextPinnedRenderOffset;
+    const splitTransitionTargetTopLine = nextSplitSurfaceOffset + 1;
+    const splitViewportScrollLines = pendingSplitFooterViewportReturn ? pendingSplitFooterTransition.scrollLines ?? 0 : nextSplitHeight > 0 && !pendingSplitFooterReturn ? Math.max(splitTransitionSourceOutputOffset - nextSplitOutputOffset, 0) : 0;
+    const splitTransitionMode = (!shrinkingSplitFooter || pendingSplitFooterViewportReturn) && splitViewportScrollLines > 0 ? "viewport-scroll" : "clear-stale-rows";
+    const splitFooterSurfaceMovesDown = nextSplitSurfaceOffset > splitTransitionSourceSurfaceOffset;
+    const splitFooterSurfaceLeavesStaleRows = splitFooterSurfaceMovesDown || shrinkingSplitFooter;
+    const shouldClearSplitSurfaceRowsImmediately = terminalWritable && !terminalScreenModeChanged && !shouldDeferSplitFooterResizeTransition && splitFooterSurfaceLeavesStaleRows && nextSplitHeight > 0;
+    let scrollOutput = "";
+    if (terminalWritable && !terminalScreenModeChanged && !shouldDeferSplitFooterResizeTransition) {
+      if (prevSplitHeight === 0 && nextSplitHeight > 0) {
+        scrollOutput = ANSI.scrollDown(this._terminalHeight - nextSplitHeight);
+      } else if (splitViewportScrollLines > 0) {
+        scrollOutput = ANSI.scrollIntoHistory(splitViewportScrollLines);
+      }
+    }
+    const clearOutput = terminalWritable && leavingSplitFooter && !terminalScreenModeChanged ? ANSI.moveCursorAndClear(splitTransitionSourceTopLine, 1) : shouldClearSplitSurfaceRowsImmediately ? this.getStaleSplitSurfaceClear(splitTransitionSourceTopLine, splitTransitionSourceHeight, this._externalOutputMode === "capture-stdout" ? splitTransitionTargetTopLine : nextPinnedRenderOffset + 1, nextSplitHeight) : "";
+    this.nativeSession.setScreen(nextUseAlternateScreen, nextGeometry.renderWidth, nextGeometry.renderHeight, this.lib.encoder.encode(scrollOutput + clearOutput));
+    this._screenMode = screenMode;
+    this._footerHeight = footerHeight;
+    this._splitHeight = nextSplitHeight;
+    this.width = nextGeometry.renderWidth;
+    this.height = nextGeometry.renderHeight;
+    this.pendingNativeMode = null;
+    if (terminalWritable && leavingSplitFooter) {
+      this.clearPendingSplitFooterTransition();
+      this.renderOffset = 0;
+      this.setRenderOffset(0);
+    }
+    if (this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout") {
+      if (prevScreenMode !== "split-footer") {
+        this.resetSplitScrollback(this.getSplitCursorSeedRows());
+      } else {
+        this.renderOffset = nextSplitSurfaceOffset;
+        this.setRenderOffset(this.renderOffset);
+      }
+      if (shouldDeferSplitFooterResizeTransition) {
+        if (splitStartupSeedBlocksFirstNativeFrame) {
+          this.clearPendingSplitFooterTransition();
+        } else {
+          this.setPendingSplitFooterTransition({
+            mode: splitTransitionMode,
+            sourceTopLine: splitTransitionSourceTopLine,
+            sourceHeight: splitTransitionSourceHeight,
+            targetTopLine: splitTransitionTargetTopLine,
+            targetHeight: nextSplitHeight,
+            scrollLines: splitViewportScrollLines
+          });
+        }
+        this.forceFullRepaintRequested = true;
+      } else {
+        this.clearPendingSplitFooterTransition();
+      }
+    } else {
+      this.syncSplitFooterState();
+    }
+    this._console.resize(this.width, this.height);
+    this.root.resize(this.width, this.height);
+    if (emitResize) {
+      this.emit("resize" /* RESIZE */, this.width, this.height);
+    }
+    if (requestRender) {
+      this.requestRender();
+    }
+  }
+  applyPendingNativeMode() {
+    if (this._isDestroyed || this.rendering || this.nativeSplitFlush || this.nativeTerminalTransition)
+      return;
+    try {
+      if (this.pendingNativeReplay?.remaining === 0)
+        this.applySplitFooterReplayReset(this.pendingNativeReplay.options);
+      if (this.pendingExternalOutputMode === "capture-stdout" && this._screenMode === "split-footer") {
+        this.applyPendingExternalOutputModeIfReady();
+      }
+      if (this._screenMode === "split-footer" && this.externalOutputQueue.size > 0)
+        return;
+      if (this.pendingExternalOutputMode === "passthrough")
+        this.applyPendingExternalOutputModeIfReady();
+      const mode = this.pendingNativeMode;
+      if (mode)
+        this.applyScreenMode(mode.screenMode, true, true, mode.footerHeight);
+      if (!this.pendingNativeMode)
+        this.applyPendingExternalOutputModeIfReady();
+    } catch (error) {
+      if (error instanceof NativeError2 && (error.status === -13 /* OutputBusy */ || error.status === -11 /* OutputBackpressure */)) {
+        this.scheduleRenderAfterOutputIdle();
+      } else
+        throw error;
+    }
+  }
+  applyPendingNativeModeReported() {
+    try {
+      this.applyPendingNativeMode();
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+  enableMouse() {
+    if (this._terminalIsSetup)
+      this.nativeSession.control({ kind: "mouse", mode: this.enableMouseMovement ? "motion" : "drag" });
+    this._useMouse = true;
+  }
+  disableMouse() {
+    if (this._terminalIsSetup && !this._isDestroyed && this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      this.nativeSession.control({ kind: "mouse", mode: "disabled" });
+    }
+    this._useMouse = false;
+    this.capturedRenderable = undefined;
+  }
+  enableKittyKeyboard(flags = KITTY_FLAG_DISAMBIGUATE | KITTY_FLAG_EVENT_TYPES) {
+    if (this.nativeTerminalTransition || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      throw new Error("Cannot change native scene Kitty modes during a terminal transition or suspension");
+    }
+    if (!Number.isInteger(flags) || flags < 0 || flags > KITTY_FLAGS_ALL)
+      throw new RangeError(`Native scene Kitty flags must be in 0..${KITTY_FLAGS_ALL}`);
+    if (this._terminalIsSetup)
+      this.nativeSession.control({ kind: "kitty-keyboard-flags", flags });
+    this.nativeKittyKeyboardFlags = flags;
+  }
+  disableKittyKeyboard() {
+    if (this.nativeTerminalTransition || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      throw new Error("Cannot change native scene Kitty modes during a terminal transition or suspension");
+    }
+    if (this._terminalIsSetup)
+      this.nativeSession.control({ kind: "kitty-keyboard-flags", flags: 0 });
+    this.nativeKittyKeyboardFlags = 0;
+    this.stdinParser?.flushTimeout();
+    this.drainStdinParser();
+  }
+  async setupTerminal() {
+    if (this._terminalIsSetup)
+      return;
+    if (this.nativeTerminalTransition)
+      return this.nativeTerminalTransition;
+    this.pendingSplitStartupCursorSeed = this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout";
+    this.startupCursorReportPending = true;
+    const startup = this.admitReplyBatch("startup", () => this.replySentinel && this.themeModeState.resolveWaiters());
+    try {
+      await this.trackNativeTerminalTransition(this.nativeSession.setupTerminal({
+        useAlternateScreen: this._screenMode === "alternate-screen",
+        mouse: this._useMouse,
+        mouseMovement: this.enableMouseMovement,
+        kittyKeyboardFlags: this.nativeKittyKeyboardFlags,
+        clearOnClose: this.clearOnShutdown,
+        replySentinel: this.replySentinel,
+        synchronizedOutput: this.synchronizedOutput,
+        hostMultiplexer: this._usesProcessStdout && !!(process.env.TMUX || process.env.STY || process.env.ZELLIJ)
+      }), () => {
+        if (this._isDestroyed)
+          return;
+        this._terminalIsSetup = true;
+        this._capabilities = this.nativeSession.getCapabilities();
+        this.startKittyTransportPolling();
+        this.nativeSession.startKittyFileProbe();
+      });
+    } catch (error) {
+      this.clearSplitStartupCursorSeed();
+      this.endReplyBatch(startup);
+      throw error;
+    }
+    if (this._isDestroyed)
+      return;
+    if (this.debugOverlay.enabled) {
+      this.configureDebugOverlay({});
+      if (!this.memorySnapshotInterval) {
+        this.memorySnapshotInterval = 3000;
+        this.startMemorySnapshotTimer();
+        this.automaticMemorySnapshot = true;
+      }
+    }
+    this.armReplyBackstop(startup);
+    if (this.pendingSplitStartupCursorSeed) {
+      if (this.splitStartupSeedTimeoutId !== null) {
+        this.clock.clearTimeout(this.splitStartupSeedTimeoutId);
+      }
+      this.splitStartupSeedTimeoutId = this.clock.setTimeout(() => {
+        this.splitStartupSeedTimeoutId = null;
+        if (!this.pendingSplitStartupCursorSeed) {
+          return;
+        }
+        if (this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout") {
+          this.requestRender();
+        }
+        if (this.externalOutputQueue.size > 0)
+          this.requestRender();
+      }, 120);
+    }
+    this.queryPixelResolution();
+    if (this.shouldSyncNativePaletteState()) {
+      this.refreshPalette();
+    }
+  }
+  get startupRepliesPending() {
+    return this.replyBatches.some((batch) => batch.kind === "startup");
+  }
+  admitReplyBatch(kind, end) {
+    const batch = { kind, backstop: null, excused: this.replyBatches.some((earlier) => earlier.excused), end };
+    this.replyBatches.push(batch);
+    this.syncReplyContext(false);
+    if (kind !== "startup") {
+      this.nativeSession.idle().then(() => this.armReplyBackstop(batch), () => {});
+    }
+    return batch;
+  }
+  armReplyBackstop(batch) {
+    if (!this.replyBatches.includes(batch) || batch.backstop !== null)
+      return;
+    if (this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
+      return;
+    batch.backstop = this.clock.setTimeout(() => {
+      batch.backstop = null;
+      if (this.replySentinel && !batch.excused && !this.stdinParser?.pasting) {
+        this.replySentinel = false;
+        if (this.nativeSession.open)
+          this.nativeSession.control({ kind: "end-reply-sentinel" });
+      }
+      this.endReplyBatch(batch);
+    }, REPLY_BACKSTOP_MS);
+  }
+  endReplyBatch(batch) {
+    const index = this.replyBatches.indexOf(batch);
+    if (index < 0)
+      return;
+    this.replyBatches.splice(index, 1);
+    if (batch.backstop !== null)
+      this.clock.clearTimeout(batch.backstop);
+    if (batch.kind === "startup") {
+      this.clearSplitStartupCursorSeed();
+      if (this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout")
+        this.requestRender();
+      this.resolveXtVersionWaiters();
+    } else if (!this.replyBatches.some((other) => other.kind === "pixel")) {
+      this.waitingForPixelResolution = false;
+    }
+    batch.end?.();
+    this.syncReplyContext(true);
+  }
+  syncReplyContext(drain) {
+    const startup = this.startupRepliesPending;
+    this.updateStdinParserProtocolContext({
+      privateCapabilityRepliesActive: startup,
+      explicitWidthCprActive: startup,
+      pixelResolutionQueryActive: this.waitingForPixelResolution,
+      replySentinelActive: this.replySentinel && this.replyBatches.length > 0
+    }, drain);
+  }
+  trackNativeTerminalTransition(transition, complete) {
+    const tracked = transition.then(() => complete?.()).finally(() => {
+      if (this.nativeTerminalTransition === tracked)
+        this.nativeTerminalTransition = null;
+      this.applyPendingNativeModeReported();
+      this.applyPendingNativeResize();
+      this.resolveIdleIfNeeded();
+    });
+    this.nativeTerminalTransition = tracked;
+    tracked.catch((error) => {
+      if (this.canRender && !this.nativeSession.isCloseInterruption(error)) {
+        this.handleError(error);
+      }
+    });
+    return tracked;
+  }
+  stdinListener = ((chunk) => {
+    const data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    if (!this.stdinParser)
+      return;
+    if (this.stdinLogPath) {
+      appendFileSync(this.stdinLogPath, data);
+    }
+    try {
+      this.stdinParser.push(data);
+      this.drainStdinParser();
+    } catch (error) {
+      this.handleStdinParserFailure(error);
+    }
+  }).bind(this);
+  addInputHandler(handler) {
+    this.sequenceHandlers.push(handler);
+  }
+  prependInputHandler(handler) {
+    this.sequenceHandlers.unshift(handler);
+  }
+  removeInputHandler(handler) {
+    this.sequenceHandlers = this.sequenceHandlers.filter((candidate) => candidate !== handler);
+  }
+  updateStdinParserProtocolContext(patch, drain = false) {
+    if (!this.stdinParser)
+      return;
+    this.stdinParser.updateProtocolContext(patch);
+    if (drain)
+      this.drainStdinParser();
+  }
+  subscribeOsc(handler) {
+    this.oscSubscribers.add(handler);
+    return () => {
+      this.oscSubscribers.delete(handler);
+    };
+  }
+  processCapabilitySequence(sequence, hasCursorReport) {
+    const hasStandardCapabilitySignature = isCapabilityResponse(sequence) || hasCursorReport && isExplicitWidthReport(sequence);
+    const shouldProcessAsCapability = hasStandardCapabilitySignature || hasCursorReport && (this.startupRepliesPending || this.nativeTerminalTransition !== null);
+    if (!shouldProcessAsCapability) {
+      return false;
+    }
+    try {
+      this.nativeSession.control({ kind: "capability-response", bytes: Buffer.from(sequence) });
+    } catch (error) {
+      if (!(error instanceof NativeError2))
+        throw error;
+      return error.status !== -19 /* InvalidPhase */;
+    }
+    const previous = JSON.stringify(this._capabilities);
+    this._capabilities = this.nativeSession.getCapabilities();
+    if (this._capabilities?.terminal?.from_xtversion) {
+      this.resolveXtVersionWaiters();
+    }
+    if (JSON.stringify(this._capabilities) !== previous) {
+      this.forceFullRepaintRequested = true;
+      this.requestRender();
+      this.emit("capabilities" /* CAPABILITIES */, this._capabilities);
+    }
+    const hadPendingSplitStartupCursorSeed = this.pendingSplitStartupCursorSeed;
+    if (hadPendingSplitStartupCursorSeed && hasCursorReport && this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout") {
+      this.resetSplitScrollback(this.getSplitCursorSeedRows());
+      this.clearPendingSplitFooterTransition();
+      this.clearSplitStartupCursorSeed();
+      this.requestRender();
+    }
+    const consumeStartupCursorReport = hadPendingSplitStartupCursorSeed && hasCursorReport && this.splitStartupSeedTimeoutId !== null;
+    return hasStandardCapabilitySignature || consumeStartupCursorReport;
+  }
+  capabilityHandler = ((sequence) => {
+    return this.processCapabilitySequence(sequence, false);
+  }).bind(this);
+  focusHandler = ((sequence) => {
+    if (sequence === "\x1B[I") {
+      if (this.shouldRestoreModesOnNextFocus) {
+        this.nativeSession.control({ kind: "restore-modes" });
+        this.shouldRestoreModesOnNextFocus = false;
+      }
+      if (this._terminalFocusState !== true) {
+        this._terminalFocusState = true;
+        this.emit("focus" /* FOCUS */);
+      }
+      return true;
+    }
+    if (sequence === "\x1B[O") {
+      this.shouldRestoreModesOnNextFocus = true;
+      if (this._terminalFocusState !== false) {
+        this._terminalFocusState = false;
+        this.emit("blur" /* BLUR */);
+      }
+      return true;
+    }
+    return false;
+  }).bind(this);
+  dispatchSequenceHandlers(sequence) {
+    if (this._debugModeEnabled) {
+      this._debugInputs.push({
+        timestamp: new Date().toISOString(),
+        sequence
+      });
+    }
+    for (const handler of this.sequenceHandlers) {
+      if (handler(sequence)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  drainStdinParser() {
+    if (!this.stdinParser)
+      return;
+    this.stdinParser.drain((event) => this.handleStdinEvent(event));
+  }
+  handleStdinEvent(event) {
+    if (event.type === "response" && event.sequence.startsWith("\x1B_G")) {
+      try {
+        const result = this.nativeSession.processKittyImageReply(Buffer.from(event.sequence));
+        if (result !== 0) {
+          if (result === 2)
+            this.requestRender();
+          return;
+        }
+      } catch (error) {
+        if (!(error instanceof NativeError2) || error.status !== -12 /* SessionClosed */ && error.status !== -9 /* StaleHandle */ && error.status !== -18 /* RendererNotAttached */) {
+          throw error;
+        }
+      }
+    }
+    if (event.type === "response" && this.replySentinel && this.replyBatches.length > 0 && DA1_REPLY.test(event.sequence)) {
+      const batch = this.replyBatches[0];
+      this.endReplyBatch(batch);
+      if (batch.kind === "startup")
+        this.processCapabilitySequence(event.sequence, false);
+      return;
+    }
+    if (this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      if (event.type === "response" && (isPixelResolutionResponse(event.sequence) || KITTY_KEYBOARD_REPLY.test(event.sequence))) {
+        this.dispatchSequenceHandlers(event.sequence);
+      }
+      return;
+    }
+    switch (event.type) {
+      case "key":
+        if (this.dispatchSequenceHandlers(event.raw)) {
+          return;
+        }
+        this._keyHandler.processParsedKey(event.key);
+        return;
+      case "mouse":
+        if (this._useMouse && this.processSingleMouseEvent(event.event)) {
+          return;
+        }
+        this.dispatchSequenceHandlers(event.raw);
+        return;
+      case "paste":
+        for (const batch of this.replyBatches)
+          batch.excused = true;
+        this._keyHandler.processPaste(event.bytes);
+        return;
+      case "response":
+        if (event.protocol === "osc") {
+          for (const subscriber of this.oscSubscribers) {
+            subscriber(event.sequence);
+          }
+        }
+        if (event.protocol === "cpr") {
+          const key = this.startupCursorReportPending ? null : parseKeypress2(event.sequence);
+          this.startupCursorReportPending = false;
+          if (key)
+            return this.handleStdinEvent({ type: "key", raw: event.sequence, key });
+          if (this.processCapabilitySequence(event.sequence, true))
+            return;
+        }
+        this.dispatchSequenceHandlers(event.sequence);
+        if (event.protocol === "osc")
+          this.applyPaletteReply(event.sequence);
+        return;
+    }
+  }
+  handleStdinParserFailure(error) {
+    if (!this.hasLoggedStdinParserError) {
+      this.hasLoggedStdinParserError = true;
+      if (true) {
+        console.error("[stdin-parser-error] parser failure, resetting parser", error);
+      }
+    }
+    try {
+      this.stdinParser?.reset();
+    } catch (resetError) {
+      console.error("stdin parser reset failed after parser error", resetError);
+    }
+  }
+  setupInput() {
+    if (this.stdinLogPath) {
+      writeFileSync(this.stdinLogPath, Buffer.alloc(0), { mode: 384 });
+    }
+    for (const handler of this.prependedInputHandlers) {
+      this.addInputHandler(handler);
+    }
+    this.addInputHandler((sequence) => {
+      if (!isPixelResolutionResponse(sequence) || this.unansweredPixelQueries === 0)
+        return false;
+      this.unansweredPixelQueries--;
+      this.waitingForPixelResolution = false;
+      if (this.pixelResolutionRequeryPending) {
+        this.syncReplyContext(false);
+        this.queryPixelResolution();
+        return true;
+      }
+      try {
+        const resolution = parsePixelResolution(sequence);
+        if (resolution) {
+          this.lib.sessionSetImageResolution(this.nativeSession.context, this.nativeSession.session, this._terminalWidth, this._terminalHeight, resolution.width, resolution.height);
+          this._resolution = resolution;
+          this.requestRender();
+        }
+      } finally {
+        this.syncReplyContext(true);
+      }
+      return true;
+    });
+    this.addInputHandler(this.capabilityHandler);
+    this.addInputHandler(this.focusHandler);
+    this.addInputHandler(this.themeModeHandler);
+    if (this.stdin.setRawMode) {
+      this.stdin.setRawMode(true);
+    }
+    this.stdin.on("data", this.stdinListener);
+    this.stdin.resume();
+    this.startTerminalKeepAlive();
+  }
+  dispatchMouseEvent(target, attributes) {
+    const event = new MouseEvent2(target, attributes);
+    this.sendMouseEvent(target, event);
+    if (this._isDestroyed || target.isDestroyed)
+      return event;
+    if (this.autoFocus && event.type === "down" && event.button === 0 /* LEFT */ && !event.defaultPrevented) {
+      let current = target;
+      while (current) {
+        if (current.focusable) {
+          current.focus();
+          break;
+        }
+        current = current.parent;
+      }
+    }
+    return event;
+  }
+  sendMouseEvent(target, event) {
+    if (this._isDestroyed || target.isDestroyed)
+      return;
+    try {
+      target.processMouseEvent(event);
+    } catch (error) {
+      const handled = this.emit("handler:error" /* HANDLER_ERROR */, { error, event });
+      if (!handled)
+        console.error("Error in mouse handler:", error);
+    }
+  }
+  processSingleMouseEvent(mouseEvent) {
+    const pressed = this.pressedRenderable;
+    const left = mouseEvent.button === 0 /* LEFT */;
+    const press = left && mouseEvent.type === "down";
+    if (press || left && mouseEvent.type === "up")
+      this.pressedRenderable = undefined;
+    if (this._splitHeight > 0) {
+      if (mouseEvent.y < this.renderOffset) {
+        return false;
+      }
+      mouseEvent.y -= this.renderOffset;
+    }
+    if (left && mouseEvent.type === "drag")
+      this.lastDrag = { ...mouseEvent };
+    const lost = press ? this.capturedRenderable : undefined;
+    if (press && this.currentSelection)
+      this.currentSelection.isDragging = false;
+    if (lost) {
+      this.capturedRenderable = undefined;
+      this.sendMouseEvent(lost, new MouseEvent2(lost, { ...this.lastDrag, type: "drag-end" }));
+      this.sendMouseEvent(lost, new MouseEvent2(lost, { ...this.lastDrag, type: "up" }));
+      if (this._isDestroyed)
+        return true;
+      this.requestRender();
+    }
+    this._latestPointer.x = mouseEvent.x;
+    this._latestPointer.y = mouseEvent.y;
+    this._hasPointer = true;
+    this._lastPointerModifiers = mouseEvent.modifiers;
+    if (this._console.visible) {
+      const consoleBounds = this._console.bounds;
+      if (mouseEvent.x >= consoleBounds.x && mouseEvent.x < consoleBounds.x + consoleBounds.width && mouseEvent.y >= consoleBounds.y && mouseEvent.y < consoleBounds.y + consoleBounds.height) {
+        const event = new MouseEvent2(null, mouseEvent);
+        const handled = this._console.handleMouse(event);
+        if (handled)
+          return true;
+      }
+    }
+    if (mouseEvent.type === "scroll") {
+      const maybeRenderableId = this.hitTest(mouseEvent.x, mouseEvent.y);
+      const maybeRenderable = Renderable2.renderablesByNumber.get(maybeRenderableId);
+      const fallbackTarget = this._currentFocusedRenderable && !this._currentFocusedRenderable.isDestroyed && this._currentFocusedRenderable.focused ? this._currentFocusedRenderable : null;
+      const scrollTarget = maybeRenderable ?? fallbackTarget;
+      if (scrollTarget) {
+        const event = new MouseEvent2(scrollTarget, mouseEvent);
+        this.sendMouseEvent(scrollTarget, event);
+      }
+      return true;
+    }
+    const maybeRenderableId = this.nativeScene.hitTest(mouseEvent.x, mouseEvent.y, this.capturedRenderable?.num ?? 0);
+    const sameElement = maybeRenderableId === this.lastOverRenderableNum;
+    this.lastOverRenderableNum = maybeRenderableId;
+    const maybeRenderable = Renderable2.renderablesByNumber.get(maybeRenderableId);
+    if (press && !mouseEvent.modifiers.ctrl) {
+      const canStartSelection = Boolean(maybeRenderable && maybeRenderable.selectable && !maybeRenderable.isDestroyed && maybeRenderable.shouldStartSelection(mouseEvent.x, mouseEvent.y));
+      if (canStartSelection && maybeRenderable) {
+        this.startSelection(maybeRenderable, mouseEvent.x, mouseEvent.y, this.nextClickBehavior(maybeRenderable, mouseEvent.x, mouseEvent.y));
+        this.dispatchMouseEvent(maybeRenderable, mouseEvent);
+        return true;
+      }
+    }
+    if (mouseEvent.type === "drag" && this.currentSelection?.isDragging) {
+      this.updateSelection(maybeRenderable, mouseEvent.x, mouseEvent.y);
+      if (maybeRenderable) {
+        const event = new MouseEvent2(maybeRenderable, {
+          ...mouseEvent,
+          isDragging: true
+        });
+        this.sendMouseEvent(maybeRenderable, event);
+      }
+      return true;
+    }
+    if (mouseEvent.type === "up" && mouseEvent.button === 0 /* LEFT */ && this.currentSelection?.isDragging) {
+      if (maybeRenderable) {
+        const event = new MouseEvent2(maybeRenderable, {
+          ...mouseEvent,
+          isDragging: true
+        });
+        this.sendMouseEvent(maybeRenderable, event);
+      }
+      this.finishSelection();
+      return true;
+    }
+    if (press && this.currentSelection && mouseEvent.modifiers.ctrl) {
+      this.currentSelection.isDragging = true;
+      this.updateSelection(maybeRenderable, mouseEvent.x, mouseEvent.y);
+      return true;
+    }
+    if (!sameElement && (mouseEvent.type === "drag" || mouseEvent.type === "move")) {
+      if (this.lastOverRenderable && this.lastOverRenderable !== this.capturedRenderable && !this.lastOverRenderable.isDestroyed) {
+        const event = new MouseEvent2(this.lastOverRenderable, {
+          ...mouseEvent,
+          type: "out"
+        });
+        this.sendMouseEvent(this.lastOverRenderable, event);
+      }
+      this.lastOverRenderable = maybeRenderable;
+      if (maybeRenderable) {
+        const event = new MouseEvent2(maybeRenderable, {
+          ...mouseEvent,
+          type: "over",
+          source: this.capturedRenderable
+        });
+        this.sendMouseEvent(maybeRenderable, event);
+      }
+    }
+    if (this.capturedRenderable && mouseEvent.type !== "up") {
+      const event = new MouseEvent2(this.capturedRenderable, mouseEvent);
+      this.sendMouseEvent(this.capturedRenderable, event);
+      return true;
+    }
+    if (this.capturedRenderable && mouseEvent.type === "up") {
+      const source = this.capturedRenderable;
+      this.sendMouseEvent(source, new MouseEvent2(source, { ...mouseEvent, type: "drag-end" }));
+      this.sendMouseEvent(source, new MouseEvent2(source, mouseEvent));
+      this.lastOverRenderable = source;
+      this.lastOverRenderableNum = source.num;
+      this.capturedRenderable = undefined;
+      this.requestRender();
+      if (maybeRenderable && this.isWithinContainer(maybeRenderable, source))
+        return true;
+      if (maybeRenderable) {
+        this.sendMouseEvent(maybeRenderable, new MouseEvent2(maybeRenderable, { ...mouseEvent, type: "drop", source }));
+      }
+    }
+    const isLeftDrag = left && mouseEvent.type === "drag";
+    const target = isLeftDrag && pressed && !pressed.isDestroyed ? pressed : maybeRenderable;
+    let event;
+    if (target) {
+      if (isLeftDrag)
+        this.capturedRenderable = target;
+      else if (press)
+        this.pressedRenderable = target;
+      event = this.dispatchMouseEvent(target, mouseEvent);
+    } else {
+      this.lastOverRenderable = undefined;
+    }
+    if (press && this.currentSelection && !event?.defaultPrevented)
+      this.clearSelection();
+    return true;
+  }
+  recheckHoverState() {
+    if (this._isDestroyed || !this._hasPointer)
+      return;
+    if (this.capturedRenderable)
+      return;
+    const hitId = this.hitTest(this._latestPointer.x, this._latestPointer.y);
+    const hitRenderable = Renderable2.renderablesByNumber.get(hitId);
+    const lastOver = this.lastOverRenderable;
+    if (lastOver?.num === hitId) {
+      this.lastOverRenderableNum = hitId;
+      return;
+    }
+    const baseEvent = {
+      type: "move",
+      button: 0,
+      x: this._latestPointer.x,
+      y: this._latestPointer.y,
+      modifiers: this._lastPointerModifiers
+    };
+    if (lastOver && !lastOver.isDestroyed) {
+      const event = new MouseEvent2(lastOver, { ...baseEvent, type: "out" });
+      this.sendMouseEvent(lastOver, event);
+    }
+    if (this._isDestroyed || this.capturedRenderable || this.lastOverRenderable !== lastOver)
+      return;
+    this.lastOverRenderable = hitRenderable?.isDestroyed ? undefined : hitRenderable;
+    this.lastOverRenderableNum = this.lastOverRenderable?.num ?? 0;
+    if (hitRenderable && !hitRenderable.isDestroyed) {
+      const event = new MouseEvent2(hitRenderable, {
+        ...baseEvent,
+        type: "over"
+      });
+      this.sendMouseEvent(hitRenderable, event);
+      if (this.lastOverRenderable === hitRenderable && (this._isDestroyed || hitRenderable.isDestroyed)) {
+        this.lastOverRenderable = undefined;
+        this.lastOverRenderableNum = 0;
+      }
+    }
+  }
+  setMousePointer(style) {
+    this.setCursorStyle({ cursor: style });
+  }
+  hitTest(x, y) {
+    return this.nativeScene.hitTest(x, y);
+  }
+  takeMemorySnapshot() {
+    if (this._isDestroyed)
+      return;
+    const memoryUsage = process.memoryUsage();
+    this.lastMemorySnapshot = {
+      heapUsed: memoryUsage.heapUsed,
+      heapTotal: memoryUsage.heapTotal,
+      arrayBuffers: memoryUsage.arrayBuffers
+    };
+    this.lib.sessionUpdateMemoryStats(this.nativeSession.context, this.nativeSession.session, this.lastMemorySnapshot.heapUsed, this.lastMemorySnapshot.heapTotal, this.lastMemorySnapshot.arrayBuffers);
+    this.emit("memory:snapshot" /* MEMORY_SNAPSHOT */, this.lastMemorySnapshot);
+  }
+  startMemorySnapshotTimer() {
+    this.stopMemorySnapshotTimer();
+    this.memorySnapshotTimer = this.clock.setInterval(() => {
+      this.takeMemorySnapshot();
+    }, this.memorySnapshotInterval);
+  }
+  stopMemorySnapshotTimer() {
+    if (this.memorySnapshotTimer) {
+      this.clock.clearInterval(this.memorySnapshotTimer);
+      this.memorySnapshotTimer = null;
+    }
+  }
+  setMemorySnapshotInterval(interval) {
+    this.memorySnapshotInterval = interval;
+    if (this._isRunning && interval > 0) {
+      this.startMemorySnapshotTimer();
+    } else if (interval <= 0 && this.memorySnapshotTimer) {
+      this.clock.clearInterval(this.memorySnapshotTimer);
+      this.memorySnapshotTimer = null;
+    }
+  }
+  requestResize(width, height) {
+    if (this._isDestroyed)
+      return;
+    if (width !== this._terminalWidth || height !== this._terminalHeight)
+      this.pendingResizeSawDifferentSize = true;
+    this.pendingNativeResize = { width, height };
+    if (this.resizeTimeoutId !== null) {
+      this.clock.clearTimeout(this.resizeTimeoutId);
+      this.resizeTimeoutId = null;
+    }
+    if (this._splitHeight > 0) {
+      this.applyPendingNativeResize();
+      return;
+    }
+    this.resizeTimeoutId = this.clock.setTimeout(() => {
+      this.resizeTimeoutId = null;
+      this.applyPendingNativeResize();
+    }, this.resizeDebounceDelay);
+  }
+  applyPendingNativeResize() {
+    const resize = this.pendingNativeResize;
+    if (!resize || this._isDestroyed || this.rendering || this.resizeTimeoutId !== null || this.nativeResizeWait || this.nativeTerminalTransition || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
+      return;
+    if (this.externalOutputQueue.size > 0 && !this.isSplitCursorSeedFrameBlocked()) {
+      this.requestRender();
+      return;
+    }
+    try {
+      this.processResize(resize.width, resize.height, this.pendingResizeSawDifferentSize);
+      if (this.pendingNativeResize === resize) {
+        this.pendingNativeResize = null;
+        this.pendingResizeSawDifferentSize = false;
+      }
+    } catch (error) {
+      if (error instanceof NativeError2 && error.status === -19 /* InvalidPhase */)
+        return;
+      if (error instanceof NativeError2 && error.status === -13 /* OutputBusy */) {
+        const wait = this.nativeSession.idle();
+        this.nativeResizeWait = wait;
+        wait.then(() => {
+          this.nativeResizeWait = null;
+          this.applyPendingNativeResize();
+          this.resolveIdleIfNeeded();
+        }, (error) => {
+          this.nativeResizeWait = null;
+          this.pendingNativeResize = null;
+          if (!this._isDestroyed)
+            this.handleError(error);
+          this.resolveIdleIfNeeded();
+        });
+        return;
+      }
+      if (this.pendingNativeResize === resize) {
+        this.pendingNativeResize = null;
+        this.pendingResizeSawDifferentSize = false;
+      }
+      this.handleError(error);
+    }
+    this.resolveIdleIfNeeded();
+  }
+  pixelResolutionRetry = null;
+  queryPixelResolution(retry = true) {
+    this.pixelResolutionRequeryPending = true;
+    if (this._isDestroyed || !this._terminalIsSetup || this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */ || this.waitingForPixelResolution || this.unansweredPixelQueries >= PIXEL_QUERIES_MAX || this.pixelResolutionRetry)
+      return;
+    try {
+      this.nativeSession.control({ kind: "query-pixel-resolution", sentinel: this.replySentinel });
+      this.pixelResolutionRequeryPending = false;
+      this.waitingForPixelResolution = true;
+      this.unansweredPixelQueries++;
+      this.admitReplyBatch("pixel");
+    } catch (error) {
+      if (!(error instanceof NativeError2))
+        throw error;
+      if (error.status === -19 /* InvalidPhase */)
+        return;
+      if (error.status !== -11 /* OutputBackpressure */ && error.status !== -13 /* OutputBusy */)
+        throw error;
+      if (!retry)
+        return;
+      const wait = this.nativeSession.idle();
+      this.pixelResolutionRetry = wait;
+      wait.then(() => {
+        this.pixelResolutionRetry = null;
+        if (!this._isDestroyed && this.pixelResolutionRequeryPending) {
+          try {
+            this.queryPixelResolution(false);
+          } catch (error) {
+            this.handleError(error);
+          }
+        }
+      }, (error) => {
+        this.pixelResolutionRetry = null;
+        if (!this._isDestroyed)
+          this.handleError(error);
+      });
+    }
+  }
+  processResize(width, height, repaintIfUnchanged = false) {
+    if (width === this._terminalWidth && height === this._terminalHeight) {
+      if (repaintIfUnchanged) {
+        this.forceFullRepaintRequested = true;
+        this.requestRender();
+      }
+      return;
+    }
+    if (this.stdoutRow)
+      this.captureStdout("", false);
+    const terminalWritable = this._terminalIsSetup && this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */;
+    if (terminalWritable && !this.isSplitCursorSeedFrameBlocked() && this.externalOutputQueue.size > 0) {
+      this.pendingNativeResize = { width, height };
+      this.requestRender();
+      return;
+    }
+    const pendingSplitFooterTransition = this.pendingSplitFooterTransition;
+    const previousGeometry = calculateRenderGeometry(this._screenMode, this._terminalWidth, this._terminalHeight, this._footerHeight);
+    if (this._screenMode === "alternate-screen")
+      this.parkedSplitScrollback = false;
+    const prevWidth = this._terminalWidth;
+    const previousTerminalHeight = this._terminalHeight;
+    const visiblePreviousSplitHeight = pendingSplitFooterTransition?.sourceHeight ?? previousGeometry.effectiveFooterHeight;
+    const nextGeometry = calculateRenderGeometry(this._screenMode, width, height, this._footerHeight);
+    const splitFooterActive = this._screenMode === "split-footer";
+    let clearStart = null;
+    if (splitFooterActive && terminalWritable) {
+      if (width < prevWidth && visiblePreviousSplitHeight > 0) {
+        clearStart = Math.min(this.renderOffset + 1, Math.max(previousTerminalHeight - visiblePreviousSplitHeight * 2, 1));
+      }
+      if (pendingSplitFooterTransition !== null) {
+        clearStart = clearStart === null ? pendingSplitFooterTransition.sourceTopLine : Math.min(clearStart, pendingSplitFooterTransition.sourceTopLine);
+      }
+    }
+    if (clearStart === null)
+      this.nativeSession.resize(nextGeometry.renderWidth, nextGeometry.renderHeight);
+    else {
+      this.nativeSession.setScreen(this._screenMode === "alternate-screen", nextGeometry.renderWidth, nextGeometry.renderHeight, this.lib.encoder.encode(ANSI.moveCursorAndClear(clearStart, 1)));
+    }
+    this._terminalWidth = width;
+    this._terminalHeight = height;
+    this._splitHeight = nextGeometry.effectiveFooterHeight;
+    this.width = nextGeometry.renderWidth;
+    this.height = nextGeometry.renderHeight;
+    this._resolution = null;
+    this.lib.sessionSetImageResolution(this.nativeSession.context, this.nativeSession.session, 0, 0, 0, 0);
+    this.capturedRenderable = undefined;
+    if (splitFooterActive) {
+      this.forceFullRepaintRequested = true;
+    }
+    this.clearPendingSplitFooterTransition();
+    if (this._screenMode === "split-footer" && this._externalOutputMode === "capture-stdout") {
+      this.syncSplitScrollback();
+    } else if (splitFooterActive) {
+      this.syncSplitFooterState();
+    }
+    this._console.resize(this.width, this.height);
+    this.root.resize(this.width, this.height);
+    this.queryPixelResolution();
+    this.emit("resize" /* RESIZE */, this.width, this.height);
+    this.requestRender();
+  }
+  resize(width, height) {
+    if (this._isDestroyed)
+      return;
+    if (this.resizeTimeoutId !== null) {
+      this.clock.clearTimeout(this.resizeTimeoutId);
+      this.resizeTimeoutId = null;
+    }
+    if (this.pendingNativeResize !== null) {
+      this.deferResize(width, height);
+      return;
+    }
+    try {
+      this.processResize(width, height);
+    } catch (error) {
+      if (!(error instanceof NativeError2) || error.status !== -13 /* OutputBusy */ && error.status !== -27 /* FrameBusy */) {
+        throw error;
+      }
+      this.deferResize(width, height);
+    }
+  }
+  deferResize(width, height) {
+    if (width !== this._terminalWidth || height !== this._terminalHeight)
+      this.pendingResizeSawDifferentSize = true;
+    this.pendingNativeResize = { width, height };
+    this.applyPendingNativeResize();
+  }
+  setBackgroundColor(color) {
+    this.backgroundColor = RGBA2.clone(parseColor2(color));
+    this.requestRender();
+  }
+  get selectionBg() {
+    return this._selectionBg;
+  }
+  get selectionFg() {
+    return this._selectionFg;
+  }
+  setSelectionColors(bg, fg) {
+    this._selectionBg = bg === undefined ? undefined : RGBA2.clone(parseColor2(bg));
+    this._selectionFg = fg === undefined ? undefined : RGBA2.clone(parseColor2(fg));
+    if (!this._isDestroyed)
+      this.lib.contextSetSelectionColors(this.nativeSession.context, this._selectionBg, this._selectionFg);
+    this.requestRender();
+  }
+  toggleDebugOverlay() {
+    const willBeEnabled = !this.debugOverlay.enabled;
+    this.configureDebugOverlay({ enabled: willBeEnabled });
+    if (willBeEnabled && !this.memorySnapshotInterval) {
+      this.memorySnapshotInterval = 3000;
+      this.startMemorySnapshotTimer();
+      this.automaticMemorySnapshot = true;
+    } else if (!willBeEnabled && this.automaticMemorySnapshot) {
+      this.stopMemorySnapshotTimer();
+      this.memorySnapshotInterval = 0;
+      this.automaticMemorySnapshot = false;
+    }
+    this.emit("debugOverlay:toggle" /* DEBUG_OVERLAY_TOGGLE */, this.debugOverlay.enabled);
+  }
+  configureDebugOverlay(options) {
+    const enabled = options.enabled ?? this.debugOverlay.enabled;
+    const corner = options.corner ?? this.debugOverlay.corner;
+    this.lib.sessionSetDebugOverlay(this.nativeSession.context, this.nativeSession.session, enabled, corner);
+    this.debugOverlay.enabled = enabled;
+    this.debugOverlay.corner = corner;
+    this.requestRender();
+  }
+  setTerminalTitle(title) {
+    this.nativeSession.control({ kind: "title", title });
+  }
+  resetTerminalBgColor() {
+    this.nativeSession.control({ kind: "reset-background" });
+  }
+  copyToClipboardOSC52(text, target) {
+    if (!this.isOsc52Supported())
+      return false;
+    return this.nativeSession.writeClipboard(target ?? 0 /* Clipboard */, this.lib.encoder.encode(text));
+  }
+  clearClipboardOSC52(target) {
+    return this.nativeSession.writeClipboard(target ?? 0 /* Clipboard */, new Uint8Array(0));
+  }
+  isOsc52Supported() {
+    return this.nativeSession.getCapabilities().osc52_support !== "unsupported";
+  }
+  dumpHitGrid() {
+    this.lib.sessionDumpHitGrid(this.nativeSession.context, this.nativeSession.session);
+  }
+  getLinkIdAt(x, y) {
+    if (this._isDestroyed || !Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x > 2147483647 || y > 2147483647) {
+      return 0;
+    }
+    return this.lib.sessionGetLinkId(this.nativeSession.context, this.nativeSession.session, x, y);
+  }
+  getLinkAt(x, y) {
+    const linkId = this.getLinkIdAt(x, y);
+    return linkId === 0 ? null : this.lib.contextGetLinkUrl(this.nativeSession.context, linkId) || null;
+  }
+  static setCursorPosition(renderer, x, y, visible = true) {
+    renderer.setCursorPosition(x, y, visible);
+  }
+  static setCursorStyle(renderer, options) {
+    renderer.setCursorStyle(options);
+  }
+  static setCursorColor(renderer, color) {
+    renderer.setCursorColor(color);
+  }
+  setCursorPosition(x, y, visible = true) {
+    this.lib.sessionSetCursor(this.nativeSession.context, this.nativeSession.session, { position: { x, y, visible } });
+  }
+  setCursorStyle(options) {
+    this.lib.sessionSetCursor(this.nativeSession.context, this.nativeSession.session, options);
+    if (options.cursor !== undefined) {
+      this._currentMousePointerStyle = options.cursor;
+    }
+  }
+  setCursorColor(color) {
+    this.lib.sessionSetCursor(this.nativeSession.context, this.nativeSession.session, { color });
+  }
+  getCursorState() {
+    return this.lib.sceneGetCursorState(this.nativeSession.context, this.nativeSession.session);
+  }
+  addPostProcessFn(processFn) {
+    this.postProcessFns.push(processFn);
+  }
+  removePostProcessFn(processFn) {
+    this.postProcessFns = this.postProcessFns.filter((fn) => fn !== processFn);
+  }
+  clearPostProcessFns() {
+    this.postProcessFns = [];
+  }
+  setFrameCallback(callback) {
+    this.frameCallbacks.push(callback);
+  }
+  hasFrameCallback(callback) {
+    return this.frameCallbacks.includes(callback);
+  }
+  removeFrameCallback(callback) {
+    this.frameCallbacks = this.frameCallbacks.filter((cb) => cb !== callback);
+  }
+  clearFrameCallbacks() {
+    this.frameCallbacks = [];
+  }
+  get canRender() {
+    return !this._isDestroyed && !this.nativeSession.error && !this.nativeSession.disposed;
+  }
+  requestAnimationFrame(callback) {
+    if (!this.canRender)
+      return -1;
+    const id = CliRenderer2.animationFrameId++;
+    this.animationRequest.set(id, callback);
+    this.requestLive();
+    return id;
+  }
+  cancelAnimationFrame(handle) {
+    if (this.animationRequest.delete(handle))
+      this.dropLive();
+  }
+  onAnimationTick(fps, callback, options = {}) {
+    const interval = 1000 / fps;
+    const { tolerance } = options;
+    if (!(interval > 0 && interval < Infinity))
+      throw new RangeError(`fps must be positive and finite, got ${fps}`);
+    if (tolerance !== undefined && !(tolerance >= 0 && tolerance < interval)) {
+      throw new RangeError(`tolerance must be at least 0 and below the interval (${interval} ms), got ${tolerance}`);
+    }
+    if (this._isDestroyed)
+      return () => {};
+    const now = this.clock.now();
+    const window = Math.max(tolerance === undefined ? 500 : tolerance * fps, ANIMATION_TIMER_SLACK_MS * fps);
+    const ticker = { fps, window, next: Math.floor((now * fps + window) / 1000) + 1, last: now, callback };
+    this.animationTickers.add(ticker);
+    this.scheduleAnimationTick();
+    return () => {
+      if (this.animationTickers.delete(ticker))
+        this.scheduleAnimationTick();
+    };
+  }
+  scheduleAnimationTick() {
+    if (this.animationTimer !== null)
+      this.clock.clearTimeout(this.animationTimer);
+    this.animationTimer = null;
+    let fastest = 0;
+    for (const ticker of this.animationTickers)
+      fastest = Math.max(fastest, ticker.fps);
+    let due = Infinity;
+    for (const ticker of this.animationTickers) {
+      const late = ticker.fps === fastest ? 0 : ticker.window;
+      due = Math.min(due, (ticker.next * 1000 + late) / ticker.fps);
+    }
+    if (due === Infinity)
+      return;
+    this.animationTimer = this.clock.setTimeout(() => {
+      this.animationTimer = null;
+      this.requestRender();
+    }, Math.max(0, due - this.clock.now()));
+  }
+  runAnimationTicks(time) {
+    if (this.animationTickers.size === 0)
+      return;
+    for (const ticker of this.animationTickers) {
+      const reach = Math.floor((time * ticker.fps + ticker.window) / 1000);
+      if (reach < ticker.next)
+        continue;
+      const ticks = reach + 1 - ticker.next;
+      const deltaTime = Math.max(0, time - ticker.last);
+      ticker.next = reach + 1;
+      ticker.last = time;
+      try {
+        ticker.callback(deltaTime, ticks, time);
+      } catch (error) {
+        console.error("Error in animation tick callback:", error);
+      }
+    }
+    this.scheduleAnimationTick();
+  }
+  yieldFrame() {
+    if (!this.canRender)
+      return Promise.resolve();
+    return new Promise((resolve) => {
+      const finish = () => {
+        this.cancelFrameContinuation = null;
+        resolve();
+      };
+      const cancel = this.nativeSession.scheduler.schedule(finish);
+      this.cancelFrameContinuation = () => {
+        cancel();
+        finish();
+      };
+    });
+  }
+  queueFrame() {
+    if (this.cancelReadyFrame || this._isDestroyed)
+      return;
+    if (!this.canRender) {
+      this.destroy();
+      return;
+    }
+    this.cancelReadyFrame = this.nativeSession.scheduler.schedule(() => {
+      this.cancelReadyFrame = null;
+      this.loop();
+    });
+  }
+  requestLive() {
+    if (!this.canRender)
+      return;
+    this.liveRequestCounter++;
+    if (this._controlState === "idle" /* IDLE */ && this.liveRequestCounter > 0) {
+      this._controlState = "auto_started" /* AUTO_STARTED */;
+      this.internalStart();
+    } else if (this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */ && this._previousControlState === "idle" /* IDLE */) {
+      this._previousControlState = "auto_started" /* AUTO_STARTED */;
+    }
+  }
+  dropLive() {
+    if (this.liveRequestCounter === 0)
+      return;
+    this.liveRequestCounter--;
+    if (this.liveRequestCounter === 0 && this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */ && this._previousControlState === "auto_started" /* AUTO_STARTED */) {
+      this._previousControlState = "idle" /* IDLE */;
+    }
+    if (this._controlState === "auto_started" /* AUTO_STARTED */ && this.liveRequestCounter === 0) {
+      this._controlState = "idle" /* IDLE */;
+      this._isRunning = false;
+      this.resolveIdleIfNeeded();
+    }
+  }
+  start() {
+    this._controlState = "explicit_started" /* EXPLICIT_STARTED */;
+    this.internalStart();
+  }
+  auto() {
+    this._controlState = this._isRunning ? "auto_started" /* AUTO_STARTED */ : "idle" /* IDLE */;
+  }
+  internalStart() {
+    if (!this._isRunning && !this._isDestroyed) {
+      this._isRunning = true;
+      this.cancelReadyFrame?.();
+      this.cancelReadyFrame = null;
+      this.clearFrameTimer();
+      if (this.memorySnapshotInterval > 0) {
+        this.startMemorySnapshotTimer();
+      }
+      this.startRenderLoop();
+    }
+  }
+  pause() {
+    this._controlState = "explicit_paused" /* EXPLICIT_PAUSED */;
+    this.ordinaryFrameWaitControlState = null;
+    this.halt(false);
+  }
+  suspend() {
+    if (this.nativeSplitFlush)
+      return this.nativeTerminalTransition;
+    if (!this._terminalIsSetup || this.nativeTerminalTransition) {
+      throw new Error("Native scene suspension requires completed terminal setup and no pending transition");
+    }
+    this.flushStdoutDecoder();
+    const { context, session } = this.nativeSession;
+    const restored = this.lib.sessionGetTerminalState(context, session) === 4 /* Suspended */;
+    const flushNativeSplit = this.externalOutputQueue.size > 0 || this.pendingNativeReplay;
+    if (flushNativeSplit)
+      this.lib.getYogaHost().assertMutable();
+    let nativeTransition;
+    if (flushNativeSplit) {
+      const count = this.externalOutputQueue.size;
+      this.nativeSplitFlush = Promise.resolve().then(() => this.flushNativeSplitOutput(count));
+      nativeTransition = (async () => {
+        try {
+          await this.nativeSplitFlush;
+          if (this._isDestroyed)
+            throw new Error("Native scene suspension interrupted by renderer destruction");
+          return this.nativeSession.suspend();
+        } finally {
+          this.nativeSplitFlush = null;
+        }
+      })();
+    } else {
+      nativeTransition = this.nativeSession.suspend();
+    }
+    const settled = nativeTransition.finally(() => {
+      this.removeExitListeners();
+      if (!this._isDestroyed && !restored)
+        this.leaveRawMode(true);
+    });
+    nativeTransition = this.trackNativeTerminalTransition(settled);
+    if (this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      this._previousControlState = this._controlState;
+      this._suspendedMouseEnabled = this._useMouse;
+    }
+    this._controlState = "explicit_suspended" /* EXPLICIT_SUSPENDED */;
+    this._cancelPaletteDetection?.(new Error("Cannot detect palette while renderer is suspended"));
+    this.resolveXtVersionWaiters();
+    this.halt(false);
+    this.clearSplitStartupCursorSeed();
+    this.disableMouse();
+    for (const batch of [...this.replyBatches]) {
+      if (batch.backstop !== null)
+        this.clock.clearTimeout(batch.backstop);
+      batch.backstop = null;
+      batch.excused = true;
+    }
+    this.pauseStdinParser(false);
+    this.stdin.removeListener("data", this.stdinListener);
+    this.stopTerminalKeepAlive();
+    this.themeModeState?.cancelRefresh();
+    this.stdin.pause();
+    return nativeTransition;
+  }
+  resume() {
+    if (!this._terminalIsSetup || this._isDestroyed || this.nativeTerminalTransition || this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      throw new Error("Native scene resume requires completed suspension");
+    }
+    const stdout = this.stdout;
+    const { columns, rows } = stdout;
+    if (this._usesProcessStdout)
+      stdout._refreshSize?.();
+    const resized = stdout.columns > 0 && stdout.rows > 0 && (stdout.columns !== columns || stdout.rows !== rows);
+    const size = resized ? { width: stdout.columns, height: stdout.rows } : this.pendingNativeResize;
+    this.pendingNativeResize = null;
+    this.pendingResizeSawDifferentSize = false;
+    try {
+      if (size)
+        this.resize(size.width, size.height);
+    } catch (error) {
+      this.handleError(error);
+    }
+    if (this.pendingSplitFooterTransition) {
+      this.lib.sessionSplitControl(this.nativeSession.context, this.nativeSession.session, {
+        kind: "clear-transition"
+      });
+    }
+    try {
+      this.stdin.setRawMode?.(true);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+    this.addExitListeners();
+    const resumed = this.trackNativeTerminalTransition(this.nativeSession.resume(), () => {
+      if (this._isDestroyed)
+        return;
+      if (this.pendingSplitFooterTransition)
+        this.setPendingSplitFooterTransition(this.pendingSplitFooterTransition);
+      this.finishResume();
+    }).then(() => {
+      if (!this._isDestroyed && (this.shouldSyncNativePaletteState() || this.listenerCount("palette" /* PALETTE */) > 0)) {
+        this.clearPaletteCache();
+        this.refreshPalette();
+      }
+    });
+    resumed.catch(() => {});
+    return resumed;
+  }
+  pauseStdinParser(resuming) {
+    if (resuming)
+      this.stdinParser?.resume();
+    else
+      this.stdinParser?.suspend();
+  }
+  finishResume() {
+    let drained;
+    while ((drained = this.stdin.read()) !== null)
+      this.stdinListener(drained);
+    this.updateStdinParserProtocolContext({
+      privateCapabilityRepliesActive: false,
+      explicitWidthCprActive: false,
+      replySentinelActive: false
+    }, true);
+    this.pauseStdinParser(true);
+    this.stdin.on("data", this.stdinListener);
+    this.stdin.resume();
+    this.startTerminalKeepAlive();
+    this._useMouse = this._suspendedMouseEnabled;
+    if (this._screenMode === "split-footer" && this._splitHeight > 0) {
+      this.syncSplitFooterState();
+    }
+    this.forceFullRepaintRequested = true;
+    this.startKittyTransportPolling();
+    this.nativeSession.startKittyFileProbe();
+    this._controlState = this._previousControlState;
+    for (const batch of this.replyBatches)
+      this.armReplyBackstop(batch);
+    this.syncReplyContext(false);
+    if (this.pixelResolutionRequeryPending)
+      this.queryPixelResolution();
+    if (this._previousControlState === "auto_started" /* AUTO_STARTED */ || this._previousControlState === "explicit_started" /* EXPLICIT_STARTED */) {
+      this.internalStart();
+    } else {
+      this.requestRender();
+    }
+  }
+  stop() {
+    this._controlState = "explicit_stopped" /* EXPLICIT_STOPPED */;
+    this.ordinaryFrameWaitControlState = null;
+    this.halt(true);
+  }
+  halt(stopSnapshots) {
+    if (stopSnapshots && this._isRunning)
+      this.stopMemorySnapshotTimer();
+    this._isRunning = false;
+    this.immediateRerenderRequested = false;
+    this.cancelReadyFrame?.();
+    this.cancelReadyFrame = null;
+    this.clearFrameTimer();
+    if (!this.rendering)
+      this.resolveIdleIfNeeded();
+  }
+  destroy() {
+    if (this._isDestroyed)
+      return;
+    this.lib.getYogaHost().assertMutable();
+    this._isDestroyed = true;
+    this._destroyPending = true;
+    this._palettePublishGeneration++;
+    this._cancelPaletteDetection?.(new Error("Cannot detect palette after renderer destruction"));
+    const splitFlush = this.nativeSplitFlush;
+    const terminalTransition = this.nativeTerminalTransition;
+    queueMicrotask(async () => {
+      try {
+        if (splitFlush || this.externalOutputQueue.size > 0 || this.pendingNativeReplay) {
+          this.nativeSession.armCloseTimeout();
+          if (splitFlush)
+            await splitFlush;
+          else if (terminalTransition)
+            await terminalTransition;
+          if (this.externalOutputQueue.size > 0 || this.pendingNativeReplay)
+            await this.flushNativeSplitOutput();
+        }
+        this.nativeSession.close();
+      } catch (error) {
+        this.externalOutputQueue.clear();
+        if (!this.nativeSession.isCloseInterruption(error)) {
+          this.nativeSession.dispose();
+          console.error("Native split output cancelled during close:", error);
+        }
+      }
+    });
+    const drain = () => this.externalOutputQueue.takeDrain(true) && this.stdout.emit("drain");
+    this.nativeClosed.then(drain, drain);
+    this.finalizeDestroy();
+  }
+  cleanupBeforeDestroy() {
+    if (this._destroyCleanupPrepared)
+      return;
+    this._destroyCleanupPrepared = true;
+    if (this.kittyTransportTimer !== null) {
+      this.clock.clearInterval(this.kittyTransportTimer);
+      this.kittyTransportTimer = null;
+      if (!this.nativeSession.disposed && !this.nativeSession.error)
+        this.nativeSession.cancelKittyImageTransport(false);
+    }
+    this.pendingNativeResize = null;
+    this.cancelReadyFrame?.();
+    this.cancelReadyFrame = null;
+    this.cancelFrameContinuation?.();
+    this.animationRequest.clear();
+    this.frameCallbacks = [];
+    this.liveRequestCounter = 0;
+    this.animationTickers.clear();
+    this.scheduleAnimationTick();
+    this.immediateRerenderRequested = false;
+    if (this._usesProcessStdout) {
+      this.removeCleanupListener(process, "SIGWINCH", this.sigwinchHandler);
+    }
+    this.removeCleanupListener(process, "uncaughtException", this.handleError);
+    this.removeCleanupListener(process, "unhandledRejection", this.handleError);
+    this.removeCleanupListener(process, "warning", this.warningHandler);
+    this.removeExitListeners();
+    if (this.resizeTimeoutId !== null) {
+      this.clock.clearTimeout(this.resizeTimeoutId);
+      this.resizeTimeoutId = null;
+    }
+    for (const batch of this.replyBatches) {
+      if (batch.backstop !== null)
+        this.clock.clearTimeout(batch.backstop);
+    }
+    this.replyBatches = [];
+    this.clearSplitStartupCursorSeed();
+    if (this.memorySnapshotTimer) {
+      this.clock.clearInterval(this.memorySnapshotTimer);
+      this.memorySnapshotTimer = null;
+    }
+    this.clearFrameTimer();
+    this.themeModeState?.cancelRefresh();
+    this._isRunning = false;
+    this.waitingForPixelResolution = false;
+    this.pixelResolutionRequeryPending = false;
+    try {
+      this.syncReplyContext(true);
+    } catch (error) {
+      this.handleStdinParserFailure(error);
+    }
+    this._useMouse = false;
+    this.capturedRenderable = undefined;
+    this.removeCleanupListener(this.stdin, "data", this.stdinListener);
+    this.stopTerminalKeepAlive();
+    try {
+      this.stdin.pause();
+    } catch (e) {
+      console.error("Error pausing stdin during destroy:", e);
+    }
+    this.flushStdoutDecoder();
+    this.externalOutputMode = "passthrough";
+  }
+  finalizeDestroy() {
+    if (this._destroyFinalized)
+      return;
+    if (this.root?._deferUntilCleanupComplete(() => this.finalizeDestroy())) {
+      this.cleanupBeforeDestroy();
+      return;
+    }
+    this._destroyFinalized = true;
+    this._destroyPending = false;
+    this.cleanupBeforeDestroy();
+    if (this._paletteDetector) {
+      this._paletteDetector.cleanup();
+      this._paletteDetector = null;
+    }
+    this._paletteCache.clear();
+    this._paletteDetectionPromise = null;
+    this._paletteDetectionSize = 0;
+    this._paletteDetectionGeneration = 0;
+    this._nativePaletteSignature = null;
+    this._emittedPaletteSignature = null;
+    this._paletteEpoch = 0;
+    this.resolveXtVersionWaiters();
+    this.themeModeState?.dispose();
+    for (const destroy of this.detachedSurfaces) {
+      try {
+        destroy();
+      } catch (error) {
+        console.error("Error destroying detached surface:", error);
+      }
+    }
+    try {
+      this.emit("destroy" /* DESTROY */);
+    } catch (error) {
+      console.error("Error in native scene destroy listener:", error);
+    } finally {
+      try {
+        destroyTimelineEngine(this);
+      } catch (error) {
+        console.error("Error releasing timeline engine:", error);
+      }
+    }
+    try {
+      this.root?.destroyRecursively();
+    } catch (e) {
+      console.error("Error destroying root renderable:", e instanceof Error ? e.stack : String(e));
+    }
+    this.stdinParser?.destroy();
+    this.stdinParser = null;
+    this.oscSubscribers.clear();
+    try {
+      this._console?.destroy();
+    } catch (error) {
+      console.error("Error destroying console:", error);
+    }
+    try {
+      this.nativeScene.destroy();
+    } catch (error) {
+      console.error("Error destroying native scene:", error);
+    }
+    this._externalOutputMode = "passthrough";
+    this.pendingExternalOutputMode = null;
+    this.stdout.write = this.realStdoutWrite;
+    const discardInput = this._terminalIsSetup && (this._controlState !== "explicit_suspended" /* EXPLICIT_SUSPENDED */ || this.nativeTerminalTransition !== null);
+    if (discardInput) {
+      const bufferedInput = this.stdin.readableLength;
+      if (bufferedInput > 0)
+        this.stdin.read(bufferedInput);
+    }
+    this.flushTerminalInputOnClose = discardInput && this.stdin === process.stdin;
+    rendererTracker.renderers.delete(this);
+    if (rendererTracker.renderers.size === 0) {
+      destroyTreeSitterClient2().catch((error) => {
+        console.error("Failed to destroy tree-sitter client:", error);
+      });
+    }
+    if (this._onDestroy) {
+      try {
+        this._onDestroy();
+      } catch (e) {
+        console.error("Error in onDestroy callback:", e instanceof Error ? e.stack : String(e));
+      }
+    }
+    this.nativeDestroyWait?.resolve();
+    this.resolveIdleIfNeeded();
+  }
+  leaveRawMode(flushInput = false) {
+    try {
+      this.stdin.setRawMode?.(false);
+    } catch (e) {
+      console.error("Error disabling raw mode:", e);
+    }
+    if (flushInput && this.stdin === process.stdin)
+      this.lib.terminalFlushInput();
+  }
+  releaseStreamLease() {
+    if (!this._streamLeaseAcquired)
+      return;
+    if (rendererTracker.streamOwners.get(this.stdin) === this)
+      rendererTracker.streamOwners.delete(this.stdin);
+    if (rendererTracker.streamOwners.get(this.stdout) === this)
+      rendererTracker.streamOwners.delete(this.stdout);
+    this._streamLeaseAcquired = false;
+  }
+  startRenderLoop() {
+    if (!this._isRunning)
+      return;
+    this.lastTime = this.normalizeClockTime(this.clock.now(), 0);
+    this.frameCount = 0;
+    this.lastFpsTime = this.lastTime;
+    this.currentFps = 0;
+    this.renderStats.fps = 0;
+    if (this.outputIdleRenderScheduled)
+      return;
+    this.queueFrame();
+  }
+  async loop(waitForActive = false) {
+    if (this.rendering) {
+      if (!waitForActive)
+        return;
+      this.renderingCompletion ??= Promise.withResolvers();
+      return this.renderingCompletion.promise;
+    }
+    if (this._isDestroyed)
+      return;
+    this.cancelReadyFrame?.();
+    this.cancelReadyFrame = null;
+    this.clearFrameTimer();
+    this.rendering = true;
+    this.ordinaryFrameWaitControlState = this._controlState;
+    let renderFailed = false;
+    try {
+      if (!this.canRender)
+        return;
+      if (this.nativeTerminalTransition && !await this.waitForTerminalTransition())
+        return;
+      if (!this.canRender || this.currentControlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */ || this.isSplitCursorSeedFrameBlocked())
+        return;
+      this._frameId++;
+      const now = this.normalizeClockTime(this.clock.now(), this.lastTime);
+      const elapsed = this.getElapsedMs(now, this.lastTime);
+      const deltaTime = elapsed;
+      this.lastTime = now;
+      this.renderStats.frameCount++;
+      const overallStart = performance.now();
+      const requestedBeforeTicks = this.immediateRerenderRequested;
+      this.runAnimationTicks(now);
+      this.immediateRerenderRequested = requestedBeforeTicks;
+      const animationFrameEnd = CliRenderer2.animationFrameId;
+      const animationRequestStart = performance.now();
+      for (const [id, callback] of this.animationRequest) {
+        if (id >= animationFrameEnd)
+          break;
+        if (!this.canRender || this.currentControlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
+          break;
+        this.animationRequest.delete(id);
+        try {
+          callback(deltaTime);
+        } finally {
+          this.dropLive();
+        }
+        await this.yieldFrame();
+      }
+      const animationRequestEnd = performance.now();
+      const animationRequestTime = animationRequestEnd - animationRequestStart;
+      const start = performance.now();
+      const frameCallbacks = this.frameCallbacks;
+      const callbackCount = frameCallbacks.length;
+      for (let index = 0;index < callbackCount; index++) {
+        if (!this.canRender || this.currentControlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
+          break;
+        const frameCallback = frameCallbacks[index];
+        if (this.frameCallbacks !== frameCallbacks && !this.frameCallbacks.includes(frameCallback))
+          continue;
+        try {
+          await frameCallback(deltaTime);
+        } catch (error) {
+          console.error("Error in frame callback:", error);
+        }
+        await this.yieldFrame();
+      }
+      const end = performance.now();
+      this.renderStats.frameCallbackTime = end - start;
+      if (this.nativeTerminalTransition && !await this.waitForTerminalTransition())
+        return;
+      if (!this.canRender || this.currentControlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
+        return;
+      const requestedBeforeRow = this.immediateRerenderRequested;
+      if (this.stdoutRow)
+        this.captureStdout("", false);
+      this.immediateRerenderRequested = requestedBeforeRow || this.stdoutRow !== "";
+      const sceneStart = performance.now();
+      const requestedBeforeScene = this.immediateRerenderRequested;
+      try {
+        this.nativeScene.paint(deltaTime, () => ({
+          background: this.backgroundColor,
+          useMouse: this._useMouse,
+          excludedHitNum: 0
+        }));
+      } catch (error) {
+        this.immediateRerenderRequested = requestedBeforeScene;
+        throw error;
+      } finally {
+        this._lastSceneTimeMs = performance.now() - sceneStart;
+      }
+      if (this._isDestroyed || this.currentControlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */ || !this.nativeScene.frame)
+        return;
+      for (const postProcessFn of this.postProcessFns) {
+        if (!this.canRender)
+          break;
+        this.nextRenderBuffer._withNativePaint(() => postProcessFn(this.nextRenderBuffer, deltaTime));
+      }
+      if (this.canRender)
+        this._console.renderToBuffer(this.nextRenderBuffer);
+      if (this.canRender && !this.nativeSplitFlush) {
+        const nativeStatus = await this.presentNativeScene();
+        if (!this.canRender || this.currentControlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */)
+          return;
+        if (nativeStatus === "rendered")
+          this.frameCount++;
+        if (this.getElapsedMs(now, this.lastFpsTime) >= 1000) {
+          this.currentFps = this.frameCount;
+          this.frameCount = 0;
+          this.lastFpsTime = now;
+        }
+        this.renderStats.fps = this.currentFps;
+        if (nativeStatus === "rendered") {
+          if (this._useMouse) {
+            this.recheckHoverState();
+          }
+          if (!this.canRender)
+            return;
+          const overallFrameTime = performance.now() - overallStart;
+          this.lib.sessionUpdateStats(this.nativeSession.context, this.nativeSession.session, overallFrameTime, this.renderStats.fps, this.renderStats.frameCallbackTime);
+          if (this.listenerCount("frame" /* FRAME */) > 0) {
+            this.emit("frame" /* FRAME */, {
+              frameId: this.frameId
+            });
+          }
+          if (!this.canRender)
+            return;
+          if (this.gatherStats) {
+            this.collectStatSample(overallFrameTime);
+          }
+          if (this._isRunning || this.immediateRerenderRequested) {
+            const immediate = this.immediateRerenderRequested;
+            const targetFrameTime = immediate ? this.minTargetFrameTime : this.targetFrameTime;
+            const remaining = targetFrameTime - this.getElapsedMs(this.normalizeClockTime(this.clock.now(), now), now);
+            this.immediateRerenderRequested = false;
+            if (immediate && remaining <= 0) {
+              this.queueFrame();
+            } else {
+              this.scheduleFrame(Math.max(1, remaining));
+            }
+          } else {
+            this.clearFrameTimer();
+          }
+        } else if (nativeStatus === "dropped" && (this._isRunning || this.immediateRerenderRequested)) {
+          const immediate = this.immediateRerenderRequested;
+          this.immediateRerenderRequested = false;
+          this.scheduleFrame(immediate ? this.minTargetFrameTime : this.targetFrameTime);
+        } else {
+          this.immediateRerenderRequested = false;
+          this.clearFrameTimer();
+        }
+      }
+    } catch (error) {
+      renderFailed = true;
+      if (this.canRender && !this.nativeSession.isCloseInterruption(error)) {
+        const renderError = error instanceof Error ? error : new Error(String(error));
+        const event = { error: renderError, renderable: this.root.takeCurrentRenderable() };
+        const handled = this.emit("render:error" /* RENDER_ERROR */, event);
+        if (!handled)
+          this.handleError(renderError);
+      }
+    } finally {
+      const completion = this.renderingCompletion;
+      this.renderingCompletion = null;
+      try {
+        this.nativeScene.cancelFrame();
+        this.rendering = false;
+        this.logNativeDiagnostics();
+        if (!this.canRender && !this._isDestroyed)
+          this.destroy();
+        if (this._destroyPending) {
+          this.finalizeDestroy();
+        }
+        if (renderFailed && (this._isRunning || this.immediateRerenderRequested) && !this._isDestroyed) {
+          this.immediateRerenderRequested = false;
+          this.scheduleRenderTimer();
+        }
+        this.applyPendingNativeModeReported();
+        this.applyPendingNativeResize();
+        this.resolveIdleIfNeeded();
+      } finally {
+        completion?.resolve();
+      }
+    }
+  }
+  logNativeDiagnostics() {
+    if (!this.canRender)
+      return;
+    try {
+      this.lib.logContextDiagnostics(this.nativeSession.context, 1 /* Warn */);
+    } catch (error) {
+      if (!(error instanceof NativeError2) || error.status !== -6 /* ContextBusy */) {
+        this.handleError(error);
+      }
+    }
+  }
+  async waitForTerminalTransition() {
+    while (this.nativeTerminalTransition) {
+      try {
+        await this.nativeTerminalTransition;
+      } catch {
+        return false;
+      }
+    }
+    return true;
+  }
+  intermediateRender() {
+    this.immediateRerenderRequested = true;
+    this.ordinaryFrameWaitControlState = this._controlState;
+    this.loop();
+  }
+  handleDroppedFrame(commits) {
+    const state = this.lib.sessionGetRendererState(this.nativeSession.context, this.nativeSession.session);
+    if (state.droppedFrameBytes === 0)
+      return false;
+    const counted = state.droppedFrames !== this.droppedFrames;
+    this.droppedFrames = state.droppedFrames;
+    if (commits && commits.length > 1) {
+      this.splitCommitLimit = 1;
+      return true;
+    }
+    if (!commits?.length) {
+      if (!counted && !this.dropRetried)
+        this.requestRender();
+      this.dropRetried = true;
+    }
+    if (commits?.length === 1) {
+      this.externalOutputQueue.drop(1);
+      this.queuedSplitTail = null;
+      if (this.pendingNativeReplay)
+        this.pendingNativeReplay.remaining -= 1;
+    }
+    if (counted) {
+      const event = {
+        bytes: state.droppedFrameBytes,
+        limit: Number(this.nativeSession.maxAtomicWriteBytes)
+      };
+      this.emit("frame:dropped" /* FRAME_DROPPED */, event);
+    }
+    return true;
+  }
+  async presentNativeScene() {
+    if (this.isSplitCursorSeedFrameBlocked())
+      return "blocked";
+    if (this.stdoutRow)
+      this.captureStdout("", false);
+    const commits = this._splitHeight > 0 && this._externalOutputMode === "capture-stdout" ? this.pendingNativeReplay?.remaining === 0 ? [] : this.externalOutputQueue.batch(Math.min(this.splitCommitLimit, this.pendingNativeReplay?.remaining ?? Infinity)) : null;
+    const split = commits === null ? null : this.nativeScene.commitSplit(commits.map((commit) => ({ ...commit, snapshot: commit.nativeSnapshot })), this.getSplitPinnedRenderOffset(), this.forceFullRepaintRequested);
+    const status = split?.status ?? this.nativeScene.commit(this.forceFullRepaintRequested);
+    if (commits && (status === 1 /* Pending */ || status === 0 /* Presented */)) {
+      this.nativeSplitAcceptedCount = commits.length;
+    }
+    switch (status) {
+      case 1 /* Pending */:
+        await this.nativeSession.whenPresented();
+        break;
+      case 0 /* Presented */:
+        break;
+      case 2 /* Skipped */:
+        this.ordinaryFrameWaitingForOutput = true;
+        this.scheduleRenderAfterOutputIdle();
+        return "retryable-skip";
+      case 3 /* Failed */:
+        if (this.handleDroppedFrame(commits)) {
+          if (commits?.length)
+            this.requestRender();
+          return "dropped";
+        }
+        console.error("[CliRenderer] Native frame render failed; waiting for the next render request to force repaint");
+        return "failed";
+      default:
+        throw new Error("Unknown native scene presentation status");
+    }
+    if (this._isDestroyed || this.nativeSplitFlush)
+      return "rendered";
+    if (split && commits) {
+      this.completeNativeSplitCommits(commits);
+      if (this.externalOutputQueue.size > 0)
+        this.requestRender();
+      else
+        this.applyPendingExternalOutputModeIfReady();
+    }
+    this.forceFullRepaintRequested = false;
+    this.dropRetried = false;
+    if (status === 1 /* Pending */ && this.nativeSession.imageUploadsPending)
+      this.requestRender();
+    return "rendered";
+  }
+  completeNativeSplitCommits(commits) {
+    if (!this._isDestroyed) {
+      this.syncSplitScrollback();
+      for (const commit of commits)
+        this.recordSplitCommit(commit);
+    }
+    this.externalOutputQueue.drop(commits.length);
+    if (this.pendingNativeReplay)
+      this.pendingNativeReplay.remaining -= commits.length;
+    this.splitCommitLimit = nativeConstants.OT_SPLIT_SNAPSHOTS_MAX;
+    this.nativeSplitAcceptedCount = 0;
+    this.pendingSplitFooterTransition = null;
+  }
+  async flushNativeSplitOutput(remaining = this.externalOutputQueue.size) {
+    const driver = this.nativeSession;
+    await driver.whenPresented();
+    this.nativeScene.cancelFrame();
+    if (this.nativeSplitAcceptedCount > 0) {
+      remaining -= this.nativeSplitAcceptedCount;
+      this.completeNativeSplitCommits(this.externalOutputQueue.peek(this.nativeSplitAcceptedCount));
+    }
+    while (remaining > 0 || this.pendingNativeReplay?.remaining === 0) {
+      if (this.pendingNativeReplay?.remaining === 0) {
+        try {
+          this.applySplitFooterReplayReset(this.pendingNativeReplay.options);
+        } catch (error) {
+          if (!(error instanceof NativeError2) || error.status !== -11 /* OutputBackpressure */)
+            throw error;
+          await driver.idle();
+          continue;
+        }
+      }
+      remaining = Math.min(remaining, this.externalOutputQueue.size);
+      if (remaining === 0)
+        break;
+      const commits = this.externalOutputQueue.batch(Math.min(remaining, this.splitCommitLimit, this.pendingNativeReplay?.remaining ?? Infinity));
+      if (this.lib.sessionGetRendererState(driver.context, driver.session).framePending) {
+        throw new Error("Native split output flush requires no pending frame presentation");
+      }
+      const result = driver.renderSplit(null, commits.map((commit) => ({ ...commit, snapshot: commit.nativeSnapshot })), this.getSplitPinnedRenderOffset(), false);
+      if (result.status === 3 /* Failed */) {
+        if (!this.handleDroppedFrame(commits))
+          throw new Error("Native split output frame failed");
+        if (commits.length === 1)
+          remaining -= 1;
+        continue;
+      }
+      if (result.status === 2 /* Skipped */) {
+        await driver.idle();
+        continue;
+      }
+      this.nativeSplitAcceptedCount = commits.length;
+      await driver.whenPresented();
+      remaining -= commits.length;
+      this.completeNativeSplitCommits(commits);
+    }
+    if (!this._isDestroyed)
+      this.applyPendingExternalOutputModeIfReady();
+  }
+  collectStatSample(frameTime) {
+    this.frameTimes.push(frameTime);
+    if (this.frameTimes.length > this.maxStatSamples) {
+      this.frameTimes.shift();
+    }
+  }
+  getNativeStats() {
+    return this.lib.sceneGetStats(this.nativeSession.context, this.nativeSession.session);
+  }
+  getStats() {
+    const nativeStats = this.getNativeStats();
+    const frameTimes = [...this.frameTimes];
+    const sum = frameTimes.reduce((acc, time) => acc + time, 0);
+    const avg = frameTimes.length ? sum / frameTimes.length : 0;
+    const min = frameTimes.length ? Math.min(...frameTimes) : 0;
+    const max = frameTimes.length ? Math.max(...frameTimes) : 0;
+    return {
+      ...nativeStats,
+      fps: this.renderStats.fps,
+      frameCount: this.renderStats.frameCount,
+      frameTimes,
+      averageFrameTime: avg,
+      minFrameTime: min,
+      maxFrameTime: max,
+      frameCallbackTime: this.renderStats.frameCallbackTime
+    };
+  }
+  resetStats() {
+    this.frameTimes = [];
+    this.renderStats.frameCount = 0;
+  }
+  setGatherStats(enabled) {
+    this.gatherStats = enabled;
+    if (!enabled) {
+      this.frameTimes = [];
+    }
+  }
+  getSelection() {
+    return this.currentSelection;
+  }
+  get hasSelection() {
+    return !!this.currentSelection;
+  }
+  getSelectionContainer() {
+    return this.selectionContainers.length > 0 ? this.selectionContainers[this.selectionContainers.length - 1] : null;
+  }
+  clearSelection() {
+    this.clearSelectionState();
+    this.lastClick = null;
+  }
+  clearSelectionState() {
+    if (this.currentSelection) {
+      for (const renderable of this.currentSelection.touchedRenderables) {
+        if (renderable.selectable && !renderable.isDestroyed) {
+          renderable.onSelectionChanged(null);
+        }
+      }
+      this.currentSelection = null;
+    }
+    this.selectionContainers = [];
+  }
+  startSelection(renderable, x, y, behavior = "cell") {
+    if (!renderable.selectable)
+      return;
+    this.clearSelectionState();
+    this.selectionContainers.push(renderable.parent || this.root);
+    this.currentSelection = new Selection2(renderable, { x, y }, { x, y }, behavior);
+    this.currentSelection.isStart = true;
+    this.notifySelectablesOfSelectionChange();
+  }
+  nextClickBehavior(renderable, x, y) {
+    const now = this.clock.now();
+    const last = this.lastClick;
+    const continued = last !== null && renderable.num === last.renderableId && now - last.time <= CLICK_REPEAT_INTERVAL_MS && Math.max(Math.abs(x - last.x), Math.abs(y - last.y)) <= 1;
+    const count = continued ? Math.min(last.count + 1, 3) : 1;
+    this.lastClick = { count, time: now, x, y, renderableId: renderable.num };
+    return count === 1 ? "cell" : count === 2 ? "word" : "line";
+  }
+  updateSelection(currentRenderable, x, y, options) {
+    if (this.currentSelection) {
+      this.currentSelection.isStart = false;
+      this.currentSelection.focus = { x, y };
+      if (options?.finishDragging) {
+        this.currentSelection.isDragging = false;
+      }
+      if (this.selectionContainers.length > 0) {
+        const currentContainer = this.selectionContainers[this.selectionContainers.length - 1];
+        if (!currentRenderable || !this.isWithinContainer(currentRenderable, currentContainer)) {
+          const parentContainer = currentContainer.parent || this.root;
+          this.selectionContainers.push(parentContainer);
+        } else if (currentRenderable && this.selectionContainers.length > 1) {
+          let containerIndex = this.selectionContainers.indexOf(currentRenderable);
+          if (containerIndex === -1) {
+            const immediateParent = currentRenderable.parent || this.root;
+            containerIndex = this.selectionContainers.indexOf(immediateParent);
+          }
+          if (containerIndex !== -1 && containerIndex < this.selectionContainers.length - 1) {
+            this.selectionContainers = this.selectionContainers.slice(0, containerIndex + 1);
+          }
+        }
+      }
+      this.notifySelectablesOfSelectionChange();
+    }
+  }
+  requestSelectionUpdate() {
+    if (this.currentSelection?.isDragging) {
+      const pointer = this._latestPointer;
+      const maybeRenderableId = this.hitTest(pointer.x, pointer.y);
+      const maybeRenderable = Renderable2.renderablesByNumber.get(maybeRenderableId);
+      this.updateSelection(maybeRenderable, pointer.x, pointer.y);
+    }
+  }
+  isWithinContainer(renderable, container) {
+    let current = renderable;
+    while (current) {
+      if (current === container)
+        return true;
+      current = current.parent;
+    }
+    return false;
+  }
+  finishSelection() {
+    if (this.currentSelection) {
+      this.currentSelection.isDragging = false;
+      this.emit("selection" /* SELECTION */, this.currentSelection);
+      this.notifySelectablesOfSelectionChange();
+    }
+  }
+  notifySelectablesOfSelectionChange() {
+    const selectedRenderables = [];
+    const touchedRenderables = [];
+    const currentContainer = this.selectionContainers.length > 0 ? this.selectionContainers[this.selectionContainers.length - 1] : this.root;
+    if (this.currentSelection) {
+      this.walkSelectableRenderables(currentContainer, this.currentSelection.bounds, selectedRenderables, touchedRenderables);
+      for (const renderable of this.currentSelection.touchedRenderables) {
+        if (!touchedRenderables.includes(renderable) && !renderable.isDestroyed) {
+          renderable.onSelectionChanged(null);
+        }
+      }
+      this.currentSelection.updateSelectedRenderables(selectedRenderables);
+      this.currentSelection.updateTouchedRenderables(touchedRenderables);
+    }
+  }
+  walkSelectableRenderables(container, selectionBounds, selectedRenderables, touchedRenderables) {
+    const children = getObjectsInViewport(selectionBounds, container.getChildrenSortedByPrimaryAxis(), container.primaryAxis, 0, 0);
+    for (const child of children) {
+      if (child.selectable) {
+        const hasSelection = child.onSelectionChanged(this.currentSelection);
+        if (hasSelection) {
+          selectedRenderables.push(child);
+        }
+        touchedRenderables.push(child);
+      }
+      if (child.getChildrenCount() > 0) {
+        this.walkSelectableRenderables(child, selectionBounds, selectedRenderables, touchedRenderables);
+      }
+    }
+  }
+  get paletteDetectionStatus() {
+    if (this._paletteDetectionPromise)
+      return "detecting";
+    if (this._paletteCache.size > 0)
+      return "cached";
+    return "idle";
+  }
+  getCachedPaletteBySize(size) {
+    const exactMatch = this._paletteCache.get(size);
+    if (exactMatch) {
+      return exactMatch;
+    }
+    const largerSize = [...this._paletteCache.keys()].sort((a, b) => a - b).find((candidate) => candidate >= size);
+    if (largerSize === undefined) {
+      return null;
+    }
+    const source = this._paletteCache.get(largerSize);
+    if (!source) {
+      return null;
+    }
+    const projected = {
+      ...source,
+      palette: source.palette.slice(0, size)
+    };
+    this._paletteCache.set(size, projected);
+    return projected;
+  }
+  paletteTmux() {
+    const name = this.capabilities?.terminal?.name?.toLowerCase();
+    const version = this.capabilities?.terminal?.version;
+    return {
+      isTmux: Boolean(this.capabilities?.multiplexer === "tmux" || name?.includes("tmux")),
+      isLegacyTmux: Boolean(name?.includes("tmux") && version !== undefined && version.localeCompare("3.6") < 0)
+    };
+  }
+  ensurePaletteDetector() {
+    if (!this._paletteDetector) {
+      const { isTmux, isLegacyTmux } = this.paletteTmux();
+      const detector = createTerminalPalette2({
+        stdin: this.stdin,
+        stdout: this.stdout,
+        writeFn: (data) => {
+          if (this._isDestroyed || this._paletteDetector !== detector) {
+            throw new Error("Palette detection was cancelled");
+          }
+          this.nativeSession.control({ kind: "palette-query", bytes: Buffer.from(data) });
+          return true;
+        },
+        isLegacyTmux,
+        isTmux,
+        oscSource: {
+          subscribeOsc: this.subscribeOsc.bind(this)
+        },
+        clock: this.clock
+      });
+      this._paletteDetector = detector;
+    }
+    return this._paletteDetector;
+  }
+  queryPaletteBatch(size, timeoutMs, isTmux, cancelled) {
+    const specials = isTmux ? [10, 11, 12] : [10, 11, 12, 13, 14, 15, 16, 17, 19];
+    const queries = [...Array(size).keys()].map((index) => `\x1B]4;${index};?\x07`).concat(specials.map((osc) => `\x1B]${osc};?\x07`));
+    const replies = { colors: emptyTerminalColors(size), generation: this._palettePublishGeneration, delivered: false };
+    const done = new Promise((resolve) => {
+      this.nativeSession.control({ kind: "palette-query", bytes: Buffer.from(queries.join("")), sentinel: true });
+      this.paletteReplies = replies;
+      const cap = timeoutMs === undefined ? null : this.clock.setTimeout(() => resolve(replies.colors), timeoutMs);
+      cancelled.catch(() => cap !== null && this.clock.clearTimeout(cap));
+      this.admitReplyBatch("palette", () => {
+        if (cap !== null)
+          this.clock.clearTimeout(cap);
+        resolve(replies.colors);
+      }).palette = replies;
+    });
+    return { replies, done };
+  }
+  applyPaletteReply(sequence) {
+    const waiting = this.replyBatches.filter((batch) => !batch.excused);
+    const index = waiting.findIndex((batch) => batch.kind === "palette");
+    const ahead = index < 0 ? waiting : waiting.slice(0, index);
+    if (/^\x1b\]1[01];/.test(sequence) && ahead.some((batch) => batch.kind === "startup" || batch.kind === "theme")) {
+      return;
+    }
+    const replies = index < 0 ? this.paletteReplies : waiting[index].palette;
+    if (!replies)
+      return;
+    if (!replies.delivered) {
+      applyPaletteReplies(replies.colors, sequence);
+      return;
+    }
+    if (replies.generation !== this._palettePublishGeneration)
+      return;
+    const colors = { ...replies.colors, palette: [...replies.colors.palette] };
+    if (!applyPaletteReplies(colors, sequence))
+      return;
+    replies.colors = colors;
+    this.publishPalette(colors);
+    this.requestRender();
+  }
+  publishPalette(colors) {
+    this._paletteCache.clear();
+    if (this.shouldSyncNativePaletteState() && colors.palette.length >= NATIVE_PALETTE_QUERY_SIZE) {
+      this.syncNativePaletteState(colors);
+    }
+    this._paletteCache.set(colors.palette.length, colors);
+    this.emitPaletteChange(colors);
+  }
+  syncNativePaletteState(colors) {
+    const signature = buildTerminalPaletteSignature2(colors);
+    const epoch = this._nativePaletteSignature !== signature ? this._paletteEpoch + 1 >>> 0 : this._paletteEpoch;
+    const normalized = normalizeTerminalPalette2(colors);
+    this.lib.sessionSetPaletteState(this.nativeSession.context, this.nativeSession.session, normalized.palette, normalized.defaultForeground, normalized.defaultBackground, epoch);
+    this._nativePaletteSignature = signature;
+    this._paletteEpoch = epoch;
+  }
+  emitPaletteChange(colors) {
+    if (this.listenerCount("palette" /* PALETTE */) === 0)
+      return;
+    const signature = JSON.stringify(colors);
+    if (this._emittedPaletteSignature === signature)
+      return;
+    this._emittedPaletteSignature = signature;
+    this.emit("palette" /* PALETTE */, colors);
+  }
+  resolveXtVersionWaiters() {
+    if (this.xtVersionWaiters.size === 0)
+      return;
+    const resolvers = [...this.xtVersionWaiters];
+    this.xtVersionWaiters.clear();
+    for (const resolve of resolvers) {
+      resolve();
+    }
+  }
+  waitForXtVersion() {
+    if (!this.startupRepliesPending || this._capabilities?.terminal?.from_xtversion) {
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+      this.xtVersionWaiters.add(resolve);
+    });
+  }
+  shouldSyncNativePaletteState() {
+    return Boolean(this._terminalIsSetup && !this._isDestroyed && this._capabilities?.ansi256 && !this._capabilities?.rgb);
+  }
+  refreshPalette() {
+    const publishGeneration = this._palettePublishGeneration;
+    this.getPalette({ size: NATIVE_PALETTE_QUERY_SIZE }).then(() => {
+      if (this._isDestroyed)
+        return;
+      if (this._palettePublishGeneration === publishGeneration)
+        this.requestRender();
+    }).catch(() => {});
+  }
+  clearPaletteCache() {
+    this._palettePublishGeneration++;
+    this._paletteCache.clear();
+  }
+  async getPalette(options) {
+    if (this._controlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+      throw new Error("Cannot detect palette while renderer is suspended");
+    }
+    if (this._isDestroyed || !this._terminalIsSetup || this.nativeTerminalTransition) {
+      throw new Error("Native palette detection requires an active terminal");
+    }
+    const requestedSize = options?.size ?? 16;
+    const detectionTimeout = options?.timeout;
+    if (!Number.isInteger(requestedSize) || requestedSize < 1 || requestedSize > 256) {
+      throw new RangeError("Native palette size must be an integer from 1 to 256");
+    }
+    const requestedGeneration = this._palettePublishGeneration;
+    const cachedPalette = this.getCachedPaletteBySize(requestedSize);
+    if (cachedPalette) {
+      return cachedPalette;
+    }
+    const terminal = this._capabilities?.terminal;
+    const hasTmuxVersion = terminal?.name?.toLowerCase() === "tmux" && Boolean(terminal.version);
+    if (this._capabilities?.multiplexer === "tmux" && !hasTmuxVersion) {
+      await this.waitForXtVersion();
+      if (this._isDestroyed || !this._terminalIsSetup || this.nativeTerminalTransition || this.currentControlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+        throw new Error("Palette detection was cancelled");
+      }
+      const afterCapabilityWait = this.getCachedPaletteBySize(requestedSize);
+      if (afterCapabilityWait) {
+        return afterCapabilityWait;
+      }
+    }
+    while (this._paletteDetectionPromise) {
+      if (this._paletteDetectionSize >= requestedSize && this._paletteDetectionGeneration === this._palettePublishGeneration) {
+        return this._paletteDetectionPromise.then((palette) => {
+          const cached = this.getCachedPaletteBySize(requestedSize);
+          if (cached) {
+            return cached;
+          }
+          const projected = {
+            ...palette,
+            palette: palette.palette.slice(0, requestedSize)
+          };
+          if (!this._isDestroyed && requestedGeneration === this._palettePublishGeneration) {
+            this._paletteCache.set(requestedSize, projected);
+          }
+          return projected;
+        });
+      }
+      await this._paletteDetectionPromise;
+      if (this._isDestroyed || !this._terminalIsSetup || this.nativeTerminalTransition || this.currentControlState === "explicit_suspended" /* EXPLICIT_SUSPENDED */) {
+        throw new Error("Palette detection was cancelled");
+      }
+      const afterWait = this.getCachedPaletteBySize(requestedSize);
+      if (afterWait) {
+        return afterWait;
+      }
+    }
+    const { isTmux, isLegacyTmux } = this.paletteTmux();
+    const batched = this.replySentinel && !isLegacyTmux && this.stdin.isTTY && this.stdout.isTTY;
+    const detector = batched ? null : this.ensurePaletteDetector();
+    const release = () => {
+      detector?.cleanup();
+      if (detector && this._paletteDetector === detector)
+        this._paletteDetector = null;
+    };
+    const publishGeneration = this._palettePublishGeneration;
+    this._paletteDetectionSize = requestedSize;
+    this._paletteDetectionGeneration = publishGeneration;
+    let cancel = null;
+    const cancelled = new Promise((_resolve, reject) => {
+      cancel = (reason) => {
+        release();
+        reject(reason);
+      };
+    });
+    this._cancelPaletteDetection = cancel;
+    if (!batched)
+      this.paletteReplies = null;
+    const batch = batched ? this.queryPaletteBatch(requestedSize, detectionTimeout, isTmux, cancelled) : null;
+    const detection = batch?.done ?? detector.detect({ ...options, timeout: detectionTimeout });
+    detection.catch(release);
+    const completion = Promise.race([detection, cancelled]).then((result) => {
+      release();
+      if (batch)
+        batch.replies.delivered = true;
+      if (this._paletteDetectionPromise === pending) {
+        this._paletteDetectionPromise = null;
+        this._paletteDetectionSize = 0;
+        this._paletteDetectionGeneration = 0;
+      }
+      if (!this._isDestroyed && this._palettePublishGeneration === publishGeneration) {
+        this.publishPalette(result);
+        if (this.shouldSyncNativePaletteState() && !this._paletteCache.has(NATIVE_PALETTE_QUERY_SIZE)) {
+          this.refreshPalette();
+        }
+      }
+      return result;
+    }).catch((error) => {
+      if (this._paletteDetectionPromise === pending) {
+        this._paletteDetectionPromise = null;
+        this._paletteDetectionSize = 0;
+        this._paletteDetectionGeneration = 0;
+      }
+      release();
+      throw error;
+    });
+    const pending = completion.finally(() => {
+      if (this._cancelPaletteDetection === cancel)
+        this._cancelPaletteDetection = null;
+    });
+    this._paletteDetectionPromise = pending;
+    const detected = await this._paletteDetectionPromise;
+    const finalPalette = this.getCachedPaletteBySize(requestedSize) ?? detected;
+    return finalPalette;
+  }
+}
+
+export { isValidBorderStyle2, parseBorderStyle2, BorderChars2, getBorderFromSides2, getBorderSides2, borderCharsToArray2, BorderCharArrays2, KeyEvent2, PasteEvent2, KeyHandler2, InternalKeyHandler2, fonts2, measureText2, getCharacterPositions2, coordinateToCharacterIndex2, renderFontToFrameBuffer2, hastToStyledText2, SystemClock2, kittyKeyMap, terminalNamedSingleStrokeKeys2, parseKeypress2, LinearScrollAccel2, MacOSScrollAccel2, parseAlign2, parseAlignItems2, parseAlignContent2, parseBoxSizing2, parseDimension2, parseDirection2, parseDisplay2, parseEdge2, parseFlexDirection2, parseGutter2, parseJustify2, parseLayoutMode2, parseLogLevel2, parseMeasureMode2, parseOverflow2, parsePositionType2, parseUnit2, parseWrap2, Selection2, convertGlobalToLocalSelection2, ASCIIFontSelectionHelper2, addDefaultParsers2, TreeSitterClient2, treeSitterToTextChunks2, treeSitterToStyledText2, DataPathsManager2, getDataPaths2, extensionToFiletype2, basenameToFiletype2, extToFiletype2, pathToFiletype2, infoStringToFiletype2, getTreeSitterClient2, destroyTreeSitterClient2, ExtmarksController2, createExtmarksController2, TerminalPalette2, createTerminalPalette2, normalizeTerminalPalette2, buildTerminalPaletteSignature2, decodePasteBytes2, stripAnsiSequences2, createHostClipboard2, createClipboard2, ClipboardTarget2, createRendererClipboardAdapter2, detectLinks2, acquireSessionBufferLease2, ResourceContext2, OptimizedBuffer2, LayoutEvents2, RenderableEvents2, isRenderable2, BaseRenderable2, Renderable2, RootRenderable2, TextBuffer2, TextBufferView2, EditBuffer2, measureEditText2, EditorView2, Timeline2, engine2, getTimelineEngine2, createTimeline2, ANSI, BoxRenderable2, TextBufferRenderable2, SliderRenderable2, ScrollBarRenderable2, ArrowRenderable2, scrollUnitSize2, ScrollBoxWrapper2, ScrollBoxViewport2, ScrollBoxContent2, ScrollBoxBar2, ScrollBoxRenderable2, CodeRenderable2, ImageLoadError2, ImageError2, imageInfo2, NativeImage2, NativeImagePool2, resolveImageRenderProtocol2, checkCrop2, sameCrop2, ImageRenderable2, isTextNodeRenderable2, TextNodeRenderable2, RootTextNodeRenderable2, TextRenderable2, NativeSession2, defaultKeyAliases, mergeKeyAliases, mergeKeyBindings, getKeyBindingAction, buildKeyBindingsMap, capture2, ConsolePosition2, TerminalConsole2, EditBufferRenderableEvents2, isEditBufferRenderable2, EditBufferRenderable2, buildKittyKeyboardFlags2, MouseEvent2, MouseButton2, createCliRenderer2, CliRenderEvents2, RendererControlState2, CliRenderer2 };
+
+//# debugId=F8F5B39DFEA16FDD64756E2164756E21
+//# sourceMappingURL=chunk-bun-hejmtvc2.js.map
