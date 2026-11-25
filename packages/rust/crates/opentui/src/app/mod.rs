@@ -816,6 +816,13 @@ impl App {
         self.0.stats.get().corner
     }
 
+    /// Host memory figures for the debug overlay, in bytes: used, total, and array buffers.
+    /// Does nothing visible unless the overlay is shown. Schedules a frame so the numbers land.
+    pub fn set_memory_stats(&self, used: u32, total: u32, array_buffers: u32) {
+        self.report(self.0.session.update_memory_stats(used, total, array_buffers));
+        self.request_redraw();
+    }
+
     /// Sets the terminal window title. A running [headless](Self::headless) app hands it to its
     /// [`Self::on_headless_write`] handlers.
     pub fn set_title(&self, title: &str) {

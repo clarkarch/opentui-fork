@@ -1144,4 +1144,13 @@ impl Session {
             sys::ot_session_update_stats(context, session, frame_ms.max(0.0), fps, callback_ms.max(0.0))
         })
     }
+
+    /// Host memory figures for the debug overlay, in bytes: used, total, and array buffers.
+    /// The overlay hides its memory row while used and total are both zero.
+    pub fn update_memory_stats(&self, heap_used: u32, heap_total: u32, array_buffers: u32) -> Result<()> {
+        let (context, session) = self.raw();
+        check("ot_session_update_memory_stats", unsafe {
+            sys::ot_session_update_memory_stats(context, session, heap_used, heap_total, array_buffers)
+        })
+    }
 }

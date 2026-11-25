@@ -523,6 +523,20 @@ fn toggling_the_debug_overlay_forgets_its_corner() {
     assert_eq!(app.debug_overlay(), Some(Corner::BottomLeft));
 }
 
+// Expected: memory figures pushed by the host show in the debug overlay's memory row, and hiding the overlay
+// removes the whole panel.
+#[test]
+fn the_debug_overlay_shows_pushed_memory_stats() {
+    let app = TestApp::new(60, 20);
+    app.set_debug_overlay(Some(opentui::native::Corner::BottomLeft));
+    app.set_memory_stats(12 * 1024 * 1024, 24 * 1024 * 1024, 0);
+    let text = rows(&app).join("\n");
+    assert!(text.contains("FPS:"), "{text}");
+    assert!(text.contains("Memory: 12.00MB / 24.00MB / 0.00MB"), "{text}");
+    app.set_debug_overlay(None);
+    assert!(!rows(&app).join("\n").contains("Debug Information"));
+}
+
 // Expected: an `App` that is dropped without `run` (for example after an early `?` while building the UI) stops
 // receiving console messages; a message logged on this thread goes to the live app running on it, as `console::log`
 // documents ("the app running on the calling thread, or else the most recently created one").
